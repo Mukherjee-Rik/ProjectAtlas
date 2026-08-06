@@ -14,9 +14,11 @@ describe('AppController', () => {
     appController = app.get<AppController>(AppController);
   });
 
-  describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!');
+  describe('healthCheck', () => {
+    it('should return health status', () => {
+      const result = appController.healthCheck();
+      expect(result.status).toBe('Perfect');
+      expect(result.Service).toBe('atlas-api');
     });
   });
 });

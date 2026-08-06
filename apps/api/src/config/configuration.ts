@@ -1,8 +1,6 @@
-export default () => ({
-  app: {
-    port: parseInt(process.env.PORT ?? '3000', 10),
-    env: process.env.NODE_ENV ?? 'development',
-  },
+export const configuration = () => ({
+  nodeEnv: process.env.NODE_ENV,
+  port: parseInt(process.env.PORT ?? '3000', 10),
 
   database: {
     url: process.env.DATABASE_URL,
@@ -10,6 +8,6 @@ export default () => ({
 
   jwt: {
     secret: process.env.JWT_SECRET,
-    expiresIn: process.env.JWT_EXPIRES_IN ?? '7d',
+    expiresIn: process.env.JWT_EXPIRES_IN,
   },
 });
