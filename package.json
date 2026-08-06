@@ -1,0 +1,12 @@
+{
+  "name": "project-atlas",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@11.10.0",
+  "scripts": {
+    "dev:api": "pnpm --filter api start:dev",
+    "build:api": "pnpm --filter api build",
+    "test:api": "pnpm --filter api test",
+    "lint:api": "pnpm --filter api lint"
+  }
+}
