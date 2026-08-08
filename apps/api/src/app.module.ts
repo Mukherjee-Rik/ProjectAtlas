@@ -1,9 +1,12 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { LoggerModule } from 'nestjs-pino';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+
 import { configuration, envValidationSchema } from './config';
+import { PrismaModule } from './database/prisma/prisma.module';
+import { HealthModule } from './modules/health/health.module';
+import { UsersModule } from './modules/users/users.module';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -11,6 +14,7 @@ import { configuration, envValidationSchema } from './config';
       isGlobal: true,
       load: [configuration],
       validationSchema: envValidationSchema,
+      cache: true,
     }),
 
     LoggerModule.forRoot({
@@ -27,8 +31,11 @@ import { configuration, envValidationSchema } from './config';
             : undefined,
       },
     }),
+
+    PrismaModule,
+    HealthModule,
+    UsersModule,
+    AuthModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}
