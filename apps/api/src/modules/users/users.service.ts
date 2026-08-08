@@ -1,4 +1,8 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../../database/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -9,151 +13,145 @@ export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
   async findAll() {
-  return this.prisma.user.findMany({
-    where: {
-      status: 'ACTIVE',
-    },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      phone: true,
-      role: true,
-      status: true,
-      createdAt: true,
-      updatedAt: true,
-    },
-    orderBy: {
-      createdAt: 'desc',
-    },
-  });
-}
+    return this.prisma.user.findMany({
+      where: {
+        status: 'ACTIVE',
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        role: true,
+        status: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+  }
 
   async findById(id: string) {
-  const user = await this.prisma.user.findFirst({
-    where: {
-      id,
-      status: 'ACTIVE',
-    },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      phone: true,
-      role: true,
-      status: true,
-      createdAt: true,
-      updatedAt: true,
-    },
-  });
-
-  if (!user) {
-    throw new NotFoundException('User not found');
-  }
-
-  return user;
-}
-
-async update(id: string, updateUserDto: UpdateUserDto) {
-  const existingUser = await this.prisma.user.findFirst({
-  where: {
-    id,
-    status: 'ACTIVE',
-  },
-});
-
-  if (!existingUser) {
-    throw new NotFoundException('User not found');
-  }
-
-  const { name, email, phone } = updateUserDto;
-
-  if (email || phone) {
-    const duplicateUser = await this.prisma.user.findFirst({
+    const user = await this.prisma.user.findFirst({
       where: {
-        OR: [
-          ...(email ? [{ email }] : []),
-          ...(phone ? [{ phone }] : []),
-        ],
-        NOT: {
-          id,
-        },
+        id,
+        status: 'ACTIVE',
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        role: true,
+        status: true,
+        createdAt: true,
+        updatedAt: true,
       },
     });
 
-    if (duplicateUser) {
-      throw new ConflictException(
-        'Another user with this email or phone already exists',
-      );
+    if (!user) {
+      throw new NotFoundException('User not found');
     }
+
+    return user;
   }
 
-  return this.prisma.user.update({
-    where: {
-      id,
-    },
-    data: {
-      ...(name !== undefined && { name }),
-      ...(email !== undefined && { email }),
-      ...(phone !== undefined && { phone }),
-    },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      phone: true,
-      role: true,
-      status: true,
-      createdAt: true,
-      updatedAt: true,
-    },
-  });
-}
+  async update(id: string, updateUserDto: UpdateUserDto) {
+    const existingUser = await this.prisma.user.findFirst({
+      where: {
+        id,
+        status: 'ACTIVE',
+      },
+    });
 
-async remove(id: string) {
-  const existingUser = await this.prisma.user.findUnique({
-    where: {
-      id,
-    },
-  });
+    if (!existingUser) {
+      throw new NotFoundException('User not found');
+    }
 
-  if (!existingUser) {
-    throw new NotFoundException('User not found');
+    const { name, email, phone } = updateUserDto;
+
+    if (email || phone) {
+      const duplicateUser = await this.prisma.user.findFirst({
+        where: {
+          OR: [...(email ? [{ email }] : []), ...(phone ? [{ phone }] : [])],
+          NOT: {
+            id,
+          },
+        },
+      });
+
+      if (duplicateUser) {
+        throw new ConflictException(
+          'Another user with this email or phone already exists',
+        );
+      }
+    }
+
+    return this.prisma.user.update({
+      where: {
+        id,
+      },
+      data: {
+        ...(name !== undefined && { name }),
+        ...(email !== undefined && { email }),
+        ...(phone !== undefined && { phone }),
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        role: true,
+        status: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
   }
 
-  if (existingUser.status === 'INACTIVE') {
-    throw new ConflictException('User is already inactive');
-  }
+  async remove(id: string) {
+    const existingUser = await this.prisma.user.findUnique({
+      where: {
+        id,
+      },
+    });
 
-  return this.prisma.user.update({
-    where: {
-      id,
-    },
-    data: {
-      status: 'INACTIVE',
-    },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      phone: true,
-      role: true,
-      status: true,
-      createdAt: true,
-      updatedAt: true,
-    },
-  });
-}
+    if (!existingUser) {
+      throw new NotFoundException('User not found');
+    }
+
+    if (existingUser.status === 'INACTIVE') {
+      throw new ConflictException('User is already inactive');
+    }
+
+    return this.prisma.user.update({
+      where: {
+        id,
+      },
+      data: {
+        status: 'INACTIVE',
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        role: true,
+        status: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+  }
 
   async create(createUserDto: CreateUserDto) {
     const { name, email, phone, password } = createUserDto;
 
     const existingUser = await this.prisma.user.findFirst({
       where: {
-        OR: [
-          { email },
-          ...(phone ? [{ phone }] : []),
-        ],
+        OR: [{ email }, ...(phone ? [{ phone }] : [])],
       },
     });
 
