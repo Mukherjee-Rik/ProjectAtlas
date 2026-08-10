@@ -6,6 +6,8 @@ describe('UsersController', () => {
   let controller: UsersController;
   let usersService: any;
 
+  const validUuid = '123e4567-e89b-12d3-a456-426614174000';
+
   beforeEach(async () => {
     usersService = {
       findAll: jest.fn().mockResolvedValue([]),
@@ -35,5 +37,21 @@ describe('UsersController', () => {
   it('findAll should call usersService.findAll', async () => {
     await controller.findAll();
     expect(usersService.findAll).toHaveBeenCalled();
+  });
+
+  it('findById should call usersService.findById with UUID', async () => {
+    await controller.findById(validUuid);
+    expect(usersService.findById).toHaveBeenCalledWith(validUuid);
+  });
+
+  it('update should call usersService.update with UUID and dto', async () => {
+    const dto = { name: 'Updated' };
+    await controller.update(validUuid, dto);
+    expect(usersService.update).toHaveBeenCalledWith(validUuid, dto);
+  });
+
+  it('remove should call usersService.remove with UUID', async () => {
+    await controller.remove(validUuid);
+    expect(usersService.remove).toHaveBeenCalledWith(validUuid);
   });
 });

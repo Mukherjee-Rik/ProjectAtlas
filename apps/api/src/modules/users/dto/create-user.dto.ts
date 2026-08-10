@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsEmail,
   IsOptional,
@@ -9,7 +9,7 @@ import {
 
 export class CreateUserDto {
   @ApiProperty({
-    example: 'Atlas User',
+    example: 'John Doe',
     description: 'Full name of the user',
   })
   @IsString()
@@ -18,16 +18,16 @@ export class CreateUserDto {
   name: string;
 
   @ApiProperty({
-    example: 'user@example.com',
+    example: 'john@example.com',
     description: 'Unique email address',
   })
   @IsEmail()
+  @MaxLength(255)
   email: string;
 
-  @ApiProperty({
-    example: '9876543210',
+  @ApiPropertyOptional({
+    example: '+919876543210',
     description: 'User phone number',
-    required: false,
   })
   @IsOptional()
   @IsString()
@@ -38,10 +38,9 @@ export class CreateUserDto {
     example: 'Password123!',
     description: 'User password',
     minLength: 8,
-    maxLength: 128,
   })
   @IsString()
   @MinLength(8)
-  @MaxLength(128)
+  @MaxLength(72)
   password: string;
 }

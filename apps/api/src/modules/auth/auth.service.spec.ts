@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { Logger } from 'nestjs-pino';
 import * as bcrypt from 'bcrypt';
 import { AuthService } from './auth.service';
 import { PrismaService } from '../../database/prisma/prisma.service';
@@ -14,6 +15,7 @@ describe('AuthService', () => {
   let service: AuthService;
   let prismaService: any;
   let jwtService: any;
+  let mockLogger: any;
 
   const mockUser = {
     id: 'user-id-1',
@@ -38,11 +40,18 @@ describe('AuthService', () => {
       signAsync: jest.fn().mockResolvedValue('mock-access-token'),
     };
 
+    mockLogger = {
+      warn: jest.fn(),
+      log: jest.fn(),
+      error: jest.fn(),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AuthService,
         { provide: PrismaService, useValue: prismaService },
         { provide: JwtService, useValue: jwtService },
+        { provide: Logger, useValue: mockLogger },
       ],
     }).compile();
 
@@ -58,7 +67,10 @@ describe('AuthService', () => {
       prismaService.user.findUnique.mockResolvedValue(mockUser);
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
 
-      const result = await service.validateUser('test@example.com', 'password123');
+      const result = await service.validateUser(
+        'test@example.com',
+        'password123',
+      );
 
       expect(result).toEqual({
         id: mockUser.id,
@@ -76,6 +88,10 @@ describe('AuthService', () => {
       await expect(
         service.validateUser('unknown@example.com', 'password123'),
       ).rejects.toThrow(UnauthorizedException);
+      expect(mockLogger.warn).toHaveBeenCalledWith(
+        { email: 'unknown@example.com' },
+        'Login failed: user not found',
+      );
     });
 
     it('should throw UnauthorizedException when password does not match', async () => {
@@ -85,6 +101,10 @@ describe('AuthService', () => {
       await expect(
         service.validateUser('test@example.com', 'wrongpassword'),
       ).rejects.toThrow(UnauthorizedException);
+      expect(mockLogger.warn).toHaveBeenCalledWith(
+        { userId: mockUser.id },
+        'Login failed: invalid password',
+      );
     });
 
     it('should throw UnauthorizedException when user status is SUSPENDED', async () => {
@@ -97,11 +117,15 @@ describe('AuthService', () => {
       await expect(
         service.validateUser('test@example.com', 'password123'),
       ).rejects.toThrow(UnauthorizedException);
+      expect(mockLogger.warn).toHaveBeenCalledWith(
+        { userId: mockUser.id },
+        'Login failed: user account is not active',
+      );
     });
   });
 
   describe('login', () => {
-    it('should return accessToken and user object', async () => {
+    it('should return accessToken and user object and log success', async () => {
       prismaService.user.findUnique.mockResolvedValue(mockUser);
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
 
@@ -123,6 +147,10 @@ describe('AuthService', () => {
         email: mockUser.email,
         role: mockUser.role,
       });
+      expect(mockLogger.log).toHaveBeenCalledWith(
+        { userId: mockUser.id, email: mockUser.email },
+        'User login successful',
+      );
     });
   });
 });

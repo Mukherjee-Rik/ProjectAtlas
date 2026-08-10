@@ -31,7 +31,10 @@ describe('AuthController', () => {
       const loginDto = { email: 'test@example.com', password: 'password123' };
       const res = await controller.login(loginDto);
 
-      expect(authService.login).toHaveBeenCalledWith(loginDto.email, loginDto.password);
+      expect(authService.login).toHaveBeenCalledWith(
+        loginDto.email,
+        loginDto.password,
+      );
       expect(res).toEqual({
         accessToken: 'jwt-token',
         user: { id: 'user-1', email: 'test@example.com', role: 'USER' },

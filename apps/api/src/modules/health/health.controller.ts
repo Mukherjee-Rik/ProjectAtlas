@@ -1,6 +1,8 @@
 import { Controller, Get } from '@nestjs/common';
+import { SkipThrottle } from '@nestjs/throttler';
 import { PrismaService } from '../../database/prisma/prisma.service';
 
+@SkipThrottle()
 @Controller({
   path: 'health',
   version: '1',

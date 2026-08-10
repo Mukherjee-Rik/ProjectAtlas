@@ -4,11 +4,12 @@ import {
   Delete,
   Get,
   Param,
+  ParseUUIDPipe,
   Patch,
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -19,6 +20,7 @@ import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import type { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 
+@ApiTags('Users')
 @Controller({
   path: 'users',
   version: '1',
@@ -43,7 +45,7 @@ export class UsersController {
   @UseGuards(JwtAuthGuard, AdminGuard)
   @ApiBearerAuth('access-token')
   @Get(':id')
-  async findById(@Param('id') id: string) {
+  async findById(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.usersService.findById(id);
   }
 
@@ -55,14 +57,17 @@ export class UsersController {
   @UseGuards(JwtAuthGuard, AdminGuard)
   @ApiBearerAuth('access-token')
   @Patch(':id')
-  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  async update(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
     return this.usersService.update(id, updateUserDto);
   }
 
   @UseGuards(JwtAuthGuard, AdminGuard)
   @ApiBearerAuth('access-token')
   @Delete(':id')
-  async remove(@Param('id') id: string) {
+  async remove(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.usersService.remove(id);
   }
 }

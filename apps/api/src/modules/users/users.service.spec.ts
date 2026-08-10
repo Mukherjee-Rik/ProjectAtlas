@@ -33,7 +33,13 @@ describe('UsersService', () => {
 
   it('should return all active users without passwordHash', async () => {
     const mockUsers = [
-      { id: '1', name: 'Admin', email: 'admin@example.com', role: 'ADMIN', status: 'ACTIVE' },
+      {
+        id: '1',
+        name: 'Admin',
+        email: 'admin@example.com',
+        role: 'ADMIN',
+        status: 'ACTIVE',
+      },
     ];
     prismaService.user.findMany.mockResolvedValue(mockUsers);
 
@@ -56,7 +62,13 @@ describe('UsersService', () => {
   });
 
   it('findById should not select passwordHash', async () => {
-    const mockUser = { id: '1', name: 'User 1', email: 'u1@example.com', role: 'USER', status: 'ACTIVE' };
+    const mockUser = {
+      id: '1',
+      name: 'User 1',
+      email: 'u1@example.com',
+      role: 'USER',
+      status: 'ACTIVE',
+    };
     prismaService.user.findFirst.mockResolvedValue(mockUser);
 
     const result = await service.findById('1');

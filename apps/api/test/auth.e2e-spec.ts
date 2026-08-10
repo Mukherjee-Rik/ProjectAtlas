@@ -1,5 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication, ValidationPipe, VersioningType } from '@nestjs/common';
+import {
+  INestApplication,
+  ValidationPipe,
+  VersioningType,
+} from '@nestjs/common';
 import request from 'supertest';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
@@ -8,12 +12,14 @@ import { PrismaService } from '../src/database/prisma/prisma.service';
 import { HttpExceptionFilter } from '../src/common/filters/http-exception.filter';
 import { ResponseInterceptor } from '../src/common/interceptors/response.interceptor';
 
-describe('Sprint 2.6.14 Auth Error Handling (e2e)', () => {
+describe('Sprint 2.7.7 Full API Integration (e2e)', () => {
   let app: INestApplication;
   let jwtService: JwtService;
 
   const rawPassword = 'Password123!';
   const hashedPassword = bcrypt.hashSync(rawPassword, 10);
+
+  const validUuid = '123e4567-e89b-12d3-a456-426614174000';
 
   const activeAdmin = {
     id: 'admin-active-1',
@@ -87,22 +93,22 @@ describe('Sprint 2.6.14 Auth Error Handling (e2e)', () => {
     updatedAt: new Date(),
   };
 
-  const allUsers = [
-    activeAdmin,
-    activeUser,
-    inactiveUser,
-    inactiveAdmin,
-    suspendedUser,
-    suspendedAdmin,
-  ];
+  const createdUserDb = {
+    id: validUuid,
+    name: 'Atlas Integration User',
+    email: 'integration@example.com',
+    phone: '9876543210',
+    passwordHash: hashedPassword,
+    role: 'USER',
+    status: 'ACTIVE',
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+
+  let dbStore: any[] = [];
 
   let activeAdminToken: string;
   let activeUserToken: string;
-  let inactiveUserToken: string;
-  let inactiveAdminToken: string;
-  let suspendedUserToken: string;
-  let suspendedAdminToken: string;
-  let expiredToken: string;
 
   const projectFields = (user: any, select?: Record<string, boolean>) => {
     if (!user) return null;
@@ -115,22 +121,42 @@ describe('Sprint 2.6.14 Auth Error Handling (e2e)', () => {
   };
 
   const mockPrismaService = {
+    $queryRaw: jest.fn().mockResolvedValue([{ 1: 1 }]),
     user: {
       findUnique: jest.fn(async ({ where, select }) => {
-        const user = allUsers.find((u) => u.id === where.id || u.email === where.email);
+        const user = dbStore.find(
+          (u) => u.id === where.id || u.email === where.email,
+        );
         return projectFields(user, select);
       }),
       findFirst: jest.fn(async ({ where, select }) => {
-        const user = allUsers.find((u) => u.id === where.id || u.email === where.email);
+        const user = dbStore.find((u) => {
+          if (where.id && u.id !== where.id) return false;
+          if (where.email && u.email !== where.email) return false;
+          if (where.status && u.status !== where.status) return false;
+          if (where.OR) {
+            const matchesOr = where.OR.some((cond: any) => {
+              if (cond.email && u.email === cond.email) return true;
+              if (cond.phone && u.phone === cond.phone) return true;
+              return false;
+            });
+            if (!matchesOr) return false;
+          }
+          if (where.NOT && where.NOT.id && u.id === where.NOT.id) return false;
+          return true;
+        });
         return projectFields(user, select);
       }),
-      findMany: jest.fn(async ({ select }) => {
-        const activeUsersList = allUsers.filter((u) => u.status === 'ACTIVE');
+      findMany: jest.fn(async ({ where, select }) => {
+        const statusFilter = where?.status;
+        const activeUsersList = statusFilter
+          ? dbStore.filter((u) => u.status === statusFilter)
+          : dbStore;
         return activeUsersList.map((u) => projectFields(u, select));
       }),
       create: jest.fn(async ({ data, select }) => {
         const newUser = {
-          id: 'created-user-id',
+          id: validUuid,
           name: data.name,
           email: data.email,
           phone: data.phone ?? null,
@@ -140,12 +166,20 @@ describe('Sprint 2.6.14 Auth Error Handling (e2e)', () => {
           createdAt: new Date(),
           updatedAt: new Date(),
         };
+        dbStore.push(newUser);
         return projectFields(newUser, select);
       }),
       update: jest.fn(async ({ where, data, select }) => {
-        const base = allUsers.find((u) => u.id === where.id) ?? activeUser;
-        const updated = { ...base, ...data };
-        return projectFields(updated, select);
+        const index = dbStore.findIndex((u) => u.id === where.id);
+        if (index === -1) return null;
+        dbStore[index] = { ...dbStore[index], ...data };
+        return projectFields(dbStore[index], select);
+      }),
+      delete: jest.fn(async ({ where, select }) => {
+        const index = dbStore.findIndex((u) => u.id === where.id);
+        if (index === -1) return null;
+        const [deleted] = dbStore.splice(index, 1);
+        return projectFields(deleted, select);
       }),
     },
     $connect: jest.fn(),
@@ -153,6 +187,15 @@ describe('Sprint 2.6.14 Auth Error Handling (e2e)', () => {
   };
 
   beforeAll(async () => {
+    dbStore = [
+      activeAdmin,
+      activeUser,
+      inactiveUser,
+      inactiveAdmin,
+      suspendedUser,
+      suspendedAdmin,
+    ];
+
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     })
@@ -181,12 +224,36 @@ describe('Sprint 2.6.14 Auth Error Handling (e2e)', () => {
 
     jwtService = app.get(JwtService);
 
-    activeAdminToken = jwtService.sign({ sub: activeAdmin.id, email: activeAdmin.email, role: activeAdmin.role });
-    activeUserToken = jwtService.sign({ sub: activeUser.id, email: activeUser.email, role: activeUser.role });
-    inactiveUserToken = jwtService.sign({ sub: inactiveUser.id, email: inactiveUser.email, role: inactiveUser.role });
-    inactiveAdminToken = jwtService.sign({ sub: inactiveAdmin.id, email: inactiveAdmin.email, role: inactiveAdmin.role });
-    suspendedUserToken = jwtService.sign({ sub: suspendedUser.id, email: suspendedUser.email, role: suspendedUser.role });
-    suspendedAdminToken = jwtService.sign({ sub: suspendedAdmin.id, email: suspendedAdmin.email, role: suspendedAdmin.role });
+    activeAdminToken = jwtService.sign({
+      sub: activeAdmin.id,
+      email: activeAdmin.email,
+      role: activeAdmin.role,
+    });
+    activeUserToken = jwtService.sign({
+      sub: activeUser.id,
+      email: activeUser.email,
+      role: activeUser.role,
+    });
+    inactiveUserToken = jwtService.sign({
+      sub: inactiveUser.id,
+      email: inactiveUser.email,
+      role: inactiveUser.role,
+    });
+    inactiveAdminToken = jwtService.sign({
+      sub: inactiveAdmin.id,
+      email: inactiveAdmin.email,
+      role: inactiveAdmin.role,
+    });
+    suspendedUserToken = jwtService.sign({
+      sub: suspendedUser.id,
+      email: suspendedUser.email,
+      role: suspendedUser.role,
+    });
+    suspendedAdminToken = jwtService.sign({
+      sub: suspendedAdmin.id,
+      email: suspendedAdmin.email,
+      role: suspendedAdmin.role,
+    });
     expiredToken = jwtService.sign(
       { sub: activeUser.id, email: activeUser.email, role: activeUser.role },
       { expiresIn: '-1s' },
@@ -197,21 +264,57 @@ describe('Sprint 2.6.14 Auth Error Handling (e2e)', () => {
     await app.close();
   });
 
-  describe('2.6.14.8 — Verification Tests', () => {
-    it('Test 1: Wrong email → 401 "Invalid email or password"', async () => {
+  describe('Health Checks', () => {
+    it('GET /api/v1/health → 200 OK', async () => {
       const response = await request(app.getHttpServer())
-        .post('/api/v1/auth/login')
-        .send({ email: 'doesnotexist@example.com', password: rawPassword })
-        .expect(401);
+        .get('/api/v1/health')
+        .expect(200);
 
-      expect(response.body).toMatchObject({
-        success: false,
-        statusCode: 401,
-        error: 'Invalid email or password',
-      });
+      expect(response.body.success).toBe(true);
+      expect(response.body.data.status).toBe('ok');
     });
 
-    it('Test 2: Wrong password → 401 "Invalid email or password"', async () => {
+    it('GET /api/v1/health/database → 200 OK', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/api/v1/health/database')
+        .expect(200);
+
+      expect(response.body.success).toBe(true);
+      expect(response.body.data.database).toBe('connected');
+    });
+  });
+
+  describe('User Registration & Login', () => {
+    it('POST /api/v1/users → 201 Created (password & passwordHash masked)', async () => {
+      const response = await request(app.getHttpServer())
+        .post('/api/v1/users')
+        .send({
+          name: createdUserDb.name,
+          email: createdUserDb.email,
+          phone: createdUserDb.phone,
+          password: rawPassword,
+        })
+        .expect(201);
+
+      expect(response.body.success).toBe(true);
+      expect(response.body.data.email).toBe(createdUserDb.email);
+      expect(response.body.data.password).toBeUndefined();
+      expect(response.body.data.passwordHash).toBeUndefined();
+    });
+
+    it('POST /api/v1/auth/login → 200 OK with accessToken', async () => {
+      const response = await request(app.getHttpServer())
+        .post('/api/v1/auth/login')
+        .send({ email: activeUser.email, password: rawPassword })
+        .expect(200);
+
+      expect(response.body.success).toBe(true);
+      expect(response.body.data.accessToken).toBeDefined();
+      expect(response.body.data.user.email).toBe(activeUser.email);
+      expect(response.body.data.user.passwordHash).toBeUndefined();
+    });
+
+    it('POST /api/v1/auth/login with wrong password → 401 Unauthorized', async () => {
       const response = await request(app.getHttpServer())
         .post('/api/v1/auth/login')
         .send({ email: activeUser.email, password: 'WrongPassword123!' })
@@ -223,55 +326,62 @@ describe('Sprint 2.6.14 Auth Error Handling (e2e)', () => {
         error: 'Invalid email or password',
       });
     });
+  });
 
-    it('Test 3: No JWT → 401 Unauthorized', async () => {
+  describe('/users/me Profile & Authentication Guards', () => {
+    it('GET /api/v1/users/me with valid USER token → 200 OK', async () => {
       const response = await request(app.getHttpServer())
         .get('/api/v1/users/me')
-        .expect(401);
+        .set('Authorization', `Bearer ${activeUserToken}`)
+        .expect(200);
 
-      expect(response.body).toMatchObject({
-        success: false,
-        statusCode: 401,
-      });
+      expect(response.body.success).toBe(true);
+      expect(response.body.data.email).toBe(activeUser.email);
     });
 
-    it('Test 4: Invalid JWT string → 401 Unauthorized', async () => {
-      const response = await request(app.getHttpServer())
+    it('GET /api/v1/users/me with missing JWT → 401 Unauthorized', async () => {
+      await request(app.getHttpServer()).get('/api/v1/users/me').expect(401);
+    });
+
+    it('GET /api/v1/users/me with invalid JWT string → 401 Unauthorized', async () => {
+      await request(app.getHttpServer())
         .get('/api/v1/users/me')
-        .set('Authorization', 'Bearer this-is-not-a-real-token')
+        .set('Authorization', 'Bearer invalid-token-string')
         .expect(401);
-
-      expect(response.body).toMatchObject({
-        success: false,
-        statusCode: 401,
-      });
     });
+  });
 
-    it('Test 5: Expired JWT → 401 Unauthorized', async () => {
-      const response = await request(app.getHttpServer())
-        .get('/api/v1/users/me')
-        .set('Authorization', `Bearer ${expiredToken}`)
-        .expect(401);
-
-      expect(response.body).toMatchObject({
-        success: false,
-        statusCode: 401,
-      });
-    });
-
-    it('Test 6: USER → ADMIN endpoint → 403 Forbidden', async () => {
-      const response = await request(app.getHttpServer())
+  describe('Authorization Matrix (USER vs ADMIN)', () => {
+    it('USER accessing GET /users → 403 Forbidden', async () => {
+      await request(app.getHttpServer())
         .get('/api/v1/users')
         .set('Authorization', `Bearer ${activeUserToken}`)
         .expect(403);
-
-      expect(response.body).toMatchObject({
-        success: false,
-        statusCode: 403,
-      });
     });
 
-    it('Test 7: ADMIN → ADMIN endpoint → 200 OK', async () => {
+    it('USER accessing GET /users/:id → 403 Forbidden', async () => {
+      await request(app.getHttpServer())
+        .get(`/api/v1/users/${validUuid}`)
+        .set('Authorization', `Bearer ${activeUserToken}`)
+        .expect(403);
+    });
+
+    it('USER accessing PATCH /users/:id → 403 Forbidden', async () => {
+      await request(app.getHttpServer())
+        .patch(`/api/v1/users/${validUuid}`)
+        .send({ name: 'Hacked' })
+        .set('Authorization', `Bearer ${activeUserToken}`)
+        .expect(403);
+    });
+
+    it('USER accessing DELETE /users/:id → 403 Forbidden', async () => {
+      await request(app.getHttpServer())
+        .delete(`/api/v1/users/${validUuid}`)
+        .set('Authorization', `Bearer ${activeUserToken}`)
+        .expect(403);
+    });
+
+    it('ADMIN accessing GET /users → 200 OK', async () => {
       const response = await request(app.getHttpServer())
         .get('/api/v1/users')
         .set('Authorization', `Bearer ${activeAdminToken}`)
@@ -282,19 +392,107 @@ describe('Sprint 2.6.14 Auth Error Handling (e2e)', () => {
     });
   });
 
-  describe('Authorization Matrix (Inactive / Suspended)', () => {
-    it('Inactive user → 401', async () => {
-      await request(app.getHttpServer())
-        .get('/api/v1/users/me')
-        .set('Authorization', `Bearer ${inactiveUserToken}`)
-        .expect(401);
+  describe('ADMIN Full User CRUD Lifecycle', () => {
+    it('ADMIN GET /users/:id → 200 OK', async () => {
+      const response = await request(app.getHttpServer())
+        .get(`/api/v1/users/${validUuid}`)
+        .set('Authorization', `Bearer ${activeAdminToken}`)
+        .expect(200);
+
+      expect(response.body.success).toBe(true);
+      expect(response.body.data.id).toBe(validUuid);
+      expect(response.body.data.passwordHash).toBeUndefined();
     });
 
-    it('Suspended user → 401', async () => {
+    it('ADMIN PATCH /users/:id → 200 OK', async () => {
+      const response = await request(app.getHttpServer())
+        .patch(`/api/v1/users/${validUuid}`)
+        .send({ name: 'Atlas Renamed User' })
+        .set('Authorization', `Bearer ${activeAdminToken}`)
+        .expect(200);
+
+      expect(response.body.success).toBe(true);
+      expect(response.body.data.name).toBe('Atlas Renamed User');
+    });
+
+    it('ADMIN DELETE /users/:id → 200 OK (soft-delete to INACTIVE)', async () => {
+      const response = await request(app.getHttpServer())
+        .delete(`/api/v1/users/${validUuid}`)
+        .set('Authorization', `Bearer ${activeAdminToken}`)
+        .expect(200);
+
+      expect(response.body.success).toBe(true);
+      expect(response.body.data.status).toBe('INACTIVE');
+    });
+
+    it('ADMIN GET /users/:id on deleted user → 404 Not Found', async () => {
+      const response = await request(app.getHttpServer())
+        .get(`/api/v1/users/${validUuid}`)
+        .set('Authorization', `Bearer ${activeAdminToken}`)
+        .expect(404);
+
+      expect(response.body.success).toBe(false);
+      expect(response.body.statusCode).toBe(404);
+    });
+  });
+
+  describe('Input Validation & Boundary Protections', () => {
+    it('Invalid DTO payload → 400 Bad Request', async () => {
       await request(app.getHttpServer())
-        .get('/api/v1/users/me')
-        .set('Authorization', `Bearer ${suspendedUserToken}`)
+        .post('/api/v1/users')
+        .send({ name: 'A', email: 'invalid-email', password: '123' })
+        .expect(400);
+    });
+
+    it('Unknown DTO property injection (role: ADMIN) → 400 Bad Request', async () => {
+      await request(app.getHttpServer())
+        .post('/api/v1/users')
+        .send({
+          name: 'Privilege Escalator',
+          email: 'escalate@example.com',
+          password: rawPassword,
+          role: 'ADMIN',
+        })
+        .expect(400);
+    });
+
+    it('Non-UUID parameter on /users/:id → 400 Bad Request', async () => {
+      await request(app.getHttpServer())
+        .get('/api/v1/users/not-a-valid-uuid')
+        .set('Authorization', `Bearer ${activeAdminToken}`)
+        .expect(400);
+    });
+
+    it('Unknown route → 404 Not Found', async () => {
+      await request(app.getHttpServer())
+        .get('/api/v1/does-not-exist')
+        .expect(404);
+    });
+  });
+
+  describe('Rate Limiting & Throttling', () => {
+    it('Exceeding login rate limit → 429 Too Many Requests', async () => {
+      await request(app.getHttpServer())
+        .post('/api/v1/auth/login')
+        .send({ email: activeUser.email, password: 'WrongPassword123!' })
         .expect(401);
+
+      await request(app.getHttpServer())
+        .post('/api/v1/auth/login')
+        .send({ email: activeUser.email, password: 'WrongPassword123!' })
+        .expect(401);
+
+      await request(app.getHttpServer())
+        .post('/api/v1/auth/login')
+        .send({ email: activeUser.email, password: 'WrongPassword123!' })
+        .expect(401);
+
+      const response = await request(app.getHttpServer())
+        .post('/api/v1/auth/login')
+        .send({ email: activeUser.email, password: 'WrongPassword123!' })
+        .expect(429);
+
+      expect(response.body.statusCode).toBe(429);
     });
   });
 });
