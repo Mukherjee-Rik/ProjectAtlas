@@ -8,19 +8,31 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 @Injectable()
-export class ResponseInterceptor<T> implements NestInterceptor<
-  T,
-  { success: boolean; data: T }
-> {
+export class ResponseInterceptor<T> implements NestInterceptor {
   intercept(
     _context: ExecutionContext,
     next: CallHandler<T>,
-  ): Observable<{ success: boolean; data: T }> {
+  ): Observable<any> {
     return next.handle().pipe(
-      map((data) => ({
-        success: true,
-        data,
-      })),
+      map((res: any) => {
+        if (
+          res &&
+          typeof res === 'object' &&
+          'data' in res &&
+          'meta' in res
+        ) {
+          return {
+            success: true,
+            data: res.data,
+            meta: res.meta,
+          };
+        }
+
+        return {
+          success: true,
+          data: res,
+        };
+      }),
     );
   }
 }

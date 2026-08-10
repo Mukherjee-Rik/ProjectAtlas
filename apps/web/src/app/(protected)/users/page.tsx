@@ -27,14 +27,34 @@ export default function UsersPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
 
+  const [totalUsers, setTotalUsers] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+
   const loadUsers = useCallback(async () => {
     setIsLoading(true);
     setError('');
 
     try {
-      const response = await getUsers();
+      const response = await getUsers({
+        search: search.trim() || undefined,
+        role: roleFilter === 'ALL' ? undefined : roleFilter,
+        status: statusFilter === 'ALL' ? undefined : statusFilter,
+        page: currentPage,
+        limit: pageSize,
+      });
 
-      setUsers(response.data);
+      const usersList = Array.isArray(response?.data)
+        ? response.data
+        : (response?.data as any)?.data ?? [];
+
+      const meta = response?.meta ?? (response?.data as any)?.meta ?? {
+        total: usersList.length,
+        totalPages: 1,
+      };
+
+      setUsers(usersList);
+      setTotalUsers(meta.total ?? usersList.length);
+      setTotalPages(meta.totalPages ?? 1);
     } catch (err) {
       console.error(err);
 
@@ -42,37 +62,11 @@ export default function UsersPage() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [search, roleFilter, statusFilter, currentPage]);
 
   useEffect(() => {
     void loadUsers();
   }, [loadUsers]);
-
-  // Derived filtered users list
-  const filteredUsers = users.filter((user) => {
-    const query = search.toLowerCase().trim();
-
-    const matchesSearch =
-      !query ||
-      user.name.toLowerCase().includes(query) ||
-      user.email.toLowerCase().includes(query) ||
-      (user.phone ? user.phone.toLowerCase().includes(query) : false);
-
-    const matchesRole =
-      roleFilter === 'ALL' || user.role === roleFilter;
-
-    const matchesStatus =
-      statusFilter === 'ALL' || user.status === statusFilter;
-
-    return matchesSearch && matchesRole && matchesStatus;
-  });
-
-  // Pagination math
-  const totalPages = Math.max(1, Math.ceil(filteredUsers.length / pageSize));
-  const paginatedUsers = filteredUsers.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize,
-  );
 
   function handleClearFilters() {
     setSearch('');
@@ -118,8 +112,7 @@ export default function UsersPage() {
           </p>
 
           <p className="mt-1 text-xs font-medium text-[#9AA6B2]">
-            Showing {paginatedUsers.length} of {filteredUsers.length} users
-            {users.length !== filteredUsers.length && ` (filtered from ${users.length} total)`}
+            Showing {users.length} of {totalUsers} users
           </p>
         </div>
 
@@ -214,7 +207,7 @@ export default function UsersPage() {
             </thead>
 
             <tbody className="divide-y divide-[#26313C]">
-              {paginatedUsers.map((user) => (
+              {users.map((user) => (
                 <tr
                   key={user.id}
                   onClick={() => router.push(`/users/${user.id}`)}
@@ -246,15 +239,13 @@ export default function UsersPage() {
         </div>
 
         {/* Empty State */}
-        {filteredUsers.length === 0 && (
+        {users.length === 0 && (
           <div className="p-10 text-center">
             <p className="text-[#F5F7FA] font-medium">
-              {users.length === 0
-                ? 'No users found.'
-                : 'No users match your filters.'}
+              No users found.
             </p>
 
-            {users.length > 0 && (
+            {(search || roleFilter !== 'ALL' || statusFilter !== 'ALL') && (
               <button
                 type="button"
                 onClick={handleClearFilters}

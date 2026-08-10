@@ -8,6 +8,10 @@ import { PrismaModule } from '../../database/prisma/prisma.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { PermissionsGuard } from './guards/permissions.guard';
+import { TenantAccessGuard } from './guards/tenant-access.guard';
+import { RestaurantAccessGuard } from './guards/restaurant-access.guard';
+import { BranchAccessGuard } from './guards/branch-access.guard';
 
 @Module({
   imports: [
@@ -26,7 +30,20 @@ import { JwtStrategy } from './strategies/jwt.strategy';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy],
-  exports: [AuthService],
+  providers: [
+    AuthService,
+    JwtStrategy,
+    PermissionsGuard,
+    TenantAccessGuard,
+    RestaurantAccessGuard,
+    BranchAccessGuard,
+  ],
+  exports: [
+    AuthService,
+    PermissionsGuard,
+    TenantAccessGuard,
+    RestaurantAccessGuard,
+    BranchAccessGuard,
+  ],
 })
 export class AuthModule {}

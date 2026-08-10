@@ -8,5 +8,9 @@
     "build:api": "pnpm --filter api build",
     "test:api": "pnpm --filter api test",
     "lint:api": "pnpm --filter api lint"
+  },
+  "devDependencies": {
+    "dotenv": "^17.4.2",
+    "prisma": "^7.9.1"
   }
 }

@@ -10,8 +10,9 @@ describe('UsersController', () => {
 
   beforeEach(async () => {
     usersService = {
-      findAll: jest.fn().mockResolvedValue([]),
+      findAll: jest.fn().mockResolvedValue({ data: [], meta: { page: 1, limit: 10, total: 0, totalPages: 1 } }),
       findById: jest.fn(),
+      updateMyProfile: jest.fn(),
       create: jest.fn(),
       update: jest.fn(),
       remove: jest.fn(),
@@ -29,14 +30,37 @@ describe('UsersController', () => {
     expect(controller).toBeDefined();
   });
 
-  it('getMe should return current authenticated user', () => {
+  it('getMe should call usersService.findById with user id', async () => {
     const mockAuthUser = { id: 'u-1', email: 'user@example.com', role: 'USER' };
-    expect(controller.getMe(mockAuthUser)).toEqual(mockAuthUser);
+    usersService.findById.mockResolvedValue({ id: 'u-1', name: 'User One' });
+
+    const result = await controller.getMe(mockAuthUser);
+
+    expect(usersService.findById).toHaveBeenCalledWith('u-1');
+    expect(result).toEqual({ id: 'u-1', name: 'User One' });
   });
 
-  it('findAll should call usersService.findAll', async () => {
-    await controller.findAll();
-    expect(usersService.findAll).toHaveBeenCalled();
+  it('updateMe should call usersService.updateMyProfile with user id and dto', async () => {
+    const mockAuthUser = { id: 'u-1', email: 'user@example.com', role: 'USER' };
+    const dto = { name: 'New Name', phone: '+919876543210' };
+    usersService.updateMyProfile.mockResolvedValue({ id: 'u-1', ...dto });
+
+    const result = await controller.updateMe(mockAuthUser, dto);
+
+    expect(usersService.updateMyProfile).toHaveBeenCalledWith('u-1', dto);
+    expect(result).toEqual({ id: 'u-1', ...dto });
+  });
+
+  it('findAll should pass query to usersService.findAll', async () => {
+    const query = {
+      page: 2,
+      limit: 10,
+      role: 'ADMIN' as const,
+    };
+
+    await controller.findAll(query as any);
+
+    expect(usersService.findAll).toHaveBeenCalledWith(query);
   });
 
   it('findById should call usersService.findById with UUID', async () => {

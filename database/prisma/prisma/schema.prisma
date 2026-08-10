@@ -8,17 +8,17 @@ datasource db {
   provider = "postgresql"
 }
 
-
 model User {
-  id           String   @id @default(uuid())
+  id           String             @id @default(uuid())
   name         String
-  email        String   @unique
-  phone        String?  @unique
+  email        String             @unique
+  phone        String?            @unique
   passwordHash String
-  role         UserRole @default(USER)
-  status       UserStatus @default(ACTIVE)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  role         UserRole           @default(USER)
+  status       UserStatus         @default(ACTIVE)
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  memberships  TenantMembership[]
 
   @@index([role])
   @@index([status])
@@ -34,4 +34,438 @@ enum UserStatus {
   ACTIVE
   INACTIVE
   SUSPENDED
+}
+
+enum TenantStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum RestaurantStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum BranchStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum DiningAreaStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum TableStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum CustomerSessionStatus {
+  ACTIVE
+  ENDED
+  EXPIRED
+}
+
+enum MenuStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum MenuCategoryStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum MenuItemStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum DietaryType {
+  VEG
+  NON_VEG
+  EGG
+  VEGAN
+}
+
+enum FoodType {
+  FOOD
+  BEVERAGE
+  DESSERT
+  OTHER
+}
+
+enum TaxType {
+  PERCENTAGE
+  FIXED
+}
+
+enum TaxRateStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum MenuItemVariantStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum MenuItemAddonStatus {
+  ACTIVE
+  INACTIVE
+}
+
+model Tenant {
+  id          String             @id @default(uuid())
+  name        String
+  slug        String             @unique
+  status      TenantStatus       @default(ACTIVE)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  restaurants Restaurant[]
+  memberships TenantMembership[]
+
+  @@map("tenants")
+}
+
+model Restaurant {
+  id        String           @id @default(uuid())
+  tenantId  String
+  name      String
+  slug      String
+  status    RestaurantStatus @default(ACTIVE)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  tenant   Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  branches Branch[]
+  menus    Menu[]
+  taxRates TaxRate[]
+
+  @@index([tenantId])
+  @@unique([tenantId, slug])
+  @@map("restaurants")
+}
+
+model TenantMembership {
+  id        String   @id @default(uuid())
+  userId    String
+  tenantId  String
+  role      UserRole
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, tenantId])
+  @@index([userId])
+  @@index([tenantId])
+  @@map("tenant_memberships")
+}
+
+model Branch {
+  id           String       @id @default(uuid())
+  restaurantId String
+
+  name       String
+  code       String
+  address    String?
+  city       String?
+  state      String?
+  postalCode String?
+  phone      String?
+  status     BranchStatus @default(ACTIVE)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  restaurant  Restaurant   @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  diningAreas DiningArea[]
+
+  @@unique([restaurantId, code])
+  @@index([restaurantId])
+  @@index([status])
+  @@map("branches")
+}
+
+model DiningArea {
+  id       String @id @default(uuid())
+  branchId String
+
+  name   String
+  code   String
+  status DiningAreaStatus @default(ACTIVE)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  branch Branch  @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  tables Table[]
+
+  @@unique([branchId, code])
+  @@index([branchId])
+  @@map("dining_areas")
+}
+
+model Table {
+  id           String @id @default(uuid())
+  diningAreaId String
+
+  publicToken  String @unique @default(dbgenerated("gen_random_uuid()"))
+  name         String
+  code         String
+  capacity     Int
+  status       TableStatus @default(ACTIVE)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  diningArea       DiningArea        @relation(fields: [diningAreaId], references: [id], onDelete: Cascade)
+  customerSessions CustomerSession[]
+
+  @@unique([diningAreaId, code])
+  @@index([diningAreaId])
+  @@index([status])
+  @@map("tables")
+}
+
+model CustomerSession {
+  id           String                @id @default(uuid())
+  tableId      String
+  sessionToken String                @unique
+  status       CustomerSessionStatus @default(ACTIVE)
+
+  startedAt DateTime  @default(now())
+  expiresAt DateTime?
+  endedAt   DateTime?
+
+  table Table @relation(fields: [tableId], references: [id], onDelete: Cascade)
+  cart  Cart?
+
+  @@index([tableId])
+  @@index([status])
+  @@map("customer_sessions")
+}
+
+model Menu {
+  id           String     @id @default(uuid())
+  restaurantId String
+
+  name   String
+  code   String
+  status MenuStatus @default(ACTIVE)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  restaurant Restaurant     @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  categories MenuCategory[]
+
+  @@unique([restaurantId, code])
+  @@index([restaurantId])
+  @@map("menus")
+}
+
+model MenuCategory {
+  id     String @id @default(uuid())
+  menuId String
+
+  name     String
+  code     String
+  position Int                @default(0)
+  status   MenuCategoryStatus @default(ACTIVE)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  menu  Menu       @relation(fields: [menuId], references: [id], onDelete: Cascade)
+  items MenuItem[]
+
+  @@unique([menuId, code])
+  @@index([menuId])
+  @@index([position])
+  @@map("menu_categories")
+}
+
+model MenuItem {
+  id         String @id @default(uuid())
+  categoryId String
+  taxRateId  String?
+
+  name                   String
+  code                   String
+  description            String?
+  imageUrl               String?
+  price                  Decimal        @db.Decimal(10, 2)
+  dietaryType            DietaryType    @default(VEG)
+  foodType               FoodType       @default(FOOD)
+  preparationTimeMinutes Int?
+  position               Int            @default(0)
+  status                 MenuItemStatus @default(ACTIVE)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  category    MenuCategory           @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  taxRate     TaxRate?               @relation(fields: [taxRateId], references: [id], onDelete: SetNull)
+  variantGroups MenuItemVariantGroup[]
+  addonGroups   MenuItemAddonGroup[]
+  cartItems     CartItem[]
+
+  @@unique([categoryId, code])
+  @@index([categoryId])
+  @@index([status])
+  @@index([position])
+  @@map("menu_items")
+}
+
+model TaxRate {
+  id           String        @id @default(uuid())
+  restaurantId String
+
+  name   String
+  type   TaxType
+  value  Decimal       @db.Decimal(10, 2)
+  status TaxRateStatus @default(ACTIVE)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  menuItems  MenuItem[]
+
+  @@index([restaurantId])
+  @@map("tax_rates")
+}
+
+model MenuItemVariantGroup {
+  id         String @id @default(uuid())
+  menuItemId String
+
+  name     String
+  required Boolean @default(false)
+  position Int     @default(0)
+
+  menuItem MenuItem            @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+  variants MenuItemVariant[]
+
+  @@index([menuItemId])
+  @@map("menu_item_variant_groups")
+}
+
+model MenuItemVariant {
+  id      String @id @default(uuid())
+  groupId String
+
+  name     String
+  price    Decimal               @db.Decimal(10, 2)
+  position Int                   @default(0)
+  status   MenuItemVariantStatus @default(ACTIVE)
+
+  group MenuItemVariantGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@index([groupId])
+  @@map("menu_item_variants")
+}
+
+model MenuItemAddonGroup {
+  id         String @id @default(uuid())
+  menuItemId String
+
+  name      String
+  required  Boolean @default(false)
+  minSelect Int     @default(0)
+  maxSelect Int     @default(1)
+  position  Int     @default(0)
+
+  menuItem MenuItem          @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+  addons   MenuItemAddon[]
+
+  @@index([menuItemId])
+  @@map("menu_item_addon_groups")
+}
+
+model MenuItemAddon {
+  id      String @id @default(uuid())
+  groupId String
+
+  name     String
+  price    Decimal             @db.Decimal(10, 2)
+  position Int                 @default(0)
+  status   MenuItemAddonStatus @default(ACTIVE)
+
+  group MenuItemAddonGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@index([groupId])
+  @@map("menu_item_addons")
+}
+
+model Cart {
+  id                String @id @default(uuid())
+  customerSessionId String @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  customerSession CustomerSession @relation(fields: [customerSessionId], references: [id], onDelete: Cascade)
+  items           CartItem[]
+
+  @@index([customerSessionId])
+  @@map("carts")
+}
+
+model CartItem {
+  id         String @id @default(uuid())
+  cartId     String
+  menuItemId String
+
+  quantity   Int     @default(1)
+  unitPrice  Decimal @db.Decimal(10, 2)
+  totalPrice Decimal @db.Decimal(10, 2)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  cart     Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  menuItem MenuItem @relation(fields: [menuItemId], references: [id], onDelete: Restrict)
+
+  variantSelections CartItemVariant[]
+  addonSelections   CartItemAddon[]
+
+  @@index([cartId])
+  @@index([menuItemId])
+  @@map("cart_items")
+}
+
+model CartItemVariant {
+  id         String @id @default(uuid())
+  cartItemId String
+  variantId  String
+
+  name  String
+  price Decimal @db.Decimal(10, 2)
+
+  cartItem CartItem @relation(fields: [cartItemId], references: [id], onDelete: Cascade)
+
+  @@index([cartItemId])
+  @@map("cart_item_variants")
+}
+
+model CartItemAddon {
+  id         String @id @default(uuid())
+  cartItemId String
+  addonId    String
+
+  name  String
+  price Decimal @db.Decimal(10, 2)
+
+  cartItem CartItem @relation(fields: [cartItemId], references: [id], onDelete: Cascade)
+
+  @@index([cartItemId])
+  @@map("cart_item_addons")
 }

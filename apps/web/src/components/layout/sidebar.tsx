@@ -3,14 +3,24 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
+import { useAuth } from '@/hooks/use-auth';
+import { hasPermission } from '@/lib/permissions';
 import { navigationItems } from './navigation';
 
 export function Sidebar() {
   const pathname = usePathname();
+  const { user } = useAuth();
+
+  const filteredNavItems = navigationItems.filter((item) => {
+    if (!item.permission) {
+      return true;
+    }
+    return hasPermission(user?.role, item.permission);
+  });
 
   return (
     <nav className="space-y-1 p-4">
-      {navigationItems.map((item) => {
+      {filteredNavItems.map((item) => {
         const isActive =
           pathname === item.href ||
           pathname.startsWith(`${item.href}/`);

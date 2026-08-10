@@ -11,53 +11,41 @@ import { PrismaModule } from './database/prisma/prisma.module';
 import { HealthModule } from './modules/health/health.module';
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { DashboardModule } from './modules/dashboard/dashboard.module';
+import { TenantsModule } from './modules/tenants/tenants.module';
+import { RestaurantsModule } from './modules/restaurants/restaurants.module';
+import { TenantMembershipsModule } from './modules/tenant-memberships/tenant-memberships.module';
+import { BranchesModule } from './modules/branches/branches.module';
+import { DiningAreasModule } from './modules/dining-areas/dining-areas.module';
+import { TablesModule } from './modules/tables/tables.module';
+import { PublicTablesModule } from './modules/public-tables/public-tables.module';
+import { MenusModule } from './modules/menus/menus.module';
+import { MenuCategoriesModule } from './modules/menu-categories/menu-categories.module';
+import { MenuItemsModule } from './modules/menu-items/menu-items.module';
+import { TaxRatesModule } from './modules/tax-rates/tax-rates.module';
+import { MenuItemVariantsModule } from './modules/menu-item-variants/menu-item-variants.module';
+import { MenuItemAddonsModule } from './modules/menu-item-addons/menu-item-addons.module';
+import { CartModule } from './modules/cart/cart.module';
 import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-      load: [configuration],
-      validationSchema: envValidationSchema,
-      cache: true,
-    }),
-
-    ThrottlerModule.forRoot([
-      {
-        ttl: 60000,
-        limit: 100,
-      },
-    ]),
-
+    ConfigModule.forRoot({ isGlobal: true, load: [configuration], validationSchema: envValidationSchema, cache: true }),
+    ThrottlerModule.forRoot([{ ttl: 60000, limit: 100 }]),
     LoggerModule.forRoot({
       pinoHttp: {
-        genReqId: (req: IncomingMessage) => {
-          return (req.headers['x-request-id'] as string) ?? crypto.randomUUID();
-        },
-        transport:
-          process.env.NODE_ENV !== 'production'
-            ? {
-                target: 'pino-pretty',
-                options: {
-                  singleLine: true,
-                  colorize: true,
-                },
-              }
-            : undefined,
+        genReqId: (req: IncomingMessage) => (req.headers['x-request-id'] as string) ?? crypto.randomUUID(),
+        transport: process.env.NODE_ENV !== 'production' ? { target: 'pino-pretty', options: { singleLine: true, colorize: true } } : undefined,
       },
     }),
-
-    PrismaModule,
-    HealthModule,
-    UsersModule,
-    AuthModule,
+    PrismaModule, HealthModule, UsersModule, AuthModule, DashboardModule,
+    TenantsModule, RestaurantsModule, TenantMembershipsModule,
+    BranchesModule, DiningAreasModule, TablesModule, PublicTablesModule,
+    MenusModule, MenuCategoriesModule, MenuItemsModule,
+    TaxRatesModule, MenuItemVariantsModule, MenuItemAddonsModule,
+    CartModule,
   ],
-  providers: [
-    {
-      provide: APP_GUARD,
-      useClass: ThrottlerGuard,
-    },
-  ],
+  providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
