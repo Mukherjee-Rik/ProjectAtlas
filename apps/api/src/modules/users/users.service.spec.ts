@@ -31,7 +31,7 @@ describe('UsersService', () => {
     expect(service).toBeDefined();
   });
 
-  it('should return all active users without passwordHash', async () => {
+  it('should return all users without passwordHash', async () => {
     const mockUsers = [
       {
         id: '1',
@@ -46,7 +46,7 @@ describe('UsersService', () => {
     const result = await service.findAll();
     expect(result).toEqual(mockUsers);
     expect(prismaService.user.findMany).toHaveBeenCalledWith({
-      where: { status: 'ACTIVE' },
+      where: {},
       select: {
         id: true,
         name: true,
@@ -74,7 +74,7 @@ describe('UsersService', () => {
     const result = await service.findById('1');
     expect(result).toEqual(mockUser);
     expect(prismaService.user.findFirst).toHaveBeenCalledWith({
-      where: { id: '1', status: 'ACTIVE' },
+      where: { id: '1' },
       select: {
         id: true,
         name: true,
@@ -122,5 +122,106 @@ describe('UsersService', () => {
         updatedAt: true,
       },
     });
+  });
+
+  it('should create an ADMIN user when role is provided', async () => {
+    prismaService.user.findFirst.mockResolvedValue(null);
+
+    prismaService.user.create.mockResolvedValue({
+      id: 'admin-id',
+      name: 'Admin User',
+      email: 'admin@example.com',
+      phone: null,
+      role: 'ADMIN',
+      status: 'ACTIVE',
+    });
+
+    const result = await service.create({
+      name: 'Admin User',
+      email: 'admin@example.com',
+      password: 'Password123!',
+      role: 'ADMIN' as any,
+    });
+
+    expect(result.role).toBe('ADMIN');
+
+    expect(prismaService.user.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          role: 'ADMIN',
+        }),
+      }),
+    );
+  });
+
+  it('should update role and status', async () => {
+    prismaService.user.findFirst.mockResolvedValue({
+      id: 'user-id',
+      status: 'ACTIVE',
+    });
+
+    prismaService.user.update.mockResolvedValue({
+      id: 'user-id',
+      name: 'Updated User',
+      email: 'user@example.com',
+      phone: null,
+      role: 'ADMIN',
+      status: 'SUSPENDED',
+    });
+
+    const result = await service.update('user-id', {
+      role: 'ADMIN' as any,
+      status: 'SUSPENDED' as any,
+    });
+
+    expect(result.role).toBe('ADMIN');
+    expect(result.status).toBe('SUSPENDED');
+
+    expect(prismaService.user.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          role: 'ADMIN',
+          status: 'SUSPENDED',
+        }),
+      }),
+    );
+  });
+
+  it('should allow clearing a phone number', async () => {
+    prismaService.user.findFirst.mockResolvedValue({
+      id: 'user-id',
+      status: 'ACTIVE',
+    });
+
+    prismaService.user.update.mockResolvedValue({
+      id: 'user-id',
+      name: 'User',
+      email: 'user@example.com',
+      phone: null,
+      role: 'USER',
+      status: 'ACTIVE',
+    });
+
+    await service.update('user-id', {
+      phone: null,
+    });
+
+    expect(prismaService.user.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          phone: null,
+        }),
+      }),
+    );
+  });
+
+  it('should prevent an admin from deactivating their own account', async () => {
+    await expect(
+      service.remove('same-user-id', 'same-user-id'),
+    ).rejects.toThrow(
+      'You cannot deactivate your own account',
+    );
+
+    expect(prismaService.user.findUnique).not.toHaveBeenCalled();
   });
 });

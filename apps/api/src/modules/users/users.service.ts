@@ -14,9 +14,7 @@ export class UsersService {
 
   async findAll() {
     return this.prisma.user.findMany({
-      where: {
-        status: 'ACTIVE',
-      },
+      where: {},
       select: {
         id: true,
         name: true,
@@ -37,7 +35,6 @@ export class UsersService {
     const user = await this.prisma.user.findFirst({
       where: {
         id,
-        status: 'ACTIVE',
       },
       select: {
         id: true,
@@ -62,7 +59,6 @@ export class UsersService {
     const existingUser = await this.prisma.user.findFirst({
       where: {
         id,
-        status: 'ACTIVE',
       },
     });
 
@@ -70,7 +66,7 @@ export class UsersService {
       throw new NotFoundException('User not found');
     }
 
-    const { name, email, phone } = updateUserDto;
+    const { name, email, phone, role, status } = updateUserDto;
 
     if (email || phone) {
       const duplicateUser = await this.prisma.user.findFirst({
@@ -97,6 +93,8 @@ export class UsersService {
         ...(name !== undefined && { name }),
         ...(email !== undefined && { email }),
         ...(phone !== undefined && { phone }),
+        ...(role !== undefined && { role }),
+        ...(status !== undefined && { status }),
       },
       select: {
         id: true,
@@ -111,7 +109,13 @@ export class UsersService {
     });
   }
 
-  async remove(id: string) {
+  async remove(id: string, currentUserId: string) {
+    if (id === currentUserId) {
+      throw new ConflictException(
+        'You cannot deactivate your own account',
+      );
+    }
+
     const existingUser = await this.prisma.user.findUnique({
       where: {
         id,
@@ -147,7 +151,7 @@ export class UsersService {
   }
 
   async create(createUserDto: CreateUserDto) {
-    const { name, email, phone, password } = createUserDto;
+    const { name, email, phone, password, role } = createUserDto;
 
     const existingUser = await this.prisma.user.findFirst({
       where: {
@@ -169,6 +173,7 @@ export class UsersService {
         email,
         phone,
         passwordHash,
+        ...(role !== undefined && { role }),
       },
       select: {
         id: true,

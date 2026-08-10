@@ -50,8 +50,18 @@ describe('UsersController', () => {
     expect(usersService.update).toHaveBeenCalledWith(validUuid, dto);
   });
 
-  it('remove should call usersService.remove with UUID', async () => {
-    await controller.remove(validUuid);
-    expect(usersService.remove).toHaveBeenCalledWith(validUuid);
+  it('remove should call usersService.remove with UUID and current user ID', async () => {
+    const currentUser = {
+      id: 'admin-id',
+      email: 'admin@example.com',
+      role: 'ADMIN',
+    };
+
+    await controller.remove(validUuid, currentUser);
+
+    expect(usersService.remove).toHaveBeenCalledWith(
+      validUuid,
+      'admin-id',
+    );
   });
 });

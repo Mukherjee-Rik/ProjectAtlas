@@ -49,10 +49,10 @@ export function UserForm({
       await onSubmit({
         name,
         email,
-        phone: phone || undefined,
+        phone: phone || null,
         role,
         status,
-      });
+      } as UpdateUserPayload);
 
       return;
     }
