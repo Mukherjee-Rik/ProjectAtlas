@@ -2,6 +2,7 @@
   "name": "project-atlas",
   "private": true,
   "version": "0.1.0",
+  "main": "apps/api/dist/main.js",
   "packageManager": "pnpm@11.10.0",
   "scripts": {
     "dev": "pnpm --parallel dev:api dev:web",
