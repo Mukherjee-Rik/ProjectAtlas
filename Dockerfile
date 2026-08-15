@@ -30,7 +30,6 @@ WORKDIR /app
 RUN apk add --no-cache openssl
 
 ENV NODE_ENV=production
-ENV PORT=3000
 
 # Copy node_modules and built dist from builder
 COPY --from=builder /app/node_modules ./node_modules
