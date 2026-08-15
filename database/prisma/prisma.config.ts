@@ -10,7 +10,7 @@ dotenv.config({
   path: path.resolve(__dirname, '../../apps/api/.env'),
 });
 
-let dbUrl = env('DATABASE_URL') || '';
+let dbUrl = process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/postgres';
 if (dbUrl.includes(':6543')) {
   dbUrl = dbUrl.replace(':6543', ':5432').replace('pgbouncer=true', 'pgbouncer=false');
 }
