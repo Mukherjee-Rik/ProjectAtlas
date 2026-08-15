@@ -161,8 +161,16 @@ async function request<T>(
       emitUnauthorizedEvent();
     }
 
+    const rawError = (errorBody as any)?.error ?? (errorBody as any)?.message;
+    const errorMessage =
+      typeof rawError === 'string'
+        ? rawError
+        : Array.isArray(rawError)
+        ? rawError.join(', ')
+        : 'API request failed';
+
     throw new ApiError(
-      errorBody?.error ?? 'API request failed',
+      errorMessage,
       response.status,
       errorBody,
     );
