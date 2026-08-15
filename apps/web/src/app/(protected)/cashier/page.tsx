@@ -7,6 +7,7 @@ import { getTables } from '@/services/tables.service';
 import { apiClient } from '@/services/api-client';
 import type { RestaurantTable } from '@/types/table';
 import { formatCurrency } from '@/lib/currency';
+import { DataCache } from '@/lib/data-cache';
 
 interface PaymentRecord {
   id: string;
@@ -28,13 +29,19 @@ export default function CashierPage() {
   const { currentRestaurant } = useRestaurant();
   const { currentBranch } = useBranch();
 
+  const cacheKeyTables = currentBranch ? `tables_${currentBranch.id}` : null;
+  const cacheKeyPayments = currentRestaurant ? `payments_${currentRestaurant.id}` : null;
+
+  const cachedTables = cacheKeyTables ? DataCache.get<RestaurantTable[]>(cacheKeyTables) : null;
+  const cachedPayments = cacheKeyPayments ? DataCache.get<PaymentRecord[]>(cacheKeyPayments) : null;
+
   // Data states
-  const [tables, setTables] = useState<RestaurantTable[]>([]);
-  const [payments, setPayments] = useState<PaymentRecord[]>([]);
+  const [tables, setTables] = useState<RestaurantTable[]>(cachedTables || []);
+  const [payments, setPayments] = useState<PaymentRecord[]>(cachedPayments || []);
   const [selectedTable, setSelectedTable] = useState<RestaurantTable | null>(null);
 
   // Loading & process states
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(!cachedTables);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState('');
 
@@ -49,7 +56,9 @@ export default function CashierPage() {
       setIsLoading(false);
       return;
     }
-    setIsLoading(true);
+    if (!DataCache.get(`tables_${currentBranch.id}`)) {
+      setIsLoading(true);
+    }
     setError('');
     try {
       const [tablesRes, paymentsRes] = await Promise.all([
@@ -57,15 +66,23 @@ export default function CashierPage() {
         apiClient.get<any>('/payments'),
       ]);
 
-      setTables(tablesRes.data ?? []);
-      setPayments(paymentsRes.data ?? []);
+      const fetchedTables = tablesRes.data ?? [];
+      const fetchedPayments = paymentsRes.data ?? [];
+
+      setTables(fetchedTables);
+      setPayments(fetchedPayments);
+
+      DataCache.set(`tables_${currentBranch.id}`, fetchedTables);
+      DataCache.set(`payments_${currentRestaurant.id}`, fetchedPayments);
     } catch (err: any) {
       console.error(err);
-      setError(err?.message ?? 'Failed to load cashier data.');
+      if (!cachedTables) {
+        setError(err?.message ?? 'Failed to load cashier data.');
+      }
     } finally {
       setIsLoading(false);
     }
-  }, [currentRestaurant, currentBranch]);
+  }, [currentRestaurant, currentBranch, cachedTables]);
 
   useEffect(() => {
     void loadData();
