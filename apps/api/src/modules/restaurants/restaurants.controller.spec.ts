@@ -37,7 +37,8 @@ describe('RestaurantsController', () => {
   });
 
   it('findAll should pass tenant.id to restaurantsService.findAll', async () => {
-    await controller.findAll(mockTenant);
+    const mockUser: any = { role: 'OWNER' };
+    await controller.findAll(mockUser, mockTenant);
     expect(restaurantsService.findAll).toHaveBeenCalledWith('t-1');
   });
 

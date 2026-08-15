@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTenant } from '@/hooks/use-tenant';
+import { useRestaurant } from '@/hooks/use-restaurant';
 import { getBranches, deleteBranch } from '@/services/branches.service';
 import type { Branch, BranchStatus } from '@/types/branch';
 import { BranchesTableSkeleton } from '@/components/branches/branches-table-skeleton';
@@ -11,6 +12,7 @@ import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 export default function BranchesPage() {
   const router = useRouter();
   const { currentTenant } = useTenant();
+  const { currentRestaurant } = useRestaurant();
 
   const [branches, setBranches] = useState<Branch[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -25,7 +27,7 @@ export default function BranchesPage() {
   const [isDeleting, setIsDeleting] = useState(false);
 
   const loadBranches = useCallback(async () => {
-    if (!currentTenant) {
+    if (!currentTenant || !currentRestaurant) {
       setBranches([]);
       setIsLoading(false);
       return;
@@ -35,7 +37,7 @@ export default function BranchesPage() {
     setError('');
 
     try {
-      const response = await getBranches();
+      const response = await getBranches(currentRestaurant.id);
       setBranches(response.data ?? []);
     } catch (err: any) {
       console.error(err);
@@ -43,7 +45,7 @@ export default function BranchesPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [currentTenant]);
+  }, [currentTenant, currentRestaurant?.id]);
 
   useEffect(() => {
     void loadBranches();

@@ -6,6 +6,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
 import { json } from 'express';
 
+import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
@@ -17,6 +18,7 @@ async function bootstrap() {
 
   app.use(helmet());
   app.use(json({ limit: '1mb' }));
+  app.use(cookieParser());
 
   app.enableShutdownHooks();
 
@@ -25,7 +27,7 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
 
   app.enableCors({
-    origin: configService.get<string>('cors.origin'),
+    origin: true,
     credentials: true,
   });
 

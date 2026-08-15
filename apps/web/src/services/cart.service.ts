@@ -1,4 +1,4 @@
-import { apiClient } from './api-client';
+import { publicApiClient } from './public-api-client';
 import type { AddCartItemPayload, Cart } from '@/types/cart';
 
 type CartResponse = { success: boolean; data: Cart };
@@ -8,11 +8,11 @@ function cartPath(token: string) {
 }
 
 export async function getCart(token: string) {
-  return apiClient.get<CartResponse>(cartPath(token));
+  return publicApiClient.get<CartResponse>(cartPath(token));
 }
 
 export async function addCartItem(token: string, payload: AddCartItemPayload) {
-  return apiClient.post<CartResponse>(`${cartPath(token)}/items`, payload);
+  return publicApiClient.post<CartResponse>(`${cartPath(token)}/items`, payload);
 }
 
 export async function updateCartItemQuantity(
@@ -20,11 +20,11 @@ export async function updateCartItemQuantity(
   itemId: string,
   quantity: number,
 ) {
-  return apiClient.patch<CartResponse>(`${cartPath(token)}/items/${itemId}`, {
+  return publicApiClient.patch<CartResponse>(`${cartPath(token)}/items/${itemId}`, {
     quantity,
   });
 }
 
 export async function removeCartItem(token: string, itemId: string) {
-  return apiClient.delete<CartResponse>(`${cartPath(token)}/items/${itemId}`);
+  return publicApiClient.delete<CartResponse>(`${cartPath(token)}/items/${itemId}`);
 }

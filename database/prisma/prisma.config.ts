@@ -10,6 +10,11 @@ dotenv.config({
   path: path.resolve(__dirname, '../../apps/api/.env'),
 });
 
+let dbUrl = env('DATABASE_URL') || '';
+if (dbUrl.includes(':6543')) {
+  dbUrl = dbUrl.replace(':6543', ':5432').replace('pgbouncer=true', 'pgbouncer=false');
+}
+
 export default defineConfig({
   schema: 'prisma/schema.prisma',
 
@@ -18,6 +23,6 @@ export default defineConfig({
   },
 
   datasource: {
-    url: env('DATABASE_URL'),
+    url: dbUrl,
   },
 });

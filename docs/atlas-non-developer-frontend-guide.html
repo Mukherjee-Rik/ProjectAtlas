@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Project Atlas — Non-Developer User Manual & Visual Frontend Guide</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+
+    :root {
+      --primary: #0F172A;
+      --accent: #0D9488;
+      --accent-light: #F0FDFA;
+      --accent-border: #99F6E4;
+      --accent-dark: #115E59;
+      --surface: #F8FAFC;
+      --border: #E2E8F0;
+      --text: #1E293B;
+      --text-muted: #64748B;
+      --success-bg: #ECFDF5;
+      --success-text: #065F46;
+      --warning-bg: #FFFBEB;
+      --warning-text: #92400E;
+      --info-bg: #EFF6FF;
+      --info-text: #1E40AF;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      color: var(--text);
+      background: #FFFFFF;
+      line-height: 1.6;
+      font-size: 10.5pt;
+    }
+
+    @page {
+      size: A4;
+      margin: 1.8cm 1.5cm 1.8cm 1.5cm;
+      @bottom-right {
+        content: "Page " counter(page) " of " counter(pages);
+        font-size: 8pt;
+        color: #94A3B8;
+      }
+      @bottom-left {
+        content: "Project Atlas v1.0 — Visual Frontend Manual";
+        font-size: 8pt;
+        font-weight: 600;
+        color: #0D9488;
+      }
+    }
+
+    .page-break {
+      page-break-before: always;
+    }
+
+    .avoid-break {
+      page-break-inside: avoid;
+    }
+
+    /* Hero Header */
+    .hero-banner {
+      background: linear-gradient(135deg, #0F172A 0%, #1E293B 60%, #0D9488 100%);
+      color: white;
+      padding: 36px 30px;
+      border-radius: 16px;
+      margin-bottom: 24px;
+    }
+
+    .hero-banner .badge {
+      display: inline-block;
+      background: rgba(42, 254, 183, 0.2);
+      border: 1px solid rgba(42, 254, 183, 0.4);
+      color: #5EEAD4;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 7.5pt;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+    }
+
+    .hero-banner h1 {
+      font-size: 24pt;
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 8px;
+    }
+
+    .hero-banner p {
+      color: #CBD5E1;
+      font-size: 10.5pt;
+      max-width: 620px;
+    }
+
+    /* Role Quick Bar */
+    .role-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    .role-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      text-align: center;
+    }
+
+    .role-card .role-icon {
+      font-size: 18pt;
+      margin-bottom: 4px;
+    }
+
+    .role-card .role-title {
+      font-size: 9.5pt;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .role-card .role-desc {
+      font-size: 8pt;
+      color: var(--text-muted);
+    }
+
+    /* Section Headings */
+    h2 {
+      font-size: 15pt;
+      font-weight: 800;
+      color: var(--primary);
+      margin-top: 24px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 6px;
+    }
+
+    h2 .section-num {
+      background: var(--accent);
+      color: white;
+      font-size: 9.5pt;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 6px;
+    }
+
+    h3 {
+      font-size: 11.5pt;
+      font-weight: 700;
+      color: var(--accent-dark);
+      margin-top: 16px;
+      margin-bottom: 8px;
+    }
+
+    /* Step flow cards */
+    .step-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 12px;
+      display: grid;
+      grid-template-columns: 36px 1fr;
+      gap: 12px;
+    }
+
+    .step-num {
+      width: 34px;
+      height: 34px;
+      background: var(--accent);
+      color: white;
+      font-weight: 800;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11pt;
+    }
+
+    .step-content h4 {
+      font-size: 10.5pt;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 4px;
+    }
+
+    .step-content p {
+      font-size: 9pt;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .ui-callout {
+      background: #FFFFFF;
+      border: 1px dashed #CBD5E1;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 8.5pt;
+      color: #334155;
+    }
+
+    .ui-callout strong {
+      color: var(--accent-dark);
+    }
+
+    /* Visual Screens preview box */
+    .screen-preview {
+      background: #0F172A;
+      color: #F8FAFC;
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin: 14px 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 8pt;
+      line-height: 1.5;
+    }
+
+    .screen-preview .accent-text {
+      color: #5EEAD4;
+      font-weight: 700;
+    }
+
+    /* FAQ List */
+    .faq-item {
+      background: var(--surface);
+      border-left: 4px solid var(--accent);
+      padding: 10px 14px;
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 10px;
+    }
+
+    .faq-item .question {
+      font-weight: 700;
+      font-size: 9.5pt;
+      color: var(--accent-dark);
+      margin-bottom: 3px;
+    }
+
+    .faq-item .answer {
+      font-size: 8.8pt;
+      color: var(--text);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HERO BANNER -->
+  <div class="hero-banner">
+    <div class="badge">Visual Non-Developer User Manual</div>
+    <h1>Project Atlas v1.0 Operations Guide</h1>
+    <p>
+      A simple, screen-by-screen guide for restaurant owners, kitchen cooks, floor waitstaff, and billing cashiers. No technical knowledge required.
+    </p>
+  </div>
+
+  <!-- ROLE GRID -->
+  <div class="role-grid">
+    <div class="role-card">
+      <div class="role-icon">👑</div>
+      <div class="role-title">Restaurant Owner</div>
+      <div class="role-desc">Setup, Menus, Sales & AI Assistant</div>
+    </div>
+    <div class="role-card">
+      <div class="role-icon">📱</div>
+      <div class="role-title">Customer / Diner</div>
+      <div class="role-desc">Scan Table QR, Cart, Order & Call Waiter</div>
+    </div>
+    <div class="role-card">
+      <div class="role-icon">🍳</div>
+      <div class="role-title">Kitchen Chef</div>
+      <div class="role-desc">Live KDS Orders, Timers & Cooking Status</div>
+    </div>
+    <div class="role-card">
+      <div class="role-icon">🛎️</div>
+      <div class="role-title">Floor Waitstaff</div>
+      <div class="role-desc">Deliver Food, Table Assistance & Manual Orders</div>
+    </div>
+    <div class="role-card">
+      <div class="role-icon">💵</div>
+      <div class="role-title">Cashier / Billing</div>
+      <div class="role-desc">Print Bills, Cash/Card/UPI QR Settlements</div>
+    </div>
+    <div class="role-card">
+      <div class="role-icon">🛡️</div>
+      <div class="role-title">Platform Admin</div>
+      <div class="role-desc">All Restaurants, Support Desk & Subscriptions</div>
+    </div>
+  </div>
+
+  <!-- SECTION 1: OWNER FLOW -->
+  <div class="avoid-break">
+    <h2><span class="section-num">1</span> Restaurant Owner: Setup, Menu & Dashboard</h2>
+    <p>Everything you need to launch and monitor your restaurant in 6 fast steps.</p>
+
+    <div class="step-box">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <h4>Sign Up & Restaurant Profile (`/onboarding`)</h4>
+        <p>Register your account with your restaurant name and email. Choose your dining concept (e.g. <i>Fine Dining, Cafe</i>) and verify currency (INR ₹).</p>
+        <div class="ui-callout">
+          <strong>What You See:</strong> Guided 6-step progress bar showing 0% to 100% setup completion.
+        </div>
+      </div>
+    </div>
+
+    <div class="step-box">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <h4>Setup Floor Dining Areas & Table QR Codes (`/tables`)</h4>
+        <p>Define your dining sections (e.g. <i>Courtyard, AC Hall, Rooftop</i>) and set table count. Atlas automatically generates encrypted QR codes for each table.</p>
+        <div class="ui-callout">
+          <strong>What You See:</strong> Downloadable QR sticker designs ready for printing on table stands.
+        </div>
+      </div>
+    </div>
+
+    <div class="step-box">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <h4>Menu Engineering & Dish Management (`/menus`)</h4>
+        <p>Create categories (<i>Starters, Biryanis, Drinks</i>), add dish photos, set prices, and dietary flags (Veg 🟢, Non-Veg 🔴). Toggle <i>"Out of Stock"</i> with 1 click!</p>
+        <div class="ui-callout">
+          <strong>What You See:</strong> Clean visual card grid with instant live sync to all diner phones.
+        </div>
+      </div>
+    </div>
+
+    <div class="step-box">
+      <div class="step-num">4</div>
+      <div class="step-content">
+        <h4>Live Operations Dashboard & AI Copilot (`/dashboard`)</h4>
+        <p>Monitor real-time sales revenue, occupied tables, and peak dining hours. Ask the AI Copilot natural questions: <i>"Which dish made the most profit today?"</i></p>
+        <div class="ui-callout">
+          <strong>What You See:</strong> Live revenue stats, occupancy meters, hourly heatmaps, and AI chat.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- SECTION 2: GUEST QR ORDERING -->
+  <div class="avoid-break">
+    <h2><span class="section-num">2</span> Customer / Diner Flow: Zero App Download</h2>
+    <p>Frictionless digital ordering directly inside mobile web browsers.</p>
+
+    <div class="screen-preview">
+📱 CUSTOMER MOBILE SCREEN (Table 04):
+┌────────────────────────────────────────────────────────┐
+│  ✨ Spice Symphony Bistro • Table 04                   │
+│  [🔍 Search Menu...]  [🟢 Veg Only]  [🌶️ Chef Specials]│
+├────────────────────────────────────────────────────────┤
+│  🍛 Truffle Dum Biryani ....................... ₹650  │
+│     "Slow cooked saffron basmati with wild truffles"   │
+│     [ - 2 + ]  Special Note: "Mild spice"              │
+├────────────────────────────────────────────────────────┤
+│  🛒 View Cart (2 Items • ₹1,300) ➔ [Submit Table Order]│
+│  [🛎️ Call Waiter]   [💧 Water Refill]   [🧾 Ask for Bill]│
+└────────────────────────────────────────────────────────┘
+    </div>
+
+    <div class="step-box">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <h4>Scan QR Sticker on Table</h4>
+        <p>Customer opens phone camera, scans the table code, and the live interactive menu opens instantly without downloading an app or registering.</p>
+      </div>
+    </div>
+
+    <div class="step-box">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <h4>Select Dishes & Shared Table Cart</h4>
+        <p>Diners add dishes, choose portion sizes, specify chef notes (e.g. <i>"Extra sauce, no nuts"</i>), and tap <b>"Submit Table Order"</b>.</p>
+      </div>
+    </div>
+
+    <div class="step-box">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <h4>Live Prep Tracking & Table Service Calls</h4>
+        <p>The screen shows live progress (<i>Pending ➔ Cooking ➔ Ready</i>). Diners can tap <b>"Call Waiter"</b> or <b>"Water Refill"</b> at any moment.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 3: KITCHEN CHEF KDS -->
+  <div class="avoid-break">
+    <h2><span class="section-num">3</span> Kitchen Chef Flow: Live KDS Touchscreen (`/kitchen`)</h2>
+    <p>Real-time order ticket workflow for chefs and kitchen line cooks.</p>
+
+    <div class="screen-preview">
+🍳 KITCHEN KDS TOUCHSCREEN:
+┌─────────────────────────┬─────────────────────────┬─────────────────────────┐
+│  🟡 NEW ORDERS (1)      │  🔵 PREPARING (2)       │  🟢 READY FOR PICKUP (1)│
+│  Table 04 • #AT-000001  │  Table 02 • Timer: 4m   │  Table 01 • #AT-000003  │
+│  • 2x Truffle Biryani   │  • 1x Butter Chicken    │  • 2x Cold Coffee       │
+│  ⚠️ Note: "Mild spice"   │  • 2x Garlic Naan       │  [WAITSTAFF NOTIFIED]   │
+│  [START COOKING ➔]      │  [MARK AS READY ➔]      │  [Completed ✓]          │
+└─────────────────────────┴─────────────────────────┴─────────────────────────┘
+    </div>
+
+    <div class="step-box">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <h4>Order Arrives (Audio Alert)</h4>
+        <p>Chime rings and the new ticket appears under <b>"New Orders"</b> with table number, quantities, and highlighted chef notes.</p>
+      </div>
+    </div>
+
+    <div class="step-box">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <h4>Start Cooking ➔ Ready for Pickup</h4>
+        <p>Cook taps <b>"Start Cooking"</b> (timer starts). When plated, cook taps <b>"Ready for Pickup"</b>. Floor waitstaff are notified immediately!</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- SECTION 4: WAITER & CASHIER -->
+  <div class="avoid-break">
+    <h2><span class="section-num">4</span> Floor Waitstaff & Cashier Billing</h2>
+
+    <div class="step-box">
+      <div class="step-num">🛎️</div>
+      <div class="step-content">
+        <h4>Floor Waiter Flow (`/waiter`)</h4>
+        <p>• <b>Food Delivery</b>: See pulsing green alerts when kitchen finishes cooking. Pick up hot food and tap <i>"Mark Served"</i>.<br/>
+           • <b>Table Calls</b>: Real-time badges for customer requests (<i>Water, Waiter, Bill</i>).<br/>
+           • <b>Manual Ordering</b>: Take orders for walk-ins on mobile phone and send directly to kitchen.</p>
+      </div>
+    </div>
+
+    <div class="step-box">
+      <div class="step-num">💵</div>
+      <div class="step-content">
+        <h4>Cashier & POS Settlement (`/cashier`)</h4>
+        <p>• <b>Review Bill</b>: Select table, review ordered items, and verify automatic taxes (CGST/SGST).<br/>
+           • <b>Apply Discounts</b>: Enter promo codes or percentage discounts.<br/>
+           • <b>Accept Payment</b>: Collect via Cash (with change calculator), Dynamic UPI QR, or Card POS machine.<br/>
+           • <b>Close Table</b>: Generates printed receipt and automatically frees up the table for the next diners!</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 5: PLATFORM ADMIN -->
+  <div class="avoid-break">
+    <h2><span class="section-num">5</span> Platform Admin Flow (`/platform-admin`)</h2>
+    <p>Central management desk for Atlas operators and engineers.</p>
+
+    <div class="step-box">
+      <div class="step-num">🛡️</div>
+      <div class="step-content">
+        <h4>Global Network & Support Incident Desk</h4>
+        <p>• <b>Platform Overview</b>: Total active restaurants, network revenue (MRR), and system health.<br/>
+           • <b>Customer Support Desk</b>: Manage tickets submitted by restaurant owners (e.g. <code>ATLAS-0FB5</code>). Type resolution notes and resolve incidents.<br/>
+           • <b>Subscription Controls</b>: Upgrade restaurants between Free, Growth, and Multi-Branch Enterprise tiers.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 6: FAQ -->
+  <div class="avoid-break">
+    <h2><span class="section-num">6</span> Frequently Asked Questions (FAQ)</h2>
+
+    <div class="faq-item">
+      <div class="question">Q: Can customers order if they don't have mobile internet?</div>
+      <div class="answer">Yes! The waiter can take their order directly on the handheld waiter screen (`/waiter`).</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="question">Q: How fast do menu price changes update?</div>
+      <div class="answer">Instantly! When you edit a price in `/menus`, all customer phone screens update immediately without reloading.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="question">Q: How do I get help if my kitchen printer stops working?</div>
+      <div class="answer">Click <b>"Support"</b> in your sidebar and click <b>"+ Create Ticket"</b>. Atlas engineers receive your ticket with priority SLA!</div>
+    </div>
+  </div>
+
+</body>
+</html>

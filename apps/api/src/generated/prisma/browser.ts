@@ -117,3 +117,123 @@ export type CartItemVariant = Prisma.CartItemVariantModel
  * 
  */
 export type CartItemAddon = Prisma.CartItemAddonModel
+/**
+ * Model Order
+ * 
+ */
+export type Order = Prisma.OrderModel
+/**
+ * Model OrderItem
+ * 
+ */
+export type OrderItem = Prisma.OrderItemModel
+/**
+ * Model OrderItemVariant
+ * 
+ */
+export type OrderItemVariant = Prisma.OrderItemVariantModel
+/**
+ * Model OrderItemAddon
+ * 
+ */
+export type OrderItemAddon = Prisma.OrderItemAddonModel
+/**
+ * Model Payment
+ * 
+ */
+export type Payment = Prisma.PaymentModel
+/**
+ * Model Invoice
+ * 
+ */
+export type Invoice = Prisma.InvoiceModel
+/**
+ * Model Supplier
+ * 
+ */
+export type Supplier = Prisma.SupplierModel
+/**
+ * Model InventoryLocation
+ * 
+ */
+export type InventoryLocation = Prisma.InventoryLocationModel
+/**
+ * Model Ingredient
+ * 
+ */
+export type Ingredient = Prisma.IngredientModel
+/**
+ * Model Recipe
+ * 
+ */
+export type Recipe = Prisma.RecipeModel
+/**
+ * Model RecipeIngredient
+ * 
+ */
+export type RecipeIngredient = Prisma.RecipeIngredientModel
+/**
+ * Model StockLedger
+ * 
+ */
+export type StockLedger = Prisma.StockLedgerModel
+/**
+ * Model Plan
+ * 
+ */
+export type Plan = Prisma.PlanModel
+/**
+ * Model Subscription
+ * 
+ */
+export type Subscription = Prisma.SubscriptionModel
+/**
+ * Model Session
+ * 
+ */
+export type Session = Prisma.SessionModel
+/**
+ * Model AuditLog
+ * 
+ */
+export type AuditLog = Prisma.AuditLogModel
+/**
+ * Model ExternalOrder
+ * 
+ */
+export type ExternalOrder = Prisma.ExternalOrderModel
+/**
+ * Model RestaurantDeliveryProvider
+ * 
+ */
+export type RestaurantDeliveryProvider = Prisma.RestaurantDeliveryProviderModel
+/**
+ * Model WebhookEvent
+ * 
+ */
+export type WebhookEvent = Prisma.WebhookEventModel
+/**
+ * Model AiUsage
+ * 
+ */
+export type AiUsage = Prisma.AiUsageModel
+/**
+ * Model AutomationRule
+ * 
+ */
+export type AutomationRule = Prisma.AutomationRuleModel
+/**
+ * Model AutomationExecution
+ * 
+ */
+export type AutomationExecution = Prisma.AutomationExecutionModel
+/**
+ * Model Notification
+ * 
+ */
+export type Notification = Prisma.NotificationModel
+/**
+ * Model SupportTicket
+ * 
+ */
+export type SupportTicket = Prisma.SupportTicketModel

@@ -8,8 +8,23 @@ describe('DashboardService', () => {
 
   beforeEach(async () => {
     prismaService = {
-      user: {
-        count: jest.fn(),
+      restaurant: {
+        findFirst: jest.fn().mockResolvedValue({ id: 'r-1', tenantId: 't-1' }),
+        findUnique: jest.fn().mockResolvedValue({ id: 'r-1', tenantId: 't-1' }),
+      },
+      order: {
+        count: jest.fn().mockResolvedValue(10),
+        aggregate: jest.fn().mockResolvedValue({ _sum: { totalAmount: 5000 } }),
+        findMany: jest.fn().mockResolvedValue([]),
+      },
+      table: {
+        count: jest.fn().mockResolvedValue(5),
+      },
+      menuItem: {
+        count: jest.fn().mockResolvedValue(20),
+      },
+      tenantMembership: {
+        count: jest.fn().mockResolvedValue(4),
         findMany: jest.fn().mockResolvedValue([]),
       },
     };
@@ -28,47 +43,14 @@ describe('DashboardService', () => {
     expect(service).toBeDefined();
   });
 
-  it('should return aggregated overview numbers and recent users', async () => {
-    prismaService.user.count
-      .mockResolvedValueOnce(10)
-      .mockResolvedValueOnce(8)
-      .mockResolvedValueOnce(2);
+  it('should return aggregated overview numbers and recent orders', async () => {
+    const result = await service.getRestaurantOverview('r-1');
 
-    const mockRecentUsers = [
-      {
-        id: 'u-1',
-        name: 'Recent User',
-        email: 'recent@example.com',
-        role: 'USER',
-        status: 'ACTIVE',
-        createdAt: new Date(),
-      },
-    ];
-
-    prismaService.user.findMany.mockResolvedValue(mockRecentUsers);
-
-    const result = await service.getOverview();
-
-    expect(result).toEqual({
-      users: {
-        total: 10,
-        active: 8,
-        admins: 2,
-      },
-      recentUsers: mockRecentUsers,
-    });
-    expect(prismaService.user.count).toHaveBeenCalledTimes(3);
-    expect(prismaService.user.findMany).toHaveBeenCalledWith({
-      orderBy: { createdAt: 'desc' },
-      take: 5,
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        status: true,
-        createdAt: true,
-      },
-    });
+    expect(result).toHaveProperty('metrics');
+    expect(result.metrics.totalOrders).toBe(10);
+    expect(result.metrics.totalSales).toBe(5000);
+    expect(result.metrics.activeTables).toBe(5);
+    expect(result.metrics.menuItems).toBe(20);
+    expect(result.metrics.staffCount).toBe(4);
   });
 });

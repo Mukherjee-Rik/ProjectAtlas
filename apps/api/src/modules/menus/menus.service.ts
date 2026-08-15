@@ -7,13 +7,20 @@ import {
 import { PrismaService } from '../../database/prisma/prisma.service';
 import { CreateMenuDto } from './dto/create-menu.dto';
 import { UpdateMenuDto } from './dto/update-menu.dto';
+import { SubscriptionUsageService } from '../subscriptions/subscription-usage.service';
 
 @Injectable()
 export class MenusService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly subscriptionUsageService: SubscriptionUsageService,
+  ) {}
 
   async create(restaurantId: string, createDto: CreateMenuDto) {
     const { name, code, status } = createDto;
+
+    // Enforce active subscription menu limit
+    await this.subscriptionUsageService.checkLimit(restaurantId, 'maxMenus');
 
     const existing = await this.prisma.menu.findUnique({
       where: {

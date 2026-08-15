@@ -1,0 +1,74 @@
+services:
+  # PostgreSQL 16 Enterprise Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: atlas_postgres
+    environment:
+      POSTGRES_USER: atlas_user
+      POSTGRES_PASSWORD: atlas_secure_password
+      POSTGRES_DB: atlas_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U atlas_user -d atlas_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Redis 7 In-Memory Cache & Background Queue
+  redis:
+    image: redis:7-alpine
+    container_name: atlas_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Project Atlas NestJS Core API
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: atlas_api
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgresql://atlas_user:atlas_secure_password@postgres:5432/atlas_db?sslmode=disable
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: production-jwt-secret-key-atlas-pos-system
+      JWT_REFRESH_SECRET: production-jwt-refresh-secret-key-atlas-pos
+      CORS_ORIGIN: http://localhost:3001
+    ports:
+      - "3000:3000"
+
+  # Project Atlas Next.js 16 Web Dashboard & POS Terminal
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    container_name: atlas_web
+    depends_on:
+      - api
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      NEXT_PUBLIC_API_URL: http://localhost:3000/api/v1
+      API_INTERNAL_URL: http://api:3000/api/v1
+    ports:
+      - "3001:3001"
+
+volumes:
+  postgres_data:
+  redis_data:

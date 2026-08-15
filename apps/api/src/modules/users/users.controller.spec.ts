@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
+import { PrismaService } from '../../database/prisma/prisma.service';
 
 describe('UsersController', () => {
   let controller: UsersController;
@@ -20,7 +21,10 @@ describe('UsersController', () => {
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UsersController],
-      providers: [{ provide: UsersService, useValue: usersService }],
+      providers: [
+        { provide: UsersService, useValue: usersService },
+        { provide: PrismaService, useValue: {} },
+      ],
     }).compile();
 
     controller = module.get<UsersController>(UsersController);
@@ -60,18 +64,18 @@ describe('UsersController', () => {
 
     await controller.findAll(query as any);
 
-    expect(usersService.findAll).toHaveBeenCalledWith(query);
+    expect(usersService.findAll).toHaveBeenCalledWith(query, undefined);
   });
 
   it('findById should call usersService.findById with UUID', async () => {
     await controller.findById(validUuid);
-    expect(usersService.findById).toHaveBeenCalledWith(validUuid);
+    expect(usersService.findById).toHaveBeenCalledWith(validUuid, undefined);
   });
 
   it('update should call usersService.update with UUID and dto', async () => {
     const dto = { name: 'Updated' };
     await controller.update(validUuid, dto);
-    expect(usersService.update).toHaveBeenCalledWith(validUuid, dto);
+    expect(usersService.update).toHaveBeenCalledWith(validUuid, dto, undefined);
   });
 
   it('remove should call usersService.remove with UUID and current user ID', async () => {
@@ -86,6 +90,7 @@ describe('UsersController', () => {
     expect(usersService.remove).toHaveBeenCalledWith(
       validUuid,
       'admin-id',
+      undefined,
     );
   });
 });

@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { use, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { use } from 'react';
 import { useCart } from '@/hooks/use-cart';
 import { formatCurrency } from '@/lib/currency';
 
@@ -13,10 +14,9 @@ export default function CustomerCartPage({
   params: Promise<{ token: string }>;
 }) {
   const { token } = use(params);
+  const router = useRouter();
   const { cart, itemCount, totalQuantity, subtotal, isLoading, isMutating, error, updateQuantity, removeItem } =
     useCart();
-
-  const [checkoutNotice, setCheckoutNotice] = useState(false);
 
   return (
     <main className="min-h-screen bg-[#0B0F14] pb-8 text-[#F5F7FA]">
@@ -160,18 +160,11 @@ export default function CustomerCartPage({
 
             <button
               type="button"
-              onClick={() => setCheckoutNotice(true)}
+              onClick={() => router.push(`/t/${token}/checkout`)}
               className="w-full rounded-xl bg-[#2AFEB7] py-3.5 text-sm font-bold text-[#0B0F14] shadow-lg transition-all hover:bg-[#22E5A4] active:scale-[0.99]"
             >
-              Continue
+              Continue to Checkout →
             </button>
-
-            {checkoutNotice && (
-              <div className="rounded-xl border border-[#2AFEB7]/40 bg-[#2AFEB7]/10 p-3 text-xs text-[#2AFEB7]">
-                🚀 Checkout arrives with the order engine in Sprint 3.26. Your cart is saved to this
-                table session.
-              </div>
-            )}
           </div>
         )}
       </div>

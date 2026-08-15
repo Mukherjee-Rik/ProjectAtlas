@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { DashboardController } from './dashboard.controller';
 import { DashboardService } from './dashboard.service';
+import { PrismaService } from '../../database/prisma/prisma.service';
 
 describe('DashboardController', () => {
   let controller: DashboardController;
@@ -8,7 +9,7 @@ describe('DashboardController', () => {
 
   beforeEach(async () => {
     dashboardService = {
-      getOverview: jest.fn().mockResolvedValue({
+      getRestaurantOverview: jest.fn().mockResolvedValue({
         users: { total: 10, active: 8, admins: 2 },
         recentUsers: [],
       }),
@@ -16,7 +17,10 @@ describe('DashboardController', () => {
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [DashboardController],
-      providers: [{ provide: DashboardService, useValue: dashboardService }],
+      providers: [
+        { provide: DashboardService, useValue: dashboardService },
+        { provide: PrismaService, useValue: {} },
+      ],
     }).compile();
 
     controller = module.get<DashboardController>(DashboardController);
@@ -26,10 +30,10 @@ describe('DashboardController', () => {
     expect(controller).toBeDefined();
   });
 
-  it('getOverview should call dashboardService.getOverview', async () => {
+  it('getOverview should call dashboardService.getRestaurantOverview', async () => {
     const result = await controller.getOverview();
 
-    expect(dashboardService.getOverview).toHaveBeenCalled();
+    expect(dashboardService.getRestaurantOverview).toHaveBeenCalled();
     expect(result).toEqual({
       users: { total: 10, active: 8, admins: 2 },
       recentUsers: [],

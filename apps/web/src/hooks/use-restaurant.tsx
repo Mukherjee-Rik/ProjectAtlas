@@ -75,19 +75,27 @@ export function RestaurantProvider({ children }: { children: ReactNode }) {
       const loadedRestaurants = response.data ?? [];
       setRestaurants(loadedRestaurants);
 
-      // Auto-select if 1 restaurant exists
-      if (loadedRestaurants.length === 1) {
-        setCurrentRestaurant(loadedRestaurants[0]);
-      } else if (currentRestaurant && !loadedRestaurants.some((r) => r.id === currentRestaurant.id)) {
-        // If currentRestaurant doesn't belong to newly loaded tenant, clear it
-        setCurrentRestaurant(loadedRestaurants[0] ?? null);
-      }
+      // Use functional update to avoid capturing currentRestaurant as a dep (causes infinite loop)
+      setCurrentRestaurantState((prevRestaurant) => {
+        if (loadedRestaurants.length > 0 && !prevRestaurant) {
+          saveCurrentRestaurant(loadedRestaurants[0]!);
+          return loadedRestaurants[0]!;
+        } else if (prevRestaurant && !loadedRestaurants.some((r) => r.id === prevRestaurant.id)) {
+          const fallback = loadedRestaurants[0] ?? null;
+          if (fallback) saveCurrentRestaurant(fallback);
+          else clearCurrentRestaurant();
+          return fallback;
+        }
+        return prevRestaurant;
+      });
     } catch {
       // Ignore load error
     } finally {
       setIsLoadingRestaurants(false);
     }
-  }, [currentTenant, currentRestaurant, setCurrentRestaurant, clearRestaurant]);
+    // ✅ currentRestaurant removed from deps - use functional setState instead
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentTenant?.id, clearRestaurant]);
 
   useEffect(() => {
     if (currentTenant) {
@@ -95,7 +103,7 @@ export function RestaurantProvider({ children }: { children: ReactNode }) {
     } else {
       clearRestaurant();
     }
-  }, [currentTenant, reloadRestaurants, clearRestaurant]);
+  }, [currentTenant?.id, reloadRestaurants, clearRestaurant]);
 
   return (
     <RestaurantContext.Provider

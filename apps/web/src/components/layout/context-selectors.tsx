@@ -53,6 +53,16 @@ export function ContextSelectors() {
             const selectedId = e.target.value;
             const target = restaurants.find((r) => r.id === selectedId);
             setCurrentRestaurant(target ?? null);
+            if (target) {
+              setCurrentTenant({
+                id: target.tenantId,
+                name: target.name,
+                slug: target.slug,
+                status: 'ACTIVE',
+                createdAt: target.createdAt,
+                updatedAt: target.updatedAt,
+              });
+            }
           }}
           className="appearance-none rounded-lg border border-[#26313C] bg-[#18212B] py-1 px-2.5 text-xs font-semibold text-[#2AFEB7] hover:border-[#2AFEB7] focus:border-[#2AFEB7] focus:outline-none"
         >

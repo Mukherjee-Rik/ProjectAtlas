@@ -1,4 +1,12 @@
-export type UserRole = 'USER' | 'ADMIN';
+export type UserRole =
+  | 'PLATFORM_ADMIN'
+  | 'OWNER'
+  | 'ADMIN'
+  | 'MANAGER'
+  | 'STAFF'
+  | 'WAITER'
+  | 'KITCHEN'
+  | 'USER';
 
 export type UserStatus =
   | 'ACTIVE'

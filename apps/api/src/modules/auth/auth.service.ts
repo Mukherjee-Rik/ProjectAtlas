@@ -1,8 +1,13 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, Injectable, UnauthorizedException, ForbiddenException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Logger } from 'nestjs-pino';
 import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
+
 import { PrismaService } from '../../database/prisma/prisma.service';
+import { RegisterRestaurantDto } from './dto/register-restaurant.dto';
+import { UserRole } from '../../generated/prisma/enums';
+import { AuditService } from '../audit/audit.service';
 
 @Injectable()
 export class AuthService {
@@ -10,17 +15,26 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
     private readonly logger: Logger,
+    private readonly auditService: AuditService,
   ) {}
 
-  async validateUser(email: string, password: string) {
+  async validateUser(email: string, password: string, ip?: string, userAgent?: string) {
+    const normalizedEmail = email.trim().toLowerCase();
+
     const user = await this.prisma.user.findUnique({
-      where: {
-        email,
-      },
+      where: { email: normalizedEmail },
     });
 
     if (!user) {
-      this.logger.warn({ email }, 'Login failed: user not found');
+      this.logger.warn({ email: normalizedEmail }, 'Login failed: user not found');
+      await this.auditService.log({
+        actorEmail: normalizedEmail,
+        action: 'LOGIN_FAILED',
+        resourceType: 'AUTH',
+        metadata: { reason: 'User not found' },
+        ipAddress: ip,
+        userAgent: userAgent,
+      });
       throw new UnauthorizedException('Invalid email or password');
     }
 
@@ -28,6 +42,15 @@ export class AuthService {
 
     if (!passwordValid) {
       this.logger.warn({ userId: user.id }, 'Login failed: invalid password');
+      await this.auditService.log({
+        actorUserId: user.id,
+        actorEmail: user.email,
+        action: 'LOGIN_FAILED',
+        resourceType: 'AUTH',
+        metadata: { reason: 'Invalid password' },
+        ipAddress: ip,
+        userAgent: userAgent,
+      });
       throw new UnauthorizedException('Invalid email or password');
     }
 
@@ -36,6 +59,15 @@ export class AuthService {
         { userId: user.id },
         'Login failed: user account is not active',
       );
+      await this.auditService.log({
+        actorUserId: user.id,
+        actorEmail: user.email,
+        action: 'LOGIN_FAILED',
+        resourceType: 'AUTH',
+        metadata: { reason: `User status is ${user.status}` },
+        ipAddress: ip,
+        userAgent: userAgent,
+      });
       throw new UnauthorizedException('User account is not active');
     }
 
@@ -49,25 +81,441 @@ export class AuthService {
     };
   }
 
-  async login(email: string, password: string) {
-    const user = await this.validateUser(email, password);
+  async login(email: string, password: string, ip?: string, userAgent?: string) {
+    const user = await this.validateUser(email, password, ip, userAgent);
+    const memberships = await this.getUserMemberships(user.id);
 
-    const payload = {
-      sub: user.id,
-      email: user.email,
-      role: user.role,
-    };
+    // Create session record
+    const session = await this.prisma.session.create({
+      data: {
+        userId: user.id,
+        refreshTokenHash: '',
+        deviceName: this.parseUserAgent(userAgent),
+        ipAddress: ip || null,
+        userAgent: userAgent || null,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+      },
+    });
 
-    const accessToken = await this.jwtService.signAsync(payload);
+    const accessToken = await this.generateAccessToken(user.id, user.email, user.role, session.id);
+    const refreshToken = await this.generateRefreshToken(session.id);
+
+    // Update with hash
+    await this.prisma.session.update({
+      where: { id: session.id },
+      data: { refreshTokenHash: this.hashToken(refreshToken) },
+    });
 
     this.logger.log(
       { userId: user.id, email: user.email },
       'User login successful',
     );
 
+    // Audit log success
+    await this.auditService.log({
+      actorUserId: user.id,
+      actorEmail: user.email,
+      action: 'LOGIN_SUCCESS',
+      resourceType: 'AUTH',
+      resourceId: session.id,
+      ipAddress: ip,
+      userAgent: userAgent,
+    });
+
     return {
       accessToken,
+      refreshToken,
       user,
+      memberships,
     };
+  }
+
+  async registerRestaurant(dto: RegisterRestaurantDto, ip?: string, userAgent?: string) {
+    const normalizedEmail = dto.email.trim().toLowerCase();
+
+    const existing = await this.prisma.user.findUnique({
+      where: { email: normalizedEmail },
+    });
+
+    if (existing) {
+      throw new ConflictException('Email address is already registered');
+    }
+
+    const passwordHash = await bcrypt.hash(dto.password, 10);
+    const baseSlug = this.slugify(dto.restaurantName);
+
+    return this.prisma.$transaction(async (tx) => {
+      // Ensure unique tenant slug
+      let tenantSlug = baseSlug;
+      const countT = await tx.tenant.count({ where: { slug: tenantSlug } });
+      if (countT > 0) {
+        tenantSlug = `${baseSlug}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
+      }
+
+      // 1. Create Tenant
+      const tenant = await tx.tenant.create({
+        data: { name: dto.restaurantName, slug: tenantSlug },
+      });
+
+      // 2. Create Restaurant under Tenant
+      const restaurant = await tx.restaurant.create({
+        data: { tenantId: tenant.id, name: dto.restaurantName, slug: tenantSlug },
+      });
+
+      // 2.5. Create Default Trial Subscription
+      try {
+        const defaultPlan = (await tx.plan.findFirst({
+          where: { name: 'Starter', status: 'ACTIVE' },
+        })) || (await tx.plan.findFirst({
+          where: { status: 'ACTIVE' },
+          orderBy: { price: 'asc' },
+        }));
+
+        if (defaultPlan) {
+          const trialDays = defaultPlan.trialDays || 14;
+          const now = new Date();
+          const trialEnd = new Date();
+          trialEnd.setDate(now.getDate() + trialDays);
+
+          await tx.subscription.create({
+            data: {
+              restaurantId: restaurant.id,
+              planId: defaultPlan.id,
+              status: 'TRIALING',
+              billingCycle: defaultPlan.billingCycle || 'MONTHLY',
+              trialStart: now,
+              trialEnd: trialEnd,
+              currentPeriodStart: now,
+              currentPeriodEnd: trialEnd,
+            },
+          });
+        }
+      } catch (subErr) {
+        this.logger.warn({ error: subErr }, 'Could not create default trial subscription during onboarding');
+      }
+
+      // 3. Create Main Branch under Restaurant
+      const branch = await tx.branch.create({
+        data: {
+          restaurantId: restaurant.id,
+          name: 'Main Branch',
+          code: 'MAIN',
+          status: 'ACTIVE',
+        },
+      });
+
+      // 4. Create Owner User
+      const user = await tx.user.create({
+        data: {
+          name: dto.ownerName,
+          email: normalizedEmail,
+          phone: dto.phone || null,
+          passwordHash,
+          role: UserRole.OWNER,
+          status: 'ACTIVE',
+        },
+      });
+
+      // 5. Create Tenant Membership with OWNER role
+      const membership = await tx.tenantMembership.create({
+        data: {
+          userId: user.id,
+          tenantId: tenant.id,
+          role: UserRole.OWNER,
+        },
+      });
+
+      // Create session for onboarding login
+      const session = await tx.session.create({
+        data: {
+          userId: user.id,
+          refreshTokenHash: '',
+          deviceName: this.parseUserAgent(userAgent),
+          ipAddress: ip || null,
+          userAgent: userAgent || null,
+          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+        },
+      });
+
+      const accessToken = await this.generateAccessToken(user.id, user.email, user.role, session.id);
+      const refreshToken = await this.generateRefreshToken(session.id);
+
+      await tx.session.update({
+        where: { id: session.id },
+        data: { refreshTokenHash: this.hashToken(refreshToken) },
+      });
+
+      this.logger.log(
+        { userId: user.id, restaurantId: restaurant.id },
+        'New restaurant onboarding successful',
+      );
+
+      // Audit logs onboarding
+      await this.auditService.log({
+        actorUserId: user.id,
+        actorEmail: user.email,
+        action: 'RESTAURANT_CREATED',
+        resourceType: 'RESTAURANT',
+        resourceId: restaurant.id,
+        restaurantId: restaurant.id,
+        ipAddress: ip,
+        userAgent: userAgent,
+      });
+
+      return {
+        accessToken,
+        refreshToken,
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          phone: user.phone,
+          role: user.role,
+          status: user.status,
+        },
+        tenant: { id: tenant.id, name: tenant.name, slug: tenant.slug },
+        restaurant: { id: restaurant.id, name: restaurant.name, slug: restaurant.slug },
+        branch: { id: branch.id, name: branch.name, code: branch.code },
+        membership: { id: membership.id, role: membership.role },
+      };
+    });
+  }
+
+  async refresh(refreshToken: string, ip?: string, userAgent?: string) {
+    if (!refreshToken) {
+      throw new UnauthorizedException('Refresh token is required');
+    }
+
+    let payload: any;
+    try {
+      payload = await this.jwtService.verifyAsync(refreshToken);
+    } catch (err) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+
+    const sessionId = payload.sessionId;
+    const session = await this.prisma.session.findUnique({
+      where: { id: sessionId },
+      include: { user: true },
+    });
+
+    if (!session) {
+      throw new UnauthorizedException('Session not found');
+    }
+
+    const incomingHash = this.hashToken(refreshToken);
+
+    if (session.revokedAt) {
+      throw new UnauthorizedException('Session has been revoked');
+    }
+
+    if (session.refreshTokenHash !== incomingHash) {
+      throw new UnauthorizedException('Invalid or expired refresh token');
+    }
+
+    if (session.expiresAt < new Date()) {
+      throw new UnauthorizedException('Session expired');
+    }
+
+    // Generate rotated tokens
+    const newAccessToken = await this.generateAccessToken(
+      session.user.id,
+      session.user.email,
+      session.user.role,
+      session.id,
+    );
+    const newRefreshToken = await this.generateRefreshToken(session.id);
+
+    // Save rotated token hash
+    await this.prisma.session.update({
+      where: { id: session.id },
+      data: {
+        refreshTokenHash: this.hashToken(newRefreshToken),
+        lastUsedAt: new Date(),
+        ipAddress: ip || null,
+        userAgent: userAgent || null,
+      },
+    });
+
+    return {
+      accessToken: newAccessToken,
+      refreshToken: newRefreshToken,
+      user: {
+        id: session.user.id,
+        name: session.user.name,
+        email: session.user.email,
+        role: session.user.role,
+        status: session.user.status,
+      },
+    };
+  }
+
+  async logout(refreshToken: string, ip?: string, userAgent?: string) {
+    if (!refreshToken) return;
+
+    try {
+      const payload = await this.jwtService.verifyAsync(refreshToken);
+      const sessionId = payload.sessionId;
+
+      const session = await this.prisma.session.findUnique({
+        where: { id: sessionId },
+        include: { user: true },
+      });
+
+      if (session) {
+        await this.prisma.session.update({
+          where: { id: sessionId },
+          data: { revokedAt: new Date() },
+        });
+
+        await this.auditService.log({
+          actorUserId: session.user.id,
+          actorEmail: session.user.email,
+          action: 'LOGOUT',
+          resourceType: 'AUTH',
+          resourceId: sessionId,
+          ipAddress: ip,
+          userAgent: userAgent,
+        });
+      }
+    } catch {
+      // Swallowing errors so logout clears successfully on client-side anyway
+    }
+  }
+
+  async logoutAll(userId: string, ip?: string, userAgent?: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) return;
+
+    await this.prisma.session.updateMany({
+      where: { userId, revokedAt: null },
+      data: { revokedAt: new Date() },
+    });
+
+    await this.auditService.log({
+      actorUserId: user.id,
+      actorEmail: user.email,
+      action: 'LOGOUT_ALL',
+      resourceType: 'AUTH',
+      ipAddress: ip,
+      userAgent: userAgent,
+    });
+  }
+
+  async getSessions(userId: string) {
+    return this.prisma.session.findMany({
+      where: {
+        userId,
+        revokedAt: null,
+        expiresAt: { gte: new Date() },
+      },
+      orderBy: { lastUsedAt: 'desc' },
+      select: {
+        id: true,
+        deviceName: true,
+        ipAddress: true,
+        createdAt: true,
+        lastUsedAt: true,
+      },
+    });
+  }
+
+  async revokeSession(userId: string, sessionId: string) {
+    const session = await this.prisma.session.findUnique({
+      where: { id: sessionId },
+    });
+
+    if (!session || session.userId !== userId) {
+      throw new ForbiddenException('You do not own this session');
+    }
+
+    await this.prisma.session.update({
+      where: { id: sessionId },
+      data: { revokedAt: new Date() },
+    });
+
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+
+    await this.auditService.log({
+      actorUserId: userId,
+      actorEmail: user?.email,
+      action: 'SESSION_REVOKED',
+      resourceType: 'AUTH',
+      resourceId: sessionId,
+    });
+  }
+
+  async getUserMemberships(userId: string) {
+    const memberships = await this.prisma.tenantMembership.findMany({
+      where: { userId },
+      select: {
+        id: true,
+        role: true,
+        tenant: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+            restaurants: {
+              select: {
+                id: true,
+                name: true,
+                slug: true,
+                branches: {
+                  select: { id: true, name: true, code: true },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return memberships;
+  }
+
+  private async generateAccessToken(userId: string, email: string, role: string, sessionId: string): Promise<string> {
+    const payload = {
+      sub: userId,
+      userId: userId,
+      email: email,
+      role: role,
+      sessionId: sessionId,
+    };
+    return this.jwtService.signAsync(payload, { expiresIn: '15m' });
+  }
+
+  private async generateRefreshToken(sessionId: string): Promise<string> {
+    const payload = {
+      sessionId: sessionId,
+    };
+    return this.jwtService.signAsync(payload, { expiresIn: '7d' });
+  }
+
+  private hashToken(token: string): string {
+    return crypto.createHash('sha256').update(token).digest('hex');
+  }
+
+  private parseUserAgent(ua?: string): string {
+    if (!ua) return 'Unknown Device';
+    if (ua.includes('iPhone')) return 'iPhone';
+    if (ua.includes('iPad')) return 'iPad';
+    if (ua.includes('Android')) return 'Android Device';
+    if (ua.includes('Windows')) return 'Windows PC';
+    if (ua.includes('Macintosh')) return 'MacBook';
+    if (ua.includes('Linux')) return 'Linux PC';
+    return 'Web Browser';
+  }
+
+  private slugify(text: string): string {
+    return text
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/[\s_-]+/g, '-')
+      .replace(/^-+|-+$/g, '') || 'restaurant';
   }
 }

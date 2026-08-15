@@ -5,12 +5,25 @@
   "packageManager": "pnpm@11.10.0",
   "scripts": {
     "dev:api": "pnpm --filter api start:dev",
+    "dev:web": "pnpm --filter web dev",
+    "build": "pnpm --filter api build && pnpm --filter web build",
     "build:api": "pnpm --filter api build",
+    "build:web": "pnpm --filter web build",
+    "test": "pnpm --filter api test",
     "test:api": "pnpm --filter api test",
+    "test:security": "node scripts/test-multi-tenant-security.mjs",
+    "test:load": "node scripts/test-load-and-resilience.mjs",
+    "test:pilot": "node scripts/test-pilot-onboarding.mjs",
+    "db:backup": "node --env-file=apps/api/.env scripts/backup-and-restore.mjs",
+    "pdf:export": "node scripts/generate-pdf.mjs",
     "lint:api": "pnpm --filter api lint"
   },
   "devDependencies": {
+    "@types/node-cron": "^3.0.11",
     "dotenv": "^17.4.2",
     "prisma": "^7.9.1"
+  },
+  "dependencies": {
+    "node-cron": "^4.6.0"
   }
 }

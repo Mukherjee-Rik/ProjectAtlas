@@ -309,6 +309,8 @@ export type MenuItemWhereInput = {
   variantGroups?: Prisma.MenuItemVariantGroupListRelationFilter
   addonGroups?: Prisma.MenuItemAddonGroupListRelationFilter
   cartItems?: Prisma.CartItemListRelationFilter
+  orderItems?: Prisma.OrderItemListRelationFilter
+  recipe?: Prisma.XOR<Prisma.RecipeNullableScalarRelationFilter, Prisma.RecipeWhereInput> | null
 }
 
 export type MenuItemOrderByWithRelationInput = {
@@ -332,6 +334,8 @@ export type MenuItemOrderByWithRelationInput = {
   variantGroups?: Prisma.MenuItemVariantGroupOrderByRelationAggregateInput
   addonGroups?: Prisma.MenuItemAddonGroupOrderByRelationAggregateInput
   cartItems?: Prisma.CartItemOrderByRelationAggregateInput
+  orderItems?: Prisma.OrderItemOrderByRelationAggregateInput
+  recipe?: Prisma.RecipeOrderByWithRelationInput
 }
 
 export type MenuItemWhereUniqueInput = Prisma.AtLeast<{
@@ -359,6 +363,8 @@ export type MenuItemWhereUniqueInput = Prisma.AtLeast<{
   variantGroups?: Prisma.MenuItemVariantGroupListRelationFilter
   addonGroups?: Prisma.MenuItemAddonGroupListRelationFilter
   cartItems?: Prisma.CartItemListRelationFilter
+  orderItems?: Prisma.OrderItemListRelationFilter
+  recipe?: Prisma.XOR<Prisma.RecipeNullableScalarRelationFilter, Prisma.RecipeWhereInput> | null
 }, "id" | "categoryId_code">
 
 export type MenuItemOrderByWithAggregationInput = {
@@ -424,6 +430,8 @@ export type MenuItemCreateInput = {
   variantGroups?: Prisma.MenuItemVariantGroupCreateNestedManyWithoutMenuItemInput
   addonGroups?: Prisma.MenuItemAddonGroupCreateNestedManyWithoutMenuItemInput
   cartItems?: Prisma.CartItemCreateNestedManyWithoutMenuItemInput
+  orderItems?: Prisma.OrderItemCreateNestedManyWithoutMenuItemInput
+  recipe?: Prisma.RecipeCreateNestedOneWithoutMenuItemInput
 }
 
 export type MenuItemUncheckedCreateInput = {
@@ -445,6 +453,8 @@ export type MenuItemUncheckedCreateInput = {
   variantGroups?: Prisma.MenuItemVariantGroupUncheckedCreateNestedManyWithoutMenuItemInput
   addonGroups?: Prisma.MenuItemAddonGroupUncheckedCreateNestedManyWithoutMenuItemInput
   cartItems?: Prisma.CartItemUncheckedCreateNestedManyWithoutMenuItemInput
+  orderItems?: Prisma.OrderItemUncheckedCreateNestedManyWithoutMenuItemInput
+  recipe?: Prisma.RecipeUncheckedCreateNestedOneWithoutMenuItemInput
 }
 
 export type MenuItemUpdateInput = {
@@ -466,6 +476,8 @@ export type MenuItemUpdateInput = {
   variantGroups?: Prisma.MenuItemVariantGroupUpdateManyWithoutMenuItemNestedInput
   addonGroups?: Prisma.MenuItemAddonGroupUpdateManyWithoutMenuItemNestedInput
   cartItems?: Prisma.CartItemUpdateManyWithoutMenuItemNestedInput
+  orderItems?: Prisma.OrderItemUpdateManyWithoutMenuItemNestedInput
+  recipe?: Prisma.RecipeUpdateOneWithoutMenuItemNestedInput
 }
 
 export type MenuItemUncheckedUpdateInput = {
@@ -487,6 +499,8 @@ export type MenuItemUncheckedUpdateInput = {
   variantGroups?: Prisma.MenuItemVariantGroupUncheckedUpdateManyWithoutMenuItemNestedInput
   addonGroups?: Prisma.MenuItemAddonGroupUncheckedUpdateManyWithoutMenuItemNestedInput
   cartItems?: Prisma.CartItemUncheckedUpdateManyWithoutMenuItemNestedInput
+  orderItems?: Prisma.OrderItemUncheckedUpdateManyWithoutMenuItemNestedInput
+  recipe?: Prisma.RecipeUncheckedUpdateOneWithoutMenuItemNestedInput
 }
 
 export type MenuItemCreateManyInput = {
@@ -781,6 +795,34 @@ export type MenuItemUpdateOneRequiredWithoutCartItemsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.MenuItemUpdateToOneWithWhereWithoutCartItemsInput, Prisma.MenuItemUpdateWithoutCartItemsInput>, Prisma.MenuItemUncheckedUpdateWithoutCartItemsInput>
 }
 
+export type MenuItemCreateNestedOneWithoutOrderItemsInput = {
+  create?: Prisma.XOR<Prisma.MenuItemCreateWithoutOrderItemsInput, Prisma.MenuItemUncheckedCreateWithoutOrderItemsInput>
+  connectOrCreate?: Prisma.MenuItemCreateOrConnectWithoutOrderItemsInput
+  connect?: Prisma.MenuItemWhereUniqueInput
+}
+
+export type MenuItemUpdateOneRequiredWithoutOrderItemsNestedInput = {
+  create?: Prisma.XOR<Prisma.MenuItemCreateWithoutOrderItemsInput, Prisma.MenuItemUncheckedCreateWithoutOrderItemsInput>
+  connectOrCreate?: Prisma.MenuItemCreateOrConnectWithoutOrderItemsInput
+  upsert?: Prisma.MenuItemUpsertWithoutOrderItemsInput
+  connect?: Prisma.MenuItemWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.MenuItemUpdateToOneWithWhereWithoutOrderItemsInput, Prisma.MenuItemUpdateWithoutOrderItemsInput>, Prisma.MenuItemUncheckedUpdateWithoutOrderItemsInput>
+}
+
+export type MenuItemCreateNestedOneWithoutRecipeInput = {
+  create?: Prisma.XOR<Prisma.MenuItemCreateWithoutRecipeInput, Prisma.MenuItemUncheckedCreateWithoutRecipeInput>
+  connectOrCreate?: Prisma.MenuItemCreateOrConnectWithoutRecipeInput
+  connect?: Prisma.MenuItemWhereUniqueInput
+}
+
+export type MenuItemUpdateOneRequiredWithoutRecipeNestedInput = {
+  create?: Prisma.XOR<Prisma.MenuItemCreateWithoutRecipeInput, Prisma.MenuItemUncheckedCreateWithoutRecipeInput>
+  connectOrCreate?: Prisma.MenuItemCreateOrConnectWithoutRecipeInput
+  upsert?: Prisma.MenuItemUpsertWithoutRecipeInput
+  connect?: Prisma.MenuItemWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.MenuItemUpdateToOneWithWhereWithoutRecipeInput, Prisma.MenuItemUpdateWithoutRecipeInput>, Prisma.MenuItemUncheckedUpdateWithoutRecipeInput>
+}
+
 export type MenuItemCreateWithoutCategoryInput = {
   id?: string
   name: string
@@ -799,6 +841,8 @@ export type MenuItemCreateWithoutCategoryInput = {
   variantGroups?: Prisma.MenuItemVariantGroupCreateNestedManyWithoutMenuItemInput
   addonGroups?: Prisma.MenuItemAddonGroupCreateNestedManyWithoutMenuItemInput
   cartItems?: Prisma.CartItemCreateNestedManyWithoutMenuItemInput
+  orderItems?: Prisma.OrderItemCreateNestedManyWithoutMenuItemInput
+  recipe?: Prisma.RecipeCreateNestedOneWithoutMenuItemInput
 }
 
 export type MenuItemUncheckedCreateWithoutCategoryInput = {
@@ -819,6 +863,8 @@ export type MenuItemUncheckedCreateWithoutCategoryInput = {
   variantGroups?: Prisma.MenuItemVariantGroupUncheckedCreateNestedManyWithoutMenuItemInput
   addonGroups?: Prisma.MenuItemAddonGroupUncheckedCreateNestedManyWithoutMenuItemInput
   cartItems?: Prisma.CartItemUncheckedCreateNestedManyWithoutMenuItemInput
+  orderItems?: Prisma.OrderItemUncheckedCreateNestedManyWithoutMenuItemInput
+  recipe?: Prisma.RecipeUncheckedCreateNestedOneWithoutMenuItemInput
 }
 
 export type MenuItemCreateOrConnectWithoutCategoryInput = {
@@ -886,6 +932,8 @@ export type MenuItemCreateWithoutTaxRateInput = {
   variantGroups?: Prisma.MenuItemVariantGroupCreateNestedManyWithoutMenuItemInput
   addonGroups?: Prisma.MenuItemAddonGroupCreateNestedManyWithoutMenuItemInput
   cartItems?: Prisma.CartItemCreateNestedManyWithoutMenuItemInput
+  orderItems?: Prisma.OrderItemCreateNestedManyWithoutMenuItemInput
+  recipe?: Prisma.RecipeCreateNestedOneWithoutMenuItemInput
 }
 
 export type MenuItemUncheckedCreateWithoutTaxRateInput = {
@@ -906,6 +954,8 @@ export type MenuItemUncheckedCreateWithoutTaxRateInput = {
   variantGroups?: Prisma.MenuItemVariantGroupUncheckedCreateNestedManyWithoutMenuItemInput
   addonGroups?: Prisma.MenuItemAddonGroupUncheckedCreateNestedManyWithoutMenuItemInput
   cartItems?: Prisma.CartItemUncheckedCreateNestedManyWithoutMenuItemInput
+  orderItems?: Prisma.OrderItemUncheckedCreateNestedManyWithoutMenuItemInput
+  recipe?: Prisma.RecipeUncheckedCreateNestedOneWithoutMenuItemInput
 }
 
 export type MenuItemCreateOrConnectWithoutTaxRateInput = {
@@ -952,6 +1002,8 @@ export type MenuItemCreateWithoutVariantGroupsInput = {
   taxRate?: Prisma.TaxRateCreateNestedOneWithoutMenuItemsInput
   addonGroups?: Prisma.MenuItemAddonGroupCreateNestedManyWithoutMenuItemInput
   cartItems?: Prisma.CartItemCreateNestedManyWithoutMenuItemInput
+  orderItems?: Prisma.OrderItemCreateNestedManyWithoutMenuItemInput
+  recipe?: Prisma.RecipeCreateNestedOneWithoutMenuItemInput
 }
 
 export type MenuItemUncheckedCreateWithoutVariantGroupsInput = {
@@ -972,6 +1024,8 @@ export type MenuItemUncheckedCreateWithoutVariantGroupsInput = {
   updatedAt?: Date | string
   addonGroups?: Prisma.MenuItemAddonGroupUncheckedCreateNestedManyWithoutMenuItemInput
   cartItems?: Prisma.CartItemUncheckedCreateNestedManyWithoutMenuItemInput
+  orderItems?: Prisma.OrderItemUncheckedCreateNestedManyWithoutMenuItemInput
+  recipe?: Prisma.RecipeUncheckedCreateNestedOneWithoutMenuItemInput
 }
 
 export type MenuItemCreateOrConnectWithoutVariantGroupsInput = {
@@ -1008,6 +1062,8 @@ export type MenuItemUpdateWithoutVariantGroupsInput = {
   taxRate?: Prisma.TaxRateUpdateOneWithoutMenuItemsNestedInput
   addonGroups?: Prisma.MenuItemAddonGroupUpdateManyWithoutMenuItemNestedInput
   cartItems?: Prisma.CartItemUpdateManyWithoutMenuItemNestedInput
+  orderItems?: Prisma.OrderItemUpdateManyWithoutMenuItemNestedInput
+  recipe?: Prisma.RecipeUpdateOneWithoutMenuItemNestedInput
 }
 
 export type MenuItemUncheckedUpdateWithoutVariantGroupsInput = {
@@ -1028,6 +1084,8 @@ export type MenuItemUncheckedUpdateWithoutVariantGroupsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   addonGroups?: Prisma.MenuItemAddonGroupUncheckedUpdateManyWithoutMenuItemNestedInput
   cartItems?: Prisma.CartItemUncheckedUpdateManyWithoutMenuItemNestedInput
+  orderItems?: Prisma.OrderItemUncheckedUpdateManyWithoutMenuItemNestedInput
+  recipe?: Prisma.RecipeUncheckedUpdateOneWithoutMenuItemNestedInput
 }
 
 export type MenuItemCreateWithoutAddonGroupsInput = {
@@ -1048,6 +1106,8 @@ export type MenuItemCreateWithoutAddonGroupsInput = {
   taxRate?: Prisma.TaxRateCreateNestedOneWithoutMenuItemsInput
   variantGroups?: Prisma.MenuItemVariantGroupCreateNestedManyWithoutMenuItemInput
   cartItems?: Prisma.CartItemCreateNestedManyWithoutMenuItemInput
+  orderItems?: Prisma.OrderItemCreateNestedManyWithoutMenuItemInput
+  recipe?: Prisma.RecipeCreateNestedOneWithoutMenuItemInput
 }
 
 export type MenuItemUncheckedCreateWithoutAddonGroupsInput = {
@@ -1068,6 +1128,8 @@ export type MenuItemUncheckedCreateWithoutAddonGroupsInput = {
   updatedAt?: Date | string
   variantGroups?: Prisma.MenuItemVariantGroupUncheckedCreateNestedManyWithoutMenuItemInput
   cartItems?: Prisma.CartItemUncheckedCreateNestedManyWithoutMenuItemInput
+  orderItems?: Prisma.OrderItemUncheckedCreateNestedManyWithoutMenuItemInput
+  recipe?: Prisma.RecipeUncheckedCreateNestedOneWithoutMenuItemInput
 }
 
 export type MenuItemCreateOrConnectWithoutAddonGroupsInput = {
@@ -1104,6 +1166,8 @@ export type MenuItemUpdateWithoutAddonGroupsInput = {
   taxRate?: Prisma.TaxRateUpdateOneWithoutMenuItemsNestedInput
   variantGroups?: Prisma.MenuItemVariantGroupUpdateManyWithoutMenuItemNestedInput
   cartItems?: Prisma.CartItemUpdateManyWithoutMenuItemNestedInput
+  orderItems?: Prisma.OrderItemUpdateManyWithoutMenuItemNestedInput
+  recipe?: Prisma.RecipeUpdateOneWithoutMenuItemNestedInput
 }
 
 export type MenuItemUncheckedUpdateWithoutAddonGroupsInput = {
@@ -1124,6 +1188,8 @@ export type MenuItemUncheckedUpdateWithoutAddonGroupsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   variantGroups?: Prisma.MenuItemVariantGroupUncheckedUpdateManyWithoutMenuItemNestedInput
   cartItems?: Prisma.CartItemUncheckedUpdateManyWithoutMenuItemNestedInput
+  orderItems?: Prisma.OrderItemUncheckedUpdateManyWithoutMenuItemNestedInput
+  recipe?: Prisma.RecipeUncheckedUpdateOneWithoutMenuItemNestedInput
 }
 
 export type MenuItemCreateWithoutCartItemsInput = {
@@ -1144,6 +1210,8 @@ export type MenuItemCreateWithoutCartItemsInput = {
   taxRate?: Prisma.TaxRateCreateNestedOneWithoutMenuItemsInput
   variantGroups?: Prisma.MenuItemVariantGroupCreateNestedManyWithoutMenuItemInput
   addonGroups?: Prisma.MenuItemAddonGroupCreateNestedManyWithoutMenuItemInput
+  orderItems?: Prisma.OrderItemCreateNestedManyWithoutMenuItemInput
+  recipe?: Prisma.RecipeCreateNestedOneWithoutMenuItemInput
 }
 
 export type MenuItemUncheckedCreateWithoutCartItemsInput = {
@@ -1164,6 +1232,8 @@ export type MenuItemUncheckedCreateWithoutCartItemsInput = {
   updatedAt?: Date | string
   variantGroups?: Prisma.MenuItemVariantGroupUncheckedCreateNestedManyWithoutMenuItemInput
   addonGroups?: Prisma.MenuItemAddonGroupUncheckedCreateNestedManyWithoutMenuItemInput
+  orderItems?: Prisma.OrderItemUncheckedCreateNestedManyWithoutMenuItemInput
+  recipe?: Prisma.RecipeUncheckedCreateNestedOneWithoutMenuItemInput
 }
 
 export type MenuItemCreateOrConnectWithoutCartItemsInput = {
@@ -1200,6 +1270,8 @@ export type MenuItemUpdateWithoutCartItemsInput = {
   taxRate?: Prisma.TaxRateUpdateOneWithoutMenuItemsNestedInput
   variantGroups?: Prisma.MenuItemVariantGroupUpdateManyWithoutMenuItemNestedInput
   addonGroups?: Prisma.MenuItemAddonGroupUpdateManyWithoutMenuItemNestedInput
+  orderItems?: Prisma.OrderItemUpdateManyWithoutMenuItemNestedInput
+  recipe?: Prisma.RecipeUpdateOneWithoutMenuItemNestedInput
 }
 
 export type MenuItemUncheckedUpdateWithoutCartItemsInput = {
@@ -1220,6 +1292,216 @@ export type MenuItemUncheckedUpdateWithoutCartItemsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   variantGroups?: Prisma.MenuItemVariantGroupUncheckedUpdateManyWithoutMenuItemNestedInput
   addonGroups?: Prisma.MenuItemAddonGroupUncheckedUpdateManyWithoutMenuItemNestedInput
+  orderItems?: Prisma.OrderItemUncheckedUpdateManyWithoutMenuItemNestedInput
+  recipe?: Prisma.RecipeUncheckedUpdateOneWithoutMenuItemNestedInput
+}
+
+export type MenuItemCreateWithoutOrderItemsInput = {
+  id?: string
+  name: string
+  code: string
+  description?: string | null
+  imageUrl?: string | null
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
+  dietaryType?: $Enums.DietaryType
+  foodType?: $Enums.FoodType
+  preparationTimeMinutes?: number | null
+  position?: number
+  status?: $Enums.MenuItemStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  category: Prisma.MenuCategoryCreateNestedOneWithoutItemsInput
+  taxRate?: Prisma.TaxRateCreateNestedOneWithoutMenuItemsInput
+  variantGroups?: Prisma.MenuItemVariantGroupCreateNestedManyWithoutMenuItemInput
+  addonGroups?: Prisma.MenuItemAddonGroupCreateNestedManyWithoutMenuItemInput
+  cartItems?: Prisma.CartItemCreateNestedManyWithoutMenuItemInput
+  recipe?: Prisma.RecipeCreateNestedOneWithoutMenuItemInput
+}
+
+export type MenuItemUncheckedCreateWithoutOrderItemsInput = {
+  id?: string
+  categoryId: string
+  taxRateId?: string | null
+  name: string
+  code: string
+  description?: string | null
+  imageUrl?: string | null
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
+  dietaryType?: $Enums.DietaryType
+  foodType?: $Enums.FoodType
+  preparationTimeMinutes?: number | null
+  position?: number
+  status?: $Enums.MenuItemStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  variantGroups?: Prisma.MenuItemVariantGroupUncheckedCreateNestedManyWithoutMenuItemInput
+  addonGroups?: Prisma.MenuItemAddonGroupUncheckedCreateNestedManyWithoutMenuItemInput
+  cartItems?: Prisma.CartItemUncheckedCreateNestedManyWithoutMenuItemInput
+  recipe?: Prisma.RecipeUncheckedCreateNestedOneWithoutMenuItemInput
+}
+
+export type MenuItemCreateOrConnectWithoutOrderItemsInput = {
+  where: Prisma.MenuItemWhereUniqueInput
+  create: Prisma.XOR<Prisma.MenuItemCreateWithoutOrderItemsInput, Prisma.MenuItemUncheckedCreateWithoutOrderItemsInput>
+}
+
+export type MenuItemUpsertWithoutOrderItemsInput = {
+  update: Prisma.XOR<Prisma.MenuItemUpdateWithoutOrderItemsInput, Prisma.MenuItemUncheckedUpdateWithoutOrderItemsInput>
+  create: Prisma.XOR<Prisma.MenuItemCreateWithoutOrderItemsInput, Prisma.MenuItemUncheckedCreateWithoutOrderItemsInput>
+  where?: Prisma.MenuItemWhereInput
+}
+
+export type MenuItemUpdateToOneWithWhereWithoutOrderItemsInput = {
+  where?: Prisma.MenuItemWhereInput
+  data: Prisma.XOR<Prisma.MenuItemUpdateWithoutOrderItemsInput, Prisma.MenuItemUncheckedUpdateWithoutOrderItemsInput>
+}
+
+export type MenuItemUpdateWithoutOrderItemsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  dietaryType?: Prisma.EnumDietaryTypeFieldUpdateOperationsInput | $Enums.DietaryType
+  foodType?: Prisma.EnumFoodTypeFieldUpdateOperationsInput | $Enums.FoodType
+  preparationTimeMinutes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  position?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumMenuItemStatusFieldUpdateOperationsInput | $Enums.MenuItemStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  category?: Prisma.MenuCategoryUpdateOneRequiredWithoutItemsNestedInput
+  taxRate?: Prisma.TaxRateUpdateOneWithoutMenuItemsNestedInput
+  variantGroups?: Prisma.MenuItemVariantGroupUpdateManyWithoutMenuItemNestedInput
+  addonGroups?: Prisma.MenuItemAddonGroupUpdateManyWithoutMenuItemNestedInput
+  cartItems?: Prisma.CartItemUpdateManyWithoutMenuItemNestedInput
+  recipe?: Prisma.RecipeUpdateOneWithoutMenuItemNestedInput
+}
+
+export type MenuItemUncheckedUpdateWithoutOrderItemsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  categoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  taxRateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  dietaryType?: Prisma.EnumDietaryTypeFieldUpdateOperationsInput | $Enums.DietaryType
+  foodType?: Prisma.EnumFoodTypeFieldUpdateOperationsInput | $Enums.FoodType
+  preparationTimeMinutes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  position?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumMenuItemStatusFieldUpdateOperationsInput | $Enums.MenuItemStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  variantGroups?: Prisma.MenuItemVariantGroupUncheckedUpdateManyWithoutMenuItemNestedInput
+  addonGroups?: Prisma.MenuItemAddonGroupUncheckedUpdateManyWithoutMenuItemNestedInput
+  cartItems?: Prisma.CartItemUncheckedUpdateManyWithoutMenuItemNestedInput
+  recipe?: Prisma.RecipeUncheckedUpdateOneWithoutMenuItemNestedInput
+}
+
+export type MenuItemCreateWithoutRecipeInput = {
+  id?: string
+  name: string
+  code: string
+  description?: string | null
+  imageUrl?: string | null
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
+  dietaryType?: $Enums.DietaryType
+  foodType?: $Enums.FoodType
+  preparationTimeMinutes?: number | null
+  position?: number
+  status?: $Enums.MenuItemStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  category: Prisma.MenuCategoryCreateNestedOneWithoutItemsInput
+  taxRate?: Prisma.TaxRateCreateNestedOneWithoutMenuItemsInput
+  variantGroups?: Prisma.MenuItemVariantGroupCreateNestedManyWithoutMenuItemInput
+  addonGroups?: Prisma.MenuItemAddonGroupCreateNestedManyWithoutMenuItemInput
+  cartItems?: Prisma.CartItemCreateNestedManyWithoutMenuItemInput
+  orderItems?: Prisma.OrderItemCreateNestedManyWithoutMenuItemInput
+}
+
+export type MenuItemUncheckedCreateWithoutRecipeInput = {
+  id?: string
+  categoryId: string
+  taxRateId?: string | null
+  name: string
+  code: string
+  description?: string | null
+  imageUrl?: string | null
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
+  dietaryType?: $Enums.DietaryType
+  foodType?: $Enums.FoodType
+  preparationTimeMinutes?: number | null
+  position?: number
+  status?: $Enums.MenuItemStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  variantGroups?: Prisma.MenuItemVariantGroupUncheckedCreateNestedManyWithoutMenuItemInput
+  addonGroups?: Prisma.MenuItemAddonGroupUncheckedCreateNestedManyWithoutMenuItemInput
+  cartItems?: Prisma.CartItemUncheckedCreateNestedManyWithoutMenuItemInput
+  orderItems?: Prisma.OrderItemUncheckedCreateNestedManyWithoutMenuItemInput
+}
+
+export type MenuItemCreateOrConnectWithoutRecipeInput = {
+  where: Prisma.MenuItemWhereUniqueInput
+  create: Prisma.XOR<Prisma.MenuItemCreateWithoutRecipeInput, Prisma.MenuItemUncheckedCreateWithoutRecipeInput>
+}
+
+export type MenuItemUpsertWithoutRecipeInput = {
+  update: Prisma.XOR<Prisma.MenuItemUpdateWithoutRecipeInput, Prisma.MenuItemUncheckedUpdateWithoutRecipeInput>
+  create: Prisma.XOR<Prisma.MenuItemCreateWithoutRecipeInput, Prisma.MenuItemUncheckedCreateWithoutRecipeInput>
+  where?: Prisma.MenuItemWhereInput
+}
+
+export type MenuItemUpdateToOneWithWhereWithoutRecipeInput = {
+  where?: Prisma.MenuItemWhereInput
+  data: Prisma.XOR<Prisma.MenuItemUpdateWithoutRecipeInput, Prisma.MenuItemUncheckedUpdateWithoutRecipeInput>
+}
+
+export type MenuItemUpdateWithoutRecipeInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  dietaryType?: Prisma.EnumDietaryTypeFieldUpdateOperationsInput | $Enums.DietaryType
+  foodType?: Prisma.EnumFoodTypeFieldUpdateOperationsInput | $Enums.FoodType
+  preparationTimeMinutes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  position?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumMenuItemStatusFieldUpdateOperationsInput | $Enums.MenuItemStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  category?: Prisma.MenuCategoryUpdateOneRequiredWithoutItemsNestedInput
+  taxRate?: Prisma.TaxRateUpdateOneWithoutMenuItemsNestedInput
+  variantGroups?: Prisma.MenuItemVariantGroupUpdateManyWithoutMenuItemNestedInput
+  addonGroups?: Prisma.MenuItemAddonGroupUpdateManyWithoutMenuItemNestedInput
+  cartItems?: Prisma.CartItemUpdateManyWithoutMenuItemNestedInput
+  orderItems?: Prisma.OrderItemUpdateManyWithoutMenuItemNestedInput
+}
+
+export type MenuItemUncheckedUpdateWithoutRecipeInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  categoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  taxRateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  dietaryType?: Prisma.EnumDietaryTypeFieldUpdateOperationsInput | $Enums.DietaryType
+  foodType?: Prisma.EnumFoodTypeFieldUpdateOperationsInput | $Enums.FoodType
+  preparationTimeMinutes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  position?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumMenuItemStatusFieldUpdateOperationsInput | $Enums.MenuItemStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  variantGroups?: Prisma.MenuItemVariantGroupUncheckedUpdateManyWithoutMenuItemNestedInput
+  addonGroups?: Prisma.MenuItemAddonGroupUncheckedUpdateManyWithoutMenuItemNestedInput
+  cartItems?: Prisma.CartItemUncheckedUpdateManyWithoutMenuItemNestedInput
+  orderItems?: Prisma.OrderItemUncheckedUpdateManyWithoutMenuItemNestedInput
 }
 
 export type MenuItemCreateManyCategoryInput = {
@@ -1257,6 +1539,8 @@ export type MenuItemUpdateWithoutCategoryInput = {
   variantGroups?: Prisma.MenuItemVariantGroupUpdateManyWithoutMenuItemNestedInput
   addonGroups?: Prisma.MenuItemAddonGroupUpdateManyWithoutMenuItemNestedInput
   cartItems?: Prisma.CartItemUpdateManyWithoutMenuItemNestedInput
+  orderItems?: Prisma.OrderItemUpdateManyWithoutMenuItemNestedInput
+  recipe?: Prisma.RecipeUpdateOneWithoutMenuItemNestedInput
 }
 
 export type MenuItemUncheckedUpdateWithoutCategoryInput = {
@@ -1277,6 +1561,8 @@ export type MenuItemUncheckedUpdateWithoutCategoryInput = {
   variantGroups?: Prisma.MenuItemVariantGroupUncheckedUpdateManyWithoutMenuItemNestedInput
   addonGroups?: Prisma.MenuItemAddonGroupUncheckedUpdateManyWithoutMenuItemNestedInput
   cartItems?: Prisma.CartItemUncheckedUpdateManyWithoutMenuItemNestedInput
+  orderItems?: Prisma.OrderItemUncheckedUpdateManyWithoutMenuItemNestedInput
+  recipe?: Prisma.RecipeUncheckedUpdateOneWithoutMenuItemNestedInput
 }
 
 export type MenuItemUncheckedUpdateManyWithoutCategoryInput = {
@@ -1331,6 +1617,8 @@ export type MenuItemUpdateWithoutTaxRateInput = {
   variantGroups?: Prisma.MenuItemVariantGroupUpdateManyWithoutMenuItemNestedInput
   addonGroups?: Prisma.MenuItemAddonGroupUpdateManyWithoutMenuItemNestedInput
   cartItems?: Prisma.CartItemUpdateManyWithoutMenuItemNestedInput
+  orderItems?: Prisma.OrderItemUpdateManyWithoutMenuItemNestedInput
+  recipe?: Prisma.RecipeUpdateOneWithoutMenuItemNestedInput
 }
 
 export type MenuItemUncheckedUpdateWithoutTaxRateInput = {
@@ -1351,6 +1639,8 @@ export type MenuItemUncheckedUpdateWithoutTaxRateInput = {
   variantGroups?: Prisma.MenuItemVariantGroupUncheckedUpdateManyWithoutMenuItemNestedInput
   addonGroups?: Prisma.MenuItemAddonGroupUncheckedUpdateManyWithoutMenuItemNestedInput
   cartItems?: Prisma.CartItemUncheckedUpdateManyWithoutMenuItemNestedInput
+  orderItems?: Prisma.OrderItemUncheckedUpdateManyWithoutMenuItemNestedInput
+  recipe?: Prisma.RecipeUncheckedUpdateOneWithoutMenuItemNestedInput
 }
 
 export type MenuItemUncheckedUpdateManyWithoutTaxRateInput = {
@@ -1379,12 +1669,14 @@ export type MenuItemCountOutputType = {
   variantGroups: number
   addonGroups: number
   cartItems: number
+  orderItems: number
 }
 
 export type MenuItemCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   variantGroups?: boolean | MenuItemCountOutputTypeCountVariantGroupsArgs
   addonGroups?: boolean | MenuItemCountOutputTypeCountAddonGroupsArgs
   cartItems?: boolean | MenuItemCountOutputTypeCountCartItemsArgs
+  orderItems?: boolean | MenuItemCountOutputTypeCountOrderItemsArgs
 }
 
 /**
@@ -1418,6 +1710,13 @@ export type MenuItemCountOutputTypeCountCartItemsArgs<ExtArgs extends runtime.Ty
   where?: Prisma.CartItemWhereInput
 }
 
+/**
+ * MenuItemCountOutputType without action
+ */
+export type MenuItemCountOutputTypeCountOrderItemsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.OrderItemWhereInput
+}
+
 
 export type MenuItemSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1440,6 +1739,8 @@ export type MenuItemSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   variantGroups?: boolean | Prisma.MenuItem$variantGroupsArgs<ExtArgs>
   addonGroups?: boolean | Prisma.MenuItem$addonGroupsArgs<ExtArgs>
   cartItems?: boolean | Prisma.MenuItem$cartItemsArgs<ExtArgs>
+  orderItems?: boolean | Prisma.MenuItem$orderItemsArgs<ExtArgs>
+  recipe?: boolean | Prisma.MenuItem$recipeArgs<ExtArgs>
   _count?: boolean | Prisma.MenuItemCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["menuItem"]>
 
@@ -1508,6 +1809,8 @@ export type MenuItemInclude<ExtArgs extends runtime.Types.Extensions.InternalArg
   variantGroups?: boolean | Prisma.MenuItem$variantGroupsArgs<ExtArgs>
   addonGroups?: boolean | Prisma.MenuItem$addonGroupsArgs<ExtArgs>
   cartItems?: boolean | Prisma.MenuItem$cartItemsArgs<ExtArgs>
+  orderItems?: boolean | Prisma.MenuItem$orderItemsArgs<ExtArgs>
+  recipe?: boolean | Prisma.MenuItem$recipeArgs<ExtArgs>
   _count?: boolean | Prisma.MenuItemCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type MenuItemIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1527,6 +1830,8 @@ export type $MenuItemPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     variantGroups: Prisma.$MenuItemVariantGroupPayload<ExtArgs>[]
     addonGroups: Prisma.$MenuItemAddonGroupPayload<ExtArgs>[]
     cartItems: Prisma.$CartItemPayload<ExtArgs>[]
+    orderItems: Prisma.$OrderItemPayload<ExtArgs>[]
+    recipe: Prisma.$RecipePayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1943,6 +2248,8 @@ export interface Prisma__MenuItemClient<T, Null = never, ExtArgs extends runtime
   variantGroups<T extends Prisma.MenuItem$variantGroupsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.MenuItem$variantGroupsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MenuItemVariantGroupPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   addonGroups<T extends Prisma.MenuItem$addonGroupsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.MenuItem$addonGroupsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MenuItemAddonGroupPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   cartItems<T extends Prisma.MenuItem$cartItemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.MenuItem$cartItemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CartItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  orderItems<T extends Prisma.MenuItem$orderItemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.MenuItem$orderItemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  recipe<T extends Prisma.MenuItem$recipeArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.MenuItem$recipeArgs<ExtArgs>>): Prisma.Prisma__RecipeClient<runtime.Types.Result.GetResult<Prisma.$RecipePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2476,6 +2783,49 @@ export type MenuItem$cartItemsArgs<ExtArgs extends runtime.Types.Extensions.Inte
   take?: number
   skip?: number
   distinct?: Prisma.CartItemScalarFieldEnum | Prisma.CartItemScalarFieldEnum[]
+}
+
+/**
+ * MenuItem.orderItems
+ */
+export type MenuItem$orderItemsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the OrderItem
+   */
+  select?: Prisma.OrderItemSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the OrderItem
+   */
+  omit?: Prisma.OrderItemOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.OrderItemInclude<ExtArgs> | null
+  where?: Prisma.OrderItemWhereInput
+  orderBy?: Prisma.OrderItemOrderByWithRelationInput | Prisma.OrderItemOrderByWithRelationInput[]
+  cursor?: Prisma.OrderItemWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.OrderItemScalarFieldEnum | Prisma.OrderItemScalarFieldEnum[]
+}
+
+/**
+ * MenuItem.recipe
+ */
+export type MenuItem$recipeArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Recipe
+   */
+  select?: Prisma.RecipeSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Recipe
+   */
+  omit?: Prisma.RecipeOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RecipeInclude<ExtArgs> | null
+  where?: Prisma.RecipeWhereInput
 }
 
 /**

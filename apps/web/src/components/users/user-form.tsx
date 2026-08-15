@@ -34,7 +34,7 @@ export function UserForm({
   const [phone, setPhone] = useState(user?.phone ?? '');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState<UserRole>(
-    user?.role ?? 'USER',
+    user?.role ?? 'WAITER',
   );
   const [status, setStatus] = useState<UserStatus>(
     user?.status ?? 'ACTIVE',
@@ -76,7 +76,7 @@ export function UserForm({
           htmlFor="name"
           className="mb-2 block text-sm font-medium text-[#F5F7FA]"
         >
-          Name
+          Staff Full Name
         </label>
 
         <input
@@ -88,7 +88,7 @@ export function UserForm({
           required
           minLength={2}
           maxLength={100}
-          placeholder="Full Name"
+          placeholder="e.g. Rahul Sharma"
           className="w-full rounded-lg border border-[#26313C] bg-[#18212B] px-4 py-2.5 text-[#F5F7FA] placeholder-[#9AA6B2] transition-colors outline-none focus:border-[#2AFEB7] focus:ring-1 focus:ring-[#2AFEB7]"
         />
       </div>
@@ -98,7 +98,7 @@ export function UserForm({
           htmlFor="email"
           className="mb-2 block text-sm font-medium text-[#F5F7FA]"
         >
-          Email
+          Email Address
         </label>
 
         <input
@@ -110,7 +110,7 @@ export function UserForm({
           }
           required
           maxLength={255}
-          placeholder="user@example.com"
+          placeholder="waiter@spicegarden.com"
           className="w-full rounded-lg border border-[#26313C] bg-[#18212B] px-4 py-2.5 text-[#F5F7FA] placeholder-[#9AA6B2] transition-colors outline-none focus:border-[#2AFEB7] focus:ring-1 focus:ring-[#2AFEB7]"
         />
       </div>
@@ -120,7 +120,7 @@ export function UserForm({
           htmlFor="phone"
           className="mb-2 block text-sm font-medium text-[#F5F7FA]"
         >
-          Phone
+          Phone Number
         </label>
 
         <input
@@ -130,7 +130,7 @@ export function UserForm({
             setPhone(event.target.value)
           }
           maxLength={20}
-          placeholder="+1 234 567 8900"
+          placeholder="9876543210"
           className="w-full rounded-lg border border-[#26313C] bg-[#18212B] px-4 py-2.5 text-[#F5F7FA] placeholder-[#9AA6B2] transition-colors outline-none focus:border-[#2AFEB7] focus:ring-1 focus:ring-[#2AFEB7]"
         />
       </div>
@@ -164,7 +164,7 @@ export function UserForm({
           htmlFor="role"
           className="mb-2 block text-sm font-medium text-[#F5F7FA]"
         >
-          Role
+          Restaurant Role
         </label>
 
         <select
@@ -175,8 +175,12 @@ export function UserForm({
           }
           className="w-full rounded-lg border border-[#26313C] bg-[#18212B] px-4 py-2.5 text-[#F5F7FA] outline-none focus:border-[#2AFEB7] focus:ring-1 focus:ring-[#2AFEB7]"
         >
-          <option value="USER">User</option>
-          <option value="ADMIN">Admin</option>
+          <option value="WAITER">Waiter / Floor Staff</option>
+          <option value="KITCHEN">Kitchen Staff</option>
+          <option value="MANAGER">Restaurant Manager</option>
+          <option value="STAFF">General Staff</option>
+          <option value="OWNER">Restaurant Owner</option>
+          <option value="ADMIN">Administrator</option>
         </select>
       </div>
 
@@ -225,7 +229,7 @@ export function UserForm({
             ? 'Saving...'
             : isEdit
               ? 'Save changes'
-              : 'Create user'}
+              : 'Add Staff Member'}
         </button>
       </div>
     </form>

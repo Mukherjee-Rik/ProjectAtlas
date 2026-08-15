@@ -9,13 +9,29 @@ import QRCode from 'qrcode';
 import { PrismaService } from '../../database/prisma/prisma.service';
 import { CreateTableDto } from './dto/create-table.dto';
 import { UpdateTableDto } from './dto/update-table.dto';
+import { SubscriptionUsageService } from '../subscriptions/subscription-usage.service';
 
 @Injectable()
 export class TablesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly subscriptionUsageService: SubscriptionUsageService,
+  ) {}
 
   async create(branchId: string, createDto: CreateTableDto) {
     const { diningAreaId, name, code, capacity, status } = createDto;
+
+    // Get branch to find restaurantId for limit checking
+    const branch = await this.prisma.branch.findUnique({
+      where: { id: branchId },
+      select: { restaurantId: true },
+    });
+    if (!branch) {
+      throw new NotFoundException('Branch not found');
+    }
+
+    // Enforce active subscription table limit
+    await this.subscriptionUsageService.checkLimit(branch.restaurantId, 'maxTables');
 
     // Security Verification: Dining Area must belong to active branchId
     const diningArea = await this.prisma.diningArea.findFirst({
@@ -102,6 +118,24 @@ export class TablesService {
             id: true,
             name: true,
             code: true,
+            branchId: true,
+          },
+        },
+        customerSessions: {
+          where: { status: 'ACTIVE' },
+          select: {
+            id: true,
+            sessionToken: true,
+            status: true,
+            startedAt: true,
+            orders: {
+              select: {
+                id: true,
+                orderNumber: true,
+                status: true,
+                totalAmount: true,
+              },
+            },
           },
         },
       },

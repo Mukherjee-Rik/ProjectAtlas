@@ -6,6 +6,8 @@ import * as bcrypt from 'bcrypt';
 import { AuthService } from './auth.service';
 import { PrismaService } from '../../database/prisma/prisma.service';
 
+import { AuditService } from '../audit/audit.service';
+
 jest.mock('bcrypt', () => ({
   compare: jest.fn(),
   hash: jest.fn(),
@@ -16,6 +18,7 @@ describe('AuthService', () => {
   let prismaService: any;
   let jwtService: any;
   let mockLogger: any;
+  let mockAuditService: any;
 
   const mockUser = {
     id: 'user-id-1',
@@ -34,6 +37,13 @@ describe('AuthService', () => {
       user: {
         findUnique: jest.fn(),
       },
+      tenantMembership: {
+        findMany: jest.fn().mockResolvedValue([]),
+      },
+      session: {
+        create: jest.fn().mockResolvedValue({ id: 'session-1' }),
+        update: jest.fn().mockResolvedValue({ id: 'session-1' }),
+      },
     };
 
     jwtService = {
@@ -46,12 +56,17 @@ describe('AuthService', () => {
       error: jest.fn(),
     };
 
+    mockAuditService = {
+      log: jest.fn().mockResolvedValue({}),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AuthService,
         { provide: PrismaService, useValue: prismaService },
         { provide: JwtService, useValue: jwtService },
         { provide: Logger, useValue: mockLogger },
+        { provide: AuditService, useValue: mockAuditService },
       ],
     }).compile();
 
@@ -133,6 +148,8 @@ describe('AuthService', () => {
 
       expect(result).toEqual({
         accessToken: 'mock-access-token',
+        refreshToken: 'mock-access-token',
+        memberships: [],
         user: {
           id: mockUser.id,
           name: mockUser.name,
@@ -142,11 +159,14 @@ describe('AuthService', () => {
           status: mockUser.status,
         },
       });
-      expect(jwtService.signAsync).toHaveBeenCalledWith({
-        sub: mockUser.id,
-        email: mockUser.email,
-        role: mockUser.role,
-      });
+      expect(jwtService.signAsync).toHaveBeenCalledWith(
+        expect.objectContaining({
+          sub: mockUser.id,
+          email: mockUser.email,
+          role: mockUser.role,
+        }),
+        expect.anything(),
+      );
       expect(mockLogger.log).toHaveBeenCalledWith(
         { userId: mockUser.id, email: mockUser.email },
         'User login successful',

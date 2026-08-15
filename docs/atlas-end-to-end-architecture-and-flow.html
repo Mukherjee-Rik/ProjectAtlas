@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Project Atlas — Complete End-to-End System Guide & Operational Architecture</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+    :root {
+      --primary: #0F172A;
+      --accent: #0D9488;
+      --accent-light: #CCFBF1;
+      --accent-dark: #115E59;
+      --secondary: #3B82F6;
+      --surface: #F8FAFC;
+      --border: #E2E8F0;
+      --text: #1E293B;
+      --text-muted: #64748B;
+      --text-light: #94A3B8;
+      --success: #10B981;
+      --warning: #F59E0B;
+      --danger: #EF4444;
+      --card-bg: #FFFFFF;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: var(--text);
+      background: #FFFFFF;
+      line-height: 1.6;
+      font-size: 11pt;
+      padding: 0;
+    }
+
+    @page {
+      size: A4;
+      margin: 1.8cm 1.5cm 1.8cm 1.5cm;
+      @bottom-right {
+        content: "Page " counter(page) " of " counter(pages);
+        font-size: 8pt;
+        color: #94A3B8;
+      }
+      @bottom-left {
+        content: "Project Atlas v1.0 — Architecture & End-to-End Flow";
+        font-size: 8pt;
+        font-weight: 600;
+        color: #0D9488;
+      }
+    }
+
+    .page-break {
+      page-break-before: always;
+    }
+
+    .avoid-break {
+      page-break-inside: avoid;
+    }
+
+    /* Cover / Header Section */
+    .cover-banner {
+      background: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #0F766E 100%);
+      color: white;
+      padding: 40px 35px;
+      border-radius: 16px;
+      margin-bottom: 30px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cover-banner h1 {
+      font-size: 28pt;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      line-height: 1.15;
+      margin-bottom: 8px;
+    }
+
+    .cover-banner .subtitle {
+      font-size: 13pt;
+      color: #5EEAD4;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    .cover-banner .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .cover-banner .meta-item {
+      font-size: 8.5pt;
+    }
+
+    .cover-banner .meta-label {
+      color: #94A3B8;
+      text-transform: uppercase;
+      font-size: 7pt;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .cover-banner .meta-val {
+      font-weight: 700;
+      color: #FFFFFF;
+      margin-top: 2px;
+    }
+
+    /* Section Styles */
+    h2 {
+      font-size: 16pt;
+      font-weight: 800;
+      color: var(--primary);
+      margin-top: 28px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 6px;
+    }
+
+    h2 .section-num {
+      background: var(--accent);
+      color: white;
+      font-size: 10pt;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 6px;
+    }
+
+    h3 {
+      font-size: 12pt;
+      font-weight: 700;
+      color: var(--accent-dark);
+      margin-top: 18px;
+      margin-bottom: 8px;
+    }
+
+    h4 {
+      font-size: 10.5pt;
+      font-weight: 700;
+      color: var(--primary);
+      margin-top: 12px;
+      margin-bottom: 4px;
+    }
+
+    p {
+      margin-bottom: 10px;
+      color: var(--text);
+      font-size: 10pt;
+      line-height: 1.55;
+    }
+
+    /* Flowchart / Step Boxes */
+    .flow-container {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    .flow-step {
+      display: grid;
+      grid-template-columns: 42px 1fr;
+      gap: 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      position: relative;
+    }
+
+    .flow-step .step-badge {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--accent);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 12pt;
+    }
+
+    .flow-step .step-content h4 {
+      margin-top: 0;
+      font-size: 11pt;
+      font-weight: 700;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .flow-step .step-content h4 .role-pill {
+      font-size: 7.5pt;
+      background: #E2E8F0;
+      color: #334155;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-weight: 600;
+    }
+
+    .flow-step .step-content p {
+      margin: 4px 0 0 0;
+      font-size: 9pt;
+      color: var(--text-muted);
+    }
+
+    .flow-step .step-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .tag {
+      font-size: 7.5pt;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-weight: 600;
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .tag.accent {
+      background: var(--accent-light);
+      border-color: #99F6E4;
+      color: var(--accent-dark);
+    }
+
+    .tag.success {
+      background: #D1FAE5;
+      border-color: #A7F3D0;
+      color: #065F46;
+    }
+
+    /* Cards & Grids */
+    .card-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 14px 0;
+    }
+
+    .card-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 14px 0;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .card h4 {
+      margin-top: 0;
+      font-size: 10.5pt;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .card p {
+      font-size: 8.8pt;
+      margin-bottom: 0;
+      color: var(--text-muted);
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0;
+      font-size: 8.8pt;
+    }
+
+    th {
+      background: #0F172A;
+      color: white;
+      text-align: left;
+      padding: 8px 10px;
+      font-weight: 700;
+      font-size: 8pt;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    td {
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    tr:nth-child(even) td {
+      background: var(--surface);
+    }
+
+    /* Callout Boxes */
+    .callout {
+      border-left: 4px solid var(--accent);
+      background: var(--accent-light);
+      padding: 12px 14px;
+      border-radius: 0 8px 8px 0;
+      margin: 14px 0;
+    }
+
+    .callout h5 {
+      font-size: 9.5pt;
+      font-weight: 800;
+      color: var(--accent-dark);
+      margin-bottom: 3px;
+    }
+
+    .callout p {
+      font-size: 8.8pt;
+      color: #134E4A;
+      margin-bottom: 0;
+    }
+
+    .callout.security {
+      border-left-color: #3B82F6;
+      background: #EFF6FF;
+    }
+
+    .callout.security h5 {
+      color: #1E40AF;
+    }
+
+    .callout.security p {
+      color: #1E3A8A;
+    }
+
+    /* Code blocks / Endpoints */
+    code, pre {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 8pt;
+    }
+
+    .endpoint-pill {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 7.5pt;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      margin-right: 4px;
+    }
+
+    .get { background: #E0F2FE; color: #0369A1; }
+    .post { background: #DCFCE7; color: #15803D; }
+    .patch { background: #FEF3C7; color: #B45309; }
+    .delete { background: #FEE2E2; color: #B91C1C; }
+
+    /* Hierarchy Diagram */
+    .tree-box {
+      background: #0F172A;
+      color: #F8FAFC;
+      border-radius: 12px;
+      padding: 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 8pt;
+      line-height: 1.6;
+      margin: 14px 0;
+    }
+
+    .tree-box .highlight {
+      color: #5EEAD4;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- COVER / HEADER -->
+  <div class="cover-banner">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <div class="subtitle">Official System Architecture & Operational Blueprint</div>
+        <h1>Project Atlas v1.0</h1>
+        <p style="color: #E2E8F0; max-width: 600px; font-size: 10.5pt; margin-top: 6px;">
+          Autonomous Multi-Tenant Restaurant Operating System & Autonomous Intelligence Engine. Complete End-to-End Workflow Guide for Platform Operators, Restaurant Owners, Kitchen Chefs, Floor Waiters, and Cashiers.
+        </p>
+      </div>
+      <div style="background: rgba(255,255,255,0.1); padding: 14px 20px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.2);">
+        <div style="font-size: 20pt; font-weight: 800; color: #5EEAD4;">v1.0</div>
+        <div style="font-size: 7.5pt; text-transform: uppercase; font-weight: 700; color: #CBD5E1;">Production Live</div>
+      </div>
+    </div>
+
+    <div class="meta-grid">
+      <div class="meta-item">
+        <div class="meta-label">Architecture</div>
+        <div class="meta-val">NestJS + Next.js 16</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Data Layer</div>
+        <div class="meta-val">PostgreSQL + Prisma ORM</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Multi-Tenancy</div>
+        <div class="meta-val">Strict Row-Level Isolation</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Intelligence</div>
+        <div class="meta-val">Groq / OpenAI Context Copilot</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 1. MULTI-TENANT ARCHITECTURE & ENTITY HIERARCHY -->
+  <div class="avoid-break">
+    <h2><span class="section-num">01</span> System Hierarchy & Data Isolation</h2>
+    <p>
+      Project Atlas enforces a hierarchical multi-tenant structure designed for independent restaurant scalability, multi-branch expansion, and total data isolation across tenants.
+    </p>
+
+    <div class="tree-box">
+<span class="highlight">PLATFORM ADMIN</span> (Global Infrastructure, Global Monitoring, Support Desk, Subscription Tiers)
+  └── <span class="highlight">TENANT</span> (Billing Organization, Subscription Account, Master Owner)
+        └── <span class="highlight">RESTAURANT</span> (Concept Branding, Master Menu, AI Copilot, Automation Rules)
+              └── <span class="highlight">BRANCH</span> (Physical Location, Local Inventory, Operating Hours)
+                    └── <span class="highlight">DINING AREA</span> (Floor Plan Section: Indoor, Rooftop, Courtyard)
+                          └── <span class="highlight">TABLE</span> (Unique QR Session Token `tbl_xxxx`, Real-time Cart)
+                                └── <span class="highlight">ORDERS & PAYMENTS</span> (KDS Pipeline: PENDING ➔ PREPARING ➔ READY ➔ SERVED ➔ COMPLETED)
+    </div>
+
+    <div class="card-grid-3">
+      <div class="card">
+        <h4>🛡️ Multi-Tenant Guards</h4>
+        <p>Every API route enforces <code>TenantAccessGuard</code>, <code>RestaurantAccessGuard</code>, and <code>BranchAccessGuard</code>. Cross-tenant leakage results in immediate HTTP 403 Forbidden.</p>
+      </div>
+      <div class="card">
+        <h4>⚡ Session QR Engine</h4>
+        <p>Tables have encrypted public tokens (e.g., <code>tbl_33c549...</code>). Customers order directly without requiring mobile app downloads or logins.</p>
+      </div>
+      <div class="card">
+        <h4>🧠 Autonomous AI Brain</h4>
+        <p>Integrated conversational copilot and scheduled cron automations actively analyze revenue, low stock, and peak sales hours.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- 2. PLATFORM ADMIN PANEL WORKFLOW -->
+  <div class="avoid-break">
+    <h2><span class="section-num">02</span> Platform Admin Panel Flow (`/platform-admin`)</h2>
+    <p>
+      The Platform Admin Desk provides global operators with centralized observability, SaaS subscription enforcement, customer support resolution, and infrastructure health monitoring.
+    </p>
+
+    <div class="flow-container">
+      <div class="flow-step">
+        <div class="step-badge">1</div>
+        <div class="step-content">
+          <h4>
+            Global Telemetry & Platform Overview
+            <span class="role-pill">PLATFORM_ADMIN</span>
+          </h4>
+          <p>
+            Real-time aggregate across all tenants: total onboarded restaurants, monthly recurring revenue (MRR), total active tables, order throughput per minute, and live P50/P95 latency percentiles.
+          </p>
+          <div class="step-tags">
+            <span class="tag accent"><span class="endpoint-pill get">GET</span>/v1/dashboard/platform-overview</span>
+            <span class="tag">Active Tenants</span>
+            <span class="tag">Platform Sales (₹)</span>
+            <span class="tag">Health Probes</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="step-badge">2</div>
+        <div class="step-content">
+          <h4>
+            Tenant & Restaurant Lifecycle Management
+            <span class="role-pill">PLATFORM_ADMIN</span>
+          </h4>
+          <p>
+            Inspect tenant accounts, audit restaurant configurations, manage subscription plan tiers (Free, Growth, Enterprise), adjust seat quotas, and activate feature flags (e.g. AI Copilot, Multi-Branch, Webhook integrations).
+          </p>
+          <div class="step-tags">
+            <span class="tag accent"><span class="endpoint-pill get">GET</span>/v1/tenants</span>
+            <span class="tag accent"><span class="endpoint-pill patch">PATCH</span>/v1/subscriptions/:id</span>
+            <span class="tag">Plan Quotas</span>
+            <span class="tag">Feature Toggles</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="step-badge">3</div>
+        <div class="step-content">
+          <h4>
+            Customer Support & Incident Resolution Desk
+            <span class="role-pill">PLATFORM_ADMIN</span>
+          </h4>
+          <p>
+            Central queue of incident tickets submitted by restaurant owners. Platform engineers filter by category (<code>TECHNICAL</code>, <code>BILLING</code>, <code>HARDWARE</code>), prioritize by SLA urgency (<code>URGENT</code>, <code>HIGH</code>), and submit resolution notes.
+          </p>
+          <div class="step-tags">
+            <span class="tag accent"><span class="endpoint-pill get">GET</span>/v1/support/admin/tickets</span>
+            <span class="tag accent"><span class="endpoint-pill patch">PATCH</span>/v1/support/tickets/:id/resolve</span>
+            <span class="tag success">SLA P0-P3 Resolution</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="step-badge">4</div>
+        <div class="step-content">
+          <h4>
+            Observability, Database Backups & Infrastructure
+            <span class="role-pill">PLATFORM_ADMIN</span>
+          </h4>
+          <p>
+            Live monitoring of PostgreSQL connection pools, Redis queue latency, and automated disaster recovery backups (<code>pnpm db:backup</code>) with foreign key consistency verification.
+          </p>
+          <div class="step-tags">
+            <span class="tag accent"><span class="endpoint-pill get">GET</span>/v1/health/live</span>
+            <span class="tag accent"><span class="endpoint-pill get">GET</span>/v1/health/ready</span>
+            <span class="tag">Disaster Recovery Snapshots</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. RESTAURANT OWNER & MANAGEMENT FLOW -->
+  <div class="avoid-break">
+    <h2><span class="section-num">03</span> Restaurant Owner & Operational Flow</h2>
+    <p>
+      The core workflow for restaurant owners from initial onboarding to day-to-day operations, menu engineering, and AI-driven growth.
+    </p>
+
+    <div class="card-grid-2">
+      <div class="card">
+        <h4>🧭 6-Step Guided Onboarding (`/onboarding`)</h4>
+        <p>1. Profile & Concept (Identity, Currency INR ₹)<br/>
+           2. Floor Layout & Dining Areas (Courtyard, Rooftop)<br/>
+           3. Dynamic QR Generation (Table 01 to T-50)<br/>
+           4. Menu Catalog & Signature Dishes<br/>
+           5. Staff Invitation (Kitchen, Waiter, Cashier)<br/>
+           6. Payment Gateway & Go-Live Activation</p>
+      </div>
+
+      <div class="card">
+        <h4>📊 Real-Time Operations Command (`/dashboard`)</h4>
+        <p>• Live Sales Revenue (₹) & Order Count<br/>
+           • Active Occupied Tables & Table Turnover<br/>
+           • Hourly Sales Velocity Charts (Peak hours)<br/>
+           • Best-Selling Menu Items & Category Contribution<br/>
+           • Real-time synchronization with KDS and POS</p>
+      </div>
+
+      <div class="card">
+        <h4>🍽️ Menu Engineering & Catalog (`/menus`)</h4>
+        <p>• Multi-category master catalogs with nested item options<br/>
+           • Price modifiers, dietary flags (Veg, Non-Veg, Vegan)<br/>
+           • Real-time stock status (In Stock / 86'd Out of Stock)<br/>
+           • Instant live sync to table QR ordering</p>
+      </div>
+
+      <div class="card">
+        <h4>🤖 AI Copilot & Automation Engine</h4>
+        <p>• Natural language queries: <i>"Which dishes drove the most profit yesterday?"</i><br/>
+           • Scheduled crons: Nightly 11 PM Revenue Report<br/>
+           • Stock depletion alerts triggered automatically<br/>
+           • AI Operational recommendations generated every Monday</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- 4. GUEST QR ORDERING LIFECYCLE -->
+  <div class="avoid-break">
+    <h2><span class="section-num">04</span> Guest QR Ordering Lifecycle (Zero App Download)</h2>
+    <p>
+      The friction-free customer ordering experience designed for mobile browsers with zero app installation.
+    </p>
+
+    <div class="flow-container">
+      <div class="flow-step">
+        <div class="step-badge">1</div>
+        <div class="step-content">
+          <h4>
+            Step 1: Scan Table QR & Session Handshake
+            <span class="role-pill">GUEST / DINER</span>
+          </h4>
+          <p>
+            Guest points phone camera at table sticker. The encrypted token URL (<code>/t/tbl_4ec99d...</code>) initiates a session with the restaurant's active branch and table metadata.
+          </p>
+          <div class="step-tags">
+            <span class="tag accent"><span class="endpoint-pill get">GET</span>/v1/public/tables/:token/session</span>
+            <span class="tag">Encrypted Token</span>
+            <span class="tag">Table Identification</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="step-badge">2</div>
+        <div class="step-content">
+          <h4>
+            Step 2: Digital Menu Exploration & Customization
+            <span class="role-pill">GUEST / DINER</span>
+          </h4>
+          <p>
+            Guest browses high-res dishes, filters by dietary preferences, selects portion sizes, and adds special chef notes (e.g. <i>"Extra spicy, no cilantro"</i>).
+          </p>
+          <div class="step-tags">
+            <span class="tag accent"><span class="endpoint-pill get">GET</span>/v1/public/tables/:token/menu</span>
+            <span class="tag">Dietary Badges</span>
+            <span class="tag">Real-Time Pricing</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="step-badge">3</div>
+        <div class="step-content">
+          <h4>
+            Step 3: Shared Table Cart & Order Placement
+            <span class="role-pill">GUEST / DINER</span>
+          </h4>
+          <p>
+            Items are committed to the synchronized table cart. Guest reviews subtotal, applicable taxes (CGST/SGST), and taps <b>"Submit Order"</b> to generate order <code>#AT-XXXXXX</code>.
+          </p>
+          <div class="step-tags">
+            <span class="tag accent"><span class="endpoint-pill post">POST</span>/v1/public/tables/:token/cart/items</span>
+            <span class="tag accent"><span class="endpoint-pill post">POST</span>/v1/public/tables/:token/orders</span>
+            <span class="tag success">Instant Order Ticket</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="step-badge">4</div>
+        <div class="step-content">
+          <h4>
+            Step 4: Live Order Tracking & Service Calls
+            <span class="role-pill">GUEST / DINER</span>
+          </h4>
+          <p>
+            Live status bar updates: <code>PENDING</code> ➔ <code>PREPARING</code> ➔ <code>READY</code>. Guest can request table service (<i>"Call Waiter"</i>, <i>"Water Refill"</i>, <i>"Request Bill"</i>) at any moment.
+          </p>
+          <div class="step-tags">
+            <span class="tag accent"><span class="endpoint-pill get">GET</span>/v1/public/tables/:token/orders/:id</span>
+            <span class="tag accent"><span class="endpoint-pill post">POST</span>/v1/public/tables/:token/call-waiter</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. KITCHEN, WAITER & CASHIER WORKFLOW -->
+  <div class="avoid-break">
+    <h2><span class="section-num">05</span> Floor & Kitchen Operations Workflow</h2>
+    <p>
+      Real-time synchronization across Kitchen Display Systems (KDS), Waitstaff floor terminals, and Cashier POS settlement counters.
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Stage</th>
+          <th>Interface / Route</th>
+          <th>Actor</th>
+          <th>Operational Action & State Transition</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><b>1. New Order Ticket</b></td>
+          <td><code>/kitchen</code> (KDS)</td>
+          <td>Kitchen Expeditor / Chef</td>
+          <td>Audio chime triggers. Ticket arrives under <b>PENDING</b> with table number, quantities, and dish notes.</td>
+        </tr>
+        <tr>
+          <td><b>2. Cooking in Progress</b></td>
+          <td><code>/kitchen</code> (KDS)</td>
+          <td>Line Chef</td>
+          <td>Chef clicks <b>"Start Cooking"</b>. Ticket moves to <b>PREPARING</b>. Prep timer begins tracking kitchen efficiency.</td>
+        </tr>
+        <tr>
+          <td><b>3. Food Plated & Ready</b></td>
+          <td><code>/kitchen</code> (KDS)</td>
+          <td>Line Chef</td>
+          <td>Chef clicks <b>"Ready for Pickup"</b>. Ticket transitions to <b>READY</b>. Waitstaff terminal receives visual notification.</td>
+        </tr>
+        <tr>
+          <td><b>4. Table Delivery</b></td>
+          <td><code>/waiter</code> (Floor App)</td>
+          <td>Floor Waiter</td>
+          <td>Waiter picks up hot dishes, delivers to table, and marks ticket <b>SERVED</b>.</td>
+        </tr>
+        <tr>
+          <td><b>5. Bill & Settlement</b></td>
+          <td><code>/cashier</code> (POS)</td>
+          <td>Cashier / Manager</td>
+          <td>Cashier reviews table total, applies discounts, processes Payment (Cash, UPI QR, Card POS), and marks order <b>COMPLETED</b>.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- 6. COMPREHENSIVE ROLE & PERMISSIONS MATRIX -->
+  <div class="avoid-break">
+    <h2><span class="section-num">06</span> Role-Based Access Control (RBAC) Matrix</h2>
+    <p>
+      Project Atlas enforces strict granular permissions mapped to specific operational roles.
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Role</th>
+          <th>Primary Workspaces</th>
+          <th>Menu / Pricing</th>
+          <th>KDS Display</th>
+          <th>Orders & Billing</th>
+          <th>AI Copilot</th>
+          <th>Platform Admin</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><b>PLATFORM_ADMIN</b></td>
+          <td><code>/platform-admin</code>, <code>/docs</code></td>
+          <td>Global Audit</td>
+          <td>Global View</td>
+          <td>Global Telemetry</td>
+          <td>Full Access</td>
+          <td><span class="tag success">FULL CONTROL</span></td>
+        </tr>
+        <tr>
+          <td><b>OWNER / TENANT_ADMIN</b></td>
+          <td><code>/dashboard</code>, <code>/onboarding</code>, <code>/menus</code></td>
+          <td><span class="tag success">CREATE / EDIT</span></td>
+          <td><span class="tag success">FULL ACCESS</span></td>
+          <td><span class="tag success">FULL ACCESS</span></td>
+          <td><span class="tag success">FULL ACCESS</span></td>
+          <td><span class="tag">NO ACCESS</span></td>
+        </tr>
+        <tr>
+          <td><b>MANAGER</b></td>
+          <td><code>/dashboard</code>, <code>/orders</code>, <code>/inventory</code></td>
+          <td><span class="tag success">EDIT ITEMS</span></td>
+          <td><span class="tag success">FULL ACCESS</span></td>
+          <td><span class="tag success">FULL ACCESS</span></td>
+          <td><span class="tag success">READ-ONLY</span></td>
+          <td><span class="tag">NO ACCESS</span></td>
+        </tr>
+        <tr>
+          <td><b>KITCHEN</b></td>
+          <td><code>/kitchen</code> (KDS)</td>
+          <td>Read Only</td>
+          <td><span class="tag success">MANAGE KDS</span></td>
+          <td>Status Update</td>
+          <td><span class="tag">NO ACCESS</span></td>
+          <td><span class="tag">NO ACCESS</span></td>
+        </tr>
+        <tr>
+          <td><b>WAITER</b></td>
+          <td><code>/waiter</code>, <code>/tables</code></td>
+          <td>Read Only</td>
+          <td>Read Status</td>
+          <td><span class="tag success">TAKE / DELIVER</span></td>
+          <td><span class="tag">NO ACCESS</span></td>
+          <td><span class="tag">NO ACCESS</span></td>
+        </tr>
+        <tr>
+          <td><b>CASHIER</b></td>
+          <td><code>/cashier</code>, <code>/orders</code></td>
+          <td>Read Only</td>
+          <td>Read Status</td>
+          <td><span class="tag success">SETTLE BILLS</span></td>
+          <td><span class="tag">NO ACCESS</span></td>
+          <td><span class="tag">NO ACCESS</span></td>
+        </tr>
+        <tr>
+          <td><b>GUEST (Anonymous QR)</b></td>
+          <td><code>/t/[token]</code>, <code>/t/[token]/cart</code></td>
+          <td>Read Live Menu</td>
+          <td><span class="tag">NO ACCESS</span></td>
+          <td><span class="tag success">SUBMIT ORDER</span></td>
+          <td><span class="tag">NO ACCESS</span></td>
+          <td><span class="tag">NO ACCESS</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 7. PRODUCTION SECURITY, RUNBOOK & RECOVERY -->
+  <div class="avoid-break">
+    <h2><span class="section-num">07</span> Production Resilience & Disaster Recovery</h2>
+    
+    <div class="callout security">
+      <h5>🔒 Multi-Tenant Security Guarantees</h5>
+      <p>
+        1. <b>Zero Cross-Tenant Leakage:</b> Every query in Prisma includes <code>where: { restaurantId, tenantId }</code> automatically scoped by JWT context.<br/>
+        2. <b>Token Integrity:</b> Cryptographically signed JWT access tokens with rotating refresh cookies and instant token blacklisting.<br/>
+        3. <b>Rate Limiting & DDoS Shield:</b> Tiered Redis rate limiters protecting public QR endpoints (100 req/min) and internal APIs (1000 req/min).
+      </p>
+    </div>
+
+    <div class="card-grid-2">
+      <div class="card">
+        <h4>📦 Automated Relational Backups</h4>
+        <p>
+          Execute full snapshot drills using <code>pnpm db:backup</code>. Snapshots 13 core relational tables and runs automated foreign key referential integrity checks before saving to encrypted storage.
+        </p>
+      </div>
+
+      <div class="card">
+        <h4>🔄 Zero-Downtime Rolling Restarts</h4>
+        <p>
+          Docker Compose healthchecks ensure new API containers are fully warmed and passing PostgreSQL / Redis readiness probes (<code>/health/ready</code>) before traffic is cut over.
+        </p>
+      </div>
+    </div>
+
+    <div style="margin-top: 25px; padding-top: 15px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+      <div style="font-size: 8pt; color: var(--text-light);">
+        Project Atlas v1.0 Production Architecture • Generated for Engineering & Operations Teams
+      </div>
+      <div style="font-size: 8pt; font-weight: 700; color: var(--accent);">
+        CONFIDENTIAL & PROPRIETARY
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

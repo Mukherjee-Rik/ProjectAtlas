@@ -16,6 +16,10 @@ describe('UsersService', () => {
         update: jest.fn(),
         count: jest.fn().mockResolvedValue(0),
       },
+      tenantMembership: {
+        create: jest.fn(),
+      },
+      $transaction: jest.fn().mockImplementation((cb) => cb(prismaService)),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -64,6 +68,17 @@ describe('UsersService', () => {
         status: true,
         createdAt: true,
         updatedAt: true,
+        memberships: {
+          select: {
+            role: true,
+            tenant: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
       },
       orderBy: { createdAt: 'desc' },
       skip: 0,
@@ -145,6 +160,17 @@ describe('UsersService', () => {
         status: true,
         createdAt: true,
         updatedAt: true,
+        memberships: {
+          select: {
+            role: true,
+            tenant: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
       },
     });
   });
@@ -202,16 +228,6 @@ describe('UsersService', () => {
         name: 'New User',
         email: 'new@example.com',
       }),
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        phone: true,
-        role: true,
-        status: true,
-        createdAt: true,
-        updatedAt: true,
-      },
     });
   });
 

@@ -1,7 +1,7 @@
 'use client';
 
-import Link from 'next/link';
 import { use, useCallback, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   createPublicCustomerSession,
   type PublicCustomerSessionResponse,
@@ -13,10 +13,12 @@ export default function CustomerTableEntryPage({
   params: Promise<{ token: string }>;
 }) {
   const { token } = use(params);
+  const router = useRouter();
 
   const [session, setSession] = useState<PublicCustomerSessionResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isInvalid, setIsInvalid] = useState(false);
+  const [countdown, setCountdown] = useState(2);
 
   const initSession = useCallback(async () => {
     setIsLoading(true);
@@ -40,18 +42,50 @@ export default function CustomerTableEntryPage({
     void initSession();
   }, [initSession]);
 
+  // Auto-redirect to menu after session loads
+  useEffect(() => {
+    if (!session || isLoading) return;
+
+    const timer = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [session, isLoading]);
+
+  useEffect(() => {
+    if (countdown === 0 && session) {
+      router.push(`/t/${token}/menu`);
+    }
+  }, [countdown, session, token, router]);
+
+  // ── Loading state ──────────────────────────────────────────────────────────
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#0B0F14] p-4 text-[#F5F7FA]">
-        <div className="w-full max-w-sm rounded-2xl border border-[#26313C] bg-[#111820] p-8 text-center shadow-2xl space-y-4 animate-pulse">
-          <div className="mx-auto h-16 w-16 rounded-full bg-[#18212B]" />
-          <div className="mx-auto h-4 w-32 rounded bg-[#18212B]" />
-          <div className="mx-auto h-3 w-48 rounded bg-[#18212B]" />
+      <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-[#0B0F14] p-4 text-[#F5F7FA]">
+        {/* Animated logo */}
+        <div className="relative flex h-20 w-20 items-center justify-center">
+          <div className="absolute inset-0 animate-ping rounded-full bg-[#2AFEB7]/20" />
+          <div className="absolute inset-2 animate-pulse rounded-full bg-[#2AFEB7]/30" />
+          <span className="relative text-3xl">🍽️</span>
+        </div>
+        <div className="space-y-2 text-center">
+          <p className="text-sm font-bold text-[#2AFEB7] animate-pulse">
+            Setting up your table…
+          </p>
+          <p className="text-xs text-[#9AA6B2]">Please wait a moment</p>
         </div>
       </div>
     );
   }
 
+  // ── Error state ────────────────────────────────────────────────────────────
   if (isInvalid || !session) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#0B0F14] p-4 text-[#F5F7FA]">
@@ -77,28 +111,34 @@ export default function CustomerTableEntryPage({
     );
   }
 
+  // ── Splash / redirect state ────────────────────────────────────────────────
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#0B0F14] p-4 text-[#F5F7FA]">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-[#0B0F14] p-4 text-[#F5F7FA]">
       <div className="w-full max-w-sm rounded-2xl border border-[#26313C] bg-[#111820] p-8 text-center shadow-2xl space-y-6">
-        {/* Brand Header */}
+
+        {/* Brand dot */}
         <div className="flex justify-center items-center gap-2">
-          <div className="h-3 w-3 rounded-full bg-[#2AFEB7] shadow-[0_0_10px_#2AFEB7]" />
+          <div className="h-3 w-3 rounded-full bg-[#2AFEB7] shadow-[0_0_10px_#2AFEB7] animate-pulse" />
           <span className="text-[#2AFEB7] text-xs font-bold uppercase tracking-widest">
             Atlas Ordering
           </span>
         </div>
 
-        {/* Restaurant & Location Info */}
+        {/* Big welcome icon */}
+        <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-[#2AFEB7]/10 text-4xl shadow-inner">
+          🍽️
+        </div>
+
+        {/* Restaurant & Table */}
         <div className="space-y-1">
           <h1 className="text-2xl font-black text-[#F5F7FA]">
             {session.restaurant.name}
           </h1>
           <p className="text-xs text-[#9AA6B2]">
-            {session.branch.name} • {session.diningArea.name}
+            {session.branch.name} · {session.diningArea.name}
           </p>
         </div>
 
-        {/* Table Badge */}
         <div className="rounded-xl border border-[#2AFEB7]/30 bg-[#2AFEB7]/10 p-4">
           <p className="text-xs uppercase font-semibold tracking-wider text-[#9AA6B2]">
             Welcome to
@@ -108,29 +148,27 @@ export default function CustomerTableEntryPage({
           </p>
         </div>
 
-        {/* CTA */}
+        {/* Auto-redirect countdown */}
         <div className="space-y-3">
-          <Link
-            href={`/t/${token}/menu`}
+          <p className="text-xs text-[#9AA6B2]">
+            Opening menu in <span className="font-bold text-[#2AFEB7]">{countdown}s</span>…
+          </p>
+          {/* Progress bar */}
+          <div className="h-1 w-full overflow-hidden rounded-full bg-[#26313C]">
+            <div
+              className="h-full bg-[#2AFEB7] transition-all duration-1000 ease-linear"
+              style={{ width: countdown === 2 ? '100%' : countdown === 1 ? '50%' : '0%' }}
+            />
+          </div>
+          <button
+            type="button"
+            onClick={() => router.push(`/t/${token}/menu`)}
             className="block w-full rounded-xl bg-[#2AFEB7] py-3.5 text-sm font-bold text-[#0B0F14] shadow-lg transition-all hover:bg-[#22E5A4] active:scale-[0.99]"
           >
-            View Digital Menu
-          </Link>
-
-          <Link
-            href={`/t/${token}/cart`}
-            className="block w-full rounded-xl border border-[#26313C] bg-[#18212B] py-3 text-xs font-semibold text-[#9AA6B2] transition-colors hover:border-[#2AFEB7]/40 hover:text-[#2AFEB7]"
-          >
-            🛒 View Cart
-          </Link>
+            View Menu Now →
+          </button>
         </div>
 
-        {/* Footer */}
-        <div className="pt-2">
-          <p className="text-[10px] font-mono text-[#9AA6B2]/60">
-            Session: {session.sessionToken.slice(0, 16)}...
-          </p>
-        </div>
       </div>
     </div>
   );

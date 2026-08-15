@@ -9,12 +9,13 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UpdateMyProfileDto } from './dto/update-my-profile.dto';
 import { UsersQueryDto } from './dto/users-query.dto';
+import { UserRole } from '../../generated/prisma/enums';
 
 @Injectable()
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findAll(query: UsersQueryDto = new UsersQueryDto()) {
+  async findAll(query: UsersQueryDto = new UsersQueryDto(), tenantId?: string) {
     const {
       search,
       role,
@@ -23,15 +24,16 @@ export class UsersService {
       limit = 10,
     } = query;
 
-    const where = {
-      ...(role !== undefined && {
-        role,
+    const where: any = {
+      ...(role !== undefined && { role }),
+      ...(status !== undefined && { status }),
+      ...(tenantId && {
+        memberships: {
+          some: {
+            tenantId,
+          },
+        },
       }),
-
-      ...(status !== undefined && {
-        status,
-      }),
-
       ...(search?.trim() && {
         OR: [
           {
@@ -70,6 +72,12 @@ export class UsersService {
           status: true,
           createdAt: true,
           updatedAt: true,
+          memberships: {
+            select: {
+              role: true,
+              tenant: { select: { id: true, name: true } },
+            },
+          },
         },
         orderBy: {
           createdAt: 'desc',
@@ -94,10 +102,17 @@ export class UsersService {
     };
   }
 
-  async findById(id: string) {
+  async findById(id: string, tenantId?: string) {
     const user = await this.prisma.user.findFirst({
       where: {
         id,
+        ...(tenantId && {
+          memberships: {
+            some: {
+              tenantId,
+            },
+          },
+        }),
       },
       select: {
         id: true,
@@ -108,6 +123,12 @@ export class UsersService {
         status: true,
         createdAt: true,
         updatedAt: true,
+        memberships: {
+          select: {
+            role: true,
+            tenant: { select: { id: true, name: true } },
+          },
+        },
       },
     });
 
@@ -118,10 +139,17 @@ export class UsersService {
     return user;
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto) {
+  async update(id: string, updateUserDto: UpdateUserDto, tenantId?: string) {
     const existingUser = await this.prisma.user.findFirst({
       where: {
         id,
+        ...(tenantId && {
+          memberships: {
+            some: {
+              tenantId,
+            },
+          },
+        }),
       },
     });
 
@@ -211,16 +239,23 @@ export class UsersService {
     });
   }
 
-  async remove(id: string, currentUserId: string) {
+  async remove(id: string, currentUserId: string, tenantId?: string) {
     if (id === currentUserId) {
       throw new ConflictException(
         'You cannot deactivate your own account',
       );
     }
 
-    const existingUser = await this.prisma.user.findUnique({
+    const existingUser = await this.prisma.user.findFirst({
       where: {
         id,
+        ...(tenantId && {
+          memberships: {
+            some: {
+              tenantId,
+            },
+          },
+        }),
       },
     });
 
@@ -252,7 +287,7 @@ export class UsersService {
     });
   }
 
-  async create(createUserDto: CreateUserDto) {
+  async create(createUserDto: CreateUserDto, tenantId?: string) {
     const { name, email, phone, password, role } = createUserDto;
 
     const existingUser = await this.prisma.user.findFirst({
@@ -268,25 +303,39 @@ export class UsersService {
     }
 
     const passwordHash = await bcrypt.hash(password, 12);
+    const assignedRole = role || UserRole.STAFF;
 
-    return this.prisma.user.create({
-      data: {
-        name,
-        email,
-        phone,
-        passwordHash,
-        ...(role !== undefined && { role }),
-      },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        phone: true,
-        role: true,
-        status: true,
-        createdAt: true,
-        updatedAt: true,
-      },
+    return this.prisma.$transaction(async (tx) => {
+      const user = await tx.user.create({
+        data: {
+          name,
+          email,
+          phone,
+          passwordHash,
+          role: assignedRole,
+        },
+      });
+
+      if (tenantId) {
+        await tx.tenantMembership.create({
+          data: {
+            userId: user.id,
+            tenantId,
+            role: assignedRole,
+          },
+        });
+      }
+
+      return {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+        status: user.status,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      };
     });
   }
 }

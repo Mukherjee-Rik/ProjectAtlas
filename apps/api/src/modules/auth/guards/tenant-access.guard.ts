@@ -23,6 +23,37 @@ export class TenantAccessGuard implements CanActivate {
       throw new ForbiddenException('User is not authenticated');
     }
 
+    // Platform ADMINs / PLATFORM_ADMINs have global management access and bypass scoping
+    if (user.role === 'PLATFORM_ADMIN' || user.role === 'ADMIN') {
+      const tenantHeaderValue = request.headers[TENANT_HEADER];
+      const tenantId =
+        (typeof tenantHeaderValue === 'string' ? tenantHeaderValue : undefined) ||
+        request.params?.tenantId ||
+        request.query?.tenantId ||
+        request.body?.tenantId;
+
+      if (tenantId && isUUID(tenantId)) {
+        const tenant = await this.prisma.tenant.findUnique({
+          where: { id: tenantId },
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+            status: true,
+          },
+        });
+        if (tenant) {
+          request.tenant = {
+            id: tenant.id,
+            name: tenant.name,
+            slug: tenant.slug,
+            status: tenant.status,
+          };
+        }
+      }
+      return true;
+    }
+
     const tenantHeaderValue = request.headers[TENANT_HEADER];
     const tenantId =
       (typeof tenantHeaderValue === 'string' ? tenantHeaderValue : undefined) ||
@@ -58,12 +89,6 @@ export class TenantAccessGuard implements CanActivate {
       slug: tenant.slug,
       status: tenant.status,
     };
-
-    // Platform ADMINs have global management access
-    if (user.role === 'ADMIN') {
-      request.tenant = currentTenant;
-      return true;
-    }
 
     const membership = await this.prisma.tenantMembership.findUnique({
       where: {

@@ -202,6 +202,13 @@ export type RestaurantWhereInput = {
   branches?: Prisma.BranchListRelationFilter
   menus?: Prisma.MenuListRelationFilter
   taxRates?: Prisma.TaxRateListRelationFilter
+  orders?: Prisma.OrderListRelationFilter
+  subscriptions?: Prisma.SubscriptionListRelationFilter
+  deliveryProviders?: Prisma.RestaurantDeliveryProviderListRelationFilter
+  aiUsages?: Prisma.AiUsageListRelationFilter
+  automationRules?: Prisma.AutomationRuleListRelationFilter
+  notifications?: Prisma.NotificationListRelationFilter
+  supportTickets?: Prisma.SupportTicketListRelationFilter
 }
 
 export type RestaurantOrderByWithRelationInput = {
@@ -216,6 +223,13 @@ export type RestaurantOrderByWithRelationInput = {
   branches?: Prisma.BranchOrderByRelationAggregateInput
   menus?: Prisma.MenuOrderByRelationAggregateInput
   taxRates?: Prisma.TaxRateOrderByRelationAggregateInput
+  orders?: Prisma.OrderOrderByRelationAggregateInput
+  subscriptions?: Prisma.SubscriptionOrderByRelationAggregateInput
+  deliveryProviders?: Prisma.RestaurantDeliveryProviderOrderByRelationAggregateInput
+  aiUsages?: Prisma.AiUsageOrderByRelationAggregateInput
+  automationRules?: Prisma.AutomationRuleOrderByRelationAggregateInput
+  notifications?: Prisma.NotificationOrderByRelationAggregateInput
+  supportTickets?: Prisma.SupportTicketOrderByRelationAggregateInput
 }
 
 export type RestaurantWhereUniqueInput = Prisma.AtLeast<{
@@ -234,6 +248,13 @@ export type RestaurantWhereUniqueInput = Prisma.AtLeast<{
   branches?: Prisma.BranchListRelationFilter
   menus?: Prisma.MenuListRelationFilter
   taxRates?: Prisma.TaxRateListRelationFilter
+  orders?: Prisma.OrderListRelationFilter
+  subscriptions?: Prisma.SubscriptionListRelationFilter
+  deliveryProviders?: Prisma.RestaurantDeliveryProviderListRelationFilter
+  aiUsages?: Prisma.AiUsageListRelationFilter
+  automationRules?: Prisma.AutomationRuleListRelationFilter
+  notifications?: Prisma.NotificationListRelationFilter
+  supportTickets?: Prisma.SupportTicketListRelationFilter
 }, "id" | "tenantId_slug">
 
 export type RestaurantOrderByWithAggregationInput = {
@@ -273,6 +294,13 @@ export type RestaurantCreateInput = {
   branches?: Prisma.BranchCreateNestedManyWithoutRestaurantInput
   menus?: Prisma.MenuCreateNestedManyWithoutRestaurantInput
   taxRates?: Prisma.TaxRateCreateNestedManyWithoutRestaurantInput
+  orders?: Prisma.OrderCreateNestedManyWithoutRestaurantInput
+  subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutRestaurantInput
+  deliveryProviders?: Prisma.RestaurantDeliveryProviderCreateNestedManyWithoutRestaurantInput
+  aiUsages?: Prisma.AiUsageCreateNestedManyWithoutRestaurantInput
+  automationRules?: Prisma.AutomationRuleCreateNestedManyWithoutRestaurantInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutRestaurantInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutRestaurantInput
 }
 
 export type RestaurantUncheckedCreateInput = {
@@ -286,6 +314,13 @@ export type RestaurantUncheckedCreateInput = {
   branches?: Prisma.BranchUncheckedCreateNestedManyWithoutRestaurantInput
   menus?: Prisma.MenuUncheckedCreateNestedManyWithoutRestaurantInput
   taxRates?: Prisma.TaxRateUncheckedCreateNestedManyWithoutRestaurantInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutRestaurantInput
+  subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutRestaurantInput
+  deliveryProviders?: Prisma.RestaurantDeliveryProviderUncheckedCreateNestedManyWithoutRestaurantInput
+  aiUsages?: Prisma.AiUsageUncheckedCreateNestedManyWithoutRestaurantInput
+  automationRules?: Prisma.AutomationRuleUncheckedCreateNestedManyWithoutRestaurantInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRestaurantInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutRestaurantInput
 }
 
 export type RestaurantUpdateInput = {
@@ -299,6 +334,13 @@ export type RestaurantUpdateInput = {
   branches?: Prisma.BranchUpdateManyWithoutRestaurantNestedInput
   menus?: Prisma.MenuUpdateManyWithoutRestaurantNestedInput
   taxRates?: Prisma.TaxRateUpdateManyWithoutRestaurantNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutRestaurantNestedInput
+  subscriptions?: Prisma.SubscriptionUpdateManyWithoutRestaurantNestedInput
+  deliveryProviders?: Prisma.RestaurantDeliveryProviderUpdateManyWithoutRestaurantNestedInput
+  aiUsages?: Prisma.AiUsageUpdateManyWithoutRestaurantNestedInput
+  automationRules?: Prisma.AutomationRuleUpdateManyWithoutRestaurantNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutRestaurantNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutRestaurantNestedInput
 }
 
 export type RestaurantUncheckedUpdateInput = {
@@ -312,6 +354,13 @@ export type RestaurantUncheckedUpdateInput = {
   branches?: Prisma.BranchUncheckedUpdateManyWithoutRestaurantNestedInput
   menus?: Prisma.MenuUncheckedUpdateManyWithoutRestaurantNestedInput
   taxRates?: Prisma.TaxRateUncheckedUpdateManyWithoutRestaurantNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutRestaurantNestedInput
+  subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutRestaurantNestedInput
+  deliveryProviders?: Prisma.RestaurantDeliveryProviderUncheckedUpdateManyWithoutRestaurantNestedInput
+  aiUsages?: Prisma.AiUsageUncheckedUpdateManyWithoutRestaurantNestedInput
+  automationRules?: Prisma.AutomationRuleUncheckedUpdateManyWithoutRestaurantNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutRestaurantNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutRestaurantNestedInput
 }
 
 export type RestaurantCreateManyInput = {
@@ -481,6 +530,104 @@ export type RestaurantUpdateOneRequiredWithoutTaxRatesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.RestaurantUpdateToOneWithWhereWithoutTaxRatesInput, Prisma.RestaurantUpdateWithoutTaxRatesInput>, Prisma.RestaurantUncheckedUpdateWithoutTaxRatesInput>
 }
 
+export type RestaurantCreateNestedOneWithoutOrdersInput = {
+  create?: Prisma.XOR<Prisma.RestaurantCreateWithoutOrdersInput, Prisma.RestaurantUncheckedCreateWithoutOrdersInput>
+  connectOrCreate?: Prisma.RestaurantCreateOrConnectWithoutOrdersInput
+  connect?: Prisma.RestaurantWhereUniqueInput
+}
+
+export type RestaurantUpdateOneRequiredWithoutOrdersNestedInput = {
+  create?: Prisma.XOR<Prisma.RestaurantCreateWithoutOrdersInput, Prisma.RestaurantUncheckedCreateWithoutOrdersInput>
+  connectOrCreate?: Prisma.RestaurantCreateOrConnectWithoutOrdersInput
+  upsert?: Prisma.RestaurantUpsertWithoutOrdersInput
+  connect?: Prisma.RestaurantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.RestaurantUpdateToOneWithWhereWithoutOrdersInput, Prisma.RestaurantUpdateWithoutOrdersInput>, Prisma.RestaurantUncheckedUpdateWithoutOrdersInput>
+}
+
+export type RestaurantCreateNestedOneWithoutSubscriptionsInput = {
+  create?: Prisma.XOR<Prisma.RestaurantCreateWithoutSubscriptionsInput, Prisma.RestaurantUncheckedCreateWithoutSubscriptionsInput>
+  connectOrCreate?: Prisma.RestaurantCreateOrConnectWithoutSubscriptionsInput
+  connect?: Prisma.RestaurantWhereUniqueInput
+}
+
+export type RestaurantUpdateOneRequiredWithoutSubscriptionsNestedInput = {
+  create?: Prisma.XOR<Prisma.RestaurantCreateWithoutSubscriptionsInput, Prisma.RestaurantUncheckedCreateWithoutSubscriptionsInput>
+  connectOrCreate?: Prisma.RestaurantCreateOrConnectWithoutSubscriptionsInput
+  upsert?: Prisma.RestaurantUpsertWithoutSubscriptionsInput
+  connect?: Prisma.RestaurantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.RestaurantUpdateToOneWithWhereWithoutSubscriptionsInput, Prisma.RestaurantUpdateWithoutSubscriptionsInput>, Prisma.RestaurantUncheckedUpdateWithoutSubscriptionsInput>
+}
+
+export type RestaurantCreateNestedOneWithoutDeliveryProvidersInput = {
+  create?: Prisma.XOR<Prisma.RestaurantCreateWithoutDeliveryProvidersInput, Prisma.RestaurantUncheckedCreateWithoutDeliveryProvidersInput>
+  connectOrCreate?: Prisma.RestaurantCreateOrConnectWithoutDeliveryProvidersInput
+  connect?: Prisma.RestaurantWhereUniqueInput
+}
+
+export type RestaurantUpdateOneRequiredWithoutDeliveryProvidersNestedInput = {
+  create?: Prisma.XOR<Prisma.RestaurantCreateWithoutDeliveryProvidersInput, Prisma.RestaurantUncheckedCreateWithoutDeliveryProvidersInput>
+  connectOrCreate?: Prisma.RestaurantCreateOrConnectWithoutDeliveryProvidersInput
+  upsert?: Prisma.RestaurantUpsertWithoutDeliveryProvidersInput
+  connect?: Prisma.RestaurantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.RestaurantUpdateToOneWithWhereWithoutDeliveryProvidersInput, Prisma.RestaurantUpdateWithoutDeliveryProvidersInput>, Prisma.RestaurantUncheckedUpdateWithoutDeliveryProvidersInput>
+}
+
+export type RestaurantCreateNestedOneWithoutAiUsagesInput = {
+  create?: Prisma.XOR<Prisma.RestaurantCreateWithoutAiUsagesInput, Prisma.RestaurantUncheckedCreateWithoutAiUsagesInput>
+  connectOrCreate?: Prisma.RestaurantCreateOrConnectWithoutAiUsagesInput
+  connect?: Prisma.RestaurantWhereUniqueInput
+}
+
+export type RestaurantUpdateOneRequiredWithoutAiUsagesNestedInput = {
+  create?: Prisma.XOR<Prisma.RestaurantCreateWithoutAiUsagesInput, Prisma.RestaurantUncheckedCreateWithoutAiUsagesInput>
+  connectOrCreate?: Prisma.RestaurantCreateOrConnectWithoutAiUsagesInput
+  upsert?: Prisma.RestaurantUpsertWithoutAiUsagesInput
+  connect?: Prisma.RestaurantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.RestaurantUpdateToOneWithWhereWithoutAiUsagesInput, Prisma.RestaurantUpdateWithoutAiUsagesInput>, Prisma.RestaurantUncheckedUpdateWithoutAiUsagesInput>
+}
+
+export type RestaurantCreateNestedOneWithoutAutomationRulesInput = {
+  create?: Prisma.XOR<Prisma.RestaurantCreateWithoutAutomationRulesInput, Prisma.RestaurantUncheckedCreateWithoutAutomationRulesInput>
+  connectOrCreate?: Prisma.RestaurantCreateOrConnectWithoutAutomationRulesInput
+  connect?: Prisma.RestaurantWhereUniqueInput
+}
+
+export type RestaurantUpdateOneRequiredWithoutAutomationRulesNestedInput = {
+  create?: Prisma.XOR<Prisma.RestaurantCreateWithoutAutomationRulesInput, Prisma.RestaurantUncheckedCreateWithoutAutomationRulesInput>
+  connectOrCreate?: Prisma.RestaurantCreateOrConnectWithoutAutomationRulesInput
+  upsert?: Prisma.RestaurantUpsertWithoutAutomationRulesInput
+  connect?: Prisma.RestaurantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.RestaurantUpdateToOneWithWhereWithoutAutomationRulesInput, Prisma.RestaurantUpdateWithoutAutomationRulesInput>, Prisma.RestaurantUncheckedUpdateWithoutAutomationRulesInput>
+}
+
+export type RestaurantCreateNestedOneWithoutNotificationsInput = {
+  create?: Prisma.XOR<Prisma.RestaurantCreateWithoutNotificationsInput, Prisma.RestaurantUncheckedCreateWithoutNotificationsInput>
+  connectOrCreate?: Prisma.RestaurantCreateOrConnectWithoutNotificationsInput
+  connect?: Prisma.RestaurantWhereUniqueInput
+}
+
+export type RestaurantUpdateOneRequiredWithoutNotificationsNestedInput = {
+  create?: Prisma.XOR<Prisma.RestaurantCreateWithoutNotificationsInput, Prisma.RestaurantUncheckedCreateWithoutNotificationsInput>
+  connectOrCreate?: Prisma.RestaurantCreateOrConnectWithoutNotificationsInput
+  upsert?: Prisma.RestaurantUpsertWithoutNotificationsInput
+  connect?: Prisma.RestaurantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.RestaurantUpdateToOneWithWhereWithoutNotificationsInput, Prisma.RestaurantUpdateWithoutNotificationsInput>, Prisma.RestaurantUncheckedUpdateWithoutNotificationsInput>
+}
+
+export type RestaurantCreateNestedOneWithoutSupportTicketsInput = {
+  create?: Prisma.XOR<Prisma.RestaurantCreateWithoutSupportTicketsInput, Prisma.RestaurantUncheckedCreateWithoutSupportTicketsInput>
+  connectOrCreate?: Prisma.RestaurantCreateOrConnectWithoutSupportTicketsInput
+  connect?: Prisma.RestaurantWhereUniqueInput
+}
+
+export type RestaurantUpdateOneRequiredWithoutSupportTicketsNestedInput = {
+  create?: Prisma.XOR<Prisma.RestaurantCreateWithoutSupportTicketsInput, Prisma.RestaurantUncheckedCreateWithoutSupportTicketsInput>
+  connectOrCreate?: Prisma.RestaurantCreateOrConnectWithoutSupportTicketsInput
+  upsert?: Prisma.RestaurantUpsertWithoutSupportTicketsInput
+  connect?: Prisma.RestaurantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.RestaurantUpdateToOneWithWhereWithoutSupportTicketsInput, Prisma.RestaurantUpdateWithoutSupportTicketsInput>, Prisma.RestaurantUncheckedUpdateWithoutSupportTicketsInput>
+}
+
 export type RestaurantCreateWithoutTenantInput = {
   id?: string
   name: string
@@ -491,6 +638,13 @@ export type RestaurantCreateWithoutTenantInput = {
   branches?: Prisma.BranchCreateNestedManyWithoutRestaurantInput
   menus?: Prisma.MenuCreateNestedManyWithoutRestaurantInput
   taxRates?: Prisma.TaxRateCreateNestedManyWithoutRestaurantInput
+  orders?: Prisma.OrderCreateNestedManyWithoutRestaurantInput
+  subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutRestaurantInput
+  deliveryProviders?: Prisma.RestaurantDeliveryProviderCreateNestedManyWithoutRestaurantInput
+  aiUsages?: Prisma.AiUsageCreateNestedManyWithoutRestaurantInput
+  automationRules?: Prisma.AutomationRuleCreateNestedManyWithoutRestaurantInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutRestaurantInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutRestaurantInput
 }
 
 export type RestaurantUncheckedCreateWithoutTenantInput = {
@@ -503,6 +657,13 @@ export type RestaurantUncheckedCreateWithoutTenantInput = {
   branches?: Prisma.BranchUncheckedCreateNestedManyWithoutRestaurantInput
   menus?: Prisma.MenuUncheckedCreateNestedManyWithoutRestaurantInput
   taxRates?: Prisma.TaxRateUncheckedCreateNestedManyWithoutRestaurantInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutRestaurantInput
+  subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutRestaurantInput
+  deliveryProviders?: Prisma.RestaurantDeliveryProviderUncheckedCreateNestedManyWithoutRestaurantInput
+  aiUsages?: Prisma.AiUsageUncheckedCreateNestedManyWithoutRestaurantInput
+  automationRules?: Prisma.AutomationRuleUncheckedCreateNestedManyWithoutRestaurantInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRestaurantInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutRestaurantInput
 }
 
 export type RestaurantCreateOrConnectWithoutTenantInput = {
@@ -554,6 +715,13 @@ export type RestaurantCreateWithoutBranchesInput = {
   tenant: Prisma.TenantCreateNestedOneWithoutRestaurantsInput
   menus?: Prisma.MenuCreateNestedManyWithoutRestaurantInput
   taxRates?: Prisma.TaxRateCreateNestedManyWithoutRestaurantInput
+  orders?: Prisma.OrderCreateNestedManyWithoutRestaurantInput
+  subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutRestaurantInput
+  deliveryProviders?: Prisma.RestaurantDeliveryProviderCreateNestedManyWithoutRestaurantInput
+  aiUsages?: Prisma.AiUsageCreateNestedManyWithoutRestaurantInput
+  automationRules?: Prisma.AutomationRuleCreateNestedManyWithoutRestaurantInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutRestaurantInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutRestaurantInput
 }
 
 export type RestaurantUncheckedCreateWithoutBranchesInput = {
@@ -566,6 +734,13 @@ export type RestaurantUncheckedCreateWithoutBranchesInput = {
   updatedAt?: Date | string
   menus?: Prisma.MenuUncheckedCreateNestedManyWithoutRestaurantInput
   taxRates?: Prisma.TaxRateUncheckedCreateNestedManyWithoutRestaurantInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutRestaurantInput
+  subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutRestaurantInput
+  deliveryProviders?: Prisma.RestaurantDeliveryProviderUncheckedCreateNestedManyWithoutRestaurantInput
+  aiUsages?: Prisma.AiUsageUncheckedCreateNestedManyWithoutRestaurantInput
+  automationRules?: Prisma.AutomationRuleUncheckedCreateNestedManyWithoutRestaurantInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRestaurantInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutRestaurantInput
 }
 
 export type RestaurantCreateOrConnectWithoutBranchesInput = {
@@ -594,6 +769,13 @@ export type RestaurantUpdateWithoutBranchesInput = {
   tenant?: Prisma.TenantUpdateOneRequiredWithoutRestaurantsNestedInput
   menus?: Prisma.MenuUpdateManyWithoutRestaurantNestedInput
   taxRates?: Prisma.TaxRateUpdateManyWithoutRestaurantNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutRestaurantNestedInput
+  subscriptions?: Prisma.SubscriptionUpdateManyWithoutRestaurantNestedInput
+  deliveryProviders?: Prisma.RestaurantDeliveryProviderUpdateManyWithoutRestaurantNestedInput
+  aiUsages?: Prisma.AiUsageUpdateManyWithoutRestaurantNestedInput
+  automationRules?: Prisma.AutomationRuleUpdateManyWithoutRestaurantNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutRestaurantNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutRestaurantNestedInput
 }
 
 export type RestaurantUncheckedUpdateWithoutBranchesInput = {
@@ -606,6 +788,13 @@ export type RestaurantUncheckedUpdateWithoutBranchesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   menus?: Prisma.MenuUncheckedUpdateManyWithoutRestaurantNestedInput
   taxRates?: Prisma.TaxRateUncheckedUpdateManyWithoutRestaurantNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutRestaurantNestedInput
+  subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutRestaurantNestedInput
+  deliveryProviders?: Prisma.RestaurantDeliveryProviderUncheckedUpdateManyWithoutRestaurantNestedInput
+  aiUsages?: Prisma.AiUsageUncheckedUpdateManyWithoutRestaurantNestedInput
+  automationRules?: Prisma.AutomationRuleUncheckedUpdateManyWithoutRestaurantNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutRestaurantNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutRestaurantNestedInput
 }
 
 export type RestaurantCreateWithoutMenusInput = {
@@ -618,6 +807,13 @@ export type RestaurantCreateWithoutMenusInput = {
   tenant: Prisma.TenantCreateNestedOneWithoutRestaurantsInput
   branches?: Prisma.BranchCreateNestedManyWithoutRestaurantInput
   taxRates?: Prisma.TaxRateCreateNestedManyWithoutRestaurantInput
+  orders?: Prisma.OrderCreateNestedManyWithoutRestaurantInput
+  subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutRestaurantInput
+  deliveryProviders?: Prisma.RestaurantDeliveryProviderCreateNestedManyWithoutRestaurantInput
+  aiUsages?: Prisma.AiUsageCreateNestedManyWithoutRestaurantInput
+  automationRules?: Prisma.AutomationRuleCreateNestedManyWithoutRestaurantInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutRestaurantInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutRestaurantInput
 }
 
 export type RestaurantUncheckedCreateWithoutMenusInput = {
@@ -630,6 +826,13 @@ export type RestaurantUncheckedCreateWithoutMenusInput = {
   updatedAt?: Date | string
   branches?: Prisma.BranchUncheckedCreateNestedManyWithoutRestaurantInput
   taxRates?: Prisma.TaxRateUncheckedCreateNestedManyWithoutRestaurantInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutRestaurantInput
+  subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutRestaurantInput
+  deliveryProviders?: Prisma.RestaurantDeliveryProviderUncheckedCreateNestedManyWithoutRestaurantInput
+  aiUsages?: Prisma.AiUsageUncheckedCreateNestedManyWithoutRestaurantInput
+  automationRules?: Prisma.AutomationRuleUncheckedCreateNestedManyWithoutRestaurantInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRestaurantInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutRestaurantInput
 }
 
 export type RestaurantCreateOrConnectWithoutMenusInput = {
@@ -658,6 +861,13 @@ export type RestaurantUpdateWithoutMenusInput = {
   tenant?: Prisma.TenantUpdateOneRequiredWithoutRestaurantsNestedInput
   branches?: Prisma.BranchUpdateManyWithoutRestaurantNestedInput
   taxRates?: Prisma.TaxRateUpdateManyWithoutRestaurantNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutRestaurantNestedInput
+  subscriptions?: Prisma.SubscriptionUpdateManyWithoutRestaurantNestedInput
+  deliveryProviders?: Prisma.RestaurantDeliveryProviderUpdateManyWithoutRestaurantNestedInput
+  aiUsages?: Prisma.AiUsageUpdateManyWithoutRestaurantNestedInput
+  automationRules?: Prisma.AutomationRuleUpdateManyWithoutRestaurantNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutRestaurantNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutRestaurantNestedInput
 }
 
 export type RestaurantUncheckedUpdateWithoutMenusInput = {
@@ -670,6 +880,13 @@ export type RestaurantUncheckedUpdateWithoutMenusInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   branches?: Prisma.BranchUncheckedUpdateManyWithoutRestaurantNestedInput
   taxRates?: Prisma.TaxRateUncheckedUpdateManyWithoutRestaurantNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutRestaurantNestedInput
+  subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutRestaurantNestedInput
+  deliveryProviders?: Prisma.RestaurantDeliveryProviderUncheckedUpdateManyWithoutRestaurantNestedInput
+  aiUsages?: Prisma.AiUsageUncheckedUpdateManyWithoutRestaurantNestedInput
+  automationRules?: Prisma.AutomationRuleUncheckedUpdateManyWithoutRestaurantNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutRestaurantNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutRestaurantNestedInput
 }
 
 export type RestaurantCreateWithoutTaxRatesInput = {
@@ -682,6 +899,13 @@ export type RestaurantCreateWithoutTaxRatesInput = {
   tenant: Prisma.TenantCreateNestedOneWithoutRestaurantsInput
   branches?: Prisma.BranchCreateNestedManyWithoutRestaurantInput
   menus?: Prisma.MenuCreateNestedManyWithoutRestaurantInput
+  orders?: Prisma.OrderCreateNestedManyWithoutRestaurantInput
+  subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutRestaurantInput
+  deliveryProviders?: Prisma.RestaurantDeliveryProviderCreateNestedManyWithoutRestaurantInput
+  aiUsages?: Prisma.AiUsageCreateNestedManyWithoutRestaurantInput
+  automationRules?: Prisma.AutomationRuleCreateNestedManyWithoutRestaurantInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutRestaurantInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutRestaurantInput
 }
 
 export type RestaurantUncheckedCreateWithoutTaxRatesInput = {
@@ -694,6 +918,13 @@ export type RestaurantUncheckedCreateWithoutTaxRatesInput = {
   updatedAt?: Date | string
   branches?: Prisma.BranchUncheckedCreateNestedManyWithoutRestaurantInput
   menus?: Prisma.MenuUncheckedCreateNestedManyWithoutRestaurantInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutRestaurantInput
+  subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutRestaurantInput
+  deliveryProviders?: Prisma.RestaurantDeliveryProviderUncheckedCreateNestedManyWithoutRestaurantInput
+  aiUsages?: Prisma.AiUsageUncheckedCreateNestedManyWithoutRestaurantInput
+  automationRules?: Prisma.AutomationRuleUncheckedCreateNestedManyWithoutRestaurantInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRestaurantInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutRestaurantInput
 }
 
 export type RestaurantCreateOrConnectWithoutTaxRatesInput = {
@@ -722,6 +953,13 @@ export type RestaurantUpdateWithoutTaxRatesInput = {
   tenant?: Prisma.TenantUpdateOneRequiredWithoutRestaurantsNestedInput
   branches?: Prisma.BranchUpdateManyWithoutRestaurantNestedInput
   menus?: Prisma.MenuUpdateManyWithoutRestaurantNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutRestaurantNestedInput
+  subscriptions?: Prisma.SubscriptionUpdateManyWithoutRestaurantNestedInput
+  deliveryProviders?: Prisma.RestaurantDeliveryProviderUpdateManyWithoutRestaurantNestedInput
+  aiUsages?: Prisma.AiUsageUpdateManyWithoutRestaurantNestedInput
+  automationRules?: Prisma.AutomationRuleUpdateManyWithoutRestaurantNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutRestaurantNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutRestaurantNestedInput
 }
 
 export type RestaurantUncheckedUpdateWithoutTaxRatesInput = {
@@ -734,6 +972,657 @@ export type RestaurantUncheckedUpdateWithoutTaxRatesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   branches?: Prisma.BranchUncheckedUpdateManyWithoutRestaurantNestedInput
   menus?: Prisma.MenuUncheckedUpdateManyWithoutRestaurantNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutRestaurantNestedInput
+  subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutRestaurantNestedInput
+  deliveryProviders?: Prisma.RestaurantDeliveryProviderUncheckedUpdateManyWithoutRestaurantNestedInput
+  aiUsages?: Prisma.AiUsageUncheckedUpdateManyWithoutRestaurantNestedInput
+  automationRules?: Prisma.AutomationRuleUncheckedUpdateManyWithoutRestaurantNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutRestaurantNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutRestaurantNestedInput
+}
+
+export type RestaurantCreateWithoutOrdersInput = {
+  id?: string
+  name: string
+  slug: string
+  status?: $Enums.RestaurantStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tenant: Prisma.TenantCreateNestedOneWithoutRestaurantsInput
+  branches?: Prisma.BranchCreateNestedManyWithoutRestaurantInput
+  menus?: Prisma.MenuCreateNestedManyWithoutRestaurantInput
+  taxRates?: Prisma.TaxRateCreateNestedManyWithoutRestaurantInput
+  subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutRestaurantInput
+  deliveryProviders?: Prisma.RestaurantDeliveryProviderCreateNestedManyWithoutRestaurantInput
+  aiUsages?: Prisma.AiUsageCreateNestedManyWithoutRestaurantInput
+  automationRules?: Prisma.AutomationRuleCreateNestedManyWithoutRestaurantInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutRestaurantInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutRestaurantInput
+}
+
+export type RestaurantUncheckedCreateWithoutOrdersInput = {
+  id?: string
+  tenantId: string
+  name: string
+  slug: string
+  status?: $Enums.RestaurantStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  branches?: Prisma.BranchUncheckedCreateNestedManyWithoutRestaurantInput
+  menus?: Prisma.MenuUncheckedCreateNestedManyWithoutRestaurantInput
+  taxRates?: Prisma.TaxRateUncheckedCreateNestedManyWithoutRestaurantInput
+  subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutRestaurantInput
+  deliveryProviders?: Prisma.RestaurantDeliveryProviderUncheckedCreateNestedManyWithoutRestaurantInput
+  aiUsages?: Prisma.AiUsageUncheckedCreateNestedManyWithoutRestaurantInput
+  automationRules?: Prisma.AutomationRuleUncheckedCreateNestedManyWithoutRestaurantInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRestaurantInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutRestaurantInput
+}
+
+export type RestaurantCreateOrConnectWithoutOrdersInput = {
+  where: Prisma.RestaurantWhereUniqueInput
+  create: Prisma.XOR<Prisma.RestaurantCreateWithoutOrdersInput, Prisma.RestaurantUncheckedCreateWithoutOrdersInput>
+}
+
+export type RestaurantUpsertWithoutOrdersInput = {
+  update: Prisma.XOR<Prisma.RestaurantUpdateWithoutOrdersInput, Prisma.RestaurantUncheckedUpdateWithoutOrdersInput>
+  create: Prisma.XOR<Prisma.RestaurantCreateWithoutOrdersInput, Prisma.RestaurantUncheckedCreateWithoutOrdersInput>
+  where?: Prisma.RestaurantWhereInput
+}
+
+export type RestaurantUpdateToOneWithWhereWithoutOrdersInput = {
+  where?: Prisma.RestaurantWhereInput
+  data: Prisma.XOR<Prisma.RestaurantUpdateWithoutOrdersInput, Prisma.RestaurantUncheckedUpdateWithoutOrdersInput>
+}
+
+export type RestaurantUpdateWithoutOrdersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumRestaurantStatusFieldUpdateOperationsInput | $Enums.RestaurantStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tenant?: Prisma.TenantUpdateOneRequiredWithoutRestaurantsNestedInput
+  branches?: Prisma.BranchUpdateManyWithoutRestaurantNestedInput
+  menus?: Prisma.MenuUpdateManyWithoutRestaurantNestedInput
+  taxRates?: Prisma.TaxRateUpdateManyWithoutRestaurantNestedInput
+  subscriptions?: Prisma.SubscriptionUpdateManyWithoutRestaurantNestedInput
+  deliveryProviders?: Prisma.RestaurantDeliveryProviderUpdateManyWithoutRestaurantNestedInput
+  aiUsages?: Prisma.AiUsageUpdateManyWithoutRestaurantNestedInput
+  automationRules?: Prisma.AutomationRuleUpdateManyWithoutRestaurantNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutRestaurantNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutRestaurantNestedInput
+}
+
+export type RestaurantUncheckedUpdateWithoutOrdersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  tenantId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumRestaurantStatusFieldUpdateOperationsInput | $Enums.RestaurantStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  branches?: Prisma.BranchUncheckedUpdateManyWithoutRestaurantNestedInput
+  menus?: Prisma.MenuUncheckedUpdateManyWithoutRestaurantNestedInput
+  taxRates?: Prisma.TaxRateUncheckedUpdateManyWithoutRestaurantNestedInput
+  subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutRestaurantNestedInput
+  deliveryProviders?: Prisma.RestaurantDeliveryProviderUncheckedUpdateManyWithoutRestaurantNestedInput
+  aiUsages?: Prisma.AiUsageUncheckedUpdateManyWithoutRestaurantNestedInput
+  automationRules?: Prisma.AutomationRuleUncheckedUpdateManyWithoutRestaurantNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutRestaurantNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutRestaurantNestedInput
+}
+
+export type RestaurantCreateWithoutSubscriptionsInput = {
+  id?: string
+  name: string
+  slug: string
+  status?: $Enums.RestaurantStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tenant: Prisma.TenantCreateNestedOneWithoutRestaurantsInput
+  branches?: Prisma.BranchCreateNestedManyWithoutRestaurantInput
+  menus?: Prisma.MenuCreateNestedManyWithoutRestaurantInput
+  taxRates?: Prisma.TaxRateCreateNestedManyWithoutRestaurantInput
+  orders?: Prisma.OrderCreateNestedManyWithoutRestaurantInput
+  deliveryProviders?: Prisma.RestaurantDeliveryProviderCreateNestedManyWithoutRestaurantInput
+  aiUsages?: Prisma.AiUsageCreateNestedManyWithoutRestaurantInput
+  automationRules?: Prisma.AutomationRuleCreateNestedManyWithoutRestaurantInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutRestaurantInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutRestaurantInput
+}
+
+export type RestaurantUncheckedCreateWithoutSubscriptionsInput = {
+  id?: string
+  tenantId: string
+  name: string
+  slug: string
+  status?: $Enums.RestaurantStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  branches?: Prisma.BranchUncheckedCreateNestedManyWithoutRestaurantInput
+  menus?: Prisma.MenuUncheckedCreateNestedManyWithoutRestaurantInput
+  taxRates?: Prisma.TaxRateUncheckedCreateNestedManyWithoutRestaurantInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutRestaurantInput
+  deliveryProviders?: Prisma.RestaurantDeliveryProviderUncheckedCreateNestedManyWithoutRestaurantInput
+  aiUsages?: Prisma.AiUsageUncheckedCreateNestedManyWithoutRestaurantInput
+  automationRules?: Prisma.AutomationRuleUncheckedCreateNestedManyWithoutRestaurantInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRestaurantInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutRestaurantInput
+}
+
+export type RestaurantCreateOrConnectWithoutSubscriptionsInput = {
+  where: Prisma.RestaurantWhereUniqueInput
+  create: Prisma.XOR<Prisma.RestaurantCreateWithoutSubscriptionsInput, Prisma.RestaurantUncheckedCreateWithoutSubscriptionsInput>
+}
+
+export type RestaurantUpsertWithoutSubscriptionsInput = {
+  update: Prisma.XOR<Prisma.RestaurantUpdateWithoutSubscriptionsInput, Prisma.RestaurantUncheckedUpdateWithoutSubscriptionsInput>
+  create: Prisma.XOR<Prisma.RestaurantCreateWithoutSubscriptionsInput, Prisma.RestaurantUncheckedCreateWithoutSubscriptionsInput>
+  where?: Prisma.RestaurantWhereInput
+}
+
+export type RestaurantUpdateToOneWithWhereWithoutSubscriptionsInput = {
+  where?: Prisma.RestaurantWhereInput
+  data: Prisma.XOR<Prisma.RestaurantUpdateWithoutSubscriptionsInput, Prisma.RestaurantUncheckedUpdateWithoutSubscriptionsInput>
+}
+
+export type RestaurantUpdateWithoutSubscriptionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumRestaurantStatusFieldUpdateOperationsInput | $Enums.RestaurantStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tenant?: Prisma.TenantUpdateOneRequiredWithoutRestaurantsNestedInput
+  branches?: Prisma.BranchUpdateManyWithoutRestaurantNestedInput
+  menus?: Prisma.MenuUpdateManyWithoutRestaurantNestedInput
+  taxRates?: Prisma.TaxRateUpdateManyWithoutRestaurantNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutRestaurantNestedInput
+  deliveryProviders?: Prisma.RestaurantDeliveryProviderUpdateManyWithoutRestaurantNestedInput
+  aiUsages?: Prisma.AiUsageUpdateManyWithoutRestaurantNestedInput
+  automationRules?: Prisma.AutomationRuleUpdateManyWithoutRestaurantNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutRestaurantNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutRestaurantNestedInput
+}
+
+export type RestaurantUncheckedUpdateWithoutSubscriptionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  tenantId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumRestaurantStatusFieldUpdateOperationsInput | $Enums.RestaurantStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  branches?: Prisma.BranchUncheckedUpdateManyWithoutRestaurantNestedInput
+  menus?: Prisma.MenuUncheckedUpdateManyWithoutRestaurantNestedInput
+  taxRates?: Prisma.TaxRateUncheckedUpdateManyWithoutRestaurantNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutRestaurantNestedInput
+  deliveryProviders?: Prisma.RestaurantDeliveryProviderUncheckedUpdateManyWithoutRestaurantNestedInput
+  aiUsages?: Prisma.AiUsageUncheckedUpdateManyWithoutRestaurantNestedInput
+  automationRules?: Prisma.AutomationRuleUncheckedUpdateManyWithoutRestaurantNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutRestaurantNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutRestaurantNestedInput
+}
+
+export type RestaurantCreateWithoutDeliveryProvidersInput = {
+  id?: string
+  name: string
+  slug: string
+  status?: $Enums.RestaurantStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tenant: Prisma.TenantCreateNestedOneWithoutRestaurantsInput
+  branches?: Prisma.BranchCreateNestedManyWithoutRestaurantInput
+  menus?: Prisma.MenuCreateNestedManyWithoutRestaurantInput
+  taxRates?: Prisma.TaxRateCreateNestedManyWithoutRestaurantInput
+  orders?: Prisma.OrderCreateNestedManyWithoutRestaurantInput
+  subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutRestaurantInput
+  aiUsages?: Prisma.AiUsageCreateNestedManyWithoutRestaurantInput
+  automationRules?: Prisma.AutomationRuleCreateNestedManyWithoutRestaurantInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutRestaurantInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutRestaurantInput
+}
+
+export type RestaurantUncheckedCreateWithoutDeliveryProvidersInput = {
+  id?: string
+  tenantId: string
+  name: string
+  slug: string
+  status?: $Enums.RestaurantStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  branches?: Prisma.BranchUncheckedCreateNestedManyWithoutRestaurantInput
+  menus?: Prisma.MenuUncheckedCreateNestedManyWithoutRestaurantInput
+  taxRates?: Prisma.TaxRateUncheckedCreateNestedManyWithoutRestaurantInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutRestaurantInput
+  subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutRestaurantInput
+  aiUsages?: Prisma.AiUsageUncheckedCreateNestedManyWithoutRestaurantInput
+  automationRules?: Prisma.AutomationRuleUncheckedCreateNestedManyWithoutRestaurantInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRestaurantInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutRestaurantInput
+}
+
+export type RestaurantCreateOrConnectWithoutDeliveryProvidersInput = {
+  where: Prisma.RestaurantWhereUniqueInput
+  create: Prisma.XOR<Prisma.RestaurantCreateWithoutDeliveryProvidersInput, Prisma.RestaurantUncheckedCreateWithoutDeliveryProvidersInput>
+}
+
+export type RestaurantUpsertWithoutDeliveryProvidersInput = {
+  update: Prisma.XOR<Prisma.RestaurantUpdateWithoutDeliveryProvidersInput, Prisma.RestaurantUncheckedUpdateWithoutDeliveryProvidersInput>
+  create: Prisma.XOR<Prisma.RestaurantCreateWithoutDeliveryProvidersInput, Prisma.RestaurantUncheckedCreateWithoutDeliveryProvidersInput>
+  where?: Prisma.RestaurantWhereInput
+}
+
+export type RestaurantUpdateToOneWithWhereWithoutDeliveryProvidersInput = {
+  where?: Prisma.RestaurantWhereInput
+  data: Prisma.XOR<Prisma.RestaurantUpdateWithoutDeliveryProvidersInput, Prisma.RestaurantUncheckedUpdateWithoutDeliveryProvidersInput>
+}
+
+export type RestaurantUpdateWithoutDeliveryProvidersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumRestaurantStatusFieldUpdateOperationsInput | $Enums.RestaurantStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tenant?: Prisma.TenantUpdateOneRequiredWithoutRestaurantsNestedInput
+  branches?: Prisma.BranchUpdateManyWithoutRestaurantNestedInput
+  menus?: Prisma.MenuUpdateManyWithoutRestaurantNestedInput
+  taxRates?: Prisma.TaxRateUpdateManyWithoutRestaurantNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutRestaurantNestedInput
+  subscriptions?: Prisma.SubscriptionUpdateManyWithoutRestaurantNestedInput
+  aiUsages?: Prisma.AiUsageUpdateManyWithoutRestaurantNestedInput
+  automationRules?: Prisma.AutomationRuleUpdateManyWithoutRestaurantNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutRestaurantNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutRestaurantNestedInput
+}
+
+export type RestaurantUncheckedUpdateWithoutDeliveryProvidersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  tenantId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumRestaurantStatusFieldUpdateOperationsInput | $Enums.RestaurantStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  branches?: Prisma.BranchUncheckedUpdateManyWithoutRestaurantNestedInput
+  menus?: Prisma.MenuUncheckedUpdateManyWithoutRestaurantNestedInput
+  taxRates?: Prisma.TaxRateUncheckedUpdateManyWithoutRestaurantNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutRestaurantNestedInput
+  subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutRestaurantNestedInput
+  aiUsages?: Prisma.AiUsageUncheckedUpdateManyWithoutRestaurantNestedInput
+  automationRules?: Prisma.AutomationRuleUncheckedUpdateManyWithoutRestaurantNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutRestaurantNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutRestaurantNestedInput
+}
+
+export type RestaurantCreateWithoutAiUsagesInput = {
+  id?: string
+  name: string
+  slug: string
+  status?: $Enums.RestaurantStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tenant: Prisma.TenantCreateNestedOneWithoutRestaurantsInput
+  branches?: Prisma.BranchCreateNestedManyWithoutRestaurantInput
+  menus?: Prisma.MenuCreateNestedManyWithoutRestaurantInput
+  taxRates?: Prisma.TaxRateCreateNestedManyWithoutRestaurantInput
+  orders?: Prisma.OrderCreateNestedManyWithoutRestaurantInput
+  subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutRestaurantInput
+  deliveryProviders?: Prisma.RestaurantDeliveryProviderCreateNestedManyWithoutRestaurantInput
+  automationRules?: Prisma.AutomationRuleCreateNestedManyWithoutRestaurantInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutRestaurantInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutRestaurantInput
+}
+
+export type RestaurantUncheckedCreateWithoutAiUsagesInput = {
+  id?: string
+  tenantId: string
+  name: string
+  slug: string
+  status?: $Enums.RestaurantStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  branches?: Prisma.BranchUncheckedCreateNestedManyWithoutRestaurantInput
+  menus?: Prisma.MenuUncheckedCreateNestedManyWithoutRestaurantInput
+  taxRates?: Prisma.TaxRateUncheckedCreateNestedManyWithoutRestaurantInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutRestaurantInput
+  subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutRestaurantInput
+  deliveryProviders?: Prisma.RestaurantDeliveryProviderUncheckedCreateNestedManyWithoutRestaurantInput
+  automationRules?: Prisma.AutomationRuleUncheckedCreateNestedManyWithoutRestaurantInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRestaurantInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutRestaurantInput
+}
+
+export type RestaurantCreateOrConnectWithoutAiUsagesInput = {
+  where: Prisma.RestaurantWhereUniqueInput
+  create: Prisma.XOR<Prisma.RestaurantCreateWithoutAiUsagesInput, Prisma.RestaurantUncheckedCreateWithoutAiUsagesInput>
+}
+
+export type RestaurantUpsertWithoutAiUsagesInput = {
+  update: Prisma.XOR<Prisma.RestaurantUpdateWithoutAiUsagesInput, Prisma.RestaurantUncheckedUpdateWithoutAiUsagesInput>
+  create: Prisma.XOR<Prisma.RestaurantCreateWithoutAiUsagesInput, Prisma.RestaurantUncheckedCreateWithoutAiUsagesInput>
+  where?: Prisma.RestaurantWhereInput
+}
+
+export type RestaurantUpdateToOneWithWhereWithoutAiUsagesInput = {
+  where?: Prisma.RestaurantWhereInput
+  data: Prisma.XOR<Prisma.RestaurantUpdateWithoutAiUsagesInput, Prisma.RestaurantUncheckedUpdateWithoutAiUsagesInput>
+}
+
+export type RestaurantUpdateWithoutAiUsagesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumRestaurantStatusFieldUpdateOperationsInput | $Enums.RestaurantStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tenant?: Prisma.TenantUpdateOneRequiredWithoutRestaurantsNestedInput
+  branches?: Prisma.BranchUpdateManyWithoutRestaurantNestedInput
+  menus?: Prisma.MenuUpdateManyWithoutRestaurantNestedInput
+  taxRates?: Prisma.TaxRateUpdateManyWithoutRestaurantNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutRestaurantNestedInput
+  subscriptions?: Prisma.SubscriptionUpdateManyWithoutRestaurantNestedInput
+  deliveryProviders?: Prisma.RestaurantDeliveryProviderUpdateManyWithoutRestaurantNestedInput
+  automationRules?: Prisma.AutomationRuleUpdateManyWithoutRestaurantNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutRestaurantNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutRestaurantNestedInput
+}
+
+export type RestaurantUncheckedUpdateWithoutAiUsagesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  tenantId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumRestaurantStatusFieldUpdateOperationsInput | $Enums.RestaurantStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  branches?: Prisma.BranchUncheckedUpdateManyWithoutRestaurantNestedInput
+  menus?: Prisma.MenuUncheckedUpdateManyWithoutRestaurantNestedInput
+  taxRates?: Prisma.TaxRateUncheckedUpdateManyWithoutRestaurantNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutRestaurantNestedInput
+  subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutRestaurantNestedInput
+  deliveryProviders?: Prisma.RestaurantDeliveryProviderUncheckedUpdateManyWithoutRestaurantNestedInput
+  automationRules?: Prisma.AutomationRuleUncheckedUpdateManyWithoutRestaurantNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutRestaurantNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutRestaurantNestedInput
+}
+
+export type RestaurantCreateWithoutAutomationRulesInput = {
+  id?: string
+  name: string
+  slug: string
+  status?: $Enums.RestaurantStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tenant: Prisma.TenantCreateNestedOneWithoutRestaurantsInput
+  branches?: Prisma.BranchCreateNestedManyWithoutRestaurantInput
+  menus?: Prisma.MenuCreateNestedManyWithoutRestaurantInput
+  taxRates?: Prisma.TaxRateCreateNestedManyWithoutRestaurantInput
+  orders?: Prisma.OrderCreateNestedManyWithoutRestaurantInput
+  subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutRestaurantInput
+  deliveryProviders?: Prisma.RestaurantDeliveryProviderCreateNestedManyWithoutRestaurantInput
+  aiUsages?: Prisma.AiUsageCreateNestedManyWithoutRestaurantInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutRestaurantInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutRestaurantInput
+}
+
+export type RestaurantUncheckedCreateWithoutAutomationRulesInput = {
+  id?: string
+  tenantId: string
+  name: string
+  slug: string
+  status?: $Enums.RestaurantStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  branches?: Prisma.BranchUncheckedCreateNestedManyWithoutRestaurantInput
+  menus?: Prisma.MenuUncheckedCreateNestedManyWithoutRestaurantInput
+  taxRates?: Prisma.TaxRateUncheckedCreateNestedManyWithoutRestaurantInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutRestaurantInput
+  subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutRestaurantInput
+  deliveryProviders?: Prisma.RestaurantDeliveryProviderUncheckedCreateNestedManyWithoutRestaurantInput
+  aiUsages?: Prisma.AiUsageUncheckedCreateNestedManyWithoutRestaurantInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRestaurantInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutRestaurantInput
+}
+
+export type RestaurantCreateOrConnectWithoutAutomationRulesInput = {
+  where: Prisma.RestaurantWhereUniqueInput
+  create: Prisma.XOR<Prisma.RestaurantCreateWithoutAutomationRulesInput, Prisma.RestaurantUncheckedCreateWithoutAutomationRulesInput>
+}
+
+export type RestaurantUpsertWithoutAutomationRulesInput = {
+  update: Prisma.XOR<Prisma.RestaurantUpdateWithoutAutomationRulesInput, Prisma.RestaurantUncheckedUpdateWithoutAutomationRulesInput>
+  create: Prisma.XOR<Prisma.RestaurantCreateWithoutAutomationRulesInput, Prisma.RestaurantUncheckedCreateWithoutAutomationRulesInput>
+  where?: Prisma.RestaurantWhereInput
+}
+
+export type RestaurantUpdateToOneWithWhereWithoutAutomationRulesInput = {
+  where?: Prisma.RestaurantWhereInput
+  data: Prisma.XOR<Prisma.RestaurantUpdateWithoutAutomationRulesInput, Prisma.RestaurantUncheckedUpdateWithoutAutomationRulesInput>
+}
+
+export type RestaurantUpdateWithoutAutomationRulesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumRestaurantStatusFieldUpdateOperationsInput | $Enums.RestaurantStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tenant?: Prisma.TenantUpdateOneRequiredWithoutRestaurantsNestedInput
+  branches?: Prisma.BranchUpdateManyWithoutRestaurantNestedInput
+  menus?: Prisma.MenuUpdateManyWithoutRestaurantNestedInput
+  taxRates?: Prisma.TaxRateUpdateManyWithoutRestaurantNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutRestaurantNestedInput
+  subscriptions?: Prisma.SubscriptionUpdateManyWithoutRestaurantNestedInput
+  deliveryProviders?: Prisma.RestaurantDeliveryProviderUpdateManyWithoutRestaurantNestedInput
+  aiUsages?: Prisma.AiUsageUpdateManyWithoutRestaurantNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutRestaurantNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutRestaurantNestedInput
+}
+
+export type RestaurantUncheckedUpdateWithoutAutomationRulesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  tenantId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumRestaurantStatusFieldUpdateOperationsInput | $Enums.RestaurantStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  branches?: Prisma.BranchUncheckedUpdateManyWithoutRestaurantNestedInput
+  menus?: Prisma.MenuUncheckedUpdateManyWithoutRestaurantNestedInput
+  taxRates?: Prisma.TaxRateUncheckedUpdateManyWithoutRestaurantNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutRestaurantNestedInput
+  subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutRestaurantNestedInput
+  deliveryProviders?: Prisma.RestaurantDeliveryProviderUncheckedUpdateManyWithoutRestaurantNestedInput
+  aiUsages?: Prisma.AiUsageUncheckedUpdateManyWithoutRestaurantNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutRestaurantNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutRestaurantNestedInput
+}
+
+export type RestaurantCreateWithoutNotificationsInput = {
+  id?: string
+  name: string
+  slug: string
+  status?: $Enums.RestaurantStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tenant: Prisma.TenantCreateNestedOneWithoutRestaurantsInput
+  branches?: Prisma.BranchCreateNestedManyWithoutRestaurantInput
+  menus?: Prisma.MenuCreateNestedManyWithoutRestaurantInput
+  taxRates?: Prisma.TaxRateCreateNestedManyWithoutRestaurantInput
+  orders?: Prisma.OrderCreateNestedManyWithoutRestaurantInput
+  subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutRestaurantInput
+  deliveryProviders?: Prisma.RestaurantDeliveryProviderCreateNestedManyWithoutRestaurantInput
+  aiUsages?: Prisma.AiUsageCreateNestedManyWithoutRestaurantInput
+  automationRules?: Prisma.AutomationRuleCreateNestedManyWithoutRestaurantInput
+  supportTickets?: Prisma.SupportTicketCreateNestedManyWithoutRestaurantInput
+}
+
+export type RestaurantUncheckedCreateWithoutNotificationsInput = {
+  id?: string
+  tenantId: string
+  name: string
+  slug: string
+  status?: $Enums.RestaurantStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  branches?: Prisma.BranchUncheckedCreateNestedManyWithoutRestaurantInput
+  menus?: Prisma.MenuUncheckedCreateNestedManyWithoutRestaurantInput
+  taxRates?: Prisma.TaxRateUncheckedCreateNestedManyWithoutRestaurantInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutRestaurantInput
+  subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutRestaurantInput
+  deliveryProviders?: Prisma.RestaurantDeliveryProviderUncheckedCreateNestedManyWithoutRestaurantInput
+  aiUsages?: Prisma.AiUsageUncheckedCreateNestedManyWithoutRestaurantInput
+  automationRules?: Prisma.AutomationRuleUncheckedCreateNestedManyWithoutRestaurantInput
+  supportTickets?: Prisma.SupportTicketUncheckedCreateNestedManyWithoutRestaurantInput
+}
+
+export type RestaurantCreateOrConnectWithoutNotificationsInput = {
+  where: Prisma.RestaurantWhereUniqueInput
+  create: Prisma.XOR<Prisma.RestaurantCreateWithoutNotificationsInput, Prisma.RestaurantUncheckedCreateWithoutNotificationsInput>
+}
+
+export type RestaurantUpsertWithoutNotificationsInput = {
+  update: Prisma.XOR<Prisma.RestaurantUpdateWithoutNotificationsInput, Prisma.RestaurantUncheckedUpdateWithoutNotificationsInput>
+  create: Prisma.XOR<Prisma.RestaurantCreateWithoutNotificationsInput, Prisma.RestaurantUncheckedCreateWithoutNotificationsInput>
+  where?: Prisma.RestaurantWhereInput
+}
+
+export type RestaurantUpdateToOneWithWhereWithoutNotificationsInput = {
+  where?: Prisma.RestaurantWhereInput
+  data: Prisma.XOR<Prisma.RestaurantUpdateWithoutNotificationsInput, Prisma.RestaurantUncheckedUpdateWithoutNotificationsInput>
+}
+
+export type RestaurantUpdateWithoutNotificationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumRestaurantStatusFieldUpdateOperationsInput | $Enums.RestaurantStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tenant?: Prisma.TenantUpdateOneRequiredWithoutRestaurantsNestedInput
+  branches?: Prisma.BranchUpdateManyWithoutRestaurantNestedInput
+  menus?: Prisma.MenuUpdateManyWithoutRestaurantNestedInput
+  taxRates?: Prisma.TaxRateUpdateManyWithoutRestaurantNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutRestaurantNestedInput
+  subscriptions?: Prisma.SubscriptionUpdateManyWithoutRestaurantNestedInput
+  deliveryProviders?: Prisma.RestaurantDeliveryProviderUpdateManyWithoutRestaurantNestedInput
+  aiUsages?: Prisma.AiUsageUpdateManyWithoutRestaurantNestedInput
+  automationRules?: Prisma.AutomationRuleUpdateManyWithoutRestaurantNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutRestaurantNestedInput
+}
+
+export type RestaurantUncheckedUpdateWithoutNotificationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  tenantId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumRestaurantStatusFieldUpdateOperationsInput | $Enums.RestaurantStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  branches?: Prisma.BranchUncheckedUpdateManyWithoutRestaurantNestedInput
+  menus?: Prisma.MenuUncheckedUpdateManyWithoutRestaurantNestedInput
+  taxRates?: Prisma.TaxRateUncheckedUpdateManyWithoutRestaurantNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutRestaurantNestedInput
+  subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutRestaurantNestedInput
+  deliveryProviders?: Prisma.RestaurantDeliveryProviderUncheckedUpdateManyWithoutRestaurantNestedInput
+  aiUsages?: Prisma.AiUsageUncheckedUpdateManyWithoutRestaurantNestedInput
+  automationRules?: Prisma.AutomationRuleUncheckedUpdateManyWithoutRestaurantNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutRestaurantNestedInput
+}
+
+export type RestaurantCreateWithoutSupportTicketsInput = {
+  id?: string
+  name: string
+  slug: string
+  status?: $Enums.RestaurantStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tenant: Prisma.TenantCreateNestedOneWithoutRestaurantsInput
+  branches?: Prisma.BranchCreateNestedManyWithoutRestaurantInput
+  menus?: Prisma.MenuCreateNestedManyWithoutRestaurantInput
+  taxRates?: Prisma.TaxRateCreateNestedManyWithoutRestaurantInput
+  orders?: Prisma.OrderCreateNestedManyWithoutRestaurantInput
+  subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutRestaurantInput
+  deliveryProviders?: Prisma.RestaurantDeliveryProviderCreateNestedManyWithoutRestaurantInput
+  aiUsages?: Prisma.AiUsageCreateNestedManyWithoutRestaurantInput
+  automationRules?: Prisma.AutomationRuleCreateNestedManyWithoutRestaurantInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutRestaurantInput
+}
+
+export type RestaurantUncheckedCreateWithoutSupportTicketsInput = {
+  id?: string
+  tenantId: string
+  name: string
+  slug: string
+  status?: $Enums.RestaurantStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  branches?: Prisma.BranchUncheckedCreateNestedManyWithoutRestaurantInput
+  menus?: Prisma.MenuUncheckedCreateNestedManyWithoutRestaurantInput
+  taxRates?: Prisma.TaxRateUncheckedCreateNestedManyWithoutRestaurantInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutRestaurantInput
+  subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutRestaurantInput
+  deliveryProviders?: Prisma.RestaurantDeliveryProviderUncheckedCreateNestedManyWithoutRestaurantInput
+  aiUsages?: Prisma.AiUsageUncheckedCreateNestedManyWithoutRestaurantInput
+  automationRules?: Prisma.AutomationRuleUncheckedCreateNestedManyWithoutRestaurantInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRestaurantInput
+}
+
+export type RestaurantCreateOrConnectWithoutSupportTicketsInput = {
+  where: Prisma.RestaurantWhereUniqueInput
+  create: Prisma.XOR<Prisma.RestaurantCreateWithoutSupportTicketsInput, Prisma.RestaurantUncheckedCreateWithoutSupportTicketsInput>
+}
+
+export type RestaurantUpsertWithoutSupportTicketsInput = {
+  update: Prisma.XOR<Prisma.RestaurantUpdateWithoutSupportTicketsInput, Prisma.RestaurantUncheckedUpdateWithoutSupportTicketsInput>
+  create: Prisma.XOR<Prisma.RestaurantCreateWithoutSupportTicketsInput, Prisma.RestaurantUncheckedCreateWithoutSupportTicketsInput>
+  where?: Prisma.RestaurantWhereInput
+}
+
+export type RestaurantUpdateToOneWithWhereWithoutSupportTicketsInput = {
+  where?: Prisma.RestaurantWhereInput
+  data: Prisma.XOR<Prisma.RestaurantUpdateWithoutSupportTicketsInput, Prisma.RestaurantUncheckedUpdateWithoutSupportTicketsInput>
+}
+
+export type RestaurantUpdateWithoutSupportTicketsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumRestaurantStatusFieldUpdateOperationsInput | $Enums.RestaurantStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tenant?: Prisma.TenantUpdateOneRequiredWithoutRestaurantsNestedInput
+  branches?: Prisma.BranchUpdateManyWithoutRestaurantNestedInput
+  menus?: Prisma.MenuUpdateManyWithoutRestaurantNestedInput
+  taxRates?: Prisma.TaxRateUpdateManyWithoutRestaurantNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutRestaurantNestedInput
+  subscriptions?: Prisma.SubscriptionUpdateManyWithoutRestaurantNestedInput
+  deliveryProviders?: Prisma.RestaurantDeliveryProviderUpdateManyWithoutRestaurantNestedInput
+  aiUsages?: Prisma.AiUsageUpdateManyWithoutRestaurantNestedInput
+  automationRules?: Prisma.AutomationRuleUpdateManyWithoutRestaurantNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutRestaurantNestedInput
+}
+
+export type RestaurantUncheckedUpdateWithoutSupportTicketsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  tenantId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumRestaurantStatusFieldUpdateOperationsInput | $Enums.RestaurantStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  branches?: Prisma.BranchUncheckedUpdateManyWithoutRestaurantNestedInput
+  menus?: Prisma.MenuUncheckedUpdateManyWithoutRestaurantNestedInput
+  taxRates?: Prisma.TaxRateUncheckedUpdateManyWithoutRestaurantNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutRestaurantNestedInput
+  subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutRestaurantNestedInput
+  deliveryProviders?: Prisma.RestaurantDeliveryProviderUncheckedUpdateManyWithoutRestaurantNestedInput
+  aiUsages?: Prisma.AiUsageUncheckedUpdateManyWithoutRestaurantNestedInput
+  automationRules?: Prisma.AutomationRuleUncheckedUpdateManyWithoutRestaurantNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutRestaurantNestedInput
 }
 
 export type RestaurantCreateManyTenantInput = {
@@ -755,6 +1644,13 @@ export type RestaurantUpdateWithoutTenantInput = {
   branches?: Prisma.BranchUpdateManyWithoutRestaurantNestedInput
   menus?: Prisma.MenuUpdateManyWithoutRestaurantNestedInput
   taxRates?: Prisma.TaxRateUpdateManyWithoutRestaurantNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutRestaurantNestedInput
+  subscriptions?: Prisma.SubscriptionUpdateManyWithoutRestaurantNestedInput
+  deliveryProviders?: Prisma.RestaurantDeliveryProviderUpdateManyWithoutRestaurantNestedInput
+  aiUsages?: Prisma.AiUsageUpdateManyWithoutRestaurantNestedInput
+  automationRules?: Prisma.AutomationRuleUpdateManyWithoutRestaurantNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutRestaurantNestedInput
+  supportTickets?: Prisma.SupportTicketUpdateManyWithoutRestaurantNestedInput
 }
 
 export type RestaurantUncheckedUpdateWithoutTenantInput = {
@@ -767,6 +1663,13 @@ export type RestaurantUncheckedUpdateWithoutTenantInput = {
   branches?: Prisma.BranchUncheckedUpdateManyWithoutRestaurantNestedInput
   menus?: Prisma.MenuUncheckedUpdateManyWithoutRestaurantNestedInput
   taxRates?: Prisma.TaxRateUncheckedUpdateManyWithoutRestaurantNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutRestaurantNestedInput
+  subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutRestaurantNestedInput
+  deliveryProviders?: Prisma.RestaurantDeliveryProviderUncheckedUpdateManyWithoutRestaurantNestedInput
+  aiUsages?: Prisma.AiUsageUncheckedUpdateManyWithoutRestaurantNestedInput
+  automationRules?: Prisma.AutomationRuleUncheckedUpdateManyWithoutRestaurantNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutRestaurantNestedInput
+  supportTickets?: Prisma.SupportTicketUncheckedUpdateManyWithoutRestaurantNestedInput
 }
 
 export type RestaurantUncheckedUpdateManyWithoutTenantInput = {
@@ -787,12 +1690,26 @@ export type RestaurantCountOutputType = {
   branches: number
   menus: number
   taxRates: number
+  orders: number
+  subscriptions: number
+  deliveryProviders: number
+  aiUsages: number
+  automationRules: number
+  notifications: number
+  supportTickets: number
 }
 
 export type RestaurantCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   branches?: boolean | RestaurantCountOutputTypeCountBranchesArgs
   menus?: boolean | RestaurantCountOutputTypeCountMenusArgs
   taxRates?: boolean | RestaurantCountOutputTypeCountTaxRatesArgs
+  orders?: boolean | RestaurantCountOutputTypeCountOrdersArgs
+  subscriptions?: boolean | RestaurantCountOutputTypeCountSubscriptionsArgs
+  deliveryProviders?: boolean | RestaurantCountOutputTypeCountDeliveryProvidersArgs
+  aiUsages?: boolean | RestaurantCountOutputTypeCountAiUsagesArgs
+  automationRules?: boolean | RestaurantCountOutputTypeCountAutomationRulesArgs
+  notifications?: boolean | RestaurantCountOutputTypeCountNotificationsArgs
+  supportTickets?: boolean | RestaurantCountOutputTypeCountSupportTicketsArgs
 }
 
 /**
@@ -826,6 +1743,55 @@ export type RestaurantCountOutputTypeCountTaxRatesArgs<ExtArgs extends runtime.T
   where?: Prisma.TaxRateWhereInput
 }
 
+/**
+ * RestaurantCountOutputType without action
+ */
+export type RestaurantCountOutputTypeCountOrdersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.OrderWhereInput
+}
+
+/**
+ * RestaurantCountOutputType without action
+ */
+export type RestaurantCountOutputTypeCountSubscriptionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SubscriptionWhereInput
+}
+
+/**
+ * RestaurantCountOutputType without action
+ */
+export type RestaurantCountOutputTypeCountDeliveryProvidersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.RestaurantDeliveryProviderWhereInput
+}
+
+/**
+ * RestaurantCountOutputType without action
+ */
+export type RestaurantCountOutputTypeCountAiUsagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AiUsageWhereInput
+}
+
+/**
+ * RestaurantCountOutputType without action
+ */
+export type RestaurantCountOutputTypeCountAutomationRulesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AutomationRuleWhereInput
+}
+
+/**
+ * RestaurantCountOutputType without action
+ */
+export type RestaurantCountOutputTypeCountNotificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.NotificationWhereInput
+}
+
+/**
+ * RestaurantCountOutputType without action
+ */
+export type RestaurantCountOutputTypeCountSupportTicketsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SupportTicketWhereInput
+}
+
 
 export type RestaurantSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -839,6 +1805,13 @@ export type RestaurantSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   branches?: boolean | Prisma.Restaurant$branchesArgs<ExtArgs>
   menus?: boolean | Prisma.Restaurant$menusArgs<ExtArgs>
   taxRates?: boolean | Prisma.Restaurant$taxRatesArgs<ExtArgs>
+  orders?: boolean | Prisma.Restaurant$ordersArgs<ExtArgs>
+  subscriptions?: boolean | Prisma.Restaurant$subscriptionsArgs<ExtArgs>
+  deliveryProviders?: boolean | Prisma.Restaurant$deliveryProvidersArgs<ExtArgs>
+  aiUsages?: boolean | Prisma.Restaurant$aiUsagesArgs<ExtArgs>
+  automationRules?: boolean | Prisma.Restaurant$automationRulesArgs<ExtArgs>
+  notifications?: boolean | Prisma.Restaurant$notificationsArgs<ExtArgs>
+  supportTickets?: boolean | Prisma.Restaurant$supportTicketsArgs<ExtArgs>
   _count?: boolean | Prisma.RestaurantCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["restaurant"]>
 
@@ -880,6 +1853,13 @@ export type RestaurantInclude<ExtArgs extends runtime.Types.Extensions.InternalA
   branches?: boolean | Prisma.Restaurant$branchesArgs<ExtArgs>
   menus?: boolean | Prisma.Restaurant$menusArgs<ExtArgs>
   taxRates?: boolean | Prisma.Restaurant$taxRatesArgs<ExtArgs>
+  orders?: boolean | Prisma.Restaurant$ordersArgs<ExtArgs>
+  subscriptions?: boolean | Prisma.Restaurant$subscriptionsArgs<ExtArgs>
+  deliveryProviders?: boolean | Prisma.Restaurant$deliveryProvidersArgs<ExtArgs>
+  aiUsages?: boolean | Prisma.Restaurant$aiUsagesArgs<ExtArgs>
+  automationRules?: boolean | Prisma.Restaurant$automationRulesArgs<ExtArgs>
+  notifications?: boolean | Prisma.Restaurant$notificationsArgs<ExtArgs>
+  supportTickets?: boolean | Prisma.Restaurant$supportTicketsArgs<ExtArgs>
   _count?: boolean | Prisma.RestaurantCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type RestaurantIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -896,6 +1876,13 @@ export type $RestaurantPayload<ExtArgs extends runtime.Types.Extensions.Internal
     branches: Prisma.$BranchPayload<ExtArgs>[]
     menus: Prisma.$MenuPayload<ExtArgs>[]
     taxRates: Prisma.$TaxRatePayload<ExtArgs>[]
+    orders: Prisma.$OrderPayload<ExtArgs>[]
+    subscriptions: Prisma.$SubscriptionPayload<ExtArgs>[]
+    deliveryProviders: Prisma.$RestaurantDeliveryProviderPayload<ExtArgs>[]
+    aiUsages: Prisma.$AiUsagePayload<ExtArgs>[]
+    automationRules: Prisma.$AutomationRulePayload<ExtArgs>[]
+    notifications: Prisma.$NotificationPayload<ExtArgs>[]
+    supportTickets: Prisma.$SupportTicketPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1303,6 +2290,13 @@ export interface Prisma__RestaurantClient<T, Null = never, ExtArgs extends runti
   branches<T extends Prisma.Restaurant$branchesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Restaurant$branchesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BranchPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   menus<T extends Prisma.Restaurant$menusArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Restaurant$menusArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MenuPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   taxRates<T extends Prisma.Restaurant$taxRatesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Restaurant$taxRatesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TaxRatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  orders<T extends Prisma.Restaurant$ordersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Restaurant$ordersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  subscriptions<T extends Prisma.Restaurant$subscriptionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Restaurant$subscriptionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SubscriptionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  deliveryProviders<T extends Prisma.Restaurant$deliveryProvidersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Restaurant$deliveryProvidersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RestaurantDeliveryProviderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  aiUsages<T extends Prisma.Restaurant$aiUsagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Restaurant$aiUsagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AiUsagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  automationRules<T extends Prisma.Restaurant$automationRulesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Restaurant$automationRulesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AutomationRulePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  notifications<T extends Prisma.Restaurant$notificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Restaurant$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  supportTickets<T extends Prisma.Restaurant$supportTicketsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Restaurant$supportTicketsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SupportTicketPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1809,6 +2803,174 @@ export type Restaurant$taxRatesArgs<ExtArgs extends runtime.Types.Extensions.Int
   take?: number
   skip?: number
   distinct?: Prisma.TaxRateScalarFieldEnum | Prisma.TaxRateScalarFieldEnum[]
+}
+
+/**
+ * Restaurant.orders
+ */
+export type Restaurant$ordersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Order
+   */
+  select?: Prisma.OrderSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Order
+   */
+  omit?: Prisma.OrderOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.OrderInclude<ExtArgs> | null
+  where?: Prisma.OrderWhereInput
+  orderBy?: Prisma.OrderOrderByWithRelationInput | Prisma.OrderOrderByWithRelationInput[]
+  cursor?: Prisma.OrderWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.OrderScalarFieldEnum | Prisma.OrderScalarFieldEnum[]
+}
+
+/**
+ * Restaurant.subscriptions
+ */
+export type Restaurant$subscriptionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Subscription
+   */
+  select?: Prisma.SubscriptionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Subscription
+   */
+  omit?: Prisma.SubscriptionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SubscriptionInclude<ExtArgs> | null
+  where?: Prisma.SubscriptionWhereInput
+  orderBy?: Prisma.SubscriptionOrderByWithRelationInput | Prisma.SubscriptionOrderByWithRelationInput[]
+  cursor?: Prisma.SubscriptionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SubscriptionScalarFieldEnum | Prisma.SubscriptionScalarFieldEnum[]
+}
+
+/**
+ * Restaurant.deliveryProviders
+ */
+export type Restaurant$deliveryProvidersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RestaurantDeliveryProvider
+   */
+  select?: Prisma.RestaurantDeliveryProviderSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the RestaurantDeliveryProvider
+   */
+  omit?: Prisma.RestaurantDeliveryProviderOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RestaurantDeliveryProviderInclude<ExtArgs> | null
+  where?: Prisma.RestaurantDeliveryProviderWhereInput
+  orderBy?: Prisma.RestaurantDeliveryProviderOrderByWithRelationInput | Prisma.RestaurantDeliveryProviderOrderByWithRelationInput[]
+  cursor?: Prisma.RestaurantDeliveryProviderWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.RestaurantDeliveryProviderScalarFieldEnum | Prisma.RestaurantDeliveryProviderScalarFieldEnum[]
+}
+
+/**
+ * Restaurant.aiUsages
+ */
+export type Restaurant$aiUsagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AiUsage
+   */
+  select?: Prisma.AiUsageSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AiUsage
+   */
+  omit?: Prisma.AiUsageOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AiUsageInclude<ExtArgs> | null
+  where?: Prisma.AiUsageWhereInput
+  orderBy?: Prisma.AiUsageOrderByWithRelationInput | Prisma.AiUsageOrderByWithRelationInput[]
+  cursor?: Prisma.AiUsageWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AiUsageScalarFieldEnum | Prisma.AiUsageScalarFieldEnum[]
+}
+
+/**
+ * Restaurant.automationRules
+ */
+export type Restaurant$automationRulesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AutomationRule
+   */
+  select?: Prisma.AutomationRuleSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AutomationRule
+   */
+  omit?: Prisma.AutomationRuleOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AutomationRuleInclude<ExtArgs> | null
+  where?: Prisma.AutomationRuleWhereInput
+  orderBy?: Prisma.AutomationRuleOrderByWithRelationInput | Prisma.AutomationRuleOrderByWithRelationInput[]
+  cursor?: Prisma.AutomationRuleWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AutomationRuleScalarFieldEnum | Prisma.AutomationRuleScalarFieldEnum[]
+}
+
+/**
+ * Restaurant.notifications
+ */
+export type Restaurant$notificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Notification
+   */
+  select?: Prisma.NotificationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Notification
+   */
+  omit?: Prisma.NotificationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.NotificationInclude<ExtArgs> | null
+  where?: Prisma.NotificationWhereInput
+  orderBy?: Prisma.NotificationOrderByWithRelationInput | Prisma.NotificationOrderByWithRelationInput[]
+  cursor?: Prisma.NotificationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.NotificationScalarFieldEnum | Prisma.NotificationScalarFieldEnum[]
+}
+
+/**
+ * Restaurant.supportTickets
+ */
+export type Restaurant$supportTicketsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SupportTicket
+   */
+  select?: Prisma.SupportTicketSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SupportTicket
+   */
+  omit?: Prisma.SupportTicketOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SupportTicketInclude<ExtArgs> | null
+  where?: Prisma.SupportTicketWhereInput
+  orderBy?: Prisma.SupportTicketOrderByWithRelationInput | Prisma.SupportTicketOrderByWithRelationInput[]
+  cursor?: Prisma.SupportTicketWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SupportTicketScalarFieldEnum | Prisma.SupportTicketScalarFieldEnum[]
 }
 
 /**

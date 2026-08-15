@@ -2,6 +2,7 @@ import { ConflictException, ForbiddenException, NotFoundException } from '@nestj
 import { Test, TestingModule } from '@nestjs/testing';
 import { BranchesService } from './branches.service';
 import { PrismaService } from '../../database/prisma/prisma.service';
+import { SubscriptionUsageService } from '../subscriptions/subscription-usage.service';
 
 describe('BranchesService', () => {
   let service: BranchesService;
@@ -22,10 +23,16 @@ describe('BranchesService', () => {
       },
     };
 
+    const mockSubscriptionUsageService = {
+      checkLimit: jest.fn().mockResolvedValue(true),
+      trackUsage: jest.fn().mockResolvedValue(true),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         BranchesService,
         { provide: PrismaService, useValue: prismaService },
+        { provide: SubscriptionUsageService, useValue: mockSubscriptionUsageService },
       ],
     }).compile();
 

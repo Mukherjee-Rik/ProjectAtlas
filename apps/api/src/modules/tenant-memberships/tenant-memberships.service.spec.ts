@@ -2,6 +2,7 @@ import { ConflictException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { TenantMembershipsService } from './tenant-memberships.service';
 import { PrismaService } from '../../database/prisma/prisma.service';
+import { SubscriptionUsageService } from '../subscriptions/subscription-usage.service';
 
 describe('TenantMembershipsService', () => {
   let service: TenantMembershipsService;
@@ -14,6 +15,9 @@ describe('TenantMembershipsService', () => {
       },
       tenant: {
         findUnique: jest.fn().mockResolvedValue({ id: 't-1' }),
+      },
+      restaurant: {
+        findFirst: jest.fn().mockResolvedValue({ id: 'r-1' }),
       },
       tenantMembership: {
         findUnique: jest.fn(),
@@ -28,6 +32,10 @@ describe('TenantMembershipsService', () => {
       providers: [
         TenantMembershipsService,
         { provide: PrismaService, useValue: prismaService },
+        {
+          provide: SubscriptionUsageService,
+          useValue: { checkLimit: jest.fn().mockResolvedValue(true) },
+        },
       ],
     }).compile();
 

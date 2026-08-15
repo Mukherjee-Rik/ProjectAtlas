@@ -1,6 +1,9 @@
 export const PERMISSIONS = {
   DASHBOARD_READ: 'dashboard.read',
 
+  SUBSCRIPTIONS_READ: 'subscriptions.read',
+  SUBSCRIPTIONS_WRITE: 'subscriptions.write',
+
   USERS_READ: 'users.read',
   USERS_CREATE: 'users.create',
   USERS_UPDATE: 'users.update',
@@ -49,6 +52,9 @@ export const PERMISSIONS = {
   MENU_ITEMS_CREATE: 'menu-items.create',
   MENU_ITEMS_UPDATE: 'menu-items.update',
   MENU_ITEMS_DELETE: 'menu-items.delete',
+
+  ORDERS_READ: 'orders.read',
+  ORDERS_UPDATE: 'orders.update',
 } as const;
 
 export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];

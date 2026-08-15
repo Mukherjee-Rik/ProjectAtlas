@@ -69,17 +69,27 @@ export function BranchProvider({ children }: { children: ReactNode }) {
       const loadedBranches = response.data ?? [];
       setBranches(loadedBranches);
 
-      if (loadedBranches.length === 1) {
-        setCurrentBranch(loadedBranches[0]);
-      } else if (currentBranch && !loadedBranches.some((b) => b.id === currentBranch.id)) {
-        setCurrentBranch(loadedBranches[0] ?? null);
-      }
+      // Use functional state update to avoid capturing stale currentBranch
+      setCurrentBranchState((prevBranch) => {
+        if (loadedBranches.length > 0 && !prevBranch) {
+          saveCurrentBranch(loadedBranches[0]!);
+          return loadedBranches[0]!;
+        } else if (prevBranch && !loadedBranches.some((b) => b.id === prevBranch.id)) {
+          const fallback = loadedBranches[0] ?? null;
+          if (fallback) saveCurrentBranch(fallback);
+          else clearCurrentBranch();
+          return fallback;
+        }
+        return prevBranch;
+      });
     } catch {
       // Ignore load error
     } finally {
       setIsLoadingBranches(false);
     }
-  }, [currentRestaurant, currentBranch, setCurrentBranch, clearBranch]);
+    // ✅ currentBranch removed from deps - use functional setState instead
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentRestaurant?.id, clearBranch]);
 
   useEffect(() => {
     if (currentRestaurant) {
@@ -87,7 +97,8 @@ export function BranchProvider({ children }: { children: ReactNode }) {
     } else {
       clearBranch();
     }
-  }, [currentRestaurant, reloadBranches, clearBranch]);
+  }, [currentRestaurant?.id, reloadBranches, clearBranch]);
+
 
   return (
     <BranchContext.Provider

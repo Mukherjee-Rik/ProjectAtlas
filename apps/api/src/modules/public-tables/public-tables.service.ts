@@ -35,7 +35,7 @@ export class PublicTablesService {
     return {
       table: { id: table.id, name: table.name, code: table.code, capacity: table.capacity },
       diningArea: { name: diningArea.name },
-      branch: { name: branch.name },
+      branch: { id: branch.id, name: branch.name },
       restaurant: { id: restaurant.id, name: restaurant.name },
     };
   }
@@ -52,6 +52,11 @@ export class PublicTablesService {
       const sessionToken = `cs_${crypto.randomUUID().replace(/-/g, '')}`;
       session = await this.prisma.customerSession.create({ data: { tableId: resolved.table.id, sessionToken, status: 'ACTIVE' } });
     }
+    // Self-healing: if there are other duplicate active sessions for this table, end them
+    await this.prisma.customerSession.updateMany({
+      where: { tableId: resolved.table.id, status: 'ACTIVE', id: { not: session.id } },
+      data: { status: 'ENDED', endedAt: new Date() }
+    });
     return { session, resolved };
   }
 

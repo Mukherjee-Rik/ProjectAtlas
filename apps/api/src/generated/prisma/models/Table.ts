@@ -250,6 +250,7 @@ export type TableWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Table"> | Date | string
   diningArea?: Prisma.XOR<Prisma.DiningAreaScalarRelationFilter, Prisma.DiningAreaWhereInput>
   customerSessions?: Prisma.CustomerSessionListRelationFilter
+  orders?: Prisma.OrderListRelationFilter
 }
 
 export type TableOrderByWithRelationInput = {
@@ -264,6 +265,7 @@ export type TableOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   diningArea?: Prisma.DiningAreaOrderByWithRelationInput
   customerSessions?: Prisma.CustomerSessionOrderByRelationAggregateInput
+  orders?: Prisma.OrderOrderByRelationAggregateInput
 }
 
 export type TableWhereUniqueInput = Prisma.AtLeast<{
@@ -282,6 +284,7 @@ export type TableWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"Table"> | Date | string
   diningArea?: Prisma.XOR<Prisma.DiningAreaScalarRelationFilter, Prisma.DiningAreaWhereInput>
   customerSessions?: Prisma.CustomerSessionListRelationFilter
+  orders?: Prisma.OrderListRelationFilter
 }, "id" | "publicToken" | "diningAreaId_code">
 
 export type TableOrderByWithAggregationInput = {
@@ -327,6 +330,7 @@ export type TableCreateInput = {
   updatedAt?: Date | string
   diningArea: Prisma.DiningAreaCreateNestedOneWithoutTablesInput
   customerSessions?: Prisma.CustomerSessionCreateNestedManyWithoutTableInput
+  orders?: Prisma.OrderCreateNestedManyWithoutTableInput
 }
 
 export type TableUncheckedCreateInput = {
@@ -340,6 +344,7 @@ export type TableUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   customerSessions?: Prisma.CustomerSessionUncheckedCreateNestedManyWithoutTableInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutTableInput
 }
 
 export type TableUpdateInput = {
@@ -353,6 +358,7 @@ export type TableUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   diningArea?: Prisma.DiningAreaUpdateOneRequiredWithoutTablesNestedInput
   customerSessions?: Prisma.CustomerSessionUpdateManyWithoutTableNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutTableNestedInput
 }
 
 export type TableUncheckedUpdateInput = {
@@ -366,6 +372,7 @@ export type TableUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   customerSessions?: Prisma.CustomerSessionUncheckedUpdateManyWithoutTableNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutTableNestedInput
 }
 
 export type TableCreateManyInput = {
@@ -467,6 +474,11 @@ export type TableScalarRelationFilter = {
   isNot?: Prisma.TableWhereInput
 }
 
+export type TableNullableScalarRelationFilter = {
+  is?: Prisma.TableWhereInput | null
+  isNot?: Prisma.TableWhereInput | null
+}
+
 export type TableCreateNestedManyWithoutDiningAreaInput = {
   create?: Prisma.XOR<Prisma.TableCreateWithoutDiningAreaInput, Prisma.TableUncheckedCreateWithoutDiningAreaInput> | Prisma.TableCreateWithoutDiningAreaInput[] | Prisma.TableUncheckedCreateWithoutDiningAreaInput[]
   connectOrCreate?: Prisma.TableCreateOrConnectWithoutDiningAreaInput | Prisma.TableCreateOrConnectWithoutDiningAreaInput[]
@@ -535,6 +547,22 @@ export type TableUpdateOneRequiredWithoutCustomerSessionsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.TableUpdateToOneWithWhereWithoutCustomerSessionsInput, Prisma.TableUpdateWithoutCustomerSessionsInput>, Prisma.TableUncheckedUpdateWithoutCustomerSessionsInput>
 }
 
+export type TableCreateNestedOneWithoutOrdersInput = {
+  create?: Prisma.XOR<Prisma.TableCreateWithoutOrdersInput, Prisma.TableUncheckedCreateWithoutOrdersInput>
+  connectOrCreate?: Prisma.TableCreateOrConnectWithoutOrdersInput
+  connect?: Prisma.TableWhereUniqueInput
+}
+
+export type TableUpdateOneWithoutOrdersNestedInput = {
+  create?: Prisma.XOR<Prisma.TableCreateWithoutOrdersInput, Prisma.TableUncheckedCreateWithoutOrdersInput>
+  connectOrCreate?: Prisma.TableCreateOrConnectWithoutOrdersInput
+  upsert?: Prisma.TableUpsertWithoutOrdersInput
+  disconnect?: Prisma.TableWhereInput | boolean
+  delete?: Prisma.TableWhereInput | boolean
+  connect?: Prisma.TableWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TableUpdateToOneWithWhereWithoutOrdersInput, Prisma.TableUpdateWithoutOrdersInput>, Prisma.TableUncheckedUpdateWithoutOrdersInput>
+}
+
 export type TableCreateWithoutDiningAreaInput = {
   id?: string
   publicToken?: string
@@ -545,6 +573,7 @@ export type TableCreateWithoutDiningAreaInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   customerSessions?: Prisma.CustomerSessionCreateNestedManyWithoutTableInput
+  orders?: Prisma.OrderCreateNestedManyWithoutTableInput
 }
 
 export type TableUncheckedCreateWithoutDiningAreaInput = {
@@ -557,6 +586,7 @@ export type TableUncheckedCreateWithoutDiningAreaInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   customerSessions?: Prisma.CustomerSessionUncheckedCreateNestedManyWithoutTableInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutTableInput
 }
 
 export type TableCreateOrConnectWithoutDiningAreaInput = {
@@ -610,6 +640,7 @@ export type TableCreateWithoutCustomerSessionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   diningArea: Prisma.DiningAreaCreateNestedOneWithoutTablesInput
+  orders?: Prisma.OrderCreateNestedManyWithoutTableInput
 }
 
 export type TableUncheckedCreateWithoutCustomerSessionsInput = {
@@ -622,6 +653,7 @@ export type TableUncheckedCreateWithoutCustomerSessionsInput = {
   status?: $Enums.TableStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutTableInput
 }
 
 export type TableCreateOrConnectWithoutCustomerSessionsInput = {
@@ -650,6 +682,7 @@ export type TableUpdateWithoutCustomerSessionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   diningArea?: Prisma.DiningAreaUpdateOneRequiredWithoutTablesNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutTableNestedInput
 }
 
 export type TableUncheckedUpdateWithoutCustomerSessionsInput = {
@@ -662,6 +695,75 @@ export type TableUncheckedUpdateWithoutCustomerSessionsInput = {
   status?: Prisma.EnumTableStatusFieldUpdateOperationsInput | $Enums.TableStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutTableNestedInput
+}
+
+export type TableCreateWithoutOrdersInput = {
+  id?: string
+  publicToken?: string
+  name: string
+  code: string
+  capacity: number
+  status?: $Enums.TableStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  diningArea: Prisma.DiningAreaCreateNestedOneWithoutTablesInput
+  customerSessions?: Prisma.CustomerSessionCreateNestedManyWithoutTableInput
+}
+
+export type TableUncheckedCreateWithoutOrdersInput = {
+  id?: string
+  diningAreaId: string
+  publicToken?: string
+  name: string
+  code: string
+  capacity: number
+  status?: $Enums.TableStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  customerSessions?: Prisma.CustomerSessionUncheckedCreateNestedManyWithoutTableInput
+}
+
+export type TableCreateOrConnectWithoutOrdersInput = {
+  where: Prisma.TableWhereUniqueInput
+  create: Prisma.XOR<Prisma.TableCreateWithoutOrdersInput, Prisma.TableUncheckedCreateWithoutOrdersInput>
+}
+
+export type TableUpsertWithoutOrdersInput = {
+  update: Prisma.XOR<Prisma.TableUpdateWithoutOrdersInput, Prisma.TableUncheckedUpdateWithoutOrdersInput>
+  create: Prisma.XOR<Prisma.TableCreateWithoutOrdersInput, Prisma.TableUncheckedCreateWithoutOrdersInput>
+  where?: Prisma.TableWhereInput
+}
+
+export type TableUpdateToOneWithWhereWithoutOrdersInput = {
+  where?: Prisma.TableWhereInput
+  data: Prisma.XOR<Prisma.TableUpdateWithoutOrdersInput, Prisma.TableUncheckedUpdateWithoutOrdersInput>
+}
+
+export type TableUpdateWithoutOrdersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  publicToken?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  capacity?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumTableStatusFieldUpdateOperationsInput | $Enums.TableStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  diningArea?: Prisma.DiningAreaUpdateOneRequiredWithoutTablesNestedInput
+  customerSessions?: Prisma.CustomerSessionUpdateManyWithoutTableNestedInput
+}
+
+export type TableUncheckedUpdateWithoutOrdersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  diningAreaId?: Prisma.StringFieldUpdateOperationsInput | string
+  publicToken?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  capacity?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumTableStatusFieldUpdateOperationsInput | $Enums.TableStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  customerSessions?: Prisma.CustomerSessionUncheckedUpdateManyWithoutTableNestedInput
 }
 
 export type TableCreateManyDiningAreaInput = {
@@ -685,6 +787,7 @@ export type TableUpdateWithoutDiningAreaInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   customerSessions?: Prisma.CustomerSessionUpdateManyWithoutTableNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutTableNestedInput
 }
 
 export type TableUncheckedUpdateWithoutDiningAreaInput = {
@@ -697,6 +800,7 @@ export type TableUncheckedUpdateWithoutDiningAreaInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   customerSessions?: Prisma.CustomerSessionUncheckedUpdateManyWithoutTableNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutTableNestedInput
 }
 
 export type TableUncheckedUpdateManyWithoutDiningAreaInput = {
@@ -717,10 +821,12 @@ export type TableUncheckedUpdateManyWithoutDiningAreaInput = {
 
 export type TableCountOutputType = {
   customerSessions: number
+  orders: number
 }
 
 export type TableCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   customerSessions?: boolean | TableCountOutputTypeCountCustomerSessionsArgs
+  orders?: boolean | TableCountOutputTypeCountOrdersArgs
 }
 
 /**
@@ -740,6 +846,13 @@ export type TableCountOutputTypeCountCustomerSessionsArgs<ExtArgs extends runtim
   where?: Prisma.CustomerSessionWhereInput
 }
 
+/**
+ * TableCountOutputType without action
+ */
+export type TableCountOutputTypeCountOrdersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.OrderWhereInput
+}
+
 
 export type TableSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -753,6 +866,7 @@ export type TableSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   updatedAt?: boolean
   diningArea?: boolean | Prisma.DiningAreaDefaultArgs<ExtArgs>
   customerSessions?: boolean | Prisma.Table$customerSessionsArgs<ExtArgs>
+  orders?: boolean | Prisma.Table$ordersArgs<ExtArgs>
   _count?: boolean | Prisma.TableCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["table"]>
 
@@ -798,6 +912,7 @@ export type TableOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = ru
 export type TableInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   diningArea?: boolean | Prisma.DiningAreaDefaultArgs<ExtArgs>
   customerSessions?: boolean | Prisma.Table$customerSessionsArgs<ExtArgs>
+  orders?: boolean | Prisma.Table$ordersArgs<ExtArgs>
   _count?: boolean | Prisma.TableCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type TableIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -812,6 +927,7 @@ export type $TablePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   objects: {
     diningArea: Prisma.$DiningAreaPayload<ExtArgs>
     customerSessions: Prisma.$CustomerSessionPayload<ExtArgs>[]
+    orders: Prisma.$OrderPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1219,6 +1335,7 @@ export interface Prisma__TableClient<T, Null = never, ExtArgs extends runtime.Ty
   readonly [Symbol.toStringTag]: "PrismaPromise"
   diningArea<T extends Prisma.DiningAreaDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.DiningAreaDefaultArgs<ExtArgs>>): Prisma.Prisma__DiningAreaClient<runtime.Types.Result.GetResult<Prisma.$DiningAreaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   customerSessions<T extends Prisma.Table$customerSessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Table$customerSessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CustomerSessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  orders<T extends Prisma.Table$ordersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Table$ordersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1679,6 +1796,30 @@ export type Table$customerSessionsArgs<ExtArgs extends runtime.Types.Extensions.
   take?: number
   skip?: number
   distinct?: Prisma.CustomerSessionScalarFieldEnum | Prisma.CustomerSessionScalarFieldEnum[]
+}
+
+/**
+ * Table.orders
+ */
+export type Table$ordersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Order
+   */
+  select?: Prisma.OrderSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Order
+   */
+  omit?: Prisma.OrderOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.OrderInclude<ExtArgs> | null
+  where?: Prisma.OrderWhereInput
+  orderBy?: Prisma.OrderOrderByWithRelationInput | Prisma.OrderOrderByWithRelationInput[]
+  cursor?: Prisma.OrderWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.OrderScalarFieldEnum | Prisma.OrderScalarFieldEnum[]
 }
 
 /**

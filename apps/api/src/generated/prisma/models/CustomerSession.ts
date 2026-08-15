@@ -200,6 +200,8 @@ export type CustomerSessionWhereInput = {
   endedAt?: Prisma.DateTimeNullableFilter<"CustomerSession"> | Date | string | null
   table?: Prisma.XOR<Prisma.TableScalarRelationFilter, Prisma.TableWhereInput>
   cart?: Prisma.XOR<Prisma.CartNullableScalarRelationFilter, Prisma.CartWhereInput> | null
+  orders?: Prisma.OrderListRelationFilter
+  payments?: Prisma.PaymentListRelationFilter
 }
 
 export type CustomerSessionOrderByWithRelationInput = {
@@ -212,6 +214,8 @@ export type CustomerSessionOrderByWithRelationInput = {
   endedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   table?: Prisma.TableOrderByWithRelationInput
   cart?: Prisma.CartOrderByWithRelationInput
+  orders?: Prisma.OrderOrderByRelationAggregateInput
+  payments?: Prisma.PaymentOrderByRelationAggregateInput
 }
 
 export type CustomerSessionWhereUniqueInput = Prisma.AtLeast<{
@@ -227,6 +231,8 @@ export type CustomerSessionWhereUniqueInput = Prisma.AtLeast<{
   endedAt?: Prisma.DateTimeNullableFilter<"CustomerSession"> | Date | string | null
   table?: Prisma.XOR<Prisma.TableScalarRelationFilter, Prisma.TableWhereInput>
   cart?: Prisma.XOR<Prisma.CartNullableScalarRelationFilter, Prisma.CartWhereInput> | null
+  orders?: Prisma.OrderListRelationFilter
+  payments?: Prisma.PaymentListRelationFilter
 }, "id" | "sessionToken">
 
 export type CustomerSessionOrderByWithAggregationInput = {
@@ -264,6 +270,8 @@ export type CustomerSessionCreateInput = {
   endedAt?: Date | string | null
   table: Prisma.TableCreateNestedOneWithoutCustomerSessionsInput
   cart?: Prisma.CartCreateNestedOneWithoutCustomerSessionInput
+  orders?: Prisma.OrderCreateNestedManyWithoutCustomerSessionInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutCustomerSessionInput
 }
 
 export type CustomerSessionUncheckedCreateInput = {
@@ -275,6 +283,8 @@ export type CustomerSessionUncheckedCreateInput = {
   expiresAt?: Date | string | null
   endedAt?: Date | string | null
   cart?: Prisma.CartUncheckedCreateNestedOneWithoutCustomerSessionInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutCustomerSessionInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutCustomerSessionInput
 }
 
 export type CustomerSessionUpdateInput = {
@@ -286,6 +296,8 @@ export type CustomerSessionUpdateInput = {
   endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   table?: Prisma.TableUpdateOneRequiredWithoutCustomerSessionsNestedInput
   cart?: Prisma.CartUpdateOneWithoutCustomerSessionNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutCustomerSessionNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutCustomerSessionNestedInput
 }
 
 export type CustomerSessionUncheckedUpdateInput = {
@@ -297,6 +309,8 @@ export type CustomerSessionUncheckedUpdateInput = {
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cart?: Prisma.CartUncheckedUpdateOneWithoutCustomerSessionNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutCustomerSessionNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutCustomerSessionNestedInput
 }
 
 export type CustomerSessionCreateManyInput = {
@@ -373,6 +387,11 @@ export type CustomerSessionScalarRelationFilter = {
   isNot?: Prisma.CustomerSessionWhereInput
 }
 
+export type CustomerSessionNullableScalarRelationFilter = {
+  is?: Prisma.CustomerSessionWhereInput | null
+  isNot?: Prisma.CustomerSessionWhereInput | null
+}
+
 export type CustomerSessionCreateNestedManyWithoutTableInput = {
   create?: Prisma.XOR<Prisma.CustomerSessionCreateWithoutTableInput, Prisma.CustomerSessionUncheckedCreateWithoutTableInput> | Prisma.CustomerSessionCreateWithoutTableInput[] | Prisma.CustomerSessionUncheckedCreateWithoutTableInput[]
   connectOrCreate?: Prisma.CustomerSessionCreateOrConnectWithoutTableInput | Prisma.CustomerSessionCreateOrConnectWithoutTableInput[]
@@ -437,6 +456,38 @@ export type CustomerSessionUpdateOneRequiredWithoutCartNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.CustomerSessionUpdateToOneWithWhereWithoutCartInput, Prisma.CustomerSessionUpdateWithoutCartInput>, Prisma.CustomerSessionUncheckedUpdateWithoutCartInput>
 }
 
+export type CustomerSessionCreateNestedOneWithoutOrdersInput = {
+  create?: Prisma.XOR<Prisma.CustomerSessionCreateWithoutOrdersInput, Prisma.CustomerSessionUncheckedCreateWithoutOrdersInput>
+  connectOrCreate?: Prisma.CustomerSessionCreateOrConnectWithoutOrdersInput
+  connect?: Prisma.CustomerSessionWhereUniqueInput
+}
+
+export type CustomerSessionUpdateOneWithoutOrdersNestedInput = {
+  create?: Prisma.XOR<Prisma.CustomerSessionCreateWithoutOrdersInput, Prisma.CustomerSessionUncheckedCreateWithoutOrdersInput>
+  connectOrCreate?: Prisma.CustomerSessionCreateOrConnectWithoutOrdersInput
+  upsert?: Prisma.CustomerSessionUpsertWithoutOrdersInput
+  disconnect?: Prisma.CustomerSessionWhereInput | boolean
+  delete?: Prisma.CustomerSessionWhereInput | boolean
+  connect?: Prisma.CustomerSessionWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CustomerSessionUpdateToOneWithWhereWithoutOrdersInput, Prisma.CustomerSessionUpdateWithoutOrdersInput>, Prisma.CustomerSessionUncheckedUpdateWithoutOrdersInput>
+}
+
+export type CustomerSessionCreateNestedOneWithoutPaymentsInput = {
+  create?: Prisma.XOR<Prisma.CustomerSessionCreateWithoutPaymentsInput, Prisma.CustomerSessionUncheckedCreateWithoutPaymentsInput>
+  connectOrCreate?: Prisma.CustomerSessionCreateOrConnectWithoutPaymentsInput
+  connect?: Prisma.CustomerSessionWhereUniqueInput
+}
+
+export type CustomerSessionUpdateOneWithoutPaymentsNestedInput = {
+  create?: Prisma.XOR<Prisma.CustomerSessionCreateWithoutPaymentsInput, Prisma.CustomerSessionUncheckedCreateWithoutPaymentsInput>
+  connectOrCreate?: Prisma.CustomerSessionCreateOrConnectWithoutPaymentsInput
+  upsert?: Prisma.CustomerSessionUpsertWithoutPaymentsInput
+  disconnect?: Prisma.CustomerSessionWhereInput | boolean
+  delete?: Prisma.CustomerSessionWhereInput | boolean
+  connect?: Prisma.CustomerSessionWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CustomerSessionUpdateToOneWithWhereWithoutPaymentsInput, Prisma.CustomerSessionUpdateWithoutPaymentsInput>, Prisma.CustomerSessionUncheckedUpdateWithoutPaymentsInput>
+}
+
 export type CustomerSessionCreateWithoutTableInput = {
   id?: string
   sessionToken: string
@@ -445,6 +496,8 @@ export type CustomerSessionCreateWithoutTableInput = {
   expiresAt?: Date | string | null
   endedAt?: Date | string | null
   cart?: Prisma.CartCreateNestedOneWithoutCustomerSessionInput
+  orders?: Prisma.OrderCreateNestedManyWithoutCustomerSessionInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutCustomerSessionInput
 }
 
 export type CustomerSessionUncheckedCreateWithoutTableInput = {
@@ -455,6 +508,8 @@ export type CustomerSessionUncheckedCreateWithoutTableInput = {
   expiresAt?: Date | string | null
   endedAt?: Date | string | null
   cart?: Prisma.CartUncheckedCreateNestedOneWithoutCustomerSessionInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutCustomerSessionInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutCustomerSessionInput
 }
 
 export type CustomerSessionCreateOrConnectWithoutTableInput = {
@@ -504,6 +559,8 @@ export type CustomerSessionCreateWithoutCartInput = {
   expiresAt?: Date | string | null
   endedAt?: Date | string | null
   table: Prisma.TableCreateNestedOneWithoutCustomerSessionsInput
+  orders?: Prisma.OrderCreateNestedManyWithoutCustomerSessionInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutCustomerSessionInput
 }
 
 export type CustomerSessionUncheckedCreateWithoutCartInput = {
@@ -514,6 +571,8 @@ export type CustomerSessionUncheckedCreateWithoutCartInput = {
   startedAt?: Date | string
   expiresAt?: Date | string | null
   endedAt?: Date | string | null
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutCustomerSessionInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutCustomerSessionInput
 }
 
 export type CustomerSessionCreateOrConnectWithoutCartInput = {
@@ -540,6 +599,8 @@ export type CustomerSessionUpdateWithoutCartInput = {
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   table?: Prisma.TableUpdateOneRequiredWithoutCustomerSessionsNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutCustomerSessionNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutCustomerSessionNestedInput
 }
 
 export type CustomerSessionUncheckedUpdateWithoutCartInput = {
@@ -550,6 +611,136 @@ export type CustomerSessionUncheckedUpdateWithoutCartInput = {
   startedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutCustomerSessionNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutCustomerSessionNestedInput
+}
+
+export type CustomerSessionCreateWithoutOrdersInput = {
+  id?: string
+  sessionToken: string
+  status?: $Enums.CustomerSessionStatus
+  startedAt?: Date | string
+  expiresAt?: Date | string | null
+  endedAt?: Date | string | null
+  table: Prisma.TableCreateNestedOneWithoutCustomerSessionsInput
+  cart?: Prisma.CartCreateNestedOneWithoutCustomerSessionInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutCustomerSessionInput
+}
+
+export type CustomerSessionUncheckedCreateWithoutOrdersInput = {
+  id?: string
+  tableId: string
+  sessionToken: string
+  status?: $Enums.CustomerSessionStatus
+  startedAt?: Date | string
+  expiresAt?: Date | string | null
+  endedAt?: Date | string | null
+  cart?: Prisma.CartUncheckedCreateNestedOneWithoutCustomerSessionInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutCustomerSessionInput
+}
+
+export type CustomerSessionCreateOrConnectWithoutOrdersInput = {
+  where: Prisma.CustomerSessionWhereUniqueInput
+  create: Prisma.XOR<Prisma.CustomerSessionCreateWithoutOrdersInput, Prisma.CustomerSessionUncheckedCreateWithoutOrdersInput>
+}
+
+export type CustomerSessionUpsertWithoutOrdersInput = {
+  update: Prisma.XOR<Prisma.CustomerSessionUpdateWithoutOrdersInput, Prisma.CustomerSessionUncheckedUpdateWithoutOrdersInput>
+  create: Prisma.XOR<Prisma.CustomerSessionCreateWithoutOrdersInput, Prisma.CustomerSessionUncheckedCreateWithoutOrdersInput>
+  where?: Prisma.CustomerSessionWhereInput
+}
+
+export type CustomerSessionUpdateToOneWithWhereWithoutOrdersInput = {
+  where?: Prisma.CustomerSessionWhereInput
+  data: Prisma.XOR<Prisma.CustomerSessionUpdateWithoutOrdersInput, Prisma.CustomerSessionUncheckedUpdateWithoutOrdersInput>
+}
+
+export type CustomerSessionUpdateWithoutOrdersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  sessionToken?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumCustomerSessionStatusFieldUpdateOperationsInput | $Enums.CustomerSessionStatus
+  startedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  table?: Prisma.TableUpdateOneRequiredWithoutCustomerSessionsNestedInput
+  cart?: Prisma.CartUpdateOneWithoutCustomerSessionNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutCustomerSessionNestedInput
+}
+
+export type CustomerSessionUncheckedUpdateWithoutOrdersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  tableId?: Prisma.StringFieldUpdateOperationsInput | string
+  sessionToken?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumCustomerSessionStatusFieldUpdateOperationsInput | $Enums.CustomerSessionStatus
+  startedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cart?: Prisma.CartUncheckedUpdateOneWithoutCustomerSessionNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutCustomerSessionNestedInput
+}
+
+export type CustomerSessionCreateWithoutPaymentsInput = {
+  id?: string
+  sessionToken: string
+  status?: $Enums.CustomerSessionStatus
+  startedAt?: Date | string
+  expiresAt?: Date | string | null
+  endedAt?: Date | string | null
+  table: Prisma.TableCreateNestedOneWithoutCustomerSessionsInput
+  cart?: Prisma.CartCreateNestedOneWithoutCustomerSessionInput
+  orders?: Prisma.OrderCreateNestedManyWithoutCustomerSessionInput
+}
+
+export type CustomerSessionUncheckedCreateWithoutPaymentsInput = {
+  id?: string
+  tableId: string
+  sessionToken: string
+  status?: $Enums.CustomerSessionStatus
+  startedAt?: Date | string
+  expiresAt?: Date | string | null
+  endedAt?: Date | string | null
+  cart?: Prisma.CartUncheckedCreateNestedOneWithoutCustomerSessionInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutCustomerSessionInput
+}
+
+export type CustomerSessionCreateOrConnectWithoutPaymentsInput = {
+  where: Prisma.CustomerSessionWhereUniqueInput
+  create: Prisma.XOR<Prisma.CustomerSessionCreateWithoutPaymentsInput, Prisma.CustomerSessionUncheckedCreateWithoutPaymentsInput>
+}
+
+export type CustomerSessionUpsertWithoutPaymentsInput = {
+  update: Prisma.XOR<Prisma.CustomerSessionUpdateWithoutPaymentsInput, Prisma.CustomerSessionUncheckedUpdateWithoutPaymentsInput>
+  create: Prisma.XOR<Prisma.CustomerSessionCreateWithoutPaymentsInput, Prisma.CustomerSessionUncheckedCreateWithoutPaymentsInput>
+  where?: Prisma.CustomerSessionWhereInput
+}
+
+export type CustomerSessionUpdateToOneWithWhereWithoutPaymentsInput = {
+  where?: Prisma.CustomerSessionWhereInput
+  data: Prisma.XOR<Prisma.CustomerSessionUpdateWithoutPaymentsInput, Prisma.CustomerSessionUncheckedUpdateWithoutPaymentsInput>
+}
+
+export type CustomerSessionUpdateWithoutPaymentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  sessionToken?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumCustomerSessionStatusFieldUpdateOperationsInput | $Enums.CustomerSessionStatus
+  startedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  table?: Prisma.TableUpdateOneRequiredWithoutCustomerSessionsNestedInput
+  cart?: Prisma.CartUpdateOneWithoutCustomerSessionNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutCustomerSessionNestedInput
+}
+
+export type CustomerSessionUncheckedUpdateWithoutPaymentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  tableId?: Prisma.StringFieldUpdateOperationsInput | string
+  sessionToken?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumCustomerSessionStatusFieldUpdateOperationsInput | $Enums.CustomerSessionStatus
+  startedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cart?: Prisma.CartUncheckedUpdateOneWithoutCustomerSessionNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutCustomerSessionNestedInput
 }
 
 export type CustomerSessionCreateManyTableInput = {
@@ -569,6 +760,8 @@ export type CustomerSessionUpdateWithoutTableInput = {
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cart?: Prisma.CartUpdateOneWithoutCustomerSessionNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutCustomerSessionNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutCustomerSessionNestedInput
 }
 
 export type CustomerSessionUncheckedUpdateWithoutTableInput = {
@@ -579,6 +772,8 @@ export type CustomerSessionUncheckedUpdateWithoutTableInput = {
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   cart?: Prisma.CartUncheckedUpdateOneWithoutCustomerSessionNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutCustomerSessionNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutCustomerSessionNestedInput
 }
 
 export type CustomerSessionUncheckedUpdateManyWithoutTableInput = {
@@ -591,6 +786,44 @@ export type CustomerSessionUncheckedUpdateManyWithoutTableInput = {
 }
 
 
+/**
+ * Count Type CustomerSessionCountOutputType
+ */
+
+export type CustomerSessionCountOutputType = {
+  orders: number
+  payments: number
+}
+
+export type CustomerSessionCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  orders?: boolean | CustomerSessionCountOutputTypeCountOrdersArgs
+  payments?: boolean | CustomerSessionCountOutputTypeCountPaymentsArgs
+}
+
+/**
+ * CustomerSessionCountOutputType without action
+ */
+export type CustomerSessionCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CustomerSessionCountOutputType
+   */
+  select?: Prisma.CustomerSessionCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * CustomerSessionCountOutputType without action
+ */
+export type CustomerSessionCountOutputTypeCountOrdersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.OrderWhereInput
+}
+
+/**
+ * CustomerSessionCountOutputType without action
+ */
+export type CustomerSessionCountOutputTypeCountPaymentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PaymentWhereInput
+}
+
 
 export type CustomerSessionSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -602,6 +835,9 @@ export type CustomerSessionSelect<ExtArgs extends runtime.Types.Extensions.Inter
   endedAt?: boolean
   table?: boolean | Prisma.TableDefaultArgs<ExtArgs>
   cart?: boolean | Prisma.CustomerSession$cartArgs<ExtArgs>
+  orders?: boolean | Prisma.CustomerSession$ordersArgs<ExtArgs>
+  payments?: boolean | Prisma.CustomerSession$paymentsArgs<ExtArgs>
+  _count?: boolean | Prisma.CustomerSessionCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["customerSession"]>
 
 export type CustomerSessionSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -640,6 +876,9 @@ export type CustomerSessionOmit<ExtArgs extends runtime.Types.Extensions.Interna
 export type CustomerSessionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   table?: boolean | Prisma.TableDefaultArgs<ExtArgs>
   cart?: boolean | Prisma.CustomerSession$cartArgs<ExtArgs>
+  orders?: boolean | Prisma.CustomerSession$ordersArgs<ExtArgs>
+  payments?: boolean | Prisma.CustomerSession$paymentsArgs<ExtArgs>
+  _count?: boolean | Prisma.CustomerSessionCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type CustomerSessionIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   table?: boolean | Prisma.TableDefaultArgs<ExtArgs>
@@ -653,6 +892,8 @@ export type $CustomerSessionPayload<ExtArgs extends runtime.Types.Extensions.Int
   objects: {
     table: Prisma.$TablePayload<ExtArgs>
     cart: Prisma.$CartPayload<ExtArgs> | null
+    orders: Prisma.$OrderPayload<ExtArgs>[]
+    payments: Prisma.$PaymentPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1058,6 +1299,8 @@ export interface Prisma__CustomerSessionClient<T, Null = never, ExtArgs extends 
   readonly [Symbol.toStringTag]: "PrismaPromise"
   table<T extends Prisma.TableDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TableDefaultArgs<ExtArgs>>): Prisma.Prisma__TableClient<runtime.Types.Result.GetResult<Prisma.$TablePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   cart<T extends Prisma.CustomerSession$cartArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CustomerSession$cartArgs<ExtArgs>>): Prisma.Prisma__CartClient<runtime.Types.Result.GetResult<Prisma.$CartPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  orders<T extends Prisma.CustomerSession$ordersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CustomerSession$ordersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  payments<T extends Prisma.CustomerSession$paymentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CustomerSession$paymentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1511,6 +1754,54 @@ export type CustomerSession$cartArgs<ExtArgs extends runtime.Types.Extensions.In
    */
   include?: Prisma.CartInclude<ExtArgs> | null
   where?: Prisma.CartWhereInput
+}
+
+/**
+ * CustomerSession.orders
+ */
+export type CustomerSession$ordersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Order
+   */
+  select?: Prisma.OrderSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Order
+   */
+  omit?: Prisma.OrderOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.OrderInclude<ExtArgs> | null
+  where?: Prisma.OrderWhereInput
+  orderBy?: Prisma.OrderOrderByWithRelationInput | Prisma.OrderOrderByWithRelationInput[]
+  cursor?: Prisma.OrderWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.OrderScalarFieldEnum | Prisma.OrderScalarFieldEnum[]
+}
+
+/**
+ * CustomerSession.payments
+ */
+export type CustomerSession$paymentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Payment
+   */
+  select?: Prisma.PaymentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Payment
+   */
+  omit?: Prisma.PaymentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PaymentInclude<ExtArgs> | null
+  where?: Prisma.PaymentWhereInput
+  orderBy?: Prisma.PaymentOrderByWithRelationInput | Prisma.PaymentOrderByWithRelationInput[]
+  cursor?: Prisma.PaymentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PaymentScalarFieldEnum | Prisma.PaymentScalarFieldEnum[]
 }
 
 /**

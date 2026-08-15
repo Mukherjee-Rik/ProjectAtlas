@@ -17,6 +17,7 @@ import {
   setStoredUser,
 } from '@/lib/auth-storage';
 import { AUTH_UNAUTHORIZED_EVENT } from '@/lib/auth-events';
+import { apiClient } from '@/services/api-client';
 
 interface AuthContextValue {
   user: AuthUser | null;
@@ -36,23 +37,38 @@ export function AuthProvider({
 }: {
   children: ReactNode;
 }) {
-  const [user, setUser] = useState<AuthUser | null>(null);
-  const [accessToken, setAccessTokenState] = useState<string | null>(
-    null,
-  );
-  const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState<AuthUser | null>(() => getStoredUser<AuthUser>());
+  const [accessToken, setAccessTokenState] = useState<string | null>(() => getAccessToken());
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const token = getAccessToken();
-    const storedUser = getStoredUser<AuthUser>();
+    function initAuth() {
+      const storedToken = getAccessToken();
+      const storedUser = getStoredUser<AuthUser>();
 
-    setAccessTokenState(token);
-    setUser(storedUser);
-    setIsLoading(false);
+      if (storedToken && storedUser) {
+        setAccessTokenState(storedToken);
+        setUser(storedUser);
+      }
+      setIsLoading(false);
+    }
+
+    if (
+      typeof window !== 'undefined' &&
+      'serviceWorker' in navigator &&
+      process.env.NODE_ENV !== 'production'
+    ) {
+      navigator.serviceWorker.getRegistrations().then((registrations) => {
+        for (const registration of registrations) {
+          registration.unregister();
+        }
+      });
+    }
+
+    initAuth();
 
     function handleUnauthorized() {
       clearAuthStorage();
-
       setAccessTokenState(null);
       setUser(null);
     }
@@ -78,9 +94,13 @@ export function AuthProvider({
     setUser(authenticatedUser);
   }
 
-  function logout() {
+  async function logout() {
+    try {
+      await apiClient.post('/auth/logout');
+    } catch (err) {
+      console.warn('Failed to logout on backend', err);
+    }
     clearAuthStorage();
-
     setAccessTokenState(null);
     setUser(null);
   }

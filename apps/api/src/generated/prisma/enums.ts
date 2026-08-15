@@ -10,8 +10,14 @@
 */
 
 export const UserRole = {
-  USER: 'USER',
-  ADMIN: 'ADMIN'
+  PLATFORM_ADMIN: 'PLATFORM_ADMIN',
+  OWNER: 'OWNER',
+  ADMIN: 'ADMIN',
+  MANAGER: 'MANAGER',
+  STAFF: 'STAFF',
+  WAITER: 'WAITER',
+  KITCHEN: 'KITCHEN',
+  USER: 'USER'
 } as const
 
 export type UserRole = (typeof UserRole)[keyof typeof UserRole]
@@ -152,3 +158,99 @@ export const MenuItemAddonStatus = {
 } as const
 
 export type MenuItemAddonStatus = (typeof MenuItemAddonStatus)[keyof typeof MenuItemAddonStatus]
+
+
+export const OrderStatus = {
+  PENDING: 'PENDING',
+  CONFIRMED: 'CONFIRMED',
+  PREPARING: 'PREPARING',
+  READY: 'READY',
+  SERVED: 'SERVED',
+  COMPLETED: 'COMPLETED',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus]
+
+
+export const PaymentStatus = {
+  PENDING: 'PENDING',
+  SUCCESS: 'SUCCESS',
+  FAILED: 'FAILED',
+  REFUNDED: 'REFUNDED'
+} as const
+
+export type PaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus]
+
+
+export const PaymentMethod = {
+  CASH: 'CASH',
+  CARD: 'CARD',
+  UPI_INTENT: 'UPI_INTENT',
+  RAZORPAY: 'RAZORPAY',
+  STRIPE: 'STRIPE'
+} as const
+
+export type PaymentMethod = (typeof PaymentMethod)[keyof typeof PaymentMethod]
+
+
+export const UnitOfMeasure = {
+  KG: 'KG',
+  GRAM: 'GRAM',
+  LITER: 'LITER',
+  ML: 'ML',
+  PIECE: 'PIECE',
+  BOX: 'BOX'
+} as const
+
+export type UnitOfMeasure = (typeof UnitOfMeasure)[keyof typeof UnitOfMeasure]
+
+
+export const StockTransactionType = {
+  RECIPE_DEDUCTION: 'RECIPE_DEDUCTION',
+  MANUAL_PURCHASE: 'MANUAL_PURCHASE',
+  WASTE_SPOILAGE: 'WASTE_SPOILAGE',
+  AUDIT_ADJUSTMENT: 'AUDIT_ADJUSTMENT'
+} as const
+
+export type StockTransactionType = (typeof StockTransactionType)[keyof typeof StockTransactionType]
+
+
+export const BillingCycle = {
+  MONTHLY: 'MONTHLY',
+  YEARLY: 'YEARLY'
+} as const
+
+export type BillingCycle = (typeof BillingCycle)[keyof typeof BillingCycle]
+
+
+export const PlanStatus = {
+  ACTIVE: 'ACTIVE',
+  INACTIVE: 'INACTIVE'
+} as const
+
+export type PlanStatus = (typeof PlanStatus)[keyof typeof PlanStatus]
+
+
+export const SubscriptionStatus = {
+  TRIALING: 'TRIALING',
+  ACTIVE: 'ACTIVE',
+  PAST_DUE: 'PAST_DUE',
+  CANCELLED: 'CANCELLED',
+  EXPIRED: 'EXPIRED',
+  SUSPENDED: 'SUSPENDED'
+} as const
+
+export type SubscriptionStatus = (typeof SubscriptionStatus)[keyof typeof SubscriptionStatus]
+
+
+export const OrderSource = {
+  DIRECT: 'DIRECT',
+  QR: 'QR',
+  WAITER: 'WAITER',
+  POS: 'POS',
+  PROVIDER_A: 'PROVIDER_A',
+  PROVIDER_B: 'PROVIDER_B'
+} as const
+
+export type OrderSource = (typeof OrderSource)[keyof typeof OrderSource]

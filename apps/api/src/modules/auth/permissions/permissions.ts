@@ -62,6 +62,9 @@ export const PERMISSIONS = {
   MENU_ITEM_ADDONS_CREATE: 'menu-item-addons.create',
   MENU_ITEM_ADDONS_UPDATE: 'menu-item-addons.update',
   MENU_ITEM_ADDONS_DELETE: 'menu-item-addons.delete',
+
+  ORDERS_READ: 'orders.read',
+  ORDERS_UPDATE: 'orders.update',
 } as const;
 
 export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];

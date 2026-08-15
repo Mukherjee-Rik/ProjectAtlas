@@ -3,7 +3,7 @@
 import { useAuth } from '@/hooks/use-auth';
 import { UserRoleBadge } from '@/components/users/user-role-badge';
 import { UserStatusBadge } from '@/components/users/user-status-badge';
-import { SessionStatus } from '@/components/security/session-status';
+import { SessionsList } from '@/components/auth/sessions-list';
 
 import type { UserRole, UserStatus } from '@/types/user';
 
@@ -98,8 +98,8 @@ export default function SecuritySettingsPage() {
         </div>
       </div>
 
-      {/* Current Session Card */}
-      <SessionStatus />
+      {/* Active Device Sessions List */}
+      <SessionsList />
     </div>
   );
 }

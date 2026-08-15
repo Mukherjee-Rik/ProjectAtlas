@@ -2,6 +2,7 @@ import { ConflictException, ForbiddenException, NotFoundException } from '@nestj
 import { Test, TestingModule } from '@nestjs/testing';
 import { TablesService } from './tables.service';
 import { PrismaService } from '../../database/prisma/prisma.service';
+import { SubscriptionUsageService } from '../subscriptions/subscription-usage.service';
 
 describe('TablesService', () => {
   let service: TablesService;
@@ -11,6 +12,9 @@ describe('TablesService', () => {
     prismaService = {
       diningArea: {
         findFirst: jest.fn(),
+      },
+      branch: {
+        findUnique: jest.fn().mockResolvedValue({ restaurantId: 'rest-1' }),
       },
       table: {
         findUnique: jest.fn(),
@@ -26,6 +30,10 @@ describe('TablesService', () => {
       providers: [
         TablesService,
         { provide: PrismaService, useValue: prismaService },
+        {
+          provide: SubscriptionUsageService,
+          useValue: { checkLimit: jest.fn().mockResolvedValue(true) },
+        },
       ],
     }).compile();
 

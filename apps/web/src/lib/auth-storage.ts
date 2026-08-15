@@ -1,26 +1,33 @@
 import { AUTH_STORAGE_KEYS } from './auth-constants';
 
-export function getAccessToken(): string | null {
-  if (typeof window === 'undefined') {
-    return null;
-  }
+let inMemoryAccessToken: string | null = null;
 
-  return localStorage.getItem(
-    AUTH_STORAGE_KEYS.accessToken,
-  );
+export function getAccessToken(): string | null {
+  if (inMemoryAccessToken) {
+    return inMemoryAccessToken;
+  }
+  if (typeof window !== 'undefined') {
+    const token = localStorage.getItem(AUTH_STORAGE_KEYS.accessToken);
+    if (token) {
+      inMemoryAccessToken = token;
+      return token;
+    }
+  }
+  return null;
 }
 
 export function setAccessToken(token: string) {
-  localStorage.setItem(
-    AUTH_STORAGE_KEYS.accessToken,
-    token,
-  );
+  inMemoryAccessToken = token;
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(AUTH_STORAGE_KEYS.accessToken, token);
+  }
 }
 
 export function removeAccessToken() {
-  localStorage.removeItem(
-    AUTH_STORAGE_KEYS.accessToken,
-  );
+  inMemoryAccessToken = null;
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem(AUTH_STORAGE_KEYS.accessToken);
+  }
 }
 
 export function getStoredUser<T>(): T | null {

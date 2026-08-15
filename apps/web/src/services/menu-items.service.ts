@@ -1,22 +1,20 @@
 import { apiClient } from './api-client';
-import type { MenuItem, MenuItemStatus } from '@/types/menu';
+import type { MenuItem, MenuItemStatus, DietaryType, FoodType } from '@/types/menu';
 
-export interface MenuItemsResponse {
-  success: boolean;
-  data: MenuItem[];
-}
-
-export interface MenuItemResponse {
-  success: boolean;
-  data: MenuItem;
-}
+export interface MenuItemsResponse { success: boolean; data: MenuItem[]; }
+export interface MenuItemResponse { success: boolean; data: MenuItem; }
 
 export interface CreateMenuItemPayload {
   categoryId: string;
   name: string;
   code: string;
   description?: string;
+  imageUrl?: string;
   price: number;
+  dietaryType?: DietaryType;
+  foodType?: FoodType;
+  preparationTimeMinutes?: number;
+  taxRateId?: string;
   position?: number;
   status?: MenuItemStatus;
 }
@@ -26,7 +24,12 @@ export interface UpdateMenuItemPayload {
   name?: string;
   code?: string;
   description?: string;
+  imageUrl?: string;
   price?: number;
+  dietaryType?: DietaryType;
+  foodType?: FoodType;
+  preparationTimeMinutes?: number;
+  taxRateId?: string;
   position?: number;
   status?: MenuItemStatus;
 }

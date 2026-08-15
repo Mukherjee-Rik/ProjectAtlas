@@ -6,13 +6,26 @@ import {
 import { PrismaService } from '../../database/prisma/prisma.service';
 import { CreateMembershipDto } from './dto/create-membership.dto';
 import { UpdateMembershipDto } from './dto/update-membership.dto';
+import { SubscriptionUsageService } from '../subscriptions/subscription-usage.service';
 
 @Injectable()
 export class TenantMembershipsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly subscriptionUsageService: SubscriptionUsageService,
+  ) {}
 
   async create(createMembershipDto: CreateMembershipDto) {
     const { userId, tenantId, role } = createMembershipDto;
+
+    // Check staff limit based on the first restaurant under this tenant
+    const restaurant = await this.prisma.restaurant.findFirst({
+      where: { tenantId },
+      select: { id: true },
+    });
+    if (restaurant) {
+      await this.subscriptionUsageService.checkLimit(restaurant.id, 'maxStaff');
+    }
 
     const user = await this.prisma.user.findUnique({
       where: { id: userId },

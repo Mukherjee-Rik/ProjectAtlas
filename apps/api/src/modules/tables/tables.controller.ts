@@ -10,6 +10,7 @@ import {
   Post,
   Query,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiHeader, ApiQuery, ApiTags } from '@nestjs/swagger';
 
@@ -93,11 +94,24 @@ export class TablesController {
   async getQrCode(
     @Param('id', new ParseUUIDPipe()) id: string,
     @CurrentBranch() branch: CurrentBranchType,
+    @Req() req: any,
+    @Query('baseUrl') explicitBaseUrl?: string,
   ) {
     if (!branch) {
       throw new BadRequestException('No active branch selected');
     }
-    return this.tablesService.getQrCode(id, branch.id);
+    // Explicit baseUrl from client (auto-detected LAN IP) takes priority
+    let baseUrl = explicitBaseUrl ?? null;
+    if (!baseUrl) {
+      // Fall back to Origin / Referer header
+      const origin = req.headers.origin || req.headers.referer || 'http://localhost:3001';
+      try {
+        baseUrl = new URL(origin).origin;
+      } catch {
+        baseUrl = 'http://localhost:3001';
+      }
+    }
+    return this.tablesService.getQrCode(id, branch.id, baseUrl);
   }
 
   @Post(':id/qr/regenerate')
@@ -105,11 +119,22 @@ export class TablesController {
   async regenerateQrCode(
     @Param('id', new ParseUUIDPipe()) id: string,
     @CurrentBranch() branch: CurrentBranchType,
+    @Req() req: any,
+    @Query('baseUrl') explicitBaseUrl?: string,
   ) {
     if (!branch) {
       throw new BadRequestException('No active branch selected');
     }
-    return this.tablesService.regenerateQrCode(id, branch.id);
+    let baseUrl = explicitBaseUrl ?? null;
+    if (!baseUrl) {
+      const origin = req.headers.origin || req.headers.referer || 'http://localhost:3001';
+      try {
+        baseUrl = new URL(origin).origin;
+      } catch {
+        baseUrl = 'http://localhost:3001';
+      }
+    }
+    return this.tablesService.regenerateQrCode(id, branch.id, baseUrl);
   }
 
   @Patch(':id')

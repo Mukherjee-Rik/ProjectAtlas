@@ -7,10 +7,14 @@ import {
 import { PrismaService } from '../../database/prisma/prisma.service';
 import { CreateBranchDto } from './dto/create-branch.dto';
 import { UpdateBranchDto } from './dto/update-branch.dto';
+import { SubscriptionUsageService } from '../subscriptions/subscription-usage.service';
 
 @Injectable()
 export class BranchesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly subscriptionUsageService: SubscriptionUsageService,
+  ) {}
 
   async create(tenantId: string, createBranchDto: CreateBranchDto) {
     const {
@@ -24,6 +28,9 @@ export class BranchesService {
       phone,
       status,
     } = createBranchDto;
+
+    // Enforce active subscription branch limit
+    await this.subscriptionUsageService.checkLimit(restaurantId, 'maxBranches');
 
     // Security Verification: Restaurant must belong to the tenantId
     const restaurant = await this.prisma.restaurant.findFirst({

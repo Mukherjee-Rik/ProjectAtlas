@@ -1,6 +1,8 @@
 'use client';
 
 import Link from 'next/link';
+import { DeliverySettings } from '@/components/settings/delivery-settings';
+import { AutomationDashboard } from '@/components/dashboard/automation-dashboard';
 
 export default function SettingsPage() {
   return (
@@ -47,6 +49,12 @@ export default function SettingsPage() {
           </p>
         </Link>
       </div>
+
+      {/* Third Party Integrations settings */}
+      <DeliverySettings />
+
+      {/* Automation Engine */}
+      <AutomationDashboard />
     </div>
   );
 }

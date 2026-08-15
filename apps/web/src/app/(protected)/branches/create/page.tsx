@@ -3,12 +3,14 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiClient } from '@/services/api-client';
+import { useRestaurant } from '@/hooks/use-restaurant';
 import { createBranch, type CreateBranchPayload } from '@/services/branches.service';
 import { BranchForm } from '@/components/branches/branch-form';
 import type { Restaurant } from '@/types/restaurant';
 
 export default function CreateBranchPage() {
   const router = useRouter();
+  const { currentRestaurant } = useRestaurant();
 
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [isLoadingRestaurants, setIsLoadingRestaurants] = useState(true);
@@ -36,8 +38,19 @@ export default function CreateBranchPage() {
     setIsSubmitting(true);
     setError('');
 
+    // Scoping check
+    const finalRestaurantId = currentRestaurant?.id ?? data.restaurantId;
+    if (!finalRestaurantId) {
+      setError('No restaurant selected.');
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
-      await createBranch(data);
+      await createBranch({
+        ...data,
+        restaurantId: finalRestaurantId,
+      });
       router.push('/branches');
     } catch (err: any) {
       console.error(err);
@@ -90,6 +103,7 @@ export default function CreateBranchPage() {
       )}
 
       <BranchForm
+        initialValues={{ restaurantId: currentRestaurant?.id }}
         restaurants={restaurants}
         isLoading={isSubmitting}
         onSubmit={handleSubmit}

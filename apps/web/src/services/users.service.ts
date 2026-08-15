@@ -1,5 +1,5 @@
 import { apiClient } from './api-client';
-import type { User } from '@/types/user';
+import type { User, UserRole, UserStatus } from '@/types/user';
 
 export interface UsersMeta {
   page: number;
@@ -21,8 +21,8 @@ export interface UserResponse {
 
 export interface UsersQuery {
   search?: string;
-  role?: 'USER' | 'ADMIN';
-  status?: 'ACTIVE' | 'INACTIVE' | 'SUSPENDED';
+  role?: UserRole;
+  status?: UserStatus;
   page?: number;
   limit?: number;
 }
@@ -32,15 +32,15 @@ export interface CreateUserPayload {
   email: string;
   phone?: string;
   password: string;
-  role?: 'USER' | 'ADMIN';
+  role?: UserRole;
 }
 
 export interface UpdateUserPayload {
   name?: string;
   email?: string;
   phone?: string | null;
-  role?: 'USER' | 'ADMIN';
-  status?: 'ACTIVE' | 'INACTIVE' | 'SUSPENDED';
+  role?: UserRole;
+  status?: UserStatus;
 }
 
 export interface UpdateMyProfilePayload {

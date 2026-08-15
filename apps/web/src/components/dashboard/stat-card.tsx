@@ -1,6 +1,6 @@
 interface StatCardProps {
   title: string;
-  value: number;
+  value: number | string;
   description?: string;
 }
 
@@ -16,7 +16,7 @@ export function StatCard({
       </p>
 
       <p className="mt-3 text-3xl font-semibold text-[#F5F7FA]">
-        {value.toLocaleString()}
+        {typeof value === 'number' ? value.toLocaleString() : value}
       </p>
 
       {description && (
