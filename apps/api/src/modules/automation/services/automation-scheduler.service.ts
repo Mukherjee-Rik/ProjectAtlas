@@ -14,7 +14,11 @@ export class AutomationSchedulerService implements OnModuleInit {
   ) {}
 
   async onModuleInit() {
-    await this.loadScheduledRules();
+    try {
+      await this.loadScheduledRules();
+    } catch (err: any) {
+      this.logger.warn(`Could not initialize scheduled rules during startup: ${err.message}`);
+    }
   }
 
   async loadScheduledRules() {
@@ -24,19 +28,23 @@ export class AutomationSchedulerService implements OnModuleInit {
     }
     this.jobs.clear();
 
-    const rules = await this.prisma.automationRule.findMany({
-      where: { triggerType: 'SCHEDULED', enabled: true },
-    });
+    try {
+      const rules = await this.prisma.automationRule.findMany({
+        where: { triggerType: 'SCHEDULED', enabled: true },
+      });
 
-    for (const rule of rules) {
-      if (rule.schedule && cron.validate(rule.schedule)) {
-        this.registerJob(rule.id, rule.schedule, rule.name);
-      } else {
-        this.logger.warn(`Invalid cron expression for rule "${rule.name}": ${rule.schedule}`);
+      for (const rule of rules) {
+        if (rule.schedule && cron.validate(rule.schedule)) {
+          this.registerJob(rule.id, rule.schedule, rule.name);
+        } else {
+          this.logger.warn(`Invalid cron expression for rule "${rule.name}": ${rule.schedule}`);
+        }
       }
-    }
 
-    this.logger.log(`Loaded ${this.jobs.size} scheduled automation jobs`);
+      this.logger.log(`Loaded ${this.jobs.size} scheduled automation jobs`);
+    } catch (err: any) {
+      this.logger.warn(`Failed to query automation rules: ${err.message}`);
+    }
   }
 
   registerJob(ruleId: string, schedule: string, name: string) {
