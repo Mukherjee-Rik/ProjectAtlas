@@ -54,10 +54,10 @@ export default function EditUserPage() {
       await updateUser(id, data as UpdateUserPayload);
 
       router.push(`/users/${id}`);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
 
-      setError('Unable to update user.');
+      setError(err?.message || err?.error || 'Unable to update user.');
     } finally {
       setIsSubmitting(false);
     }

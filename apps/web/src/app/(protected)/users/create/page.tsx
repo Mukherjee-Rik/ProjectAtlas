@@ -22,11 +22,11 @@ export default function CreateUserPage() {
       await createUser(data as CreateUserPayload);
 
       router.push('/users');
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
 
       setError(
-        'Unable to create user. Please check the entered information.',
+        err?.message || err?.error || 'Unable to create user. Please check the entered information.',
       );
     } finally {
       setIsSubmitting(false);
