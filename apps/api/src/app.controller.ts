@@ -1,12 +1,14 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, VERSION_NEUTRAL } from '@nestjs/common';
 
-@Controller()
+@Controller({
+  version: [VERSION_NEUTRAL, '1'],
+})
 export class AppController {
-  @Get('health')
+  @Get(['health', 'status', ''])
   healthCheck() {
     return {
-      status: 'Perfect',
-      Service: 'atlas-api',
+      status: 'ok',
+      service: 'atlas-api',
       timestamp: new Date().toISOString(),
     };
   }

@@ -31,7 +31,7 @@ async function bootstrap() {
     credentials: true,
   });
 
-  const port = configService.get<number>('port', 3000);
+  const port = Number(process.env.PORT) || 3000;
 
   app.setGlobalPrefix('api');
 
@@ -68,10 +68,9 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-
   SwaggerModule.setup('api/docs', app, document);
 
-  await app.listen(port);
+  await app.listen(port, '0.0.0.0');
 }
 
 void bootstrap();
