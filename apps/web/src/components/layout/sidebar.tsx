@@ -16,8 +16,14 @@ export function Sidebar() {
       // Platform Admin navigation
       return ['/platform-admin', '/restaurants', '/subscriptions', '/support', '/profile', '/settings'].includes(item.href);
     }
-    if (user?.role === 'WAITER' || user?.role === 'STAFF') {
-      return ['/waiter', '/profile'].includes(item.href);
+    if (user?.role === 'CASHIER') {
+      return ['/cashier', '/kitchen', '/profile'].includes(item.href);
+    }
+    if (user?.role === 'WAITER') {
+      return ['/waiter', '/kitchen', '/profile'].includes(item.href);
+    }
+    if (user?.role === 'STAFF') {
+      return ['/waiter', '/cashier', '/kitchen', '/profile'].includes(item.href);
     }
     if (user?.role === 'KITCHEN') {
       return ['/kitchen', '/profile'].includes(item.href);

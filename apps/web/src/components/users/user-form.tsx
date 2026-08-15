@@ -175,6 +175,7 @@ export function UserForm({
           }
           className="w-full rounded-lg border border-[#26313C] bg-[#18212B] px-4 py-2.5 text-[#F5F7FA] outline-none focus:border-[#2AFEB7] focus:ring-1 focus:ring-[#2AFEB7]"
         >
+          <option value="CASHIER">Cashier (POS & Kitchen)</option>
           <option value="WAITER">Waiter / Floor Staff</option>
           <option value="KITCHEN">Kitchen Staff</option>
           <option value="MANAGER">Restaurant Manager</option>

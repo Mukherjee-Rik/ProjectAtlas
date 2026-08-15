@@ -151,6 +151,7 @@ export default function UsersPage() {
             <option value="ALL">All Roles</option>
             <option value="OWNER">Owner</option>
             <option value="MANAGER">Manager</option>
+            <option value="CASHIER">Cashier</option>
             <option value="WAITER">Waiter</option>
             <option value="KITCHEN">Kitchen Staff</option>
             <option value="STAFF">General Staff</option>

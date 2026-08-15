@@ -17,6 +17,7 @@ export const UserRole = {
   STAFF: 'STAFF',
   WAITER: 'WAITER',
   KITCHEN: 'KITCHEN',
+  CASHIER: 'CASHIER',
   USER: 'USER'
 } as const
 
