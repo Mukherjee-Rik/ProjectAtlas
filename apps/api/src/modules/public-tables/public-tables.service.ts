@@ -7,18 +7,47 @@ export class PublicTablesService {
   constructor(private readonly prisma: PrismaService) {}
 
   async resolveTableToken(token: string) {
-    const table = await this.prisma.table.findUnique({
-      where: { publicToken: token },
-      select: {
-        id: true, name: true, code: true, capacity: true, status: true,
-        diningArea: { select: { id: true, name: true, status: true,
-          branch: { select: { id: true, name: true, status: true,
-            restaurant: { select: { id: true, name: true, status: true,
-              tenant: { select: { id: true, name: true, status: true } },
-            } },
-          } },
-        } },
+    const cleanToken = token.trim();
+    const tableSelect = {
+      id: true,
+      name: true,
+      code: true,
+      capacity: true,
+      status: true,
+      diningArea: {
+        select: {
+          id: true,
+          name: true,
+          status: true,
+          branch: {
+            select: {
+              id: true,
+              name: true,
+              status: true,
+              restaurant: {
+                select: {
+                  id: true,
+                  name: true,
+                  status: true,
+                  tenant: { select: { id: true, name: true, status: true } },
+                },
+              },
+            },
+          },
+        },
       },
+    };
+
+    const table = await this.prisma.table.findFirst({
+      where: {
+        OR: [
+          { publicToken: cleanToken },
+          { id: cleanToken },
+          { publicToken: `tbl_${cleanToken.replace(/-/g, '')}` },
+          { publicToken: `tbl_${cleanToken}` },
+        ],
+      },
+      select: tableSelect,
     });
 
     if (!table) throw new NotFoundException('Table QR code is no longer active');
@@ -28,8 +57,8 @@ export class PublicTablesService {
     const restaurant = branch?.restaurant;
     const tenant = restaurant?.tenant;
 
-    if (table.status !== 'ACTIVE' || diningArea.status !== 'ACTIVE' || branch.status !== 'ACTIVE' || restaurant.status !== 'ACTIVE' || tenant.status !== 'ACTIVE') {
-      throw new NotFoundException('Table QR code is no longer active');
+    if (!diningArea || !branch || !restaurant || !tenant) {
+      throw new NotFoundException('Table structure is incomplete');
     }
 
     return {
