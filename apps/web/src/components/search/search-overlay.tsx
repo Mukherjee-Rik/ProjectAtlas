@@ -61,7 +61,8 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
     const handler = setTimeout(async () => {
       try {
         const res = await apiClient.get<any>(`/search?q=${encodeURIComponent(query)}`);
-        setResults(res || {
+        const payload = (res as any)?.data ?? res;
+        setResults(payload || {
           pages: [],
           restaurants: [],
           orders: [],
@@ -83,13 +84,23 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
   // Flatten results for easy keyboard index traversal
   const getFlatItems = () => {
     const list: { type: string; label: string; href: string; detail?: string }[] = [];
-    results.pages.forEach((p: any) => list.push({ type: 'Page', label: p.label, href: p.href }));
-    results.restaurants.forEach((r: any) => list.push({ type: 'Restaurant', label: r.name, href: `/platform-admin`, detail: r.slug }));
-    results.menuItems.forEach((m: any) => list.push({ type: 'Menu Item', label: m.name, href: `/menus`, detail: `₹${m.price}` }));
-    results.orders.forEach((o: any) => list.push({ type: 'Order', label: `Order ${o.orderNumber}`, href: `/orders`, detail: `${o.status} • ₹${o.totalAmount}` }));
-    results.tables.forEach((t: any) => list.push({ type: 'Table', label: `Table ${t.name}`, href: `/tables`, detail: `Code: ${t.code}` }));
-    if (results.staff) {
-      results.staff.forEach((s: any) => list.push({ type: 'Staff', label: s.name, href: `/users`, detail: `${s.email} (${s.role})` }));
+    if (Array.isArray(results?.pages)) {
+      results.pages.forEach((p: any) => p?.label && p?.href && list.push({ type: 'Page', label: p.label, href: p.href }));
+    }
+    if (Array.isArray(results?.restaurants)) {
+      results.restaurants.forEach((r: any) => r?.name && list.push({ type: 'Restaurant', label: r.name, href: `/platform-admin`, detail: r.slug }));
+    }
+    if (Array.isArray(results?.menuItems)) {
+      results.menuItems.forEach((m: any) => m?.name && list.push({ type: 'Menu Item', label: m.name, href: `/menus`, detail: `₹${m.price}` }));
+    }
+    if (Array.isArray(results?.orders)) {
+      results.orders.forEach((o: any) => o?.orderNumber && list.push({ type: 'Order', label: `Order ${o.orderNumber}`, href: `/orders`, detail: `${o.status} • ₹${o.totalAmount}` }));
+    }
+    if (Array.isArray(results?.tables)) {
+      results.tables.forEach((t: any) => t?.name && list.push({ type: 'Table', label: `Table ${t.name}`, href: `/tables`, detail: `Code: ${t.code ?? ''}` }));
+    }
+    if (Array.isArray(results?.staff)) {
+      results.staff.forEach((s: any) => s?.name && list.push({ type: 'Staff', label: s.name, href: `/users`, detail: `${s.email ?? ''} (${s.role ?? ''})` }));
     }
     return list;
   };
