@@ -6,6 +6,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
 import { json } from 'express';
 
+import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
@@ -16,6 +17,7 @@ async function bootstrap() {
     bufferLogs: true,
   });
 
+  app.use(compression());
   app.use(helmet());
   app.use(json({ limit: '1mb' }));
   app.use(cookieParser());
