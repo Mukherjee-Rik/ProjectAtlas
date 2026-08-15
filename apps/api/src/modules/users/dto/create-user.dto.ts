@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsEmail,
+  IsIn,
   IsEnum,
   IsOptional,
   IsString,
@@ -48,11 +49,10 @@ export class CreateUserDto {
   password: string;
 
   @ApiPropertyOptional({
-    enum: UserRole,
-    example: UserRole.USER,
+    example: 'CASHIER',
     description: 'Role assigned to the new user',
   })
   @IsOptional()
-  @IsEnum(UserRole)
+  @IsIn(['PLATFORM_ADMIN', 'OWNER', 'ADMIN', 'MANAGER', 'STAFF', 'WAITER', 'KITCHEN', 'CASHIER', 'USER'])
   role?: UserRole;
 }
