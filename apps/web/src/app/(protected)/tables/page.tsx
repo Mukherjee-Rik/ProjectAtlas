@@ -8,14 +8,21 @@ import { getDiningAreas } from '@/services/dining-areas.service';
 import type { RestaurantTable, TableStatus } from '@/types/table';
 import type { DiningArea } from '@/types/dining-area';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
+import { DataCache } from '@/lib/data-cache';
 
 export default function TablesPage() {
   const router = useRouter();
   const { currentBranch } = useBranch();
 
-  const [tables, setTables] = useState<RestaurantTable[]>([]);
-  const [diningAreas, setDiningAreas] = useState<DiningArea[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const cacheKeyTables = currentBranch ? `tables_${currentBranch.id}` : null;
+  const cacheKeyAreas = currentBranch ? `areas_${currentBranch.id}` : null;
+
+  const cachedTables = cacheKeyTables ? DataCache.get<RestaurantTable[]>(cacheKeyTables) : null;
+  const cachedAreas = cacheKeyAreas ? DataCache.get<DiningArea[]>(cacheKeyAreas) : null;
+
+  const [tables, setTables] = useState<RestaurantTable[]>(cachedTables || []);
+  const [diningAreas, setDiningAreas] = useState<DiningArea[]>(cachedAreas || []);
+  const [isLoading, setIsLoading] = useState(!cachedTables && !cachedAreas);
   const [error, setError] = useState('');
 
   // Filters
@@ -35,7 +42,9 @@ export default function TablesPage() {
       return;
     }
 
-    setIsLoading(true);
+    if (!DataCache.get(`tables_${currentBranch.id}`)) {
+      setIsLoading(true);
+    }
     setError('');
 
     try {
@@ -44,15 +53,23 @@ export default function TablesPage() {
         getDiningAreas(),
       ]);
 
-      setTables(tablesRes.data ?? []);
-      setDiningAreas(areasRes.data ?? []);
+      const fetchedTables = tablesRes.data ?? [];
+      const fetchedAreas = areasRes.data ?? [];
+
+      setTables(fetchedTables);
+      setDiningAreas(fetchedAreas);
+
+      DataCache.set(`tables_${currentBranch.id}`, fetchedTables);
+      DataCache.set(`areas_${currentBranch.id}`, fetchedAreas);
     } catch (err: any) {
       console.error(err);
-      setError(err?.message ?? 'Failed to load tables data');
+      if (!cachedTables) {
+        setError(err?.message ?? 'Failed to load tables data');
+      }
     } finally {
       setIsLoading(false);
     }
-  }, [currentBranch]);
+  }, [currentBranch, cachedTables]);
 
   useEffect(() => {
     void loadData();
