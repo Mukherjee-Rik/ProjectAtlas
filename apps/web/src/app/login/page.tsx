@@ -65,12 +65,12 @@ function LoginForm() {
           const b = item.restaurant.branches[0];
           setCurrentBranch({ id: b.id, restaurantId: item.restaurant.id, name: b.name, code: b.code, status: 'ACTIVE', createdAt: '', updatedAt: '' });
         }
-        const targetPath = (user.role === 'WAITER' || user.role === 'STAFF') ? '/waiter' : (user.role === 'KITCHEN' ? '/kitchen' : '/dashboard');
+        const targetPath = user.role === 'CASHIER' ? '/cashier' : (user.role === 'WAITER' || user.role === 'STAFF') ? '/waiter' : (user.role === 'KITCHEN' ? '/kitchen' : '/dashboard');
         window.location.href = targetPath;
       } else if (allRestaurants.length > 1) {
         window.location.href = '/select-restaurant';
       } else {
-        const targetPath = (user.role === 'WAITER' || user.role === 'STAFF') ? '/waiter' : (user.role === 'KITCHEN' ? '/kitchen' : '/dashboard');
+        const targetPath = user.role === 'CASHIER' ? '/cashier' : (user.role === 'WAITER' || user.role === 'STAFF') ? '/waiter' : (user.role === 'KITCHEN' ? '/kitchen' : '/dashboard');
         window.location.href = targetPath;
       }
     } catch (err: any) {

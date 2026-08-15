@@ -51,6 +51,14 @@ const ROLE_PERMISSIONS: Record<string, readonly Permission[]> = {
     'profile.read',
     'orders.read', 'orders.update',
   ],
+  CASHIER: [
+    'dashboard.read',
+    'profile.read', 'profile.update',
+    'restaurants.read', 'branches.read',
+    'dining-areas.read', 'tables.read',
+    'menus.read', 'menu-categories.read', 'menu-items.read',
+    'orders.read', 'orders.update',
+  ],
   USER: [
     'profile.read', 'profile.update',
     'restaurants.read', 'branches.read',

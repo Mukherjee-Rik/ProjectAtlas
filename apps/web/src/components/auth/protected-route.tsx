@@ -31,9 +31,21 @@ export function ProtectedRoute({
     }
 
     if (isAuthenticated && user) {
-      // WAITER and STAFF (Cashier) are restricted to /waiter and /profile
-      if (user.role === 'WAITER' || user.role === 'STAFF') {
-        if (!pathname.startsWith('/waiter') && !pathname.startsWith('/profile') && !pathname.startsWith('/api')) {
+      // CASHIER is restricted to /cashier, /kitchen, /profile
+      if (user.role === 'CASHIER') {
+        if (!pathname.startsWith('/cashier') && !pathname.startsWith('/kitchen') && !pathname.startsWith('/profile') && !pathname.startsWith('/api')) {
+          window.location.href = '/cashier';
+        }
+      }
+      // WAITER is restricted to /waiter, /kitchen, /profile
+      else if (user.role === 'WAITER') {
+        if (!pathname.startsWith('/waiter') && !pathname.startsWith('/kitchen') && !pathname.startsWith('/profile') && !pathname.startsWith('/api')) {
+          window.location.href = '/waiter';
+        }
+      }
+      // STAFF is restricted to /waiter, /cashier, /kitchen, /profile
+      else if (user.role === 'STAFF') {
+        if (!pathname.startsWith('/waiter') && !pathname.startsWith('/cashier') && !pathname.startsWith('/kitchen') && !pathname.startsWith('/profile') && !pathname.startsWith('/api')) {
           window.location.href = '/waiter';
         }
       }

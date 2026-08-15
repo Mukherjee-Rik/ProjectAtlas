@@ -6,6 +6,7 @@ export type UserRole =
   | 'STAFF'
   | 'WAITER'
   | 'KITCHEN'
+  | 'CASHIER'
   | 'USER';
 
 export type UserStatus =
