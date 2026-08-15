@@ -216,16 +216,6 @@ export function PlatformAdminDashboard() {
           <span className="text-[10px] text-[#9AA6B2]">Filter global metrics & telemetry</span>
         </div>
         <div className="flex flex-wrap items-center gap-3">
-          <button
-            type="button"
-            onClick={() => {
-              setStartDate(getTodayDateStr());
-              setEndDate(getTodayDateStr());
-            }}
-            className="rounded-lg border border-[#26313C] bg-[#18212B] px-3 py-1.5 text-[11px] font-bold text-[#2AFEB7] hover:border-[#2AFEB7]"
-          >
-            Today (1 Day)
-          </button>
           <div className="flex items-center gap-2">
             <span className="text-xs text-[#9AA6B2]">From</span>
             <input
