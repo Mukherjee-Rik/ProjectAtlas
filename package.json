@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "main": "apps/api/dist/main.js",
-  "packageManager": "pnpm@10.5.2",
+  "packageManager": "pnpm@11.10.0",
   "engines": {
     "node": ">=20.0.0"
   },
@@ -11,7 +11,7 @@
     "dev": "pnpm --parallel dev:api dev:web",
     "dev:api": "pnpm --filter api start:dev",
     "dev:web": "pnpm --filter web dev",
-    "start": "node index.js",
+    "start": "pnpm --filter api start",
     "start:api": "pnpm --filter api start",
     "build": "pnpm --filter api build",
     "build:all": "pnpm --filter api build && pnpm --filter web build",
