@@ -25,17 +25,22 @@ export default function TableQrsDashboard() {
   const [detectedBaseUrl, setDetectedBaseUrl] = useState<string | null>(null);
   const [detectedIp, setDetectedIp] = useState<string | null>(null);
 
-  // Auto-detect the laptop's LAN IP on mount
+  // Auto-detect URL for QR code generation
   useEffect(() => {
-    fetch('/api/server-ip')
-      .then((r) => r.json())
-      .then((data: { ip: string | null; baseUrl: string | null }) => {
-        setDetectedIp(data.ip);
-        setDetectedBaseUrl(data.baseUrl);
-      })
-      .catch(() => {
-        // silent — will fall back to Origin header on backend
-      });
+    if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+      setDetectedIp(window.location.hostname);
+      setDetectedBaseUrl(window.location.origin);
+    } else {
+      fetch('/api/server-ip')
+        .then((r) => r.json())
+        .then((data: { ip: string | null; baseUrl: string | null }) => {
+          setDetectedIp(data.ip || window.location.hostname);
+          setDetectedBaseUrl(data.baseUrl || window.location.origin);
+        })
+        .catch(() => {
+          setDetectedBaseUrl(window.location.origin);
+        });
+    }
   }, []);
 
   const loadData = useCallback(async () => {

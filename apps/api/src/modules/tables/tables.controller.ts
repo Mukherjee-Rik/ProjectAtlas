@@ -103,12 +103,12 @@ export class TablesController {
     // Explicit baseUrl from client (auto-detected LAN IP) takes priority
     let baseUrl = explicitBaseUrl ?? null;
     if (!baseUrl) {
-      // Fall back to Origin / Referer header
-      const origin = req.headers.origin || req.headers.referer || 'http://localhost:3001';
+      const defaultUrl = process.env.APP_URL || process.env.WEB_URL || 'https://project-atlas-web-self.vercel.app';
+      const origin = req.headers.origin || req.headers.referer || defaultUrl;
       try {
         baseUrl = new URL(origin).origin;
       } catch {
-        baseUrl = 'http://localhost:3001';
+        baseUrl = defaultUrl;
       }
     }
     return this.tablesService.getQrCode(id, branch.id, baseUrl);
@@ -127,11 +127,12 @@ export class TablesController {
     }
     let baseUrl = explicitBaseUrl ?? null;
     if (!baseUrl) {
-      const origin = req.headers.origin || req.headers.referer || 'http://localhost:3001';
+      const defaultUrl = process.env.APP_URL || process.env.WEB_URL || 'https://project-atlas-web-self.vercel.app';
+      const origin = req.headers.origin || req.headers.referer || defaultUrl;
       try {
         baseUrl = new URL(origin).origin;
       } catch {
-        baseUrl = 'http://localhost:3001';
+        baseUrl = defaultUrl;
       }
     }
     return this.tablesService.regenerateQrCode(id, branch.id, baseUrl);
