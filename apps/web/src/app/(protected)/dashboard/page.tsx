@@ -27,14 +27,21 @@ export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState<'overview' | 'analytics'>('overview');
   
   // Date Helpers
+  const formatLocalDate = (d: Date) => {
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const getPastDateStr = (daysAgo: number) => {
     const d = new Date();
     d.setDate(d.getDate() - daysAgo);
-    return d.toISOString().split('T')[0];
+    return formatLocalDate(d);
   };
 
   const getTodayDateStr = () => {
-    return new Date().toISOString().split('T')[0];
+    return formatLocalDate(new Date());
   };
 
   // Date state filters

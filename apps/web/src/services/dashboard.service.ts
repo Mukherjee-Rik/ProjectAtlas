@@ -62,8 +62,13 @@ export interface PlatformOverviewResponse {
   };
 }
 
-export async function getPlatformDashboardOverview() {
-  return apiClient.get<PlatformOverviewResponse>(
-    '/dashboard/platform-overview',
-  );
+export async function getPlatformDashboardOverview(startDate?: string, endDate?: string) {
+  const query = new URLSearchParams();
+  if (startDate) query.append('startDate', startDate);
+  if (endDate) query.append('endDate', endDate);
+  
+  const queryString = query.toString();
+  const url = `/dashboard/platform-overview${queryString ? `?${queryString}` : ''}`;
+  
+  return apiClient.get<PlatformOverviewResponse>(url);
 }

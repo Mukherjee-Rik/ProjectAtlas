@@ -48,7 +48,10 @@ export class DashboardController {
   @Get('platform-overview')
   @UseGuards(PlatformAdminGuard)
   @ApiOperation({ summary: 'Get global platform admin overview metrics' })
-  async getPlatformOverview() {
-    return this.dashboardService.getPlatformOverview();
+  async getPlatformOverview(
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+  ) {
+    return this.dashboardService.getPlatformOverview(startDate, endDate);
   }
 }

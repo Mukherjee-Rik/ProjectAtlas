@@ -39,6 +39,28 @@ interface PlatformTelemetry {
 export function PlatformAdminDashboard() {
   const { user } = useAuth();
   
+  // Date Helpers
+  const formatLocalDate = (d: Date) => {
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const getPastDateStr = (daysAgo: number) => {
+    const d = new Date();
+    d.setDate(d.getDate() - daysAgo);
+    return formatLocalDate(d);
+  };
+
+  const getTodayDateStr = () => {
+    return formatLocalDate(new Date());
+  };
+
+  // Date state filters
+  const [startDate, setStartDate] = useState(getPastDateStr(30));
+  const [endDate, setEndDate] = useState(getTodayDateStr());
+
   const [tenants, setTenants] = useState<Tenant[]>([]);
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [telemetry, setTelemetry] = useState<PlatformTelemetry | null>(null);
@@ -91,7 +113,7 @@ export function PlatformAdminDashboard() {
     setActiveMaintenance(null);
   };
 
-  const loadPlatformData = useCallback(async (showRefreshing = false) => {
+  const loadPlatformData = useCallback(async (showRefreshing = false, start?: string, end?: string) => {
     if (showRefreshing) {
       setIsRefreshing(true);
     } else {
@@ -100,10 +122,13 @@ export function PlatformAdminDashboard() {
     setError('');
     
     try {
+      const actualStart = start !== undefined ? start : startDate;
+      const actualEnd = end !== undefined ? end : endDate;
+
       const [tRes, rRes, telRes] = await Promise.all([
         getTenants().catch(() => ({ success: false, data: [] as Tenant[] })),
         getRestaurants().catch(() => ({ success: false, data: [] as Restaurant[] })),
-        getPlatformDashboardOverview(),
+        getPlatformDashboardOverview(actualStart, actualEnd),
       ]);
 
       setTenants(tRes.data ?? []);
@@ -116,11 +141,11 @@ export function PlatformAdminDashboard() {
       setIsLoading(false);
       setIsRefreshing(false);
     }
-  }, []);
+  }, [startDate, endDate]);
 
   useEffect(() => {
-    void loadPlatformData();
-  }, [loadPlatformData]);
+    void loadPlatformData(false, startDate, endDate);
+  }, [startDate, endDate]);
 
   if (isLoading) {
     return (
@@ -182,6 +207,54 @@ export function PlatformAdminDashboard() {
         >
           <span>{isRefreshing ? 'Refreshing...' : '⟳ Refresh Data'}</span>
         </button>
+      </div>
+
+      {/* Date Pickers Filter Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[#26313C] bg-[#111820] p-4 shadow-xl">
+        <div className="flex items-center gap-3">
+          <span className="text-xs font-bold text-[#F5F7FA]">📅 Platform Sales & Activity Date Filter</span>
+          <span className="text-[10px] text-[#9AA6B2]">Filter global metrics & telemetry</span>
+        </div>
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            type="button"
+            onClick={() => {
+              setStartDate(getTodayDateStr());
+              setEndDate(getTodayDateStr());
+            }}
+            className="rounded-lg border border-[#26313C] bg-[#18212B] px-3 py-1.5 text-[11px] font-bold text-[#2AFEB7] hover:border-[#2AFEB7]"
+          >
+            Today (1 Day)
+          </button>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-[#9AA6B2]">From</span>
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="rounded-lg border border-[#26313C] bg-[#18212B] px-3 py-1.5 text-xs text-[#F5F7FA] outline-none focus:border-[#2AFEB7]"
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-[#9AA6B2]">To</span>
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              className="rounded-lg border border-[#26313C] bg-[#18212B] px-3 py-1.5 text-xs text-[#F5F7FA] outline-none focus:border-[#2AFEB7]"
+            />
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              setStartDate(getPastDateStr(30));
+              setEndDate(getTodayDateStr());
+            }}
+            className="rounded-lg border border-[#26313C] bg-[#18212B] px-3 py-1.5 text-[11px] font-bold text-[#9AA6B2] hover:text-[#F5F7FA] hover:border-[#2AFEB7]"
+          >
+            Reset (30 Days)
+          </button>
+        </div>
       </div>
 
       {error && (

@@ -25,8 +25,14 @@ export function AppShell({ children }: AppShellProps) {
   
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isAiOpen, setIsAiOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isOffline, setIsOffline] = useState(false);
   const [canAccessAi, setCanAccessAi] = useState(false);
+
+  // Close mobile drawer when route changes
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [pathname]);
 
   // Subscription gating for AI Copilot (Hidden for Free Trial & Starter plans)
   useEffect(() => {
@@ -128,7 +134,7 @@ export function AppShell({ children }: AppShellProps) {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#0B0F14] text-[#F5F7FA] pb-16 md:pb-0">
+    <div className="min-h-screen bg-[#0B0F14] text-[#F5F7FA]">
       {/* Offline Status Alert Banner */}
       {isOffline && (
         <div className="sticky top-0 z-50 flex items-center justify-center gap-2 bg-[#F59E0B] px-4 py-2 text-xs font-bold text-[#0B0F14] shadow-md animate-pulse">
@@ -140,7 +146,19 @@ export function AppShell({ children }: AppShellProps) {
       {/* Top Header */}
       <header className="sticky top-0 z-40 border-b border-[#26313C] bg-[#111820]/90 backdrop-blur-md">
         <div className="flex h-16 items-center justify-between px-4 md:px-8">
-          <div className="flex items-center gap-4 flex-1">
+          <div className="flex items-center gap-3 flex-1">
+            {/* Mobile Hamburger Button */}
+            {user && (
+              <button
+                type="button"
+                onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+                className="md:hidden flex items-center justify-center p-2 rounded-lg border border-[#26313C] bg-[#18212B] text-[#F5F7FA] hover:border-[#2AFEB7] transition-colors"
+                aria-label="Toggle navigation menu"
+              >
+                <span className="text-xl leading-none">{isMobileMenuOpen ? '✕' : '☰'}</span>
+              </button>
+            )}
+
             <Link
               href="/dashboard"
               className="flex items-center gap-2 hover:opacity-90 transition-opacity"
@@ -177,7 +195,7 @@ export function AppShell({ children }: AppShellProps) {
             )}
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             {/* Quick search button for mobile */}
             {user && (
               <button
@@ -213,7 +231,7 @@ export function AppShell({ children }: AppShellProps) {
             <button
               type="button"
               onClick={logout}
-              className="rounded-lg border border-[#26313C] bg-[#18212B] px-3 py-2 text-sm text-[#F5F7FA] transition-all hover:border-[#2AFEB7] hover:text-[#2AFEB7]"
+              className="hidden sm:block rounded-lg border border-[#26313C] bg-[#18212B] px-3 py-2 text-sm text-[#F5F7FA] transition-all hover:border-[#2AFEB7] hover:text-[#2AFEB7]"
             >
               Logout
             </button>
@@ -232,54 +250,60 @@ export function AppShell({ children }: AppShellProps) {
         </main>
       </div>
 
-      {/* Mobile Bottom Navigation Bar */}
-      {user && (
-        <div className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-[#111820] border-t border-[#26313C] flex justify-around items-center z-40 px-4">
-          <Link
-            href="/dashboard"
-            className={`flex flex-col items-center gap-1 text-[10px] ${
-              pathname === '/dashboard' ? 'text-[#2AFEB7] font-bold' : 'text-[#9AA6B2]'
-            }`}
-          >
-            <span className="text-base">📊</span>
-            <span>Dashboard</span>
-          </Link>
-          <Link
-            href="/orders"
-            className={`flex flex-col items-center gap-1 text-[10px] ${
-              pathname === '/orders' ? 'text-[#2AFEB7] font-bold' : 'text-[#9AA6B2]'
-            }`}
-          >
-            <span className="text-base">🧾</span>
-            <span>Orders</span>
-          </Link>
-          <Link
-            href="/tables"
-            className={`flex flex-col items-center gap-1 text-[10px] ${
-              pathname === '/tables' ? 'text-[#2AFEB7] font-bold' : 'text-[#9AA6B2]'
-            }`}
-          >
-            <span className="text-base">🪑</span>
-            <span>Tables</span>
-          </Link>
-          <Link
-            href="/menus"
-            className={`flex flex-col items-center gap-1 text-[10px] ${
-              pathname === '/menus' ? 'text-[#2AFEB7] font-bold' : 'text-[#9AA6B2]'
-            }`}
-          >
-            <span className="text-base">🍽️</span>
-            <span>Menus</span>
-          </Link>
-          <Link
-            href="/profile"
-            className={`flex flex-col items-center gap-1 text-[10px] ${
-              pathname === '/profile' ? 'text-[#2AFEB7] font-bold' : 'text-[#9AA6B2]'
-            }`}
-          >
-            <span className="text-base">⚙️</span>
-            <span>Profile</span>
-          </Link>
+      {/* Mobile Navigation Drawer Slide-Over */}
+      {user && isMobileMenuOpen && (
+        <div className="fixed inset-0 z-50 md:hidden flex">
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-[#0B0F14]/80 backdrop-blur-sm transition-opacity"
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+
+          {/* Drawer Content */}
+          <div className="relative flex flex-col w-4/5 max-w-xs bg-[#111820] border-r border-[#26313C] h-full z-10 shadow-2xl p-4 space-y-4">
+            <div className="flex items-center justify-between border-b border-[#26313C] pb-3">
+              <div className="flex items-center gap-2">
+                <img src="/logo.png" alt="Atlas Logo" className="h-7 w-auto" />
+                <span className="rounded bg-[#2AFEB7]/15 border border-[#2AFEB7]/30 px-2 py-0.5 text-[10px] font-bold text-[#2AFEB7] uppercase tracking-wider">
+                  {user.role}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="p-1.5 rounded-lg border border-[#26313C] text-[#9AA6B2] hover:text-[#F5F7FA]"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Context Selectors on Mobile */}
+            <div className="border-b border-[#26313C] pb-3">
+              <ContextSelectors />
+            </div>
+
+            {/* Sidebar Navigation */}
+            <div className="flex-1 overflow-y-auto" onClick={() => setIsMobileMenuOpen(false)}>
+              <Sidebar />
+            </div>
+
+            {/* Mobile Actions Footer */}
+            <div className="pt-4 border-t border-[#26313C] space-y-3">
+              <div className="text-xs text-[#9AA6B2]">
+                Logged in as <span className="font-semibold text-[#F5F7FA]">{user.name}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  logout();
+                }}
+                className="w-full rounded-lg border border-[#26313C] bg-[#18212B] px-3 py-2 text-xs font-semibold text-[#EF4444] hover:bg-[#EF4444]/10 transition-colors"
+              >
+                Logout
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
