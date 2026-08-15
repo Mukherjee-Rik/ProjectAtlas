@@ -1,6 +1,7 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsEmail,
+  IsIn,
   IsEnum,
   IsOptional,
   IsString,
@@ -44,12 +45,11 @@ export class UpdateUserDto {
   phone?: string | null;
 
   @ApiPropertyOptional({
-    enum: UserRole,
-    example: UserRole.USER,
+    example: 'CASHIER',
     description: 'Updated user role',
   })
   @IsOptional()
-  @IsEnum(UserRole)
+  @IsIn(['PLATFORM_ADMIN', 'OWNER', 'ADMIN', 'MANAGER', 'STAFF', 'WAITER', 'KITCHEN', 'CASHIER', 'USER'])
   role?: UserRole;
 
   @ApiPropertyOptional({
