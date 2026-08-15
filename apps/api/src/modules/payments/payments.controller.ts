@@ -19,38 +19,8 @@ import { CurrentRestaurant } from '../auth/decorators/current-restaurant.decorat
 import { PERMISSIONS } from '../auth/permissions/permissions';
 import { RESTAURANT_HEADER, TENANT_HEADER } from '../auth/constants/tenant.constants';
 import type { CurrentRestaurant as CurrentRestaurantType } from '../auth/types/current-restaurant.type';
-import { PaymentMethod } from '../../generated/prisma/enums';
-import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, Min } from 'class-validator';
-
-// Dto for initiating a payment request
-export class InitiatePaymentDto {
-  @IsString()
-  @IsNotEmpty()
-  orderId: string;
-
-  @IsNumber()
-  @Min(0.01)
-  amount: number;
-
-  @IsEnum(PaymentMethod)
-  @IsNotEmpty()
-  method: PaymentMethod;
-}
-
-// Dto for mock webhook trigger
-export class MockWebhookDto {
-  @IsString()
-  @IsNotEmpty()
-  status: 'SUCCESS' | 'FAILED';
-
-  @IsString()
-  @IsOptional()
-  transactionReference?: string;
-
-  @IsString()
-  @IsOptional()
-  failureReason?: string;
-}
+import { InitiatePaymentDto } from './dto/initiate-payment.dto';
+import { MockWebhookDto } from './dto/mock-webhook.dto';
 
 @ApiTags('Payments')
 @Controller({ path: 'payments', version: '1' })
