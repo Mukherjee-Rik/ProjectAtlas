@@ -9,6 +9,8 @@ import { getPlatformDashboardOverview } from '@/services/dashboard.service';
 import type { Tenant } from '@/types/tenant';
 import type { Restaurant } from '@/types/restaurant';
 import { formatCurrency } from '@/lib/currency';
+import { DeliverySettings } from '@/components/settings/delivery-settings';
+import { AutomationDashboard } from '@/components/dashboard/automation-dashboard';
 
 interface PlatformTelemetry {
   metrics: {
@@ -536,6 +538,12 @@ export function PlatformAdminDashboard() {
             </tbody>
           </table>
         </div>
+      </div>
+
+      {/* Delivery Aggregator Integrations & Automation Engine (Platform Admin Management) */}
+      <div className="pt-6 border-t border-[#26313C] space-y-8">
+        <DeliverySettings />
+        <AutomationDashboard />
       </div>
     </div>
   );

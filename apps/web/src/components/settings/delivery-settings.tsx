@@ -38,7 +38,12 @@ export function DeliverySettings() {
         }
       });
     } catch (err: any) {
-      setError(err?.message || 'Failed to load integration configurations');
+      const msg = err?.message || '';
+      if (msg.includes('x-restaurant-id')) {
+        setError('Select an active restaurant context from the top header to configure Zomato/Swiggy delivery integrations.');
+      } else {
+        setError(msg || 'Failed to load integration configurations');
+      }
     } finally {
       setIsLoading(false);
     }

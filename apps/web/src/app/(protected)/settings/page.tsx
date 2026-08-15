@@ -50,11 +50,11 @@ export default function SettingsPage() {
         </Link>
       </div>
 
-      {/* Third Party Integrations settings */}
-      <DeliverySettings />
+      {/* Third Party Integrations settings (v1: Disabled for restaurant access; managed in Platform Admin) */}
+      {/* <DeliverySettings /> */}
 
-      {/* Automation Engine */}
-      <AutomationDashboard />
+      {/* Automation Engine (v1: Disabled for restaurant access; managed in Platform Admin) */}
+      {/* <AutomationDashboard /> */}
     </div>
   );
 }
