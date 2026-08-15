@@ -1,6 +1,9 @@
 import { type NextRequest, NextResponse } from 'next/server';
 
-const BACKEND_URL = process.env.BACKEND_URL ?? 'http://localhost:3000/api/v1';
+const BACKEND_URL =
+  process.env.BACKEND_URL ||
+  process.env.API_INTERNAL_URL ||
+  'https://projectatlas-production-0c80.up.railway.app/api/v1';
 
 async function handler(
   request: NextRequest,
