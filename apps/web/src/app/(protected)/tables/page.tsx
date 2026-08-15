@@ -74,11 +74,16 @@ export default function TablesPage() {
     }
   };
 
-  const filteredTables = tables.filter((t) => {
+  const filteredTables = (tables || []).filter((t) => {
+    if (!t) return false;
+    const tableName = (t.name || '').toLowerCase();
+    const tableCode = (t.code || '').toLowerCase();
+    const searchTerm = (search || '').toLowerCase();
+
     const matchesSearch =
       !search ||
-      t.name.toLowerCase().includes(search.toLowerCase()) ||
-      t.code.toLowerCase().includes(search.toLowerCase());
+      tableName.includes(searchTerm) ||
+      tableCode.includes(searchTerm);
 
     const matchesArea =
       diningAreaFilter === 'ALL' || t.diningAreaId === diningAreaFilter;
