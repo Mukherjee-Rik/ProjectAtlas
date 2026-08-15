@@ -1,9 +1,9 @@
 [phases.setup]
-nixPkgs = ["nodejs_20", "openssl"]
+nixPkgs = ["nodejs_20", "pnpm", "openssl"]
 
 [phases.install]
 cmds = [
-  "npm install -g pnpm@10.5.2",
+  "corepack enable",
   "pnpm install --frozen-lockfile"
 ]
 
