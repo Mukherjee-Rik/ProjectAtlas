@@ -5,7 +5,8 @@
   "main": "apps/api/dist/main.js",
   "packageManager": "pnpm@11.10.0",
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=22.13.0"
+}
   },
   "scripts": {
     "dev": "pnpm --parallel dev:api dev:web",
