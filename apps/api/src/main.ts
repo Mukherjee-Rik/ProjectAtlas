@@ -70,6 +70,11 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
 
+  // Fast root & health routes for platform healthchecks
+  const httpAdapter = app.getHttpAdapter().getInstance();
+  httpAdapter.get('/health', (_req: any, res: any) => res.status(200).json({ status: 'ok', uptime: process.uptime() }));
+  httpAdapter.get('/', (_req: any, res: any) => res.status(200).send('Project Atlas API is running'));
+
   await app.listen(port, '0.0.0.0');
   console.log(`Atlas API running on port ${port}`);
 }

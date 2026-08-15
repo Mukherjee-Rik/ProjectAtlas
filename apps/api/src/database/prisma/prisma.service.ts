@@ -1,4 +1,4 @@
-import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '../../generated/prisma/client';
 
@@ -7,9 +7,12 @@ export class PrismaService
   extends PrismaClient
   implements OnModuleInit, OnModuleDestroy
 {
+  private readonly logger = new Logger(PrismaService.name);
+
   constructor() {
+    const connectionString = process.env.DATABASE_URL;
     const adapter = new PrismaPg({
-      connectionString: process.env.DATABASE_URL,
+      connectionString,
     });
 
     super({
@@ -18,10 +21,46 @@ export class PrismaService
   }
 
   async onModuleInit(): Promise<void> {
-    await this.$connect();
+    if (!process.env.DATABASE_URL) {
+      this.logger.error('❌ DATABASE_URL environment variable is missing or empty!');
+      return;
+    }
+
+    // Mask database password in logs for security
+    const maskedUrl = process.env.DATABASE_URL.replace(/:([^@/]+)@/, ':****@');
+    this.logger.log(`🔄 Connecting to database: ${maskedUrl}`);
+
+    try {
+      // Connect with a 7-second timeout so the server doesn't hang indefinitely during cold starts
+      await Promise.race([
+        this.$connect(),
+        new Promise((_, reject) =>
+          setTimeout(
+            () =>
+              reject(
+                new Error(
+                  'Connection timeout after 7000ms. Check DATABASE_URL accessibility and PostgreSQL service state.',
+                ),
+              ),
+            7000,
+          ),
+        ),
+      ]);
+      this.logger.log('✅ Database connected successfully');
+    } catch (error: any) {
+      this.logger.error(
+        `⚠️ Failed to connect to database during startup: ${error.message}`,
+        error.stack,
+      );
+    }
   }
 
   async onModuleDestroy(): Promise<void> {
-    await this.$disconnect();
+    try {
+      await this.$disconnect();
+    } catch {
+      // ignore disconnect error on exit
+    }
   }
 }
+
