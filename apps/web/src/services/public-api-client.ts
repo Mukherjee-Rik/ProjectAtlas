@@ -10,15 +10,10 @@
  * No auth headers are attached — these are unauthenticated public endpoints.
  */
 
-const API_PORT = 3000;
+import { config } from '@/lib/config';
 
 function getPublicApiBaseUrl(): string {
-  if (typeof window === 'undefined') {
-    // SSR fallback — won't actually make network requests
-    return `http://localhost:${API_PORT}/api/v1`;
-  }
-  const { hostname } = window.location;
-  return `http://${hostname}:${API_PORT}/api/v1`;
+  return config.apiUrl;
 }
 
 async function publicRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
