@@ -20,14 +20,19 @@ export function NotificationBell() {
 
   const fetchNotifications = useCallback(async () => {
     try {
-      const [list, countRes] = await Promise.all([
-        apiClient.get<Notification[]>('/automations/notifications/list'),
-        apiClient.get<{ count: number }>('/automations/notifications/unread-count'),
+      const [listRes, countRes] = await Promise.all([
+        apiClient.get<any>('/automations/notifications/list'),
+        apiClient.get<any>('/automations/notifications/unread-count'),
       ]);
-      setNotifications(list);
-      setUnreadCount(countRes.count);
+      
+      const list = (listRes as any)?.data ?? listRes;
+      const countData = (countRes as any)?.data ?? countRes;
+
+      setNotifications(Array.isArray(list) ? list : []);
+      setUnreadCount(typeof countData?.count === 'number' ? countData.count : (countData?.unreadCount ?? 0));
     } catch {
-      // Silently fail for non-critical feature
+      setNotifications([]);
+      setUnreadCount(0);
     }
   }, []);
 
@@ -52,7 +57,7 @@ export function NotificationBell() {
     try {
       await apiClient.patch(`/automations/notifications/${id}/read`);
       setNotifications((prev) =>
-        prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
+        (Array.isArray(prev) ? prev : []).map((n) => (n.id === id ? { ...n, isRead: true } : n))
       );
       setUnreadCount((c) => Math.max(0, c - 1));
     } catch {}
@@ -66,14 +71,20 @@ export function NotificationBell() {
   };
 
   const timeAgo = (dateStr: string) => {
-    const diff = Date.now() - new Date(dateStr).getTime();
-    const m = Math.floor(diff / 60000);
-    if (m < 1) return 'Just now';
-    if (m < 60) return `${m}m ago`;
-    const h = Math.floor(m / 60);
-    if (h < 24) return `${h}h ago`;
-    return `${Math.floor(h / 24)}d ago`;
+    try {
+      const diff = Date.now() - new Date(dateStr).getTime();
+      const m = Math.floor(diff / 60000);
+      if (m < 1) return 'Just now';
+      if (m < 60) return `${m}m ago`;
+      const h = Math.floor(m / 60);
+      if (h < 24) return `${h}h ago`;
+      return `${Math.floor(h / 24)}d ago`;
+    } catch {
+      return '';
+    }
   };
+
+  const safeNotifications = Array.isArray(notifications) ? notifications : [];
 
   return (
     <div ref={ref} className="relative">
@@ -81,18 +92,19 @@ export function NotificationBell() {
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className="relative rounded-lg border border-[#26313C] bg-[#18212B]/85 hover:border-[#2AFEB7] hover:bg-[#18212B] px-2.5 py-2 text-sm transition-all"
+        aria-label="Notifications"
       >
         🔔
         {unreadCount > 0 && (
-          <span className="absolute -top-1.5 -right-1.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white px-1">
+          <span className="absolute -top-1.5 -right-1.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white px-1 shadow-md">
             {unreadCount > 99 ? '99+' : unreadCount}
           </span>
         )}
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-12 z-50 w-80 max-h-[420px] overflow-y-auto rounded-xl border border-[#26313C] bg-[#111820] shadow-2xl">
-          <div className="sticky top-0 bg-[#111820] border-b border-[#26313C] px-4 py-3 flex items-center justify-between">
+        <div className="absolute right-0 top-12 z-50 w-80 max-h-[420px] overflow-y-auto rounded-xl border border-[#26313C] bg-[#111820] shadow-2xl animate-in fade-in zoom-in-95">
+          <div className="sticky top-0 bg-[#111820] border-b border-[#26313C] px-4 py-3 flex items-center justify-between z-10">
             <h3 className="text-sm font-semibold text-[#F5F7FA]">Notifications</h3>
             {unreadCount > 0 && (
               <span className="text-[10px] text-[#2AFEB7] font-medium">
@@ -101,13 +113,13 @@ export function NotificationBell() {
             )}
           </div>
 
-          {notifications.length === 0 ? (
+          {safeNotifications.length === 0 ? (
             <div className="p-6 text-center text-xs text-[#9AA6B2]">
               No notifications yet
             </div>
           ) : (
             <div>
-              {notifications.map((n) => (
+              {safeNotifications.map((n) => (
                 <button
                   key={n.id}
                   type="button"

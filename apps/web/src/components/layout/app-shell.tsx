@@ -5,6 +5,9 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 import { useAuth } from '@/hooks/use-auth';
+import { useRestaurant } from '@/hooks/use-restaurant';
+import { apiClient } from '@/services/api-client';
+import type { Subscription } from '@/services/subscriptions.service';
 import { Sidebar } from './sidebar';
 import { ContextSelectors } from './context-selectors';
 import { SearchOverlay } from '../search/search-overlay';
@@ -17,11 +20,69 @@ interface AppShellProps {
 
 export function AppShell({ children }: AppShellProps) {
   const { user, logout } = useAuth();
+  const { currentRestaurant } = useRestaurant();
   const pathname = usePathname();
   
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isAiOpen, setIsAiOpen] = useState(false);
   const [isOffline, setIsOffline] = useState(false);
+  const [canAccessAi, setCanAccessAi] = useState(false);
+
+  // Subscription gating for AI Copilot (Hidden for Free Trial & Starter plans)
+  useEffect(() => {
+    if (!user) {
+      setCanAccessAi(false);
+      return;
+    }
+    // Platform Admins always have AI Copilot access
+    if (user.role === 'PLATFORM_ADMIN') {
+      setCanAccessAi(true);
+      return;
+    }
+
+    let isMounted = true;
+    apiClient.get<any>('/subscriptions/my-subscription')
+      .then((res) => {
+        if (!isMounted) return;
+        const sub: Subscription | null = (res as any)?.data ?? res;
+        if (!sub || !sub.plan) {
+          setCanAccessAi(false);
+          return;
+        }
+
+        const planName = (sub.plan.name || '').toLowerCase();
+        const status = sub.status;
+        const features = (sub.plan.features as string[]) || [];
+
+        // Users on Free Trial, Trialing state, or Starter plans do NOT have Ask AI option
+        if (
+          status === 'TRIALING' ||
+          status !== 'ACTIVE' ||
+          planName.includes('starter') ||
+          planName.includes('trial') ||
+          planName.includes('free')
+        ) {
+          setCanAccessAi(false);
+          return;
+        }
+
+        // Only Active Paid Plans with ai_copilot feature (Growth, Pro, Enterprise)
+        const hasAiFeature =
+          features.includes('ai_copilot') ||
+          planName.includes('growth') ||
+          planName.includes('pro') ||
+          planName.includes('enterprise');
+          
+        setCanAccessAi(hasAiFeature);
+      })
+      .catch(() => {
+        if (isMounted) setCanAccessAi(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [user, currentRestaurant]);
 
   // Keyboard shortcut Ctrl + K
   useEffect(() => {
@@ -68,34 +129,32 @@ export function AppShell({ children }: AppShellProps) {
 
   return (
     <div className="min-h-screen bg-[#0B0F14] text-[#F5F7FA] pb-16 md:pb-0">
-      {/* Offline Status Warning Banner */}
+      {/* Offline Status Alert Banner */}
       {isOffline && (
-        <div className="bg-red-500 text-white text-xs font-bold text-center py-2 flex items-center justify-center gap-2 animate-pulse z-50 relative">
-          <span>⚠️ You are offline. Connection to the Atlas server is interrupted.</span>
+        <div className="sticky top-0 z-50 flex items-center justify-center gap-2 bg-[#F59E0B] px-4 py-2 text-xs font-bold text-[#0B0F14] shadow-md animate-pulse">
+          <span>⚠️</span>
+          <span>You are currently working offline. Changes will automatically sync once your internet connection is restored.</span>
         </div>
       )}
 
-      {/* Persistent App Header */}
-      <header className="border-b border-[#26313C] bg-[#111820]">
-        <div className="flex h-16 items-center justify-between px-6">
+      {/* Top Header */}
+      <header className="sticky top-0 z-40 border-b border-[#26313C] bg-[#111820]/90 backdrop-blur-md">
+        <div className="flex h-16 items-center justify-between px-4 md:px-8">
           <div className="flex items-center gap-4 flex-1">
-            <div className="flex items-center gap-3">
-              <div className="h-3 w-3 rounded-full bg-[#2AFEB7] shadow-[0_0_12px_#2AFEB7]" />
-              <div className="text-xl font-bold tracking-tight text-[#F5F7FA]">
-                Atlas
-              </div>
-            </div>
+            <Link
+              href="/dashboard"
+              className="text-lg font-bold tracking-wider text-[#2AFEB7] hover:opacity-80 transition-opacity"
+            >
+              PROJECT ATLAS
+            </Link>
 
-            {user && !['WAITER', 'STAFF', 'KITCHEN'].includes(user.role) && (
-              <>
-                <div className="h-4 w-px bg-[#26313C] hidden md:block" />
-                <div className="hidden md:block">
-                  <ContextSelectors />
-                </div>
-              </>
+            {user && (
+              <div className="hidden lg:block">
+                <ContextSelectors />
+              </div>
             )}
 
-            {/* Global Search trigger inside Header */}
+            {/* Universal Command Search Trigger */}
             {user && (
               <div className="flex-1 max-w-sm mx-6 hidden md:block">
                 <button
@@ -137,11 +196,11 @@ export function AppShell({ children }: AppShellProps) {
 
             {user && <NotificationBell />}
 
-            {user && (
+            {user && canAccessAi && (
               <button
                 type="button"
                 onClick={() => setIsAiOpen(true)}
-                className="rounded-lg border border-[#26313C] bg-[#18212B]/85 hover:border-[#2AFEB7] hover:bg-[#18212B] px-3 py-2 text-sm font-semibold text-[#2AFEB7] transition-all flex items-center gap-1.5"
+                className="rounded-lg border border-[#26313C] bg-[#18212B]/85 hover:border-[#2AFEB7] hover:bg-[#18212B] px-3 py-2 text-sm font-semibold text-[#2AFEB7] transition-all flex items-center gap-1.5 shadow-sm"
               >
                 <span>🤖</span> <span className="hidden sm:inline">Ask AI</span>
               </button>
@@ -178,47 +237,55 @@ export function AppShell({ children }: AppShellProps) {
               pathname === '/dashboard' ? 'text-[#2AFEB7] font-bold' : 'text-[#9AA6B2]'
             }`}
           >
-            <span className="text-lg">🏠</span>
+            <span className="text-base">📊</span>
             <span>Dashboard</span>
           </Link>
-
           <Link
             href="/orders"
             className={`flex flex-col items-center gap-1 text-[10px] ${
               pathname === '/orders' ? 'text-[#2AFEB7] font-bold' : 'text-[#9AA6B2]'
             }`}
           >
-            <span className="text-lg">📦</span>
+            <span className="text-base">🧾</span>
             <span>Orders</span>
           </Link>
-
           <Link
             href="/tables"
             className={`flex flex-col items-center gap-1 text-[10px] ${
               pathname === '/tables' ? 'text-[#2AFEB7] font-bold' : 'text-[#9AA6B2]'
             }`}
           >
-            <span className="text-lg">🍽️</span>
+            <span className="text-base">🪑</span>
             <span>Tables</span>
           </Link>
-
+          <Link
+            href="/menus"
+            className={`flex flex-col items-center gap-1 text-[10px] ${
+              pathname === '/menus' ? 'text-[#2AFEB7] font-bold' : 'text-[#9AA6B2]'
+            }`}
+          >
+            <span className="text-base">🍽️</span>
+            <span>Menus</span>
+          </Link>
           <Link
             href="/profile"
             className={`flex flex-col items-center gap-1 text-[10px] ${
               pathname === '/profile' ? 'text-[#2AFEB7] font-bold' : 'text-[#9AA6B2]'
             }`}
           >
-            <span className="text-lg">👤</span>
+            <span className="text-base">⚙️</span>
             <span>Profile</span>
           </Link>
         </div>
       )}
 
-      {/* Keyboard Search Overlay Modal */}
+      {/* Universal Search Modal (Ctrl + K) */}
       <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
 
-      {/* AI Assistant Chatbot Drawer Overlay */}
-      <AIAssistantDrawer isOpen={isAiOpen} onClose={() => setIsAiOpen(false)} />
+      {/* AI Assistant Drawer */}
+      {canAccessAi && (
+        <AIAssistantDrawer isOpen={isAiOpen} onClose={() => setIsAiOpen(false)} />
+      )}
     </div>
   );
 }
