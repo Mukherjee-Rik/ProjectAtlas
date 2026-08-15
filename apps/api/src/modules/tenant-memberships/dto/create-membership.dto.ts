@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsUUID } from 'class-validator';
+import { IsIn, IsEnum, IsUUID } from 'class-validator';
 
 import { UserRole } from '../../../generated/prisma/enums';
 
@@ -19,10 +19,9 @@ export class CreateMembershipDto {
   tenantId: string;
 
   @ApiProperty({
-    enum: UserRole,
-    example: UserRole.USER,
+    example: 'CASHIER',
     description: 'Role of the user within this tenant',
   })
-  @IsEnum(UserRole)
+  @IsIn(['PLATFORM_ADMIN', 'OWNER', 'ADMIN', 'MANAGER', 'STAFF', 'WAITER', 'KITCHEN', 'CASHIER', 'USER'])
   role: UserRole;
 }

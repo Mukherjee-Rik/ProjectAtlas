@@ -1,6 +1,7 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsEnum,
+  IsIn,
   IsInt,
   IsOptional,
   IsString,
@@ -24,11 +25,10 @@ export class UsersQueryDto {
   search?: string;
 
   @ApiPropertyOptional({
-    enum: UserRole,
-    example: UserRole.ADMIN,
+    example: 'CASHIER',
   })
   @IsOptional()
-  @IsEnum(UserRole)
+  @IsIn(['PLATFORM_ADMIN', 'OWNER', 'ADMIN', 'MANAGER', 'STAFF', 'WAITER', 'KITCHEN', 'CASHIER', 'USER'])
   role?: UserRole;
 
   @ApiPropertyOptional({

@@ -1,7 +1,8 @@
 {
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
-    "builder": "NIXPACKS"
+    "builder": "NIXPACKS",
+    "buildCommand": "pnpm prisma generate --config database/prisma/prisma.config.ts && pnpm --filter api build"
   },
   "deploy": {
     "startCommand": "node apps/api/dist/main.js"

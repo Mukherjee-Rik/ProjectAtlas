@@ -1,14 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum } from 'class-validator';
+import { IsIn } from 'class-validator';
 
 import { UserRole } from '../../../generated/prisma/enums';
 
 export class UpdateMembershipDto {
   @ApiProperty({
-    enum: UserRole,
-    example: UserRole.ADMIN,
+    example: 'CASHIER',
     description: 'Updated role of the user within this tenant',
   })
-  @IsEnum(UserRole)
+  @IsIn(['PLATFORM_ADMIN', 'OWNER', 'ADMIN', 'MANAGER', 'STAFF', 'WAITER', 'KITCHEN', 'CASHIER', 'USER'])
   role: UserRole;
 }
