@@ -85,16 +85,14 @@ function LoginForm() {
     <main className="flex min-h-screen items-center justify-center bg-[#0B0F14] px-4 py-12">
       <div className="w-full max-w-md">
         {/* Header Branding */}
-        <div className="mb-8 text-center space-y-2">
-          <div className="inline-flex items-center justify-center gap-2">
-            <div className="h-3 w-3 rounded-full bg-[#2AFEB7] shadow-[0_0_12px_#2AFEB7]" />
-            <h1 className="text-4xl font-bold tracking-tight text-[#F5F7FA]">
-              Atlas
-            </h1>
+        <div className="mb-8 text-center space-y-3">
+          <div className="flex justify-center">
+            <img
+              src="/logo.png"
+              alt="Atlas - Powering Restaurants Elevating Operations"
+              className="h-24 w-auto object-contain drop-shadow-[0_0_15px_rgba(42,254,183,0.2)]"
+            />
           </div>
-          <p className="text-xs uppercase tracking-widest text-[#2AFEB7] font-semibold">
-            Restaurant Operations Platform
-          </p>
           <p className="text-xs text-[#9AA6B2]">
             Sign in to your restaurant workspace or platform panel
           </p>

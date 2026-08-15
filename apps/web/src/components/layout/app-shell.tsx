@@ -143,9 +143,13 @@ export function AppShell({ children }: AppShellProps) {
           <div className="flex items-center gap-4 flex-1">
             <Link
               href="/dashboard"
-              className="text-lg font-bold tracking-wider text-[#2AFEB7] hover:opacity-80 transition-opacity"
+              className="flex items-center gap-2 hover:opacity-90 transition-opacity"
             >
-              PROJECT ATLAS
+              <img
+                src="/logo.png"
+                alt="Project Atlas Logo"
+                className="h-9 w-auto object-contain"
+              />
             </Link>
 
             {user && (

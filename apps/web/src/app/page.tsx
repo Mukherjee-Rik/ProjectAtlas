@@ -15,10 +15,13 @@ export default function Home() {
 
       {/* Top Header staff link */}
       <header className="absolute top-0 left-0 right-0 p-6 flex justify-between items-center max-w-7xl mx-auto w-full z-20">
-        <div className="flex items-center gap-2.5">
-          <div className="h-2.5 w-2.5 rounded-full bg-[#2AFEB7] shadow-[0_0_8px_#2AFEB7]" />
-          <span className="text-xs uppercase tracking-widest font-black text-[#F5F7FA]">Atlas</span>
-        </div>
+        <Link href="/" className="flex items-center gap-2">
+          <img
+            src="/logo.png"
+            alt="Atlas Logo"
+            className="h-10 w-auto object-contain"
+          />
+        </Link>
         <Link
           href="/login"
           className="rounded-full border border-[#26313C] bg-[#111820]/45 backdrop-blur px-4 py-1.5 text-[11px] font-bold tracking-wider uppercase text-[#9AA6B2] hover:text-[#2AFEB7] hover:border-[#2AFEB7]/40 transition-all duration-300"

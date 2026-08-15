@@ -116,12 +116,13 @@ export default function CustomerTableEntryPage({
     <div className="flex min-h-screen flex-col items-center justify-center bg-[#0B0F14] p-4 text-[#F5F7FA]">
       <div className="w-full max-w-sm rounded-2xl border border-[#26313C] bg-[#111820] p-8 text-center shadow-2xl space-y-6">
 
-        {/* Brand dot */}
-        <div className="flex justify-center items-center gap-2">
-          <div className="h-3 w-3 rounded-full bg-[#2AFEB7] shadow-[0_0_10px_#2AFEB7] animate-pulse" />
-          <span className="text-[#2AFEB7] text-xs font-bold uppercase tracking-widest">
-            Atlas Ordering
-          </span>
+        {/* Brand logo */}
+        <div className="flex justify-center items-center">
+          <img
+            src="/logo.png"
+            alt="Atlas Logo"
+            className="h-14 w-auto object-contain drop-shadow-[0_0_10px_rgba(42,254,183,0.3)]"
+          />
         </div>
 
         {/* Big welcome icon */}

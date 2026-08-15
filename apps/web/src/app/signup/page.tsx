@@ -72,15 +72,15 @@ export default function SignupPage() {
     <main className="flex min-h-screen items-center justify-center bg-[#0B0F14] p-4 text-[#F5F7FA]">
       <div className="w-full max-w-md space-y-6">
         {/* Brand Logo & Header */}
-        <div className="text-center space-y-2">
-          <div className="inline-flex items-center gap-2">
-            <div className="h-3 w-3 rounded-full bg-[#2AFEB7] shadow-[0_0_12px_#2AFEB7]" />
-            <span className="text-2xl font-black tracking-wider text-[#F5F7FA]">ATLAS</span>
+        <div className="text-center space-y-3">
+          <div className="flex justify-center">
+            <img
+              src="/logo.png"
+              alt="Atlas Logo"
+              className="h-20 w-auto object-contain drop-shadow-[0_0_12px_rgba(42,254,183,0.2)]"
+            />
           </div>
-          <p className="text-xs uppercase tracking-widest text-[#2AFEB7] font-semibold">
-            Restaurant Operations Platform
-          </p>
-          <h1 className="text-xl font-bold text-[#F5F7FA] pt-2">Start Your Free Trial</h1>
+          <h1 className="text-xl font-bold text-[#F5F7FA] pt-1">Start Your Free Trial</h1>
           <p className="text-xs text-[#9AA6B2]">
             Create your restaurant account and manage menus, orders, and branches.
           </p>
