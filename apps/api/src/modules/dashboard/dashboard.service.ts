@@ -1,6 +1,28 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma/prisma.service';
 
+function parseStartOfDay(dateStr?: string): Date | undefined {
+  if (!dateStr) return undefined;
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateStr.trim());
+  if (match) {
+    const [, y, m, d] = match;
+    return new Date(Date.UTC(Number(y), Number(m) - 1, Number(d), 0, 0, 0, 0));
+  }
+  const parsed = new Date(`${dateStr}T00:00:00.000`);
+  return isNaN(parsed.getTime()) ? (isNaN(new Date(dateStr).getTime()) ? undefined : new Date(dateStr)) : parsed;
+}
+
+function parseEndOfDay(dateStr?: string): Date | undefined {
+  if (!dateStr) return undefined;
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateStr.trim());
+  if (match) {
+    const [, y, m, d] = match;
+    return new Date(Date.UTC(Number(y), Number(m) - 1, Number(d), 23, 59, 59, 999));
+  }
+  const parsed = new Date(`${dateStr}T23:59:59.999`);
+  return isNaN(parsed.getTime()) ? (isNaN(new Date(dateStr).getTime()) ? undefined : new Date(dateStr)) : parsed;
+}
+
 @Injectable()
 export class DashboardService {
   constructor(private readonly prisma: PrismaService) {}
@@ -27,15 +49,11 @@ export class DashboardService {
     if (branchId) whereOrder.branchId = branchId;
 
     if (startDate || endDate) {
+      const gte = parseStartOfDay(startDate);
+      const lte = parseEndOfDay(endDate);
       whereOrder.createdAt = {};
-      if (startDate) {
-        const start = new Date(`${startDate}T00:00:00.000`);
-        whereOrder.createdAt.gte = isNaN(start.getTime()) ? new Date(startDate) : start;
-      }
-      if (endDate) {
-        const end = new Date(`${endDate}T23:59:59.999`);
-        whereOrder.createdAt.lte = isNaN(end.getTime()) ? new Date(endDate) : end;
-      }
+      if (gte) whereOrder.createdAt.gte = gte;
+      if (lte) whereOrder.createdAt.lte = lte;
     }
 
     const whereSalesOrder: any = {
@@ -167,22 +185,8 @@ export class DashboardService {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    let start: Date;
-    let end: Date;
-
-    if (startDate) {
-      const parsedStart = new Date(`${startDate}T00:00:00.000`);
-      start = isNaN(parsedStart.getTime()) ? new Date(startDate) : parsedStart;
-    } else {
-      start = thirtyDaysAgo;
-    }
-
-    if (endDate) {
-      const parsedEnd = new Date(`${endDate}T23:59:59.999`);
-      end = isNaN(parsedEnd.getTime()) ? new Date(endDate) : parsedEnd;
-    } else {
-      end = new Date();
-    }
+    let start: Date = parseStartOfDay(startDate) ?? thirtyDaysAgo;
+    let end: Date = parseEndOfDay(endDate) ?? new Date();
 
     whereOrder.createdAt = {
       gte: start,
@@ -415,15 +419,11 @@ export class DashboardService {
     const whereAllOrders: any = {};
 
     if (startDate || endDate) {
+      const gte = parseStartOfDay(startDate);
+      const lte = parseEndOfDay(endDate);
       const dateFilter: any = {};
-      if (startDate) {
-        const start = new Date(`${startDate}T00:00:00.000`);
-        dateFilter.gte = isNaN(start.getTime()) ? new Date(startDate) : start;
-      }
-      if (endDate) {
-        const end = new Date(`${endDate}T23:59:59.999`);
-        dateFilter.lte = isNaN(end.getTime()) ? new Date(endDate) : end;
-      }
+      if (gte) dateFilter.gte = gte;
+      if (lte) dateFilter.lte = lte;
       whereOrder.createdAt = dateFilter;
       whereAllOrders.createdAt = dateFilter;
     }
