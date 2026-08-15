@@ -28,13 +28,20 @@ export class DashboardService {
 
     if (startDate || endDate) {
       whereOrder.createdAt = {};
-      if (startDate) whereOrder.createdAt.gte = new Date(startDate);
+      if (startDate) {
+        const start = new Date(`${startDate}T00:00:00.000`);
+        whereOrder.createdAt.gte = isNaN(start.getTime()) ? new Date(startDate) : start;
+      }
       if (endDate) {
-        const end = new Date(endDate);
-        end.setHours(23, 59, 59, 999);
-        whereOrder.createdAt.lte = end;
+        const end = new Date(`${endDate}T23:59:59.999`);
+        whereOrder.createdAt.lte = isNaN(end.getTime()) ? new Date(endDate) : end;
       }
     }
+
+    const whereSalesOrder: any = {
+      ...whereOrder,
+      status: { not: 'CANCELLED' },
+    };
 
     const whereTables: any = {};
     if (restaurantId) {
@@ -62,7 +69,7 @@ export class DashboardService {
 
       restaurantId
         ? this.prisma.order.aggregate({
-            where: whereOrder,
+            where: whereSalesOrder,
             _sum: { totalAmount: true },
           })
         : { _sum: { totalAmount: null } },
@@ -160,12 +167,26 @@ export class DashboardService {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    const start = startDate ? new Date(startDate) : thirtyDaysAgo;
-    const end = endDate ? new Date(endDate) : new Date();
+    let start: Date;
+    let end: Date;
+
+    if (startDate) {
+      const parsedStart = new Date(`${startDate}T00:00:00.000`);
+      start = isNaN(parsedStart.getTime()) ? new Date(startDate) : parsedStart;
+    } else {
+      start = thirtyDaysAgo;
+    }
+
+    if (endDate) {
+      const parsedEnd = new Date(`${endDate}T23:59:59.999`);
+      end = isNaN(parsedEnd.getTime()) ? new Date(endDate) : parsedEnd;
+    } else {
+      end = new Date();
+    }
 
     whereOrder.createdAt = {
       gte: start,
-      lte: new Date(new Date(end).setHours(23, 59, 59, 999)),
+      lte: end,
     };
 
     const orders = await this.prisma.order.findMany({
@@ -276,16 +297,27 @@ export class DashboardService {
 
     // 2. Sales Trend (group by day)
     const salesTrendMap = new Map<string, { date: string; sales: number; subtotal: number; taxAmount: number; discountAmount: number; orders: number }>();
-    // Pre-populate date range with zeros
+    
+    const formatDateStr = (d: Date) => {
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+
     const currentDay = new Date(start);
-    while (currentDay <= end) {
-      const dateStr = currentDay.toISOString().split('T')[0];
-      salesTrendMap.set(dateStr, { date: dateStr, sales: 0, subtotal: 0, taxAmount: 0, discountAmount: 0, orders: 0 });
+    const endMidnight = new Date(end);
+    
+    while (currentDay <= endMidnight) {
+      const dateStr = formatDateStr(currentDay);
+      if (!salesTrendMap.has(dateStr)) {
+        salesTrendMap.set(dateStr, { date: dateStr, sales: 0, subtotal: 0, taxAmount: 0, discountAmount: 0, orders: 0 });
+      }
       currentDay.setDate(currentDay.getDate() + 1);
     }
 
     orders.forEach((o) => {
-      const dateStr = o.createdAt.toISOString().split('T')[0];
+      const dateStr = formatDateStr(o.createdAt);
       const existing = salesTrendMap.get(dateStr);
       if (existing) {
         existing.sales += Number(o.totalAmount || 0);
@@ -378,7 +410,24 @@ export class DashboardService {
     };
   }
 
-  async getPlatformOverview() {
+  async getPlatformOverview(startDate?: string, endDate?: string) {
+    const whereOrder: any = { status: { not: 'CANCELLED' } };
+    const whereAllOrders: any = {};
+
+    if (startDate || endDate) {
+      const dateFilter: any = {};
+      if (startDate) {
+        const start = new Date(`${startDate}T00:00:00.000`);
+        dateFilter.gte = isNaN(start.getTime()) ? new Date(startDate) : start;
+      }
+      if (endDate) {
+        const end = new Date(`${endDate}T23:59:59.999`);
+        dateFilter.lte = isNaN(end.getTime()) ? new Date(endDate) : end;
+      }
+      whereOrder.createdAt = dateFilter;
+      whereAllOrders.createdAt = dateFilter;
+    }
+
     const [
       totalTenants,
       totalRestaurants,
@@ -390,12 +439,13 @@ export class DashboardService {
       this.prisma.tenant.count(),
       this.prisma.restaurant.count(),
       this.prisma.user.count(),
-      this.prisma.order.count(),
+      this.prisma.order.count({ where: whereAllOrders }),
       this.prisma.order.aggregate({
-        where: { status: { not: 'CANCELLED' } },
+        where: whereOrder,
         _sum: { totalAmount: true },
       }),
       this.prisma.order.findMany({
+        where: whereAllOrders,
         orderBy: { createdAt: 'desc' },
         take: 5,
         include: {
@@ -434,4 +484,5 @@ export class DashboardService {
       })),
     };
   }
+
 }
