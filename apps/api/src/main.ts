@@ -33,6 +33,15 @@ async function bootstrap() {
 
   const port = Number(process.env.PORT) || 3000;
 
+  // Rewrite unversioned /auth/* requests to /api/v1/auth/*
+  const expressInstance = app.getHttpAdapter().getInstance();
+  expressInstance.use((req: any, _res: any, next: any) => {
+    if (req.url && (req.url.startsWith('/auth/') || req.url === '/auth')) {
+      req.url = `/api/v1${req.url}`;
+    }
+    next();
+  });
+
   app.setGlobalPrefix('api');
 
   app.enableVersioning({
