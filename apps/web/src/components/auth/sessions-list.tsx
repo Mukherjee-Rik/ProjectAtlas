@@ -21,8 +21,9 @@ export function SessionsList() {
     setIsLoading(true);
     setError('');
     try {
-      const res = await apiClient.get<DeviceSession[]>('/auth/sessions');
-      setSessions(res || []);
+      const res = await apiClient.get<any>('/auth/sessions');
+      const list = Array.isArray(res) ? res : res?.data ?? [];
+      setSessions(list);
     } catch (err: any) {
       setError(err?.message || 'Failed to load active login sessions');
     } finally {
@@ -96,7 +97,7 @@ export function SessionsList() {
       )}
 
       <div className="divide-y divide-[#26313C]/50">
-        {sessions.map((sess) => (
+        {(Array.isArray(sessions) ? sessions : []).map((sess) => (
           <div key={sess.id} className="flex items-center justify-between py-4 first:pt-0 last:pb-0 gap-4">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
@@ -121,7 +122,7 @@ export function SessionsList() {
           </div>
         ))}
 
-        {sessions.length === 0 && (
+        {(!Array.isArray(sessions) || sessions.length === 0) && (
           <div className="py-8 text-center text-xs text-[#9AA6B2]">
             No active sessions registered.
           </div>

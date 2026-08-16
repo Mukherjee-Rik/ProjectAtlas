@@ -80,9 +80,11 @@ export function AutomationDashboard() {
 
   const fetchRules = useCallback(async () => {
     try {
-      const data = await apiClient.get<AutomationRule[]>('/automations');
-      setRules(data);
+      const res = await apiClient.get<any>('/automations');
+      const list = Array.isArray(res) ? res : res?.data ?? [];
+      setRules(list);
     } catch {
+      setRules([]);
     } finally {
       setLoading(false);
     }
@@ -149,10 +151,13 @@ export function AutomationDashboard() {
       return;
     }
     try {
-      const data = await apiClient.get<Execution[]>(`/automations/${id}/executions`);
-      setExecutions(data);
+      const res = await apiClient.get<any>(`/automations/${id}/executions`);
+      const list = Array.isArray(res) ? res : res?.data ?? [];
+      setExecutions(list);
       setSelectedRule(id);
-    } catch {}
+    } catch {
+      setExecutions([]);
+    }
   };
 
   const actionIcon: Record<string, string> = {
