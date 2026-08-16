@@ -1364,7 +1364,7 @@ export type $PaymentPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
 export type PaymentGetPayload<S extends boolean | null | undefined | PaymentDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$PaymentPayload, S>
 
 export type PaymentCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<PaymentFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<PaymentFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: PaymentCountAggregateInputType | true
   }
 
@@ -1822,6 +1822,7 @@ export type PaymentFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Filter, which Payment to fetch.
    */
   where: Prisma.PaymentWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1844,6 +1845,7 @@ export type PaymentFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extension
    * Filter, which Payment to fetch.
    */
   where: Prisma.PaymentWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1896,6 +1898,7 @@ export type PaymentFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Filter by unique combinations of Payments.
    */
   distinct?: Prisma.PaymentScalarFieldEnum | Prisma.PaymentScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1948,6 +1951,7 @@ export type PaymentFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions
    * Filter by unique combinations of Payments.
    */
   distinct?: Prisma.PaymentScalarFieldEnum | Prisma.PaymentScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -2000,6 +2004,7 @@ export type PaymentFindManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Filter by unique combinations of Payments.
    */
   distinct?: Prisma.PaymentScalarFieldEnum | Prisma.PaymentScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -2022,6 +2027,7 @@ export type PaymentCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * The data needed to create a Payment.
    */
   data: Prisma.XOR<Prisma.PaymentCreateInput, Prisma.PaymentUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -2082,6 +2088,7 @@ export type PaymentUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Choose, which Payment to update.
    */
   where: Prisma.PaymentWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -2160,6 +2167,7 @@ export type PaymentUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * In case the Payment was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.PaymentUpdateInput, Prisma.PaymentUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -2182,6 +2190,7 @@ export type PaymentDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Filter which Payment to delete.
    */
   where: Prisma.PaymentWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

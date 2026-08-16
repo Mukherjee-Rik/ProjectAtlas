@@ -547,7 +547,7 @@ export type $ExternalOrderPayload<ExtArgs extends runtime.Types.Extensions.Inter
 export type ExternalOrderGetPayload<S extends boolean | null | undefined | ExternalOrderDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$ExternalOrderPayload, S>
 
 export type ExternalOrderCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<ExternalOrderFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<ExternalOrderFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: ExternalOrderCountAggregateInputType | true
   }
 
@@ -996,6 +996,7 @@ export type ExternalOrderFindUniqueArgs<ExtArgs extends runtime.Types.Extensions
    * Filter, which ExternalOrder to fetch.
    */
   where: Prisma.ExternalOrderWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1018,6 +1019,7 @@ export type ExternalOrderFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Ext
    * Filter, which ExternalOrder to fetch.
    */
   where: Prisma.ExternalOrderWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1070,6 +1072,7 @@ export type ExternalOrderFindFirstArgs<ExtArgs extends runtime.Types.Extensions.
    * Filter by unique combinations of ExternalOrders.
    */
   distinct?: Prisma.ExternalOrderScalarFieldEnum | Prisma.ExternalOrderScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1122,6 +1125,7 @@ export type ExternalOrderFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Exte
    * Filter by unique combinations of ExternalOrders.
    */
   distinct?: Prisma.ExternalOrderScalarFieldEnum | Prisma.ExternalOrderScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1174,6 +1178,7 @@ export type ExternalOrderFindManyArgs<ExtArgs extends runtime.Types.Extensions.I
    * Filter by unique combinations of ExternalOrders.
    */
   distinct?: Prisma.ExternalOrderScalarFieldEnum | Prisma.ExternalOrderScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1196,6 +1201,7 @@ export type ExternalOrderCreateArgs<ExtArgs extends runtime.Types.Extensions.Int
    * The data needed to create a ExternalOrder.
    */
   data: Prisma.XOR<Prisma.ExternalOrderCreateInput, Prisma.ExternalOrderUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1256,6 +1262,7 @@ export type ExternalOrderUpdateArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Choose, which ExternalOrder to update.
    */
   where: Prisma.ExternalOrderWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1334,6 +1341,7 @@ export type ExternalOrderUpsertArgs<ExtArgs extends runtime.Types.Extensions.Int
    * In case the ExternalOrder was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.ExternalOrderUpdateInput, Prisma.ExternalOrderUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1356,6 +1364,7 @@ export type ExternalOrderDeleteArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Filter which ExternalOrder to delete.
    */
   where: Prisma.ExternalOrderWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

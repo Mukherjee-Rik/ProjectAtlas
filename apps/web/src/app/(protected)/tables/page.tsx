@@ -150,8 +150,11 @@ export default function TablesPage() {
       </div>
 
       {/* Toolbar / Filters */}
-      <div className="flex flex-col gap-4 rounded-xl border border-[#26313C] bg-[#111820] p-4 shadow-md sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-1 flex-col gap-3 sm:flex-row sm:items-center">
+      <div className="flex flex-col gap-4 rounded-xl border border-[#26313C] bg-[#111820] p-4 shadow-md sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+        {/* flex-wrap + min-w-0: at tablet width the sidebar appears and this
+            row had no room for the search box plus both selects, pushing the
+            whole page wider than the viewport. */}
+        <div className="flex min-w-0 flex-1 flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
           <input
             type="search"
             placeholder="Search by name or code..."
@@ -195,10 +198,9 @@ export default function TablesPage() {
           <p>{error}</p>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-xl border border-[#26313C] bg-[#111820] shadow-xl">
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[700px] text-left">
-              <thead className="border-b border-[#26313C] bg-[#18212B]">
+        <div className="table-responsive rounded-xl border border-[#26313C] bg-[#111820] shadow-xl">
+          <table className="w-full min-w-[700px] text-left">
+            <thead className="border-b border-[#26313C] bg-[#18212B]">
                 <tr>
                   <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
                     Table Name
@@ -276,14 +278,13 @@ export default function TablesPage() {
                 ))}
               </tbody>
             </table>
-          </div>
 
-          {filteredTables.length === 0 && (
-            <div className="p-8 text-center text-[#9AA6B2]">
-              No tables found.
-            </div>
-          )}
-        </div>
+            {filteredTables.length === 0 && (
+              <div className="p-8 text-center text-[#9AA6B2]">
+                No tables found.
+              </div>
+            )}
+          </div>
       )}
 
       {/* Delete Confirmation Modal */}

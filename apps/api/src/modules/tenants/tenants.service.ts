@@ -40,6 +40,36 @@ export class TenantsService {
     });
   }
 
+  /**
+   * Lists tenants visible to the caller.
+   *
+   * Platform operators see every tenant; everyone else sees only the tenants
+   * they hold a membership in. Without that scoping this endpoint returned the
+   * whole platform's tenant list to any authenticated user — and because the
+   * OWNER role carries every permission, a restaurant owner could enumerate
+   * every other business on the platform.
+   */
+  async findAllForUser(userId: string, role: string) {
+    const isPlatformOperator = role === 'PLATFORM_ADMIN' || role === 'ADMIN';
+
+    return this.prisma.tenant.findMany({
+      ...(isPlatformOperator
+        ? {}
+        : { where: { memberships: { some: { userId } } } }),
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        status: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+  }
+
   async findAll() {
     return this.prisma.tenant.findMany({
       select: {

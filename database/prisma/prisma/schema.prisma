@@ -2,6 +2,10 @@ generator client {
   provider     = "prisma-client"
   output       = "../../../apps/api/src/generated/prisma"
   moduleFormat = "cjs"
+  // Lets nested reads resolve in one SQL join instead of one query per
+  // relation. The database is in another region, so each saved query is a
+  // saved network round trip.
+  previewFeatures = ["relationJoins"]
 }
 
 datasource db {

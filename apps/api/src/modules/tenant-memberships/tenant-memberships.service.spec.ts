@@ -3,6 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { TenantMembershipsService } from './tenant-memberships.service';
 import { PrismaService } from '../../database/prisma/prisma.service';
 import { SubscriptionUsageService } from '../subscriptions/subscription-usage.service';
+import { TtlCacheService } from '../../common/cache/ttl-cache.service';
 
 describe('TenantMembershipsService', () => {
   let service: TenantMembershipsService;
@@ -30,6 +31,7 @@ describe('TenantMembershipsService', () => {
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
+        TtlCacheService,
         TenantMembershipsService,
         { provide: PrismaService, useValue: prismaService },
         {

@@ -2842,7 +2842,7 @@ export type $OrderPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
 export type OrderGetPayload<S extends boolean | null | undefined | OrderDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$OrderPayload, S>
 
 export type OrderCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<OrderFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<OrderFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: OrderCountAggregateInputType | true
   }
 
@@ -3311,6 +3311,7 @@ export type OrderFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Filter, which Order to fetch.
    */
   where: Prisma.OrderWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -3333,6 +3334,7 @@ export type OrderFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensions.
    * Filter, which Order to fetch.
    */
   where: Prisma.OrderWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -3385,6 +3387,7 @@ export type OrderFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Filter by unique combinations of Orders.
    */
   distinct?: Prisma.OrderScalarFieldEnum | Prisma.OrderScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -3437,6 +3440,7 @@ export type OrderFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions.I
    * Filter by unique combinations of Orders.
    */
   distinct?: Prisma.OrderScalarFieldEnum | Prisma.OrderScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -3489,6 +3493,7 @@ export type OrderFindManyArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Filter by unique combinations of Orders.
    */
   distinct?: Prisma.OrderScalarFieldEnum | Prisma.OrderScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -3511,6 +3516,7 @@ export type OrderCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
    * The data needed to create a Order.
    */
   data: Prisma.XOR<Prisma.OrderCreateInput, Prisma.OrderUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -3571,6 +3577,7 @@ export type OrderUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
    * Choose, which Order to update.
    */
   where: Prisma.OrderWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -3649,6 +3656,7 @@ export type OrderUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
    * In case the Order was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.OrderUpdateInput, Prisma.OrderUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -3671,6 +3679,7 @@ export type OrderDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
    * Filter which Order to delete.
    */
   where: Prisma.OrderWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

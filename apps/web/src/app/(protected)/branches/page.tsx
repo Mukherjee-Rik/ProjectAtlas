@@ -151,88 +151,86 @@ export default function BranchesPage() {
           </button>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-xl border border-[#26313C] bg-[#111820] shadow-xl">
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[700px] text-left">
-              <thead className="border-b border-[#26313C] bg-[#18212B]">
-                <tr>
-                  <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
-                    Branch Name
-                  </th>
-                  <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
-                    Code
-                  </th>
-                  <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
-                    Restaurant
-                  </th>
-                  <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
-                    City
-                  </th>
-                  <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
-                    Status
-                  </th>
-                  <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
+        <div className="table-responsive rounded-xl border border-[#26313C] bg-[#111820] shadow-xl">
+          <table className="w-full min-w-[700px] text-left">
+            <thead className="border-b border-[#26313C] bg-[#18212B]">
+              <tr>
+                <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
+                  Branch Name
+                </th>
+                <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
+                  Code
+                </th>
+                <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
+                  Restaurant
+                </th>
+                <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
+                  City
+                </th>
+                <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
+                  Status
+                </th>
+                <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
+                  Actions
+                </th>
+              </tr>
+            </thead>
 
-              <tbody className="divide-y divide-[#26313C]">
-                {filteredBranches.map((branch) => (
-                  <tr
-                    key={branch.id}
-                    onClick={() => router.push(`/branches/${branch.id}`)}
-                    className="cursor-pointer transition-colors hover:bg-[#18212B]"
+            <tbody className="divide-y divide-[#26313C]">
+              {filteredBranches.map((branch) => (
+                <tr
+                  key={branch.id}
+                  onClick={() => router.push(`/branches/${branch.id}`)}
+                  className="cursor-pointer transition-colors hover:bg-[#18212B]"
+                >
+                  <td className="px-6 py-4 text-sm font-medium text-[#F5F7FA]">
+                    {branch.name}
+                  </td>
+
+                  <td className="px-6 py-4 text-sm font-mono text-[#2AFEB7]">
+                    {branch.code}
+                  </td>
+
+                  <td className="px-6 py-4 text-sm text-[#9AA6B2]">
+                    {branch.restaurant?.name ?? '—'}
+                  </td>
+
+                  <td className="px-6 py-4 text-sm text-[#9AA6B2]">
+                    {branch.city ?? '—'}
+                  </td>
+
+                  <td className="px-6 py-4 text-sm">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-[#22C55E]/15 px-3 py-1 text-xs font-semibold text-[#22C55E] border border-[#22C55E]/30">
+                      <span className="h-1.5 w-1.5 rounded-full bg-[#22C55E]" />
+                      {branch.status}
+                    </span>
+                  </td>
+
+                  <td
+                    className="px-6 py-4 text-sm"
+                    onClick={(e) => e.stopPropagation()}
                   >
-                    <td className="px-6 py-4 text-sm font-medium text-[#F5F7FA]">
-                      {branch.name}
-                    </td>
-
-                    <td className="px-6 py-4 text-sm font-mono text-[#2AFEB7]">
-                      {branch.code}
-                    </td>
-
-                    <td className="px-6 py-4 text-sm text-[#9AA6B2]">
-                      {branch.restaurant?.name ?? '—'}
-                    </td>
-
-                    <td className="px-6 py-4 text-sm text-[#9AA6B2]">
-                      {branch.city ?? '—'}
-                    </td>
-
-                    <td className="px-6 py-4 text-sm">
-                      <span className="inline-flex items-center gap-1.5 rounded-full bg-[#22C55E]/15 px-3 py-1 text-xs font-semibold text-[#22C55E] border border-[#22C55E]/30">
-                        <span className="h-1.5 w-1.5 rounded-full bg-[#22C55E]" />
-                        {branch.status}
-                      </span>
-                    </td>
-
-                    <td
-                      className="px-6 py-4 text-sm"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <div className="flex gap-2">
-                        <button
-                          type="button"
-                          onClick={() => router.push(`/branches/${branch.id}/edit`)}
-                          className="rounded-lg border border-[#26313C] bg-[#18212B] px-2.5 py-1 text-xs text-[#F5F7FA] hover:border-[#2AFEB7]"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setDeletingBranch(branch)}
-                          className="rounded-lg border border-[#EF4444]/40 bg-[#EF4444]/10 px-2.5 py-1 text-xs text-[#EF4444] hover:bg-[#EF4444]/20"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => router.push(`/branches/${branch.id}/edit`)}
+                        className="rounded-lg border border-[#26313C] bg-[#18212B] px-2.5 py-1 text-xs text-[#F5F7FA] hover:border-[#2AFEB7]"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setDeletingBranch(branch)}
+                        className="rounded-lg border border-[#EF4444]/40 bg-[#EF4444]/10 px-2.5 py-1 text-xs text-[#EF4444] hover:bg-[#EF4444]/20"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
 
           {filteredBranches.length === 0 && (
             <div className="p-8 text-center text-[#9AA6B2]">

@@ -37,45 +37,94 @@ function LoginForm() {
         password,
       });
 
-      const { accessToken, user, memberships } = response.data;
+      const resData = (response as any)?.data ?? response;
+      const accessToken = resData?.accessToken;
+      const user = resData?.user;
+      const memberships = resData?.memberships ?? [];
 
+      if (!accessToken || !user) {
+        throw new Error('Authentication succeeded but session token is missing. Please try again.');
+      }
+
+      // Save user session
       loginUser(accessToken, user);
 
-      // 1. Platform Admin -> Platform Dashboard
+      // 1. Platform Admin -> Platform Management / Dashboard
       if (user.role === 'PLATFORM_ADMIN') {
-        window.location.href = '/dashboard';
+        window.location.href = '/platform-admin';
         return;
       }
 
-      // 2. Restaurant Owner / Staff -> Restaurant Dashboard or Workspace Selection
-      const allRestaurants = (memberships ?? []).flatMap((m) =>
-        m.tenant.restaurants.map((r) => ({
-          tenantId: m.tenant.id,
-          tenantSlug: m.tenant.slug,
+      // 2. Restaurant Owner / Staff -> Extract active workspace
+      const allRestaurants = (memberships ?? []).flatMap((m: any) =>
+        (m?.tenant?.restaurants ?? []).map((r: any) => ({
+          tenantId: m?.tenant?.id,
+          tenantSlug: m?.tenant?.slug,
           restaurant: r,
-          role: m.role,
+          role: m?.role || user.role,
         })),
       );
 
       if (allRestaurants.length === 1) {
         const item = allRestaurants[0];
-        setCurrentTenant({ id: item.tenantId, name: item.restaurant.name, slug: item.tenantSlug, status: 'ACTIVE', createdAt: '', updatedAt: '' });
-        setCurrentRestaurant({ id: item.restaurant.id, tenantId: item.tenantId, name: item.restaurant.name, slug: item.restaurant.slug, status: 'ACTIVE', createdAt: '', updatedAt: '' });
+        setCurrentTenant({
+          id: item.tenantId,
+          name: item.restaurant.name,
+          slug: item.tenantSlug,
+          status: 'ACTIVE',
+          createdAt: '',
+          updatedAt: '',
+        });
+        setCurrentRestaurant({
+          id: item.restaurant.id,
+          tenantId: item.tenantId,
+          name: item.restaurant.name,
+          slug: item.restaurant.slug,
+          status: 'ACTIVE',
+          createdAt: '',
+          updatedAt: '',
+        });
         if (item.restaurant.branches?.[0]?.id) {
           const b = item.restaurant.branches[0];
-          setCurrentBranch({ id: b.id, restaurantId: item.restaurant.id, name: b.name, code: b.code, status: 'ACTIVE', createdAt: '', updatedAt: '' });
+          setCurrentBranch({
+            id: b.id,
+            restaurantId: item.restaurant.id,
+            name: b.name,
+            code: b.code,
+            status: 'ACTIVE',
+            createdAt: '',
+            updatedAt: '',
+          });
         }
-        const targetPath = user.role === 'CASHIER' ? '/cashier' : (user.role === 'WAITER' || user.role === 'STAFF') ? '/waiter' : (user.role === 'KITCHEN' ? '/kitchen' : '/dashboard');
+        const targetPath =
+          user.role === 'CASHIER'
+            ? '/cashier'
+            : user.role === 'WAITER' || user.role === 'STAFF'
+            ? '/waiter'
+            : user.role === 'KITCHEN'
+            ? '/kitchen'
+            : '/dashboard';
         window.location.href = targetPath;
       } else if (allRestaurants.length > 1) {
         window.location.href = '/select-restaurant';
       } else {
-        const targetPath = user.role === 'CASHIER' ? '/cashier' : (user.role === 'WAITER' || user.role === 'STAFF') ? '/waiter' : (user.role === 'KITCHEN' ? '/kitchen' : '/dashboard');
+        const targetPath =
+          user.role === 'CASHIER'
+            ? '/cashier'
+            : user.role === 'WAITER' || user.role === 'STAFF'
+            ? '/waiter'
+            : user.role === 'KITCHEN'
+            ? '/kitchen'
+            : '/dashboard';
         window.location.href = targetPath;
       }
     } catch (err: any) {
-      console.error(err);
-      setError(err?.error ?? err?.message ?? 'Invalid email or password');
+      console.error('Login error:', err);
+      const message =
+        err?.error ??
+        err?.message ??
+        (typeof err === 'string' ? err : 'Unable to sign in. Please verify your credentials.');
+      setError(message);
     } finally {
       setLoading(false);
     }

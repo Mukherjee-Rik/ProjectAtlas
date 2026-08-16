@@ -16,6 +16,8 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { PermissionsGuard } from '../auth/guards/permissions.guard';
 import { Permissions } from '../auth/decorators/permissions.decorator';
 import { PERMISSIONS } from '../auth/permissions/permissions';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import type { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 
 @ApiTags('Tenants')
 @ApiBearerAuth('access-token')
@@ -29,8 +31,9 @@ export class TenantsController {
 
   @Get()
   @Permissions(PERMISSIONS.TENANTS_READ)
-  async findAll() {
-    return this.tenantsService.findAll();
+  async findAll(@CurrentUser() user: AuthenticatedUser) {
+    // Scoped to the caller — see TenantsService.findAllForUser.
+    return this.tenantsService.findAllForUser(user.id, user.role);
   }
 
   @Get(':id')

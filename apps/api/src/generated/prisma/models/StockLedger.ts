@@ -1227,7 +1227,7 @@ export type $StockLedgerPayload<ExtArgs extends runtime.Types.Extensions.Interna
 export type StockLedgerGetPayload<S extends boolean | null | undefined | StockLedgerDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$StockLedgerPayload, S>
 
 export type StockLedgerCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<StockLedgerFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<StockLedgerFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: StockLedgerCountAggregateInputType | true
   }
 
@@ -1682,6 +1682,7 @@ export type StockLedgerFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.I
    * Filter, which StockLedger to fetch.
    */
   where: Prisma.StockLedgerWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1704,6 +1705,7 @@ export type StockLedgerFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Exten
    * Filter, which StockLedger to fetch.
    */
   where: Prisma.StockLedgerWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1756,6 +1758,7 @@ export type StockLedgerFindFirstArgs<ExtArgs extends runtime.Types.Extensions.In
    * Filter by unique combinations of StockLedgers.
    */
   distinct?: Prisma.StockLedgerScalarFieldEnum | Prisma.StockLedgerScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1808,6 +1811,7 @@ export type StockLedgerFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extens
    * Filter by unique combinations of StockLedgers.
    */
   distinct?: Prisma.StockLedgerScalarFieldEnum | Prisma.StockLedgerScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1860,6 +1864,7 @@ export type StockLedgerFindManyArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Filter by unique combinations of StockLedgers.
    */
   distinct?: Prisma.StockLedgerScalarFieldEnum | Prisma.StockLedgerScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1882,6 +1887,7 @@ export type StockLedgerCreateArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * The data needed to create a StockLedger.
    */
   data: Prisma.XOR<Prisma.StockLedgerCreateInput, Prisma.StockLedgerUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1942,6 +1948,7 @@ export type StockLedgerUpdateArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Choose, which StockLedger to update.
    */
   where: Prisma.StockLedgerWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -2020,6 +2027,7 @@ export type StockLedgerUpsertArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * In case the StockLedger was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.StockLedgerUpdateInput, Prisma.StockLedgerUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -2042,6 +2050,7 @@ export type StockLedgerDeleteArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Filter which StockLedger to delete.
    */
   where: Prisma.StockLedgerWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

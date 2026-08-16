@@ -7,12 +7,14 @@ import { PrismaService } from '../../database/prisma/prisma.service';
 import { CreateMembershipDto } from './dto/create-membership.dto';
 import { UpdateMembershipDto } from './dto/update-membership.dto';
 import { SubscriptionUsageService } from '../subscriptions/subscription-usage.service';
+import { CacheKeys, TtlCacheService } from '../../common/cache/ttl-cache.service';
 
 @Injectable()
 export class TenantMembershipsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly subscriptionUsageService: SubscriptionUsageService,
+    private readonly cache: TtlCacheService,
   ) {}
 
   async create(createMembershipDto: CreateMembershipDto) {
@@ -183,7 +185,7 @@ export class TenantMembershipsService {
       throw new NotFoundException('Tenant membership not found');
     }
 
-    return this.prisma.tenantMembership.update({
+    const updated = await this.prisma.tenantMembership.update({
       where: { id },
       data: {
         role: updateMembershipDto.role,
@@ -197,6 +199,12 @@ export class TenantMembershipsService {
         updatedAt: true,
       },
     });
+
+    this.cache.invalidate(
+      CacheKeys.membership(existing.userId, existing.tenantId),
+    );
+
+    return updated;
   }
 
   async remove(id: string) {
@@ -208,7 +216,7 @@ export class TenantMembershipsService {
       throw new NotFoundException('Tenant membership not found');
     }
 
-    return this.prisma.tenantMembership.delete({
+    const removed = await this.prisma.tenantMembership.delete({
       where: { id },
       select: {
         id: true,
@@ -216,5 +224,12 @@ export class TenantMembershipsService {
         tenantId: true,
       },
     });
+
+    // Revoking membership must take away tenant access immediately.
+    this.cache.invalidate(
+      CacheKeys.membership(removed.userId, removed.tenantId),
+    );
+
+    return removed;
   }
 }

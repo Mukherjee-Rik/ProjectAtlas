@@ -56,9 +56,17 @@ export class OrdersController {
     @CurrentRestaurant() restaurant: CurrentRestaurantType,
     @CurrentBranch() branch?: CurrentBranchType,
     @Query('status') status?: OrderStatus,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
   ) {
     if (!restaurant) throw new BadRequestException('No active restaurant selected');
-    return this.ordersService.findRestaurantOrders(restaurant.id, branch?.id, status);
+    return this.ordersService.findRestaurantOrders(
+      restaurant.id,
+      branch?.id,
+      status,
+      page ? Number(page) : undefined,
+      limit ? Number(limit) : undefined,
+    );
   }
 
   @Get(':id')

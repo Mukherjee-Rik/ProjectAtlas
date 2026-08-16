@@ -703,7 +703,7 @@ export type $SupplierPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
 export type SupplierGetPayload<S extends boolean | null | undefined | SupplierDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$SupplierPayload, S>
 
 export type SupplierCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<SupplierFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<SupplierFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: SupplierCountAggregateInputType | true
   }
 
@@ -1154,6 +1154,7 @@ export type SupplierFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Filter, which Supplier to fetch.
    */
   where: Prisma.SupplierWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1176,6 +1177,7 @@ export type SupplierFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensio
    * Filter, which Supplier to fetch.
    */
   where: Prisma.SupplierWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1228,6 +1230,7 @@ export type SupplierFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Filter by unique combinations of Suppliers.
    */
   distinct?: Prisma.SupplierScalarFieldEnum | Prisma.SupplierScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1280,6 +1283,7 @@ export type SupplierFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extension
    * Filter by unique combinations of Suppliers.
    */
   distinct?: Prisma.SupplierScalarFieldEnum | Prisma.SupplierScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1332,6 +1336,7 @@ export type SupplierFindManyArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Filter by unique combinations of Suppliers.
    */
   distinct?: Prisma.SupplierScalarFieldEnum | Prisma.SupplierScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1354,6 +1359,7 @@ export type SupplierCreateArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * The data needed to create a Supplier.
    */
   data: Prisma.XOR<Prisma.SupplierCreateInput, Prisma.SupplierUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1410,6 +1416,7 @@ export type SupplierUpdateArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Choose, which Supplier to update.
    */
   where: Prisma.SupplierWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1484,6 +1491,7 @@ export type SupplierUpsertArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * In case the Supplier was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.SupplierUpdateInput, Prisma.SupplierUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1506,6 +1514,7 @@ export type SupplierDeleteArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Filter which Supplier to delete.
    */
   where: Prisma.SupplierWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

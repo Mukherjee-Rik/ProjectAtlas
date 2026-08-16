@@ -548,7 +548,7 @@ export type $CartItemVariantPayload<ExtArgs extends runtime.Types.Extensions.Int
 export type CartItemVariantGetPayload<S extends boolean | null | undefined | CartItemVariantDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$CartItemVariantPayload, S>
 
 export type CartItemVariantCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<CartItemVariantFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<CartItemVariantFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: CartItemVariantCountAggregateInputType | true
   }
 
@@ -994,6 +994,7 @@ export type CartItemVariantFindUniqueArgs<ExtArgs extends runtime.Types.Extensio
    * Filter, which CartItemVariant to fetch.
    */
   where: Prisma.CartItemVariantWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1016,6 +1017,7 @@ export type CartItemVariantFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.E
    * Filter, which CartItemVariant to fetch.
    */
   where: Prisma.CartItemVariantWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1068,6 +1070,7 @@ export type CartItemVariantFindFirstArgs<ExtArgs extends runtime.Types.Extension
    * Filter by unique combinations of CartItemVariants.
    */
   distinct?: Prisma.CartItemVariantScalarFieldEnum | Prisma.CartItemVariantScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1120,6 +1123,7 @@ export type CartItemVariantFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Ex
    * Filter by unique combinations of CartItemVariants.
    */
   distinct?: Prisma.CartItemVariantScalarFieldEnum | Prisma.CartItemVariantScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1172,6 +1176,7 @@ export type CartItemVariantFindManyArgs<ExtArgs extends runtime.Types.Extensions
    * Filter by unique combinations of CartItemVariants.
    */
   distinct?: Prisma.CartItemVariantScalarFieldEnum | Prisma.CartItemVariantScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1194,6 +1199,7 @@ export type CartItemVariantCreateArgs<ExtArgs extends runtime.Types.Extensions.I
    * The data needed to create a CartItemVariant.
    */
   data: Prisma.XOR<Prisma.CartItemVariantCreateInput, Prisma.CartItemVariantUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1254,6 +1260,7 @@ export type CartItemVariantUpdateArgs<ExtArgs extends runtime.Types.Extensions.I
    * Choose, which CartItemVariant to update.
    */
   where: Prisma.CartItemVariantWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1332,6 +1339,7 @@ export type CartItemVariantUpsertArgs<ExtArgs extends runtime.Types.Extensions.I
    * In case the CartItemVariant was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.CartItemVariantUpdateInput, Prisma.CartItemVariantUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1354,6 +1362,7 @@ export type CartItemVariantDeleteArgs<ExtArgs extends runtime.Types.Extensions.I
    * Filter which CartItemVariant to delete.
    */
   where: Prisma.CartItemVariantWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

@@ -572,7 +572,7 @@ export type $RestaurantDeliveryProviderPayload<ExtArgs extends runtime.Types.Ext
 export type RestaurantDeliveryProviderGetPayload<S extends boolean | null | undefined | RestaurantDeliveryProviderDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$RestaurantDeliveryProviderPayload, S>
 
 export type RestaurantDeliveryProviderCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<RestaurantDeliveryProviderFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<RestaurantDeliveryProviderFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: RestaurantDeliveryProviderCountAggregateInputType | true
   }
 
@@ -1020,6 +1020,7 @@ export type RestaurantDeliveryProviderFindUniqueArgs<ExtArgs extends runtime.Typ
    * Filter, which RestaurantDeliveryProvider to fetch.
    */
   where: Prisma.RestaurantDeliveryProviderWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1042,6 +1043,7 @@ export type RestaurantDeliveryProviderFindUniqueOrThrowArgs<ExtArgs extends runt
    * Filter, which RestaurantDeliveryProvider to fetch.
    */
   where: Prisma.RestaurantDeliveryProviderWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1094,6 +1096,7 @@ export type RestaurantDeliveryProviderFindFirstArgs<ExtArgs extends runtime.Type
    * Filter by unique combinations of RestaurantDeliveryProviders.
    */
   distinct?: Prisma.RestaurantDeliveryProviderScalarFieldEnum | Prisma.RestaurantDeliveryProviderScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1146,6 +1149,7 @@ export type RestaurantDeliveryProviderFindFirstOrThrowArgs<ExtArgs extends runti
    * Filter by unique combinations of RestaurantDeliveryProviders.
    */
   distinct?: Prisma.RestaurantDeliveryProviderScalarFieldEnum | Prisma.RestaurantDeliveryProviderScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1198,6 +1202,7 @@ export type RestaurantDeliveryProviderFindManyArgs<ExtArgs extends runtime.Types
    * Filter by unique combinations of RestaurantDeliveryProviders.
    */
   distinct?: Prisma.RestaurantDeliveryProviderScalarFieldEnum | Prisma.RestaurantDeliveryProviderScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1220,6 +1225,7 @@ export type RestaurantDeliveryProviderCreateArgs<ExtArgs extends runtime.Types.E
    * The data needed to create a RestaurantDeliveryProvider.
    */
   data: Prisma.XOR<Prisma.RestaurantDeliveryProviderCreateInput, Prisma.RestaurantDeliveryProviderUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1280,6 +1286,7 @@ export type RestaurantDeliveryProviderUpdateArgs<ExtArgs extends runtime.Types.E
    * Choose, which RestaurantDeliveryProvider to update.
    */
   where: Prisma.RestaurantDeliveryProviderWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1358,6 +1365,7 @@ export type RestaurantDeliveryProviderUpsertArgs<ExtArgs extends runtime.Types.E
    * In case the RestaurantDeliveryProvider was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.RestaurantDeliveryProviderUpdateInput, Prisma.RestaurantDeliveryProviderUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1380,6 +1388,7 @@ export type RestaurantDeliveryProviderDeleteArgs<ExtArgs extends runtime.Types.E
    * Filter which RestaurantDeliveryProvider to delete.
    */
   where: Prisma.RestaurantDeliveryProviderWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

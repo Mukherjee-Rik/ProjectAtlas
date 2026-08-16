@@ -8,12 +8,27 @@ import {
 } from '@nestjs/common';
 import { isUUID } from 'class-validator';
 import { PrismaService } from '../../../database/prisma/prisma.service';
+import {
+  CacheKeys,
+  CacheTtl,
+  TtlCacheService,
+} from '../../../common/cache/ttl-cache.service';
 import { TENANT_HEADER } from '../constants/tenant.constants';
 import type { CurrentTenant } from '../types/current-tenant.type';
 
+const TENANT_SELECT = {
+  id: true,
+  name: true,
+  slug: true,
+  status: true,
+} as const;
+
 @Injectable()
 export class TenantAccessGuard implements CanActivate {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly cache: TtlCacheService,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
@@ -33,15 +48,15 @@ export class TenantAccessGuard implements CanActivate {
         request.body?.tenantId;
 
       if (tenantId && isUUID(tenantId)) {
-        const tenant = await this.prisma.tenant.findUnique({
-          where: { id: tenantId },
-          select: {
-            id: true,
-            name: true,
-            slug: true,
-            status: true,
-          },
-        });
+        const tenant = await this.cache.wrap(
+          CacheKeys.tenant(tenantId),
+          CacheTtl.tenant,
+          () =>
+            this.prisma.tenant.findUnique({
+              where: { id: tenantId },
+              select: TENANT_SELECT,
+            }),
+        );
         if (tenant) {
           request.tenant = {
             id: tenant.id,
@@ -69,39 +84,45 @@ export class TenantAccessGuard implements CanActivate {
       throw new BadRequestException('Invalid tenant ID');
     }
 
-    const tenant = await this.prisma.tenant.findUnique({
-      where: { id: tenantId },
-      select: {
-        id: true,
-        name: true,
-        slug: true,
-        status: true,
-      },
-    });
+    // One query resolves both "does this tenant exist" and "may this user use
+    // it" — the membership row carries the tenant. Previously these were two
+    // sequential round trips on every single request.
+    const membership = await this.cache.wrap(
+      CacheKeys.membership(user.id, tenantId),
+      CacheTtl.membership,
+      () =>
+        this.prisma.tenantMembership.findUnique({
+          where: { userId_tenantId: { userId: user.id, tenantId } },
+          select: { id: true, tenant: { select: TENANT_SELECT } },
+        }),
+    );
 
-    if (!tenant) {
-      throw new NotFoundException('Tenant not found');
+    if (!membership) {
+      // Only on the failure path do we pay a second query, so an unknown
+      // tenant still reports 404 rather than a misleading 403.
+      const tenantExists = await this.cache.wrap(
+        CacheKeys.tenant(tenantId),
+        CacheTtl.tenant,
+        () =>
+          this.prisma.tenant.findUnique({
+            where: { id: tenantId },
+            select: TENANT_SELECT,
+          }),
+      );
+
+      if (!tenantExists) {
+        throw new NotFoundException('Tenant not found');
+      }
+
+      throw new ForbiddenException('You do not have access to this tenant');
     }
 
     const currentTenant: CurrentTenant = {
-      id: tenant.id,
-      name: tenant.name,
-      slug: tenant.slug,
-      status: tenant.status,
+      id: membership.tenant.id,
+      name: membership.tenant.name,
+      slug: membership.tenant.slug,
+      status: membership.tenant.status,
     };
-
-    const membership = await this.prisma.tenantMembership.findUnique({
-      where: {
-        userId_tenantId: {
-          userId: user.id,
-          tenantId,
-        },
-      },
-    });
-
-    if (!membership) {
-      throw new ForbiddenException('You do not have access to this tenant');
-    }
 
     request.tenant = currentTenant;
     return true;

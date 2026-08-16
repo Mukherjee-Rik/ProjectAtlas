@@ -1036,7 +1036,7 @@ export type $CartItemPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
 export type CartItemGetPayload<S extends boolean | null | undefined | CartItemDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$CartItemPayload, S>
 
 export type CartItemCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<CartItemFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<CartItemFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: CartItemCountAggregateInputType | true
   }
 
@@ -1488,6 +1488,7 @@ export type CartItemFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Filter, which CartItem to fetch.
    */
   where: Prisma.CartItemWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1510,6 +1511,7 @@ export type CartItemFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensio
    * Filter, which CartItem to fetch.
    */
   where: Prisma.CartItemWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1562,6 +1564,7 @@ export type CartItemFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Filter by unique combinations of CartItems.
    */
   distinct?: Prisma.CartItemScalarFieldEnum | Prisma.CartItemScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1614,6 +1617,7 @@ export type CartItemFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extension
    * Filter by unique combinations of CartItems.
    */
   distinct?: Prisma.CartItemScalarFieldEnum | Prisma.CartItemScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1666,6 +1670,7 @@ export type CartItemFindManyArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Filter by unique combinations of CartItems.
    */
   distinct?: Prisma.CartItemScalarFieldEnum | Prisma.CartItemScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1688,6 +1693,7 @@ export type CartItemCreateArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * The data needed to create a CartItem.
    */
   data: Prisma.XOR<Prisma.CartItemCreateInput, Prisma.CartItemUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1748,6 +1754,7 @@ export type CartItemUpdateArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Choose, which CartItem to update.
    */
   where: Prisma.CartItemWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1826,6 +1833,7 @@ export type CartItemUpsertArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * In case the CartItem was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.CartItemUpdateInput, Prisma.CartItemUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1848,6 +1856,7 @@ export type CartItemDeleteArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Filter which CartItem to delete.
    */
   where: Prisma.CartItemWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

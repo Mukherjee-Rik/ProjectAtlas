@@ -910,7 +910,7 @@ export type $CustomerSessionPayload<ExtArgs extends runtime.Types.Extensions.Int
 export type CustomerSessionGetPayload<S extends boolean | null | undefined | CustomerSessionDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$CustomerSessionPayload, S>
 
 export type CustomerSessionCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<CustomerSessionFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<CustomerSessionFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: CustomerSessionCountAggregateInputType | true
   }
 
@@ -1361,6 +1361,7 @@ export type CustomerSessionFindUniqueArgs<ExtArgs extends runtime.Types.Extensio
    * Filter, which CustomerSession to fetch.
    */
   where: Prisma.CustomerSessionWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1383,6 +1384,7 @@ export type CustomerSessionFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.E
    * Filter, which CustomerSession to fetch.
    */
   where: Prisma.CustomerSessionWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1435,6 +1437,7 @@ export type CustomerSessionFindFirstArgs<ExtArgs extends runtime.Types.Extension
    * Filter by unique combinations of CustomerSessions.
    */
   distinct?: Prisma.CustomerSessionScalarFieldEnum | Prisma.CustomerSessionScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1487,6 +1490,7 @@ export type CustomerSessionFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Ex
    * Filter by unique combinations of CustomerSessions.
    */
   distinct?: Prisma.CustomerSessionScalarFieldEnum | Prisma.CustomerSessionScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1539,6 +1543,7 @@ export type CustomerSessionFindManyArgs<ExtArgs extends runtime.Types.Extensions
    * Filter by unique combinations of CustomerSessions.
    */
   distinct?: Prisma.CustomerSessionScalarFieldEnum | Prisma.CustomerSessionScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1561,6 +1566,7 @@ export type CustomerSessionCreateArgs<ExtArgs extends runtime.Types.Extensions.I
    * The data needed to create a CustomerSession.
    */
   data: Prisma.XOR<Prisma.CustomerSessionCreateInput, Prisma.CustomerSessionUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1621,6 +1627,7 @@ export type CustomerSessionUpdateArgs<ExtArgs extends runtime.Types.Extensions.I
    * Choose, which CustomerSession to update.
    */
   where: Prisma.CustomerSessionWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1699,6 +1706,7 @@ export type CustomerSessionUpsertArgs<ExtArgs extends runtime.Types.Extensions.I
    * In case the CustomerSession was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.CustomerSessionUpdateInput, Prisma.CustomerSessionUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1721,6 +1729,7 @@ export type CustomerSessionDeleteArgs<ExtArgs extends runtime.Types.Extensions.I
    * Filter which CustomerSession to delete.
    */
   where: Prisma.CustomerSessionWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

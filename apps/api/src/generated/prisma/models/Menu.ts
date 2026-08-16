@@ -702,7 +702,7 @@ export type $MenuPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
 export type MenuGetPayload<S extends boolean | null | undefined | MenuDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$MenuPayload, S>
 
 export type MenuCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<MenuFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<MenuFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: MenuCountAggregateInputType | true
   }
 
@@ -1151,6 +1151,7 @@ export type MenuFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Filter, which Menu to fetch.
    */
   where: Prisma.MenuWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1173,6 +1174,7 @@ export type MenuFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensions.I
    * Filter, which Menu to fetch.
    */
   where: Prisma.MenuWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1225,6 +1227,7 @@ export type MenuFindFirstArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Filter by unique combinations of Menus.
    */
   distinct?: Prisma.MenuScalarFieldEnum | Prisma.MenuScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1277,6 +1280,7 @@ export type MenuFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions.In
    * Filter by unique combinations of Menus.
    */
   distinct?: Prisma.MenuScalarFieldEnum | Prisma.MenuScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1329,6 +1333,7 @@ export type MenuFindManyArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
    * Filter by unique combinations of Menus.
    */
   distinct?: Prisma.MenuScalarFieldEnum | Prisma.MenuScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1351,6 +1356,7 @@ export type MenuCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
    * The data needed to create a Menu.
    */
   data: Prisma.XOR<Prisma.MenuCreateInput, Prisma.MenuUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1411,6 +1417,7 @@ export type MenuUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
    * Choose, which Menu to update.
    */
   where: Prisma.MenuWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1489,6 +1496,7 @@ export type MenuUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
    * In case the Menu was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.MenuUpdateInput, Prisma.MenuUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1511,6 +1519,7 @@ export type MenuDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
    * Filter which Menu to delete.
    */
   where: Prisma.MenuWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

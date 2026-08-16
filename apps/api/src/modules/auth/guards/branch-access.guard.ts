@@ -8,12 +8,20 @@ import {
 } from '@nestjs/common';
 import { isUUID } from 'class-validator';
 import { PrismaService } from '../../../database/prisma/prisma.service';
+import {
+  CacheKeys,
+  CacheTtl,
+  TtlCacheService,
+} from '../../../common/cache/ttl-cache.service';
 import { BRANCH_HEADER } from '../constants/tenant.constants';
 import type { CurrentBranch } from '../types/current-branch.type';
 
 @Injectable()
 export class BranchAccessGuard implements CanActivate {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly cache: TtlCacheService,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
@@ -33,21 +41,26 @@ export class BranchAccessGuard implements CanActivate {
       throw new BadRequestException('Invalid branch ID');
     }
 
-    const branch = await this.prisma.branch.findUnique({
-      where: { id: branchId },
-      select: {
-        id: true,
-        name: true,
-        code: true,
-        restaurantId: true,
-        restaurant: {
+    const branch = await this.cache.wrap(
+      CacheKeys.branch(branchId),
+      CacheTtl.branch,
+      () =>
+        this.prisma.branch.findUnique({
+          where: { id: branchId },
           select: {
             id: true,
-            tenantId: true,
+            name: true,
+            code: true,
+            restaurantId: true,
+            restaurant: {
+              select: {
+                id: true,
+                tenantId: true,
+              },
+            },
           },
-        },
-      },
-    });
+        }),
+    );
 
     if (!branch) {
       throw new NotFoundException('Branch not found');

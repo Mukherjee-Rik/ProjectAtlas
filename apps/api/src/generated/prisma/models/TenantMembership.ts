@@ -669,7 +669,7 @@ export type $TenantMembershipPayload<ExtArgs extends runtime.Types.Extensions.In
 export type TenantMembershipGetPayload<S extends boolean | null | undefined | TenantMembershipDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$TenantMembershipPayload, S>
 
 export type TenantMembershipCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<TenantMembershipFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<TenantMembershipFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: TenantMembershipCountAggregateInputType | true
   }
 
@@ -1117,6 +1117,7 @@ export type TenantMembershipFindUniqueArgs<ExtArgs extends runtime.Types.Extensi
    * Filter, which TenantMembership to fetch.
    */
   where: Prisma.TenantMembershipWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1139,6 +1140,7 @@ export type TenantMembershipFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.
    * Filter, which TenantMembership to fetch.
    */
   where: Prisma.TenantMembershipWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1191,6 +1193,7 @@ export type TenantMembershipFindFirstArgs<ExtArgs extends runtime.Types.Extensio
    * Filter by unique combinations of TenantMemberships.
    */
   distinct?: Prisma.TenantMembershipScalarFieldEnum | Prisma.TenantMembershipScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1243,6 +1246,7 @@ export type TenantMembershipFindFirstOrThrowArgs<ExtArgs extends runtime.Types.E
    * Filter by unique combinations of TenantMemberships.
    */
   distinct?: Prisma.TenantMembershipScalarFieldEnum | Prisma.TenantMembershipScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1295,6 +1299,7 @@ export type TenantMembershipFindManyArgs<ExtArgs extends runtime.Types.Extension
    * Filter by unique combinations of TenantMemberships.
    */
   distinct?: Prisma.TenantMembershipScalarFieldEnum | Prisma.TenantMembershipScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1317,6 +1322,7 @@ export type TenantMembershipCreateArgs<ExtArgs extends runtime.Types.Extensions.
    * The data needed to create a TenantMembership.
    */
   data: Prisma.XOR<Prisma.TenantMembershipCreateInput, Prisma.TenantMembershipUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1377,6 +1383,7 @@ export type TenantMembershipUpdateArgs<ExtArgs extends runtime.Types.Extensions.
    * Choose, which TenantMembership to update.
    */
   where: Prisma.TenantMembershipWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1455,6 +1462,7 @@ export type TenantMembershipUpsertArgs<ExtArgs extends runtime.Types.Extensions.
    * In case the TenantMembership was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.TenantMembershipUpdateInput, Prisma.TenantMembershipUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1477,6 +1485,7 @@ export type TenantMembershipDeleteArgs<ExtArgs extends runtime.Types.Extensions.
    * Filter which TenantMembership to delete.
    */
   where: Prisma.TenantMembershipWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

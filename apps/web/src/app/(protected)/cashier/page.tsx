@@ -79,7 +79,7 @@ export default function CashierPage() {
     }
     setError('');
     try {
-      const [tablesRes, paymentsRes, reqsRes, refundsRes, cancelledRes] = await Promise.all([
+      const results = await Promise.allSettled([
         getTables(),
         getPayments(),
         getCancellationRequests(),
@@ -87,11 +87,19 @@ export default function CashierPage() {
         getOrders('CANCELLED'),
       ]);
 
-      const fetchedTables = Array.isArray(tablesRes) ? tablesRes : tablesRes?.data ?? [];
-      const fetchedPayments = Array.isArray(paymentsRes) ? paymentsRes : paymentsRes?.data ?? [];
-      const fetchedRequests = Array.isArray(reqsRes) ? reqsRes : reqsRes?.data ?? [];
-      const fetchedRefunds = Array.isArray(refundsRes) ? refundsRes : refundsRes?.data ?? [];
-      const fetchedCancelled = Array.isArray(cancelledRes) ? cancelledRes : cancelledRes?.data ?? [];
+      const [tablesRes, paymentsRes, reqsRes, refundsRes, cancelledRes] = results;
+
+      const rawTables = tablesRes.status === 'fulfilled' ? tablesRes.value : [];
+      const rawPayments = paymentsRes.status === 'fulfilled' ? paymentsRes.value : [];
+      const rawReqs = reqsRes.status === 'fulfilled' ? reqsRes.value : [];
+      const rawRefunds = refundsRes.status === 'fulfilled' ? refundsRes.value : [];
+      const rawCancelled = cancelledRes.status === 'fulfilled' ? cancelledRes.value : [];
+
+      const fetchedTables = Array.isArray(rawTables) ? rawTables : (rawTables as any)?.data ?? [];
+      const fetchedPayments = Array.isArray(rawPayments) ? rawPayments : (rawPayments as any)?.data ?? [];
+      const fetchedRequests = Array.isArray(rawReqs) ? rawReqs : (rawReqs as any)?.data ?? [];
+      const fetchedRefunds = Array.isArray(rawRefunds) ? rawRefunds : (rawRefunds as any)?.data ?? [];
+      const fetchedCancelled = Array.isArray(rawCancelled) ? rawCancelled : (rawCancelled as any)?.data ?? [];
 
       setTables(fetchedTables);
       setPayments(fetchedPayments);
@@ -102,7 +110,7 @@ export default function CashierPage() {
       DataCache.set(`tables_${currentBranch.id}`, fetchedTables);
       DataCache.set(`payments_${currentRestaurant.id}`, fetchedPayments);
     } catch (err: any) {
-      console.error(err);
+      console.error('Cashier load error:', err);
       if (!cachedTables) {
         setError(err?.message ?? 'Failed to load cashier data.');
       }
@@ -341,11 +349,11 @@ export default function CashierPage() {
         </div>
 
         {/* Main Tabs Navigation */}
-        <div className="flex rounded-xl bg-[#111820] p-1 border border-[#26313C]">
+        <div className="flex rounded-xl bg-[#111820] p-1 border border-[#26313C] overflow-x-auto no-scrollbar touch-pan-x flex-nowrap">
           <button
             type="button"
             onClick={() => setActiveMainTab('POS')}
-            className={`flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-bold transition-all ${
+            className={`flex items-center gap-2 rounded-lg px-3.5 sm:px-4 py-2 text-xs font-bold transition-all whitespace-nowrap shrink-0 ${
               activeMainTab === 'POS'
                 ? 'bg-[#2AFEB7] text-[#0B0F14] shadow-sm'
                 : 'text-[#9AA6B2] hover:text-[#F5F7FA]'
@@ -360,7 +368,7 @@ export default function CashierPage() {
           <button
             type="button"
             onClick={() => setActiveMainTab('REFUNDS_CANCELLATIONS')}
-            className={`flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-bold transition-all ${
+            className={`flex items-center gap-2 rounded-lg px-3.5 sm:px-4 py-2 text-xs font-bold transition-all whitespace-nowrap shrink-0 ${
               activeMainTab === 'REFUNDS_CANCELLATIONS'
                 ? 'bg-[#2AFEB7] text-[#0B0F14] shadow-sm'
                 : 'text-[#9AA6B2] hover:text-[#F5F7FA]'
@@ -377,7 +385,7 @@ export default function CashierPage() {
           <button
             type="button"
             onClick={() => setActiveMainTab('LEDGER')}
-            className={`flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-bold transition-all ${
+            className={`flex items-center gap-2 rounded-lg px-3.5 sm:px-4 py-2 text-xs font-bold transition-all whitespace-nowrap shrink-0 ${
               activeMainTab === 'LEDGER'
                 ? 'bg-[#2AFEB7] text-[#0B0F14] shadow-sm'
                 : 'text-[#9AA6B2] hover:text-[#F5F7FA]'
@@ -621,11 +629,11 @@ export default function CashierPage() {
       {activeMainTab === 'REFUNDS_CANCELLATIONS' && (
         <div className="space-y-5">
           {/* Sub Tabs */}
-          <div className="flex gap-2 border-b border-[#26313C] pb-3">
+          <div className="flex gap-2 border-b border-[#26313C] pb-3 overflow-x-auto no-scrollbar touch-pan-x flex-nowrap">
             <button
               type="button"
               onClick={() => setRefundSubTab('REQUESTS')}
-              className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-bold transition-all ${
+              className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-bold transition-all whitespace-nowrap shrink-0 ${
                 refundSubTab === 'REQUESTS'
                   ? 'bg-[#18212B] text-[#2AFEB7] border border-[#2AFEB7]/30'
                   : 'text-[#9AA6B2] hover:text-[#F5F7FA]'
@@ -642,7 +650,7 @@ export default function CashierPage() {
             <button
               type="button"
               onClick={() => setRefundSubTab('REFUND_HISTORY')}
-              className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-bold transition-all ${
+              className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-bold transition-all whitespace-nowrap shrink-0 ${
                 refundSubTab === 'REFUND_HISTORY'
                   ? 'bg-[#18212B] text-[#2AFEB7] border border-[#2AFEB7]/30'
                   : 'text-[#9AA6B2] hover:text-[#F5F7FA]'
@@ -654,7 +662,7 @@ export default function CashierPage() {
             <button
               type="button"
               onClick={() => setRefundSubTab('CANCELLED_ORDERS')}
-              className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-bold transition-all ${
+              className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-bold transition-all whitespace-nowrap shrink-0 ${
                 refundSubTab === 'CANCELLED_ORDERS'
                   ? 'bg-[#18212B] text-[#2AFEB7] border border-[#2AFEB7]/30'
                   : 'text-[#9AA6B2] hover:text-[#F5F7FA]'
@@ -754,8 +762,8 @@ export default function CashierPage() {
 
           {/* SUB-VIEW: REFUND HISTORY */}
           {refundSubTab === 'REFUND_HISTORY' && (
-            <div className="overflow-x-auto rounded-xl border border-[#26313C] bg-[#111820]">
-              <table className="w-full text-left text-xs text-[#9AA6B2]">
+            <div className="table-responsive rounded-xl border border-[#26313C] bg-[#111820]">
+              <table className="w-full min-w-[700px] text-left text-xs text-[#9AA6B2]">
                 <thead className="bg-[#18212B] font-bold uppercase text-[#F5F7FA] border-b border-[#26313C]">
                   <tr>
                     <th className="py-3 px-4">Processed At</th>
@@ -808,8 +816,8 @@ export default function CashierPage() {
 
           {/* SUB-VIEW: CANCELLED ORDERS */}
           {refundSubTab === 'CANCELLED_ORDERS' && (
-            <div className="overflow-x-auto rounded-xl border border-[#26313C] bg-[#111820]">
-              <table className="w-full text-left text-xs text-[#9AA6B2]">
+            <div className="table-responsive rounded-xl border border-[#26313C] bg-[#111820]">
+              <table className="w-full min-w-[700px] text-left text-xs text-[#9AA6B2]">
                 <thead className="bg-[#18212B] font-bold uppercase text-[#F5F7FA] border-b border-[#26313C]">
                   <tr>
                     <th className="py-3 px-4">Cancelled At</th>
@@ -860,8 +868,8 @@ export default function CashierPage() {
 
       {/* TAB 3: PAYMENTS LEDGER */}
       {activeMainTab === 'LEDGER' && (
-        <div className="overflow-x-auto rounded-xl border border-[#26313C] bg-[#111820]">
-          <table className="w-full text-left text-xs text-[#9AA6B2]">
+        <div className="table-responsive rounded-xl border border-[#26313C] bg-[#111820]">
+          <table className="w-full min-w-[800px] text-left text-xs text-[#9AA6B2]">
             <thead className="bg-[#18212B] font-bold uppercase text-[#F5F7FA] border-b border-[#26313C]">
               <tr>
                 <th className="py-3 px-4">Paid At</th>

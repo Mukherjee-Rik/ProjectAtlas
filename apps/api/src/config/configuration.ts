@@ -18,6 +18,11 @@ export const configuration = () => ({
   },
 
   cors: {
-    origin: process.env.CORS_ORIGIN ?? 'http://localhost:3001',
+    // Comma-separated allowlist, e.g. "https://app.example.com,https://admin.example.com".
+    // Empty means "reflect the requesting origin" — see main.ts for the warning.
+    origins: (process.env.CORS_ORIGIN ?? '')
+      .split(',')
+      .map((origin) => origin.trim())
+      .filter(Boolean),
   },
 });

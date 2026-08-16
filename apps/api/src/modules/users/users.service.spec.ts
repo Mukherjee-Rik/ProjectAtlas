@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from './users.service';
 import { PrismaService } from '../../database/prisma/prisma.service';
+import { TtlCacheService } from '../../common/cache/ttl-cache.service';
 
 describe('UsersService', () => {
   let service: UsersService;
@@ -24,6 +25,7 @@ describe('UsersService', () => {
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
+        TtlCacheService,
         UsersService,
         { provide: PrismaService, useValue: prismaService },
       ],

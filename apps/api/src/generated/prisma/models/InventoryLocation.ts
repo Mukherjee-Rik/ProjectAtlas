@@ -639,7 +639,7 @@ export type $InventoryLocationPayload<ExtArgs extends runtime.Types.Extensions.I
 export type InventoryLocationGetPayload<S extends boolean | null | undefined | InventoryLocationDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$InventoryLocationPayload, S>
 
 export type InventoryLocationCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<InventoryLocationFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<InventoryLocationFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: InventoryLocationCountAggregateInputType | true
   }
 
@@ -1088,6 +1088,7 @@ export type InventoryLocationFindUniqueArgs<ExtArgs extends runtime.Types.Extens
    * Filter, which InventoryLocation to fetch.
    */
   where: Prisma.InventoryLocationWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1110,6 +1111,7 @@ export type InventoryLocationFindUniqueOrThrowArgs<ExtArgs extends runtime.Types
    * Filter, which InventoryLocation to fetch.
    */
   where: Prisma.InventoryLocationWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1162,6 +1164,7 @@ export type InventoryLocationFindFirstArgs<ExtArgs extends runtime.Types.Extensi
    * Filter by unique combinations of InventoryLocations.
    */
   distinct?: Prisma.InventoryLocationScalarFieldEnum | Prisma.InventoryLocationScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1214,6 +1217,7 @@ export type InventoryLocationFindFirstOrThrowArgs<ExtArgs extends runtime.Types.
    * Filter by unique combinations of InventoryLocations.
    */
   distinct?: Prisma.InventoryLocationScalarFieldEnum | Prisma.InventoryLocationScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1266,6 +1270,7 @@ export type InventoryLocationFindManyArgs<ExtArgs extends runtime.Types.Extensio
    * Filter by unique combinations of InventoryLocations.
    */
   distinct?: Prisma.InventoryLocationScalarFieldEnum | Prisma.InventoryLocationScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1288,6 +1293,7 @@ export type InventoryLocationCreateArgs<ExtArgs extends runtime.Types.Extensions
    * The data needed to create a InventoryLocation.
    */
   data: Prisma.XOR<Prisma.InventoryLocationCreateInput, Prisma.InventoryLocationUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1344,6 +1350,7 @@ export type InventoryLocationUpdateArgs<ExtArgs extends runtime.Types.Extensions
    * Choose, which InventoryLocation to update.
    */
   where: Prisma.InventoryLocationWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1418,6 +1425,7 @@ export type InventoryLocationUpsertArgs<ExtArgs extends runtime.Types.Extensions
    * In case the InventoryLocation was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.InventoryLocationUpdateInput, Prisma.InventoryLocationUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1440,6 +1448,7 @@ export type InventoryLocationDeleteArgs<ExtArgs extends runtime.Types.Extensions
    * Filter which InventoryLocation to delete.
    */
   where: Prisma.InventoryLocationWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

@@ -784,7 +784,7 @@ export type $TaxRatePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
 export type TaxRateGetPayload<S extends boolean | null | undefined | TaxRateDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$TaxRatePayload, S>
 
 export type TaxRateCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<TaxRateFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<TaxRateFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: TaxRateCountAggregateInputType | true
   }
 
@@ -1234,6 +1234,7 @@ export type TaxRateFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Filter, which TaxRate to fetch.
    */
   where: Prisma.TaxRateWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1256,6 +1257,7 @@ export type TaxRateFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extension
    * Filter, which TaxRate to fetch.
    */
   where: Prisma.TaxRateWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1308,6 +1310,7 @@ export type TaxRateFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Filter by unique combinations of TaxRates.
    */
   distinct?: Prisma.TaxRateScalarFieldEnum | Prisma.TaxRateScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1360,6 +1363,7 @@ export type TaxRateFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions
    * Filter by unique combinations of TaxRates.
    */
   distinct?: Prisma.TaxRateScalarFieldEnum | Prisma.TaxRateScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1412,6 +1416,7 @@ export type TaxRateFindManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Filter by unique combinations of TaxRates.
    */
   distinct?: Prisma.TaxRateScalarFieldEnum | Prisma.TaxRateScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1434,6 +1439,7 @@ export type TaxRateCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * The data needed to create a TaxRate.
    */
   data: Prisma.XOR<Prisma.TaxRateCreateInput, Prisma.TaxRateUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1494,6 +1500,7 @@ export type TaxRateUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Choose, which TaxRate to update.
    */
   where: Prisma.TaxRateWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1572,6 +1579,7 @@ export type TaxRateUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * In case the TaxRate was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.TaxRateUpdateInput, Prisma.TaxRateUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1594,6 +1602,7 @@ export type TaxRateDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Filter which TaxRate to delete.
    */
   where: Prisma.TaxRateWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

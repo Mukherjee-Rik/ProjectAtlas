@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { DashboardController } from './dashboard.controller';
 import { DashboardService } from './dashboard.service';
 import { PrismaService } from '../../database/prisma/prisma.service';
+import { TtlCacheService } from '../../common/cache/ttl-cache.service';
 
 describe('DashboardController', () => {
   let controller: DashboardController;
@@ -18,6 +19,7 @@ describe('DashboardController', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [DashboardController],
       providers: [
+        TtlCacheService,
         { provide: DashboardService, useValue: dashboardService },
         { provide: PrismaService, useValue: {} },
       ],

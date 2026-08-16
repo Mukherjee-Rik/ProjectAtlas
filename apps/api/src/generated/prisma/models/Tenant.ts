@@ -598,7 +598,7 @@ export type $TenantPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
 export type TenantGetPayload<S extends boolean | null | undefined | TenantDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$TenantPayload, S>
 
 export type TenantCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<TenantFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<TenantFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: TenantCountAggregateInputType | true
   }
 
@@ -1046,6 +1046,7 @@ export type TenantFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Filter, which Tenant to fetch.
    */
   where: Prisma.TenantWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1068,6 +1069,7 @@ export type TenantFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensions
    * Filter, which Tenant to fetch.
    */
   where: Prisma.TenantWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1120,6 +1122,7 @@ export type TenantFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Filter by unique combinations of Tenants.
    */
   distinct?: Prisma.TenantScalarFieldEnum | Prisma.TenantScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1172,6 +1175,7 @@ export type TenantFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions.
    * Filter by unique combinations of Tenants.
    */
   distinct?: Prisma.TenantScalarFieldEnum | Prisma.TenantScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1224,6 +1228,7 @@ export type TenantFindManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Filter by unique combinations of Tenants.
    */
   distinct?: Prisma.TenantScalarFieldEnum | Prisma.TenantScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1246,6 +1251,7 @@ export type TenantCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
    * The data needed to create a Tenant.
    */
   data: Prisma.XOR<Prisma.TenantCreateInput, Prisma.TenantUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1302,6 +1308,7 @@ export type TenantUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
    * Choose, which Tenant to update.
    */
   where: Prisma.TenantWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1376,6 +1383,7 @@ export type TenantUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
    * In case the Tenant was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.TenantUpdateInput, Prisma.TenantUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1398,6 +1406,7 @@ export type TenantDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
    * Filter which Tenant to delete.
    */
   where: Prisma.TenantWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

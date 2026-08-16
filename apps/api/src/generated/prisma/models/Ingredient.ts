@@ -1232,7 +1232,7 @@ export type $IngredientPayload<ExtArgs extends runtime.Types.Extensions.Internal
 export type IngredientGetPayload<S extends boolean | null | undefined | IngredientDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$IngredientPayload, S>
 
 export type IngredientCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<IngredientFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<IngredientFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: IngredientCountAggregateInputType | true
   }
 
@@ -1688,6 +1688,7 @@ export type IngredientFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.In
    * Filter, which Ingredient to fetch.
    */
   where: Prisma.IngredientWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1710,6 +1711,7 @@ export type IngredientFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extens
    * Filter, which Ingredient to fetch.
    */
   where: Prisma.IngredientWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1762,6 +1764,7 @@ export type IngredientFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Filter by unique combinations of Ingredients.
    */
   distinct?: Prisma.IngredientScalarFieldEnum | Prisma.IngredientScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1814,6 +1817,7 @@ export type IngredientFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensi
    * Filter by unique combinations of Ingredients.
    */
   distinct?: Prisma.IngredientScalarFieldEnum | Prisma.IngredientScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1866,6 +1870,7 @@ export type IngredientFindManyArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Filter by unique combinations of Ingredients.
    */
   distinct?: Prisma.IngredientScalarFieldEnum | Prisma.IngredientScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1888,6 +1893,7 @@ export type IngredientCreateArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * The data needed to create a Ingredient.
    */
   data: Prisma.XOR<Prisma.IngredientCreateInput, Prisma.IngredientUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1948,6 +1954,7 @@ export type IngredientUpdateArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Choose, which Ingredient to update.
    */
   where: Prisma.IngredientWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -2026,6 +2033,7 @@ export type IngredientUpsertArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * In case the Ingredient was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.IngredientUpdateInput, Prisma.IngredientUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -2048,6 +2056,7 @@ export type IngredientDeleteArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Filter which Ingredient to delete.
    */
   where: Prisma.IngredientWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

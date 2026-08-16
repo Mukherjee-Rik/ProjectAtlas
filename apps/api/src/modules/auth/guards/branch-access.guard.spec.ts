@@ -2,6 +2,7 @@ import { BadRequestException, ExecutionContext, ForbiddenException } from '@nest
 import { Test, TestingModule } from '@nestjs/testing';
 import { BranchAccessGuard } from './branch-access.guard';
 import { PrismaService } from '../../../database/prisma/prisma.service';
+import { TtlCacheService } from '../../../common/cache/ttl-cache.service';
 
 describe('BranchAccessGuard', () => {
   let guard: BranchAccessGuard;
@@ -21,6 +22,7 @@ describe('BranchAccessGuard', () => {
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
+        TtlCacheService,
         BranchAccessGuard,
         { provide: PrismaService, useValue: prismaService },
       ],

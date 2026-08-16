@@ -644,7 +644,7 @@ export type $AutomationExecutionPayload<ExtArgs extends runtime.Types.Extensions
 export type AutomationExecutionGetPayload<S extends boolean | null | undefined | AutomationExecutionDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$AutomationExecutionPayload, S>
 
 export type AutomationExecutionCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<AutomationExecutionFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<AutomationExecutionFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: AutomationExecutionCountAggregateInputType | true
   }
 
@@ -1093,6 +1093,7 @@ export type AutomationExecutionFindUniqueArgs<ExtArgs extends runtime.Types.Exte
    * Filter, which AutomationExecution to fetch.
    */
   where: Prisma.AutomationExecutionWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1115,6 +1116,7 @@ export type AutomationExecutionFindUniqueOrThrowArgs<ExtArgs extends runtime.Typ
    * Filter, which AutomationExecution to fetch.
    */
   where: Prisma.AutomationExecutionWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1167,6 +1169,7 @@ export type AutomationExecutionFindFirstArgs<ExtArgs extends runtime.Types.Exten
    * Filter by unique combinations of AutomationExecutions.
    */
   distinct?: Prisma.AutomationExecutionScalarFieldEnum | Prisma.AutomationExecutionScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1219,6 +1222,7 @@ export type AutomationExecutionFindFirstOrThrowArgs<ExtArgs extends runtime.Type
    * Filter by unique combinations of AutomationExecutions.
    */
   distinct?: Prisma.AutomationExecutionScalarFieldEnum | Prisma.AutomationExecutionScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1271,6 +1275,7 @@ export type AutomationExecutionFindManyArgs<ExtArgs extends runtime.Types.Extens
    * Filter by unique combinations of AutomationExecutions.
    */
   distinct?: Prisma.AutomationExecutionScalarFieldEnum | Prisma.AutomationExecutionScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1293,6 +1298,7 @@ export type AutomationExecutionCreateArgs<ExtArgs extends runtime.Types.Extensio
    * The data needed to create a AutomationExecution.
    */
   data: Prisma.XOR<Prisma.AutomationExecutionCreateInput, Prisma.AutomationExecutionUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1353,6 +1359,7 @@ export type AutomationExecutionUpdateArgs<ExtArgs extends runtime.Types.Extensio
    * Choose, which AutomationExecution to update.
    */
   where: Prisma.AutomationExecutionWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1431,6 +1438,7 @@ export type AutomationExecutionUpsertArgs<ExtArgs extends runtime.Types.Extensio
    * In case the AutomationExecution was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.AutomationExecutionUpdateInput, Prisma.AutomationExecutionUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1453,6 +1461,7 @@ export type AutomationExecutionDeleteArgs<ExtArgs extends runtime.Types.Extensio
    * Filter which AutomationExecution to delete.
    */
   where: Prisma.AutomationExecutionWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

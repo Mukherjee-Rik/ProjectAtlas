@@ -9,6 +9,17 @@ import { RegisterRestaurantDto } from './dto/register-restaurant.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CurrentUser } from './decorators/current-user.decorator';
 
+/**
+ * Credential endpoints are deliberately rate limited to blunt brute-force and
+ * mass-signup attempts. The limits stay strict by default and are only raised
+ * via environment variables, which end-to-end runs use so a suite of tests is
+ * not mistaken for an attack.
+ */
+const AUTH_WINDOW_MS = Number(process.env.AUTH_THROTTLE_TTL_MS ?? 60_000);
+const LOGIN_LIMIT = Number(process.env.AUTH_LOGIN_LIMIT ?? 5);
+const SIGNUP_LIMIT = Number(process.env.AUTH_SIGNUP_LIMIT ?? 5);
+const REFRESH_LIMIT = Number(process.env.AUTH_REFRESH_LIMIT ?? 10);
+
 @ApiTags('Auth')
 @Controller({
   path: 'auth',
@@ -19,8 +30,8 @@ export class AuthController {
 
   @Throttle({
     default: {
-      ttl: 60000,
-      limit: 5, // Hardened rate limit
+      ttl: AUTH_WINDOW_MS,
+      limit: LOGIN_LIMIT,
     },
   })
   @HttpCode(HttpStatus.OK)
@@ -53,8 +64,8 @@ export class AuthController {
 
   @Throttle({
     default: {
-      ttl: 60000,
-      limit: 5,
+      ttl: AUTH_WINDOW_MS,
+      limit: SIGNUP_LIMIT,
     },
   })
   @HttpCode(HttpStatus.CREATED)
@@ -90,8 +101,8 @@ export class AuthController {
 
   @Throttle({
     default: {
-      ttl: 60000,
-      limit: 10,
+      ttl: AUTH_WINDOW_MS,
+      limit: REFRESH_LIMIT,
     },
   })
   @HttpCode(HttpStatus.OK)

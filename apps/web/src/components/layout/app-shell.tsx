@@ -3,6 +3,7 @@
 import { ReactNode, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { Menu, Search, Sparkles, WifiOff, X } from 'lucide-react';
 
 import { useAuth } from '@/hooks/use-auth';
 import { useRestaurant } from '@/hooks/use-restaurant';
@@ -90,17 +91,32 @@ export function AppShell({ children }: AppShellProps) {
     };
   }, [user, currentRestaurant]);
 
-  // Keyboard shortcut Ctrl + K
+  // Keyboard shortcut Ctrl + K, plus Escape to close the mobile drawer.
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
         setIsSearchOpen((prev) => !prev);
       }
+      if (e.key === 'Escape') {
+        setIsMobileMenuOpen(false);
+      }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
+
+  // A drawer that covers the page should not leave the page behind it scrolling.
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+
+    const original = document.body.style.overflow;
+    document.body.style.overflow = isMobileMenuOpen ? 'hidden' : original;
+
+    return () => {
+      document.body.style.overflow = original;
+    };
+  }, [isMobileMenuOpen]);
 
   // Offline status listener
   useEffect(() => {
@@ -135,10 +151,18 @@ export function AppShell({ children }: AppShellProps) {
 
   return (
     <div className="min-h-screen bg-[#0B0F14] text-[#F5F7FA]">
+      {/* Lets keyboard users bypass the header and nav on every page. */}
+      <a href="#main-content" className="skip-link">
+        Skip to main content
+      </a>
+
       {/* Offline Status Alert Banner */}
       {isOffline && (
-        <div className="sticky top-0 z-50 flex items-center justify-center gap-2 bg-[#F59E0B] px-4 py-2 text-xs font-bold text-[#0B0F14] shadow-md animate-pulse">
-          <span>⚠️</span>
+        <div
+          role="status"
+          className="sticky top-0 z-50 flex items-center justify-center gap-2 bg-[#F59E0B] px-4 py-2 text-xs font-bold text-[#0B0F14] shadow-md"
+        >
+          <WifiOff className="h-4 w-4 shrink-0" aria-hidden="true" />
           <span>You are currently working offline. Changes will automatically sync once your internet connection is restored.</span>
         </div>
       )}
@@ -154,8 +178,14 @@ export function AppShell({ children }: AppShellProps) {
                 onClick={() => setIsMobileMenuOpen((prev) => !prev)}
                 className="md:hidden flex items-center justify-center p-2 rounded-lg border border-[#26313C] bg-[#18212B] text-[#F5F7FA] hover:border-[#2AFEB7] transition-colors"
                 aria-label="Toggle navigation menu"
+                aria-expanded={isMobileMenuOpen}
+                aria-controls="mobile-navigation"
               >
-                <span className="text-xl leading-none">{isMobileMenuOpen ? '✕' : '☰'}</span>
+                {isMobileMenuOpen ? (
+                  <X className="h-5 w-5" aria-hidden="true" />
+                ) : (
+                  <Menu className="h-5 w-5" aria-hidden="true" />
+                )}
               </button>
             )}
 
@@ -185,7 +215,7 @@ export function AppShell({ children }: AppShellProps) {
                   className="w-full flex items-center justify-between rounded-xl border border-[#26313C] bg-[#18212B] px-3.5 py-1.5 text-xs text-[#9AA6B2] hover:border-[#2AFEB7]/40 transition-colors"
                 >
                   <span className="flex items-center gap-2">
-                    <span>🔎</span> Search Atlas...
+                    <Search className="h-3.5 w-3.5" aria-hidden="true" /> Search Atlas...
                   </span>
                   <span className="rounded bg-[#111820] border border-[#26313C] px-1.5 py-0.5 text-[10px] font-mono">
                     Ctrl K
@@ -201,9 +231,10 @@ export function AppShell({ children }: AppShellProps) {
               <button
                 type="button"
                 onClick={() => setIsSearchOpen(true)}
-                className="md:hidden text-lg p-1.5 hover:bg-[#18212B] rounded-lg border border-[#26313C]"
+                aria-label="Search Atlas"
+                className="md:hidden flex items-center justify-center p-1.5 hover:bg-[#18212B] rounded-lg border border-[#26313C]"
               >
-                🔎
+                <Search className="h-5 w-5" aria-hidden="true" />
               </button>
             )}
 
@@ -224,7 +255,8 @@ export function AppShell({ children }: AppShellProps) {
                 onClick={() => setIsAiOpen(true)}
                 className="rounded-lg border border-[#26313C] bg-[#18212B]/85 hover:border-[#2AFEB7] hover:bg-[#18212B] px-3 py-2 text-sm font-semibold text-[#2AFEB7] transition-all flex items-center gap-1.5 shadow-sm"
               >
-                <span>🤖</span> <span className="hidden sm:inline">Ask AI</span>
+                <Sparkles className="h-4 w-4" aria-hidden="true" />{' '}
+                <span className="hidden sm:inline">Ask AI</span>
               </button>
             )}
 
@@ -241,11 +273,14 @@ export function AppShell({ children }: AppShellProps) {
 
       {/* Main Layout Area */}
       <div className="flex min-h-[calc(100vh-4rem)]">
-        <aside className="hidden w-64 border-r border-[#26313C] bg-[#111820] md:block">
+        <aside
+          aria-label="Main navigation"
+          className="hidden w-56 shrink-0 border-r border-[#26313C] bg-[#111820] md:block lg:w-64"
+        >
           <Sidebar />
         </aside>
 
-        <main className="min-w-0 flex-1 p-4 md:p-8">
+        <main id="main-content" className="min-w-0 flex-1 p-4 md:p-6 lg:p-8">
           {children}
         </main>
       </div>
@@ -260,7 +295,13 @@ export function AppShell({ children }: AppShellProps) {
           />
 
           {/* Drawer Content */}
-          <div className="relative flex flex-col w-4/5 max-w-xs bg-[#111820] border-r border-[#26313C] h-full z-10 shadow-2xl p-4 space-y-4">
+          <div
+            id="mobile-navigation"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Navigation menu"
+            className="relative flex flex-col w-4/5 max-w-xs bg-[#111820] border-r border-[#26313C] h-full z-10 shadow-2xl p-4 space-y-4"
+          >
             <div className="flex items-center justify-between border-b border-[#26313C] pb-3">
               <div className="flex items-center gap-2">
                 <img src="/logo.png" alt="Atlas Logo" className="h-7 w-auto" />
