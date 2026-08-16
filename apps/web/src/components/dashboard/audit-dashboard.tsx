@@ -37,8 +37,9 @@ export function AuditDashboard() {
       if (startDate) query += `&startDate=${startDate}`;
       if (endDate) query += `&endDate=${endDate}`;
       
-      const res = await apiClient.get<AuditLog[]>(`/audit${query}`);
-      setLogs(res || []);
+      const res = await apiClient.get<any>(`/audit${query}`);
+      const list = Array.isArray(res) ? res : res?.data ?? [];
+      setLogs(list);
     } catch (err: any) {
       setError(err?.message || 'Failed to fetch platform security logs');
     } finally {
