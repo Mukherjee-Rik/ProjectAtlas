@@ -5,9 +5,11 @@ import { useRestaurant } from '@/hooks/use-restaurant';
 import { useBranch } from '@/hooks/use-branch';
 import { getTables } from '@/services/tables.service';
 import { getDiningAreas } from '@/services/dining-areas.service';
+import { cancelOrder, createCancellationRequest } from '@/services/orders.service';
 import { apiClient } from '@/services/api-client';
 import type { RestaurantTable } from '@/types/table';
 import type { DiningArea } from '@/types/dining-area';
+import { CANCELLATION_REASONS } from '@/types/order';
 import { formatCurrency } from '@/lib/currency';
 
 // Synthesize a calming, classical guitar arpeggio pluck sound using Web Audio API
@@ -81,6 +83,53 @@ export default function WaiterDashboard() {
   const [callToasts, setCallToasts] = useState<any[]>([]);
   const [notifiedOrderIds, setNotifiedOrderIds] = useState<Set<string>>(new Set());
   const [notifiedCallIds, setNotifiedCallIds] = useState<Set<string>>(new Set());
+
+  // Order Cancellation states
+  const [cancellationOrder, setCancellationOrder] = useState<any | null>(null);
+  const [cancellationReason, setCancellationReason] = useState<string>('CUSTOMER_REQUESTED');
+  const [cancellationNote, setCancellationNote] = useState<string>('');
+  const [isSubmittingCancel, setIsSubmittingCancel] = useState<boolean>(false);
+
+  const handleCancelOrderSubmit = async () => {
+    if (!cancellationOrder) return;
+    if (cancellationReason === 'OTHER' && !cancellationNote.trim()) {
+      alert('Please provide a note when choosing Other as cancellation reason.');
+      return;
+    }
+
+    const hasPaid = cancellationOrder.payments?.some(
+      (p: any) => p.status === 'SUCCESS' || p.status === 'PARTIALLY_REFUNDED',
+    );
+
+    setIsSubmittingCancel(true);
+    try {
+      if (hasPaid) {
+        await createCancellationRequest(
+          cancellationOrder.id,
+          cancellationReason,
+          cancellationNote,
+        );
+        alert(`Cancellation request submitted to Cashier for Order #${cancellationOrder.orderNumber}!`);
+      } else {
+        await cancelOrder(
+          cancellationOrder.id,
+          cancellationReason,
+          cancellationNote,
+        );
+        alert(`Order #${cancellationOrder.orderNumber} has been cancelled.`);
+      }
+
+      setCancellationOrder(null);
+      setCancellationReason('CUSTOMER_REQUESTED');
+      setCancellationNote('');
+      await loadData();
+    } catch (err: any) {
+      console.error(err);
+      alert(err?.message ?? 'Failed to process cancellation.');
+    } finally {
+      setIsSubmittingCancel(false);
+    }
+  };
 
   const loadData = useCallback(async () => {
     if (!currentBranch) {
@@ -556,47 +605,97 @@ export default function WaiterDashboard() {
                         return <p className="text-xs text-[#9AA6B2]">No orders placed yet.</p>;
                       }
                       return (
-                        <div className="space-y-2">
-                          {allOrders.map((o) => (
-                            <div
-                              key={o.id}
-                              className="flex items-center justify-between rounded bg-[#18212B] p-2.5 text-xs border border-[#26313C]"
-                            >
-                              <div>
-                                <span className="font-mono font-bold text-[#2AFEB7]">
-                                  {o.orderNumber}
-                                </span>
-                                <div className="text-[10px] text-[#9AA6B2]">{o.status}</div>
+                        <div className="space-y-2.5">
+                          {allOrders.map((o) => {
+                            const isCancelled = o.status === 'CANCELLED';
+                            const isCompleted = o.status === 'COMPLETED';
+                            const hasPendingReview = o.cancellationRequests?.some(
+                              (cr: any) => cr.status === 'PENDING_REVIEW',
+                            );
+                            const hasPaid = o.payments?.some(
+                              (p: any) => p.status === 'SUCCESS' || p.status === 'PARTIALLY_REFUNDED',
+                            );
+
+                            return (
+                              <div
+                                key={o.id}
+                                className={`rounded-xl p-3 text-xs border transition-all ${
+                                  isCancelled
+                                    ? 'border-red-500/20 bg-red-500/5 opacity-75'
+                                    : 'border-[#26313C] bg-[#18212B]'
+                                }`}
+                              >
+                                <div className="flex items-center justify-between">
+                                  <div>
+                                    <div className="flex items-center gap-2">
+                                      <span className="font-mono font-bold text-[#2AFEB7]">
+                                        {o.orderNumber}
+                                      </span>
+                                      <span
+                                        className={`rounded px-1.5 py-0.2 text-[9px] font-bold uppercase ${
+                                          isCancelled
+                                            ? 'bg-red-500/20 text-red-400 border border-red-500/30'
+                                            : isCompleted
+                                            ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
+                                            : hasPendingReview
+                                            ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                                            : 'bg-[#111820] text-[#9AA6B2]'
+                                        }`}
+                                      >
+                                        {hasPendingReview ? 'Review Pending' : o.status}
+                                      </span>
+                                    </div>
+                                    {isCancelled && o.cancellationReason && (
+                                      <p className="mt-1 text-[10px] text-red-400/80">
+                                        Reason: {o.cancellationReason}
+                                      </p>
+                                    )}
+                                  </div>
+
+                                  <div className="flex items-center gap-1.5">
+                                    {['PENDING', 'CONFIRMED', 'PREPARING', 'READY'].includes(o.status) && (
+                                      <button
+                                        type="button"
+                                        onClick={() => handleUpdateOrderStatus(o.id, 'SERVED', 'Served')}
+                                        className={`rounded px-2 py-1 text-[10px] font-bold transition-all ${
+                                          o.status === 'READY'
+                                            ? 'bg-[#2AFEB7] text-[#0B0F14] hover:bg-[#22E5A4]'
+                                            : 'bg-[#111820] border border-[#26313C] text-[#9AA6B2] hover:border-[#2AFEB7]/40 hover:text-[#2AFEB7]'
+                                        }`}
+                                      >
+                                        {o.status === 'READY' ? '🔔 Serve' : 'Serve'}
+                                      </button>
+                                    )}
+                                    {o.status === 'SERVED' && (
+                                      <button
+                                        type="button"
+                                        onClick={() => handleUpdateOrderStatus(o.id, 'COMPLETED', 'Completed')}
+                                        className="rounded bg-[#A855F7] px-2 py-1 text-[10px] font-bold text-white hover:bg-[#9333EA] transition-all"
+                                      >
+                                        Complete
+                                      </button>
+                                    )}
+                                    {!isCancelled && !isCompleted && !hasPendingReview && (
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          setCancellationOrder(o);
+                                          setCancellationReason('CUSTOMER_REQUESTED');
+                                          setCancellationNote('');
+                                        }}
+                                        className="rounded border border-red-500/30 bg-red-500/10 px-2 py-1 text-[10px] font-bold text-red-400 hover:bg-red-500/20"
+                                      >
+                                        {hasPaid ? 'Req Cancel' : 'Cancel'}
+                                      </button>
+                                    )}
+                                    <span className="font-bold text-[#F5F7FA] pl-1">
+                                      {formatCurrency(o.totalAmount)}
+                                    </span>
+                                  </div>
+                                </div>
                               </div>
-                              <div className="flex items-center gap-2">
-                                {['PENDING', 'CONFIRMED', 'PREPARING', 'READY'].includes(o.status) && (
-                                  <button
-                                    type="button"
-                                    onClick={() => handleUpdateOrderStatus(o.id, 'SERVED', 'Served')}
-                                    className={`rounded px-2 py-0.5 text-[10px] font-bold transition-all ${
-                                      o.status === 'READY'
-                                        ? 'bg-[#2AFEB7] text-[#0B0F14] hover:bg-[#22E5A4]'
-                                        : 'bg-[#18212B] border border-[#26313C] text-[#9AA6B2] hover:border-[#2AFEB7]/40 hover:text-[#2AFEB7]'
-                                    }`}
-                                  >
-                                    {o.status === 'READY' ? '🔔 Serve' : 'Serve'}
-                                  </button>
-                                )}
-                                {o.status === 'SERVED' && (
-                                  <button
-                                    type="button"
-                                    onClick={() => handleUpdateOrderStatus(o.id, 'COMPLETED', 'Completed')}
-                                    className="rounded bg-[#A855F7] px-2 py-0.5 text-[10px] font-bold text-white hover:bg-[#9333EA] transition-all"
-                                  >
-                                    Complete
-                                  </button>
-                                )}
-                                <span className="font-semibold text-[#F5F7FA]">
-                                  {formatCurrency(o.totalAmount)}
-                                </span>
-                              </div>
-                            </div>
-                          ))}
+                            );
+                          })}
                         </div>
                       );
                     })()}
@@ -1010,6 +1109,106 @@ export default function WaiterDashboard() {
           </div>
         )}
       </div>
+
+      {/* Order Cancellation Modal */}
+      {cancellationOrder && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 no-print">
+          <div className="w-full max-w-md rounded-2xl border border-[#26313C] bg-[#111820] p-6 shadow-2xl space-y-4">
+            <div>
+              {(() => {
+                const hasPaid = cancellationOrder.payments?.some(
+                  (p: any) => p.status === 'SUCCESS' || p.status === 'PARTIALLY_REFUNDED',
+                );
+                return (
+                  <>
+                    <h3 className="text-base font-bold text-[#F5F7FA]">
+                      {hasPaid ? 'Request Order Cancellation' : 'Cancel Unpaid Order'}
+                    </h3>
+                    <p className="mt-1 text-xs text-[#9AA6B2]">
+                      {hasPaid
+                        ? 'This order has a recorded payment. Submitting this form will send a cancellation & refund request to the Cashier.'
+                        : 'This order is unpaid and will be cancelled immediately.'}
+                    </p>
+                  </>
+                );
+              })()}
+            </div>
+
+            <div className="rounded-xl bg-[#18212B] p-3 text-xs space-y-1.5 border border-[#26313C]">
+              <div className="flex justify-between">
+                <span className="text-[#9AA6B2]">Order Number:</span>
+                <span className="font-mono font-bold text-[#2AFEB7]">
+                  {cancellationOrder.orderNumber}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-[#9AA6B2]">Order Total:</span>
+                <span className="font-bold text-[#F5F7FA]">
+                  {formatCurrency(cancellationOrder.totalAmount)}
+                </span>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-bold text-[#9AA6B2] uppercase">
+                  Select Reason
+                </label>
+                <select
+                  value={cancellationReason}
+                  onChange={(e) => setCancellationReason(e.target.value)}
+                  className="mt-1.5 w-full rounded-lg border border-[#26313C] bg-[#18212B] p-2.5 text-xs text-[#F5F7FA] outline-none focus:border-[#2AFEB7]"
+                >
+                  {CANCELLATION_REASONS.map((r) => (
+                    <option key={r.code} value={r.code}>
+                      {r.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-[#9AA6B2] uppercase">
+                  Additional Notes {cancellationReason === 'OTHER' && <span className="text-red-400">*</span>}
+                </label>
+                <textarea
+                  rows={2}
+                  value={cancellationNote}
+                  onChange={(e) => setCancellationNote(e.target.value)}
+                  placeholder={
+                    cancellationReason === 'OTHER'
+                      ? 'Please specify detailed explanation (required)...'
+                      : 'Optional notes for record keeping...'
+                  }
+                  className="mt-1.5 w-full rounded-lg border border-[#26313C] bg-[#18212B] p-2 text-xs text-[#F5F7FA] outline-none focus:border-[#2AFEB7]"
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setCancellationOrder(null)}
+                className="flex-1 rounded-lg bg-[#18212B] border border-[#26313C] py-2.5 text-xs font-bold text-[#F5F7FA]"
+              >
+                Back
+              </button>
+              <button
+                type="button"
+                disabled={isSubmittingCancel}
+                onClick={handleCancelOrderSubmit}
+                className="flex-1 rounded-lg bg-red-500 py-2.5 text-xs font-bold text-white hover:bg-red-600 disabled:opacity-50 transition-all"
+              >
+                {isSubmittingCancel
+                  ? 'Submitting...'
+                  : cancellationOrder.payments?.some((p: any) => p.status === 'SUCCESS' || p.status === 'PARTIALLY_REFUNDED')
+                  ? 'Submit Request'
+                  : 'Confirm Cancel'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

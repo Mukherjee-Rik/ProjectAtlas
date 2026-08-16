@@ -41,8 +41,25 @@ function KDSTicket({ order, onStatusChange, isUpdating }: KDSTicketProps) {
         ? 'text-[#F59E0B] bg-[#F59E0B]/15 border-[#F59E0B]/30'
         : 'text-[#2AFEB7] bg-[#2AFEB7]/10 border-[#2AFEB7]/20';
 
+  const hasCancellationRequest = order.cancellationRequests?.some(
+    (cr) => cr.status === 'PENDING_REVIEW',
+  );
+
   return (
-    <div className="flex flex-col rounded-xl border border-[#26313C] bg-[#0F141C] p-4 shadow-lg transition-all hover:border-[#2AFEB7]/30">
+    <div
+      className={`flex flex-col rounded-xl border p-4 shadow-lg transition-all ${
+        hasCancellationRequest
+          ? 'border-red-500/60 bg-red-950/20 shadow-[0_0_15px_rgba(239,68,68,0.2)]'
+          : 'border-[#26313C] bg-[#0F141C] hover:border-[#2AFEB7]/30'
+      }`}
+    >
+      {/* Cancellation Warning Banner */}
+      {hasCancellationRequest && (
+        <div className="mb-2.5 rounded-lg bg-red-500/20 border border-red-500/40 p-2 text-center text-xs font-black text-red-400 animate-pulse">
+          🚨 CANCELLATION REQUESTED — HOLD PREPARATION
+        </div>
+      )}
+
       {/* Ticket Header */}
       <div className="flex items-start justify-between border-b border-[#26313C]/50 pb-2.5">
         <div>

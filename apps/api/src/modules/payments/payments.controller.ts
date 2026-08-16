@@ -7,6 +7,7 @@ import {
   Param,
   UseGuards,
   Headers,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiHeader, ApiTags } from '@nestjs/swagger';
 import { PaymentsService } from './payments.service';
@@ -16,11 +17,13 @@ import { TenantAccessGuard } from '../auth/guards/tenant-access.guard';
 import { RestaurantAccessGuard } from '../auth/guards/restaurant-access.guard';
 import { Permissions } from '../auth/decorators/permissions.decorator';
 import { CurrentRestaurant } from '../auth/decorators/current-restaurant.decorator';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { PERMISSIONS } from '../auth/permissions/permissions';
 import { RESTAURANT_HEADER, TENANT_HEADER } from '../auth/constants/tenant.constants';
 import type { CurrentRestaurant as CurrentRestaurantType } from '../auth/types/current-restaurant.type';
 import { InitiatePaymentDto } from './dto/initiate-payment.dto';
 import { MockWebhookDto } from './dto/mock-webhook.dto';
+import { ProcessRefundDto } from './dto/process-refund.dto';
 
 @ApiTags('Payments')
 @Controller({ path: 'payments', version: '1' })
@@ -61,7 +64,36 @@ export class PaymentsController {
     return this.paymentsService.findAll(restaurant.id);
   }
 
-  // 3. Webhook listener for Stripe/Razorpay (Public / No Auth guard)
+  // 3. Authenticated endpoint to list all refunds
+  @ApiBearerAuth('access-token')
+  @ApiHeader({ name: TENANT_HEADER, required: true })
+  @ApiHeader({ name: RESTAURANT_HEADER, required: true })
+  @UseGuards(JwtAuthGuard, PermissionsGuard, TenantAccessGuard, RestaurantAccessGuard)
+  @Get('refunds')
+  @Permissions(PERMISSIONS.ORDERS_READ)
+  async findRefunds(@CurrentRestaurant() restaurant: CurrentRestaurantType) {
+    if (!restaurant) throw new BadRequestException('No active restaurant selected');
+    return this.paymentsService.findRefunds(restaurant.id);
+  }
+
+  // 4. Authenticated endpoint to process full or partial refund
+  @ApiBearerAuth('access-token')
+  @ApiHeader({ name: TENANT_HEADER, required: true })
+  @ApiHeader({ name: RESTAURANT_HEADER, required: true })
+  @UseGuards(JwtAuthGuard, PermissionsGuard, TenantAccessGuard, RestaurantAccessGuard)
+  @Post(':id/refund')
+  @Permissions(PERMISSIONS.ORDERS_UPDATE)
+  async refund(
+    @Param('id', new ParseUUIDPipe()) paymentId: string,
+    @CurrentRestaurant() restaurant: CurrentRestaurantType,
+    @CurrentUser() user: any,
+    @Body() dto: ProcessRefundDto,
+  ) {
+    if (!restaurant) throw new BadRequestException('No active restaurant selected');
+    return this.paymentsService.refundPayment(paymentId, restaurant.id, user, dto);
+  }
+
+  // 5. Webhook listener for Stripe/Razorpay (Public / No Auth guard)
   @Post('webhook/:id')
   async handleWebhook(
     @Param('id') paymentId: string,

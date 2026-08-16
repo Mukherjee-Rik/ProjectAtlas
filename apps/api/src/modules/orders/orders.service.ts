@@ -1,12 +1,16 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma/prisma.service';
 import { Prisma } from '../../generated/prisma/client';
-import { OrderStatus } from '../../generated/prisma/enums';
+import { OrderStatus, CancellationRequestStatus } from '../../generated/prisma/enums';
 import { PublicTablesService } from '../public-tables/public-tables.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
+import { CancelOrderDto } from './dto/cancel-order.dto';
+import { CreateCancellationRequestDto } from './dto/cancellation-request.dto';
+import { ReviewCancellationRequestDto } from './dto/review-cancellation-request.dto';
 import { DeliveryEventsService } from '../delivery/services/delivery-events.service';
 import { InventoryService } from '../inventory/inventory.service';
+import { AuditService } from '../audit/audit.service';
 
 const ALLOWED_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
   PENDING: [OrderStatus.CONFIRMED, OrderStatus.PREPARING, OrderStatus.SERVED, OrderStatus.CANCELLED],
@@ -31,10 +35,52 @@ const ORDER_SELECT_FULL = {
   taxAmount: true,
   discountAmount: true,
   totalAmount: true,
+  cancelledAt: true,
+  cancelledBy: true,
+  cancellationReason: true,
+  cancellationNote: true,
   createdAt: true,
   updatedAt: true,
   table: { select: { id: true, name: true, code: true } },
   branch: { select: { id: true, name: true, code: true } },
+  payments: {
+    select: {
+      id: true,
+      amount: true,
+      method: true,
+      status: true,
+      paidAt: true,
+      transactionReference: true,
+    },
+  },
+  cancellationRequests: {
+    select: {
+      id: true,
+      reason: true,
+      note: true,
+      status: true,
+      requestedBy: true,
+      requestedByName: true,
+      reviewedBy: true,
+      reviewedByName: true,
+      reviewedAt: true,
+      rejectionReason: true,
+      createdAt: true,
+    },
+  },
+  refunds: {
+    select: {
+      id: true,
+      amount: true,
+      reason: true,
+      note: true,
+      status: true,
+      requestedBy: true,
+      approvedBy: true,
+      processedAt: true,
+      createdAt: true,
+    },
+  },
   items: {
     orderBy: { id: 'asc' as const },
     select: {
@@ -60,6 +106,7 @@ export class OrdersService {
     private readonly publicTablesService: PublicTablesService,
     private readonly deliveryEvents: DeliveryEventsService,
     private readonly inventoryService: InventoryService,
+    private readonly auditService: AuditService,
   ) {}
 
   validateStatusTransition(currentStatus: OrderStatus, nextStatus: OrderStatus) {
@@ -363,6 +410,385 @@ export class OrdersService {
     return this.formatOrderResponse(updated);
   }
 
+  async cancelOrder(
+    id: string,
+    restaurantId: string,
+    user: { id: string; name?: string; email?: string; role: string },
+    dto: CancelOrderDto,
+    branchId?: string,
+  ) {
+    const existing = await this.prisma.order.findFirst({
+      where: {
+        id,
+        restaurantId,
+        ...(branchId && { branchId }),
+      },
+      include: {
+        payments: true,
+        cancellationRequests: { where: { status: 'PENDING_REVIEW' } },
+      },
+    });
+
+    if (!existing) {
+      throw new NotFoundException('Order not found or does not belong to active restaurant');
+    }
+
+    if (existing.status === OrderStatus.CANCELLED) {
+      throw new BadRequestException('Order is already cancelled');
+    }
+
+    // Role-based financial validation
+    const hasSuccessfulPayment = existing.payments.some(
+      (p) => p.status === 'SUCCESS' || p.status === 'PARTIALLY_REFUNDED',
+    );
+
+    const isWaiter = user.role === 'WAITER' || user.role === 'STAFF';
+    const isPrivileged = ['CASHIER', 'MANAGER', 'ADMIN', 'OWNER', 'PLATFORM_ADMIN'].includes(user.role);
+
+    if (hasSuccessfulPayment && isWaiter && !isPrivileged) {
+      throw new BadRequestException(
+        'Paid orders cannot be directly cancelled by Waiters. Please submit a Cancellation Request for Cashier/Manager approval.',
+      );
+    }
+
+    if (
+      existing.status === OrderStatus.COMPLETED &&
+      !['MANAGER', 'ADMIN', 'OWNER', 'PLATFORM_ADMIN'].includes(user.role)
+    ) {
+      throw new ForbiddenException('Only Managers or Admins can cancel a completed order.');
+    }
+
+    const cancelledByLabel = user.name || user.email || `User (${user.id})`;
+
+    const updated = await this.prisma.$transaction(async (tx) => {
+      if (existing.cancellationRequests.length > 0) {
+        await tx.cancellationRequest.updateMany({
+          where: { orderId: existing.id, status: 'PENDING_REVIEW' },
+          data: {
+            status: 'APPROVED',
+            reviewedBy: user.id,
+            reviewedByName: cancelledByLabel,
+            reviewedAt: new Date(),
+          },
+        });
+      }
+
+      const orderUpdated = await tx.order.update({
+        where: { id: existing.id },
+        data: {
+          status: OrderStatus.CANCELLED,
+          cancelledAt: new Date(),
+          cancelledBy: cancelledByLabel,
+          cancellationReason: dto.reason,
+          cancellationNote: dto.note || null,
+        },
+        select: ORDER_SELECT_FULL,
+      });
+
+      return orderUpdated;
+    });
+
+    // Record audit log
+    await this.auditService.log({
+      actorUserId: user.id,
+      actorEmail: user.email,
+      action: 'ORDER_CANCELLED',
+      resourceType: 'ORDER',
+      resourceId: updated.id,
+      restaurantId,
+      metadata: {
+        orderNumber: updated.orderNumber,
+        reason: dto.reason,
+        note: dto.note,
+        userRole: user.role,
+        hadPaid: hasSuccessfulPayment,
+      },
+    });
+
+    this.deliveryEvents.emitOrderStatusUpdated(updated.id, updated.status, updated.restaurantId);
+
+    return this.formatOrderResponse(updated);
+  }
+
+  async createCancellationRequest(
+    id: string,
+    restaurantId: string,
+    user: { id: string; name?: string; email?: string; role: string },
+    dto: CreateCancellationRequestDto,
+    branchId?: string,
+  ) {
+    const existing = await this.prisma.order.findFirst({
+      where: {
+        id,
+        restaurantId,
+        ...(branchId && { branchId }),
+      },
+      include: {
+        cancellationRequests: { where: { status: 'PENDING_REVIEW' } },
+        payments: true,
+      },
+    });
+
+    if (!existing) {
+      throw new NotFoundException('Order not found or does not belong to active restaurant');
+    }
+
+    if (existing.status === OrderStatus.CANCELLED) {
+      throw new BadRequestException('Order is already cancelled');
+    }
+
+    if (existing.cancellationRequests.length > 0) {
+      throw new BadRequestException('A cancellation request is already pending review for this order');
+    }
+
+    const requesterName = user.name || user.email || 'Staff';
+
+    const req = await this.prisma.cancellationRequest.create({
+      data: {
+        restaurantId,
+        orderId: existing.id,
+        requestedBy: user.id,
+        requestedByName: requesterName,
+        reason: dto.reason,
+        note: dto.note || null,
+        status: 'PENDING_REVIEW',
+      },
+      include: {
+        order: { select: ORDER_SELECT_FULL },
+      },
+    });
+
+    // Create in-app Notification for Cashiers/Managers
+    await this.prisma.notification.create({
+      data: {
+        restaurantId,
+        title: `Cancellation Request: ${existing.orderNumber}`,
+        message: `${requesterName} requested cancellation for Order #${existing.orderNumber} (Reason: ${dto.reason})`,
+        type: 'ALERT',
+        metadata: { orderId: existing.id, requestId: req.id },
+      },
+    });
+
+    // Audit log
+    await this.auditService.log({
+      actorUserId: user.id,
+      actorEmail: user.email,
+      action: 'ORDER_CANCEL_REQUESTED',
+      resourceType: 'ORDER',
+      resourceId: existing.id,
+      restaurantId,
+      metadata: {
+        orderNumber: existing.orderNumber,
+        requestId: req.id,
+        reason: dto.reason,
+        note: dto.note,
+      },
+    });
+
+    return {
+      id: req.id,
+      orderId: req.orderId,
+      restaurantId: req.restaurantId,
+      reason: req.reason,
+      note: req.note,
+      status: req.status,
+      requestedBy: req.requestedBy,
+      requestedByName: req.requestedByName,
+      createdAt: req.createdAt,
+      order: this.formatOrderResponse(req.order),
+    };
+  }
+
+  async findCancellationRequests(
+    restaurantId: string,
+    status?: CancellationRequestStatus,
+    branchId?: string,
+  ) {
+    const requests = await this.prisma.cancellationRequest.findMany({
+      where: {
+        restaurantId,
+        ...(status && { status }),
+        ...(branchId && { order: { branchId } }),
+      },
+      include: {
+        order: { select: ORDER_SELECT_FULL },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return requests.map((req) => ({
+      id: req.id,
+      orderId: req.orderId,
+      restaurantId: req.restaurantId,
+      reason: req.reason,
+      note: req.note,
+      status: req.status,
+      requestedBy: req.requestedBy,
+      requestedByName: req.requestedByName,
+      reviewedBy: req.reviewedBy,
+      reviewedByName: req.reviewedByName,
+      reviewedAt: req.reviewedAt,
+      rejectionReason: req.rejectionReason,
+      createdAt: req.createdAt,
+      updatedAt: req.updatedAt,
+      order: this.formatOrderResponse(req.order),
+    }));
+  }
+
+  async reviewCancellationRequest(
+    requestId: string,
+    restaurantId: string,
+    user: { id: string; name?: string; email?: string; role: string },
+    dto: ReviewCancellationRequestDto,
+  ) {
+    if (!['CASHIER', 'MANAGER', 'ADMIN', 'OWNER', 'PLATFORM_ADMIN'].includes(user.role)) {
+      throw new ForbiddenException('Only Cashiers, Managers, or Admins can review cancellation requests.');
+    }
+
+    const req = await this.prisma.cancellationRequest.findFirst({
+      where: { id: requestId, restaurantId },
+      include: {
+        order: {
+          include: {
+            payments: { where: { status: 'SUCCESS' } },
+            invoice: true,
+          },
+        },
+      },
+    });
+
+    if (!req) {
+      throw new NotFoundException('Cancellation request not found');
+    }
+
+    if (req.status !== 'PENDING_REVIEW') {
+      throw new BadRequestException(`Request has already been reviewed (status: ${req.status})`);
+    }
+
+    const reviewerName = user.name || user.email || `Staff (${user.id})`;
+
+    if (dto.action === 'REJECT') {
+      const rejected = await this.prisma.cancellationRequest.update({
+        where: { id: req.id },
+        data: {
+          status: 'REJECTED',
+          reviewedBy: user.id,
+          reviewedByName: reviewerName,
+          reviewedAt: new Date(),
+          rejectionReason: dto.rejectionReason,
+        },
+      });
+
+      await this.auditService.log({
+        actorUserId: user.id,
+        actorEmail: user.email,
+        action: 'ORDER_CANCEL_REJECTED',
+        resourceType: 'ORDER',
+        resourceId: req.orderId,
+        restaurantId,
+        metadata: {
+          requestId: req.id,
+          rejectionReason: dto.rejectionReason,
+        },
+      });
+
+      return {
+        id: rejected.id,
+        status: rejected.status,
+        rejectionReason: rejected.rejectionReason,
+        reviewedBy: rejected.reviewedBy,
+        reviewedByName: rejected.reviewedByName,
+        reviewedAt: rejected.reviewedAt,
+      };
+    }
+
+    // APPROVE flow
+    return this.prisma.$transaction(async (tx) => {
+      // 1. Mark request APPROVED
+      await tx.cancellationRequest.update({
+        where: { id: req.id },
+        data: {
+          status: 'APPROVED',
+          reviewedBy: user.id,
+          reviewedByName: reviewerName,
+          reviewedAt: new Date(),
+        },
+      });
+
+      // 2. Mark order CANCELLED
+      const orderUpdated = await tx.order.update({
+        where: { id: req.orderId },
+        data: {
+          status: OrderStatus.CANCELLED,
+          cancelledAt: new Date(),
+          cancelledBy: reviewerName,
+          cancellationReason: req.reason,
+          cancellationNote: req.note || null,
+        },
+        select: ORDER_SELECT_FULL,
+      });
+
+      // 3. If refund amount requested and order has paid payments, process refund
+      if (dto.refundAmount && dto.refundAmount > 0 && req.order.payments.length > 0) {
+        const payment = req.order.payments[0];
+        const refundAmt = Math.min(dto.refundAmount, Number(payment.amount));
+        const isFull = refundAmt >= Number(payment.amount);
+
+        await tx.refund.create({
+          data: {
+            restaurantId,
+            orderId: req.orderId,
+            paymentId: payment.id,
+            amount: new Prisma.Decimal(refundAmt),
+            reason: req.reason,
+            note: req.note || 'Refund generated from approved cancellation request',
+            status: 'SUCCESS',
+            requestedBy: req.requestedBy,
+            approvedBy: reviewerName,
+            processedAt: new Date(),
+            providerRefundId: `RFND-${Math.random().toString(36).substring(2, 11).toUpperCase()}`,
+          },
+        });
+
+        await tx.payment.update({
+          where: { id: payment.id },
+          data: { status: isFull ? 'REFUNDED' : 'PARTIALLY_REFUNDED' },
+        });
+
+        if (req.order.invoice) {
+          await tx.invoice.update({
+            where: { id: req.order.invoice.id },
+            data: { isSettled: !isFull },
+          });
+        }
+      }
+
+      await this.auditService.log({
+        actorUserId: user.id,
+        actorEmail: user.email,
+        action: 'ORDER_CANCEL_APPROVED',
+        resourceType: 'ORDER',
+        resourceId: req.orderId,
+        restaurantId,
+        metadata: {
+          requestId: req.id,
+          refundAmount: dto.refundAmount,
+        },
+      });
+
+      this.deliveryEvents.emitOrderStatusUpdated(orderUpdated.id, orderUpdated.status, orderUpdated.restaurantId);
+
+      return {
+        id: req.id,
+        status: 'APPROVED',
+        reviewedBy: user.id,
+        reviewedByName: reviewerName,
+        reviewedAt: new Date(),
+        order: this.formatOrderResponse(orderUpdated),
+      };
+    });
+  }
+
   private formatOrderResponse(order: DbOrderPayload) {
     return {
       id: order.id,
@@ -377,10 +803,46 @@ export class OrdersService {
       taxAmount: Number(order.taxAmount),
       discountAmount: Number(order.discountAmount),
       totalAmount: Number(order.totalAmount),
+      cancelledAt: order.cancelledAt,
+      cancelledBy: order.cancelledBy,
+      cancellationReason: order.cancellationReason,
+      cancellationNote: order.cancellationNote,
       createdAt: order.createdAt,
       updatedAt: order.updatedAt,
       table: order.table ? { id: order.table.id, name: order.table.name, code: order.table.code } : null,
       branch: order.branch ? { id: order.branch.id, name: order.branch.name, code: order.branch.code } : null,
+      payments: (order.payments || []).map((p) => ({
+        id: p.id,
+        amount: Number(p.amount),
+        method: p.method,
+        status: p.status,
+        paidAt: p.paidAt,
+        transactionReference: p.transactionReference,
+      })),
+      cancellationRequests: (order.cancellationRequests || []).map((cr) => ({
+        id: cr.id,
+        reason: cr.reason,
+        note: cr.note,
+        status: cr.status,
+        requestedBy: cr.requestedBy,
+        requestedByName: cr.requestedByName,
+        reviewedBy: cr.reviewedBy,
+        reviewedByName: cr.reviewedByName,
+        reviewedAt: cr.reviewedAt,
+        rejectionReason: cr.rejectionReason,
+        createdAt: cr.createdAt,
+      })),
+      refunds: (order.refunds || []).map((rf) => ({
+        id: rf.id,
+        amount: Number(rf.amount),
+        reason: rf.reason,
+        note: rf.note,
+        status: rf.status,
+        requestedBy: rf.requestedBy,
+        approvedBy: rf.approvedBy,
+        processedAt: rf.processedAt,
+        createdAt: rf.createdAt,
+      })),
       items: order.items.map((item) => ({
         id: item.id,
         menuItemId: item.menuItemId,

@@ -75,6 +75,8 @@ export const ModelName = {
   OrderItem: 'OrderItem',
   OrderItemVariant: 'OrderItemVariant',
   OrderItemAddon: 'OrderItemAddon',
+  CancellationRequest: 'CancellationRequest',
+  Refund: 'Refund',
   Payment: 'Payment',
   Invoice: 'Invoice',
   Supplier: 'Supplier',
@@ -393,6 +395,10 @@ export const OrderScalarFieldEnum = {
   taxAmount: 'taxAmount',
   discountAmount: 'discountAmount',
   totalAmount: 'totalAmount',
+  cancelledAt: 'cancelledAt',
+  cancelledBy: 'cancelledBy',
+  cancellationReason: 'cancellationReason',
+  cancellationNote: 'cancellationNote',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -434,6 +440,47 @@ export const OrderItemAddonScalarFieldEnum = {
 } as const
 
 export type OrderItemAddonScalarFieldEnum = (typeof OrderItemAddonScalarFieldEnum)[keyof typeof OrderItemAddonScalarFieldEnum]
+
+
+export const CancellationRequestScalarFieldEnum = {
+  id: 'id',
+  restaurantId: 'restaurantId',
+  orderId: 'orderId',
+  requestedBy: 'requestedBy',
+  requestedByName: 'requestedByName',
+  reason: 'reason',
+  note: 'note',
+  status: 'status',
+  reviewedBy: 'reviewedBy',
+  reviewedByName: 'reviewedByName',
+  reviewedAt: 'reviewedAt',
+  rejectionReason: 'rejectionReason',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CancellationRequestScalarFieldEnum = (typeof CancellationRequestScalarFieldEnum)[keyof typeof CancellationRequestScalarFieldEnum]
+
+
+export const RefundScalarFieldEnum = {
+  id: 'id',
+  restaurantId: 'restaurantId',
+  orderId: 'orderId',
+  paymentId: 'paymentId',
+  amount: 'amount',
+  reason: 'reason',
+  note: 'note',
+  status: 'status',
+  requestedBy: 'requestedBy',
+  approvedBy: 'approvedBy',
+  processedAt: 'processedAt',
+  providerRefundId: 'providerRefundId',
+  failureReason: 'failureReason',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RefundScalarFieldEnum = (typeof RefundScalarFieldEnum)[keyof typeof RefundScalarFieldEnum]
 
 
 export const PaymentScalarFieldEnum = {

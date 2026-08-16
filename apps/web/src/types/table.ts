@@ -23,6 +23,13 @@ export interface RestaurantTable {
       orderNumber: string;
       status: string;
       totalAmount: number;
+      cancelledAt?: string | null;
+      cancelledBy?: string | null;
+      cancellationReason?: string | null;
+      cancellationNote?: string | null;
+      cancellationRequests?: any[];
+      payments?: any[];
+      refunds?: any[];
     }[];
   }[];
 }

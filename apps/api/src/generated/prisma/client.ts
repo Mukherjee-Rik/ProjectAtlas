@@ -160,6 +160,16 @@ export type OrderItemVariant = Prisma.OrderItemVariantModel
  */
 export type OrderItemAddon = Prisma.OrderItemAddonModel
 /**
+ * Model CancellationRequest
+ * 
+ */
+export type CancellationRequest = Prisma.CancellationRequestModel
+/**
+ * Model Refund
+ * 
+ */
+export type Refund = Prisma.RefundModel
+/**
  * Model Payment
  * 
  */

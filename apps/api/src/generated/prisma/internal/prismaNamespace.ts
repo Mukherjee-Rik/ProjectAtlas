@@ -421,6 +421,8 @@ export const ModelName = {
   OrderItem: 'OrderItem',
   OrderItemVariant: 'OrderItemVariant',
   OrderItemAddon: 'OrderItemAddon',
+  CancellationRequest: 'CancellationRequest',
+  Refund: 'Refund',
   Payment: 'Payment',
   Invoice: 'Invoice',
   Supplier: 'Supplier',
@@ -456,7 +458,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "tenant" | "restaurant" | "tenantMembership" | "branch" | "diningArea" | "table" | "customerSession" | "menu" | "menuCategory" | "menuItem" | "taxRate" | "menuItemVariantGroup" | "menuItemVariant" | "menuItemAddonGroup" | "menuItemAddon" | "cart" | "cartItem" | "cartItemVariant" | "cartItemAddon" | "order" | "orderItem" | "orderItemVariant" | "orderItemAddon" | "payment" | "invoice" | "supplier" | "inventoryLocation" | "ingredient" | "recipe" | "recipeIngredient" | "stockLedger" | "plan" | "subscription" | "session" | "auditLog" | "externalOrder" | "restaurantDeliveryProvider" | "webhookEvent" | "aiUsage" | "automationRule" | "automationExecution" | "notification" | "supportTicket"
+    modelProps: "user" | "tenant" | "restaurant" | "tenantMembership" | "branch" | "diningArea" | "table" | "customerSession" | "menu" | "menuCategory" | "menuItem" | "taxRate" | "menuItemVariantGroup" | "menuItemVariant" | "menuItemAddonGroup" | "menuItemAddon" | "cart" | "cartItem" | "cartItemVariant" | "cartItemAddon" | "order" | "orderItem" | "orderItemVariant" | "orderItemAddon" | "cancellationRequest" | "refund" | "payment" | "invoice" | "supplier" | "inventoryLocation" | "ingredient" | "recipe" | "recipeIngredient" | "stockLedger" | "plan" | "subscription" | "session" | "auditLog" | "externalOrder" | "restaurantDeliveryProvider" | "webhookEvent" | "aiUsage" | "automationRule" | "automationExecution" | "notification" | "supportTicket"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2233,6 +2235,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.OrderItemAddonCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.OrderItemAddonCountAggregateOutputType> | number
+        }
+      }
+    }
+    CancellationRequest: {
+      payload: Prisma.$CancellationRequestPayload<ExtArgs>
+      fields: Prisma.CancellationRequestFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CancellationRequestFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CancellationRequestPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CancellationRequestFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CancellationRequestPayload>
+        }
+        findFirst: {
+          args: Prisma.CancellationRequestFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CancellationRequestPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CancellationRequestFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CancellationRequestPayload>
+        }
+        findMany: {
+          args: Prisma.CancellationRequestFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CancellationRequestPayload>[]
+        }
+        create: {
+          args: Prisma.CancellationRequestCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CancellationRequestPayload>
+        }
+        createMany: {
+          args: Prisma.CancellationRequestCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CancellationRequestCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CancellationRequestPayload>[]
+        }
+        delete: {
+          args: Prisma.CancellationRequestDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CancellationRequestPayload>
+        }
+        update: {
+          args: Prisma.CancellationRequestUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CancellationRequestPayload>
+        }
+        deleteMany: {
+          args: Prisma.CancellationRequestDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CancellationRequestUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CancellationRequestUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CancellationRequestPayload>[]
+        }
+        upsert: {
+          args: Prisma.CancellationRequestUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CancellationRequestPayload>
+        }
+        aggregate: {
+          args: Prisma.CancellationRequestAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCancellationRequest>
+        }
+        groupBy: {
+          args: Prisma.CancellationRequestGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CancellationRequestGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CancellationRequestCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CancellationRequestCountAggregateOutputType> | number
+        }
+      }
+    }
+    Refund: {
+      payload: Prisma.$RefundPayload<ExtArgs>
+      fields: Prisma.RefundFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RefundFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RefundPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RefundFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RefundPayload>
+        }
+        findFirst: {
+          args: Prisma.RefundFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RefundPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RefundFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RefundPayload>
+        }
+        findMany: {
+          args: Prisma.RefundFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RefundPayload>[]
+        }
+        create: {
+          args: Prisma.RefundCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RefundPayload>
+        }
+        createMany: {
+          args: Prisma.RefundCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.RefundCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RefundPayload>[]
+        }
+        delete: {
+          args: Prisma.RefundDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RefundPayload>
+        }
+        update: {
+          args: Prisma.RefundUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RefundPayload>
+        }
+        deleteMany: {
+          args: Prisma.RefundDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RefundUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.RefundUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RefundPayload>[]
+        }
+        upsert: {
+          args: Prisma.RefundUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RefundPayload>
+        }
+        aggregate: {
+          args: Prisma.RefundAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRefund>
+        }
+        groupBy: {
+          args: Prisma.RefundGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RefundGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RefundCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RefundCountAggregateOutputType> | number
         }
       }
     }
@@ -4035,6 +4185,10 @@ export const OrderScalarFieldEnum = {
   taxAmount: 'taxAmount',
   discountAmount: 'discountAmount',
   totalAmount: 'totalAmount',
+  cancelledAt: 'cancelledAt',
+  cancelledBy: 'cancelledBy',
+  cancellationReason: 'cancellationReason',
+  cancellationNote: 'cancellationNote',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -4076,6 +4230,47 @@ export const OrderItemAddonScalarFieldEnum = {
 } as const
 
 export type OrderItemAddonScalarFieldEnum = (typeof OrderItemAddonScalarFieldEnum)[keyof typeof OrderItemAddonScalarFieldEnum]
+
+
+export const CancellationRequestScalarFieldEnum = {
+  id: 'id',
+  restaurantId: 'restaurantId',
+  orderId: 'orderId',
+  requestedBy: 'requestedBy',
+  requestedByName: 'requestedByName',
+  reason: 'reason',
+  note: 'note',
+  status: 'status',
+  reviewedBy: 'reviewedBy',
+  reviewedByName: 'reviewedByName',
+  reviewedAt: 'reviewedAt',
+  rejectionReason: 'rejectionReason',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CancellationRequestScalarFieldEnum = (typeof CancellationRequestScalarFieldEnum)[keyof typeof CancellationRequestScalarFieldEnum]
+
+
+export const RefundScalarFieldEnum = {
+  id: 'id',
+  restaurantId: 'restaurantId',
+  orderId: 'orderId',
+  paymentId: 'paymentId',
+  amount: 'amount',
+  reason: 'reason',
+  note: 'note',
+  status: 'status',
+  requestedBy: 'requestedBy',
+  approvedBy: 'approvedBy',
+  processedAt: 'processedAt',
+  providerRefundId: 'providerRefundId',
+  failureReason: 'failureReason',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RefundScalarFieldEnum = (typeof RefundScalarFieldEnum)[keyof typeof RefundScalarFieldEnum]
 
 
 export const PaymentScalarFieldEnum = {
@@ -4782,6 +4977,34 @@ export type ListEnumOrderSourceFieldRefInput<$PrismaModel> = FieldRefInputType<$
 
 
 /**
+ * Reference to a field of type 'CancellationRequestStatus'
+ */
+export type EnumCancellationRequestStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CancellationRequestStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'CancellationRequestStatus[]'
+ */
+export type ListEnumCancellationRequestStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CancellationRequestStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'RefundStatus'
+ */
+export type EnumRefundStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RefundStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'RefundStatus[]'
+ */
+export type ListEnumRefundStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RefundStatus[]'>
+    
+
+
+/**
  * Reference to a field of type 'PaymentMethod'
  */
 export type EnumPaymentMethodFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaymentMethod'>
@@ -5081,6 +5304,8 @@ export type GlobalOmitConfig = {
   orderItem?: Prisma.OrderItemOmit
   orderItemVariant?: Prisma.OrderItemVariantOmit
   orderItemAddon?: Prisma.OrderItemAddonOmit
+  cancellationRequest?: Prisma.CancellationRequestOmit
+  refund?: Prisma.RefundOmit
   payment?: Prisma.PaymentOmit
   invoice?: Prisma.InvoiceOmit
   supplier?: Prisma.SupplierOmit

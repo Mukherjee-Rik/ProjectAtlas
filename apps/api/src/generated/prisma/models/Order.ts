@@ -53,6 +53,10 @@ export type OrderMinAggregateOutputType = {
   taxAmount: runtime.Decimal | null
   discountAmount: runtime.Decimal | null
   totalAmount: runtime.Decimal | null
+  cancelledAt: Date | null
+  cancelledBy: string | null
+  cancellationReason: string | null
+  cancellationNote: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -70,6 +74,10 @@ export type OrderMaxAggregateOutputType = {
   taxAmount: runtime.Decimal | null
   discountAmount: runtime.Decimal | null
   totalAmount: runtime.Decimal | null
+  cancelledAt: Date | null
+  cancelledBy: string | null
+  cancellationReason: string | null
+  cancellationNote: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -87,6 +95,10 @@ export type OrderCountAggregateOutputType = {
   taxAmount: number
   discountAmount: number
   totalAmount: number
+  cancelledAt: number
+  cancelledBy: number
+  cancellationReason: number
+  cancellationNote: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -120,6 +132,10 @@ export type OrderMinAggregateInputType = {
   taxAmount?: true
   discountAmount?: true
   totalAmount?: true
+  cancelledAt?: true
+  cancelledBy?: true
+  cancellationReason?: true
+  cancellationNote?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -137,6 +153,10 @@ export type OrderMaxAggregateInputType = {
   taxAmount?: true
   discountAmount?: true
   totalAmount?: true
+  cancelledAt?: true
+  cancelledBy?: true
+  cancellationReason?: true
+  cancellationNote?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -154,6 +174,10 @@ export type OrderCountAggregateInputType = {
   taxAmount?: true
   discountAmount?: true
   totalAmount?: true
+  cancelledAt?: true
+  cancelledBy?: true
+  cancellationReason?: true
+  cancellationNote?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -258,6 +282,10 @@ export type OrderGroupByOutputType = {
   taxAmount: runtime.Decimal
   discountAmount: runtime.Decimal
   totalAmount: runtime.Decimal
+  cancelledAt: Date | null
+  cancelledBy: string | null
+  cancellationReason: string | null
+  cancellationNote: string | null
   createdAt: Date
   updatedAt: Date
   _count: OrderCountAggregateOutputType | null
@@ -298,6 +326,10 @@ export type OrderWhereInput = {
   taxAmount?: Prisma.DecimalFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount?: Prisma.DecimalFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount?: Prisma.DecimalFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Prisma.DateTimeNullableFilter<"Order"> | Date | string | null
+  cancelledBy?: Prisma.StringNullableFilter<"Order"> | string | null
+  cancellationReason?: Prisma.StringNullableFilter<"Order"> | string | null
+  cancellationNote?: Prisma.StringNullableFilter<"Order"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Order"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Order"> | Date | string
   restaurant?: Prisma.XOR<Prisma.RestaurantScalarRelationFilter, Prisma.RestaurantWhereInput>
@@ -309,6 +341,8 @@ export type OrderWhereInput = {
   invoice?: Prisma.XOR<Prisma.InvoiceNullableScalarRelationFilter, Prisma.InvoiceWhereInput> | null
   stockLedgers?: Prisma.StockLedgerListRelationFilter
   externalOrder?: Prisma.XOR<Prisma.ExternalOrderNullableScalarRelationFilter, Prisma.ExternalOrderWhereInput> | null
+  cancellationRequests?: Prisma.CancellationRequestListRelationFilter
+  refunds?: Prisma.RefundListRelationFilter
 }
 
 export type OrderOrderByWithRelationInput = {
@@ -324,6 +358,10 @@ export type OrderOrderByWithRelationInput = {
   taxAmount?: Prisma.SortOrder
   discountAmount?: Prisma.SortOrder
   totalAmount?: Prisma.SortOrder
+  cancelledAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  cancelledBy?: Prisma.SortOrderInput | Prisma.SortOrder
+  cancellationReason?: Prisma.SortOrderInput | Prisma.SortOrder
+  cancellationNote?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   restaurant?: Prisma.RestaurantOrderByWithRelationInput
@@ -335,6 +373,8 @@ export type OrderOrderByWithRelationInput = {
   invoice?: Prisma.InvoiceOrderByWithRelationInput
   stockLedgers?: Prisma.StockLedgerOrderByRelationAggregateInput
   externalOrder?: Prisma.ExternalOrderOrderByWithRelationInput
+  cancellationRequests?: Prisma.CancellationRequestOrderByRelationAggregateInput
+  refunds?: Prisma.RefundOrderByRelationAggregateInput
 }
 
 export type OrderWhereUniqueInput = Prisma.AtLeast<{
@@ -354,6 +394,10 @@ export type OrderWhereUniqueInput = Prisma.AtLeast<{
   taxAmount?: Prisma.DecimalFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount?: Prisma.DecimalFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount?: Prisma.DecimalFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Prisma.DateTimeNullableFilter<"Order"> | Date | string | null
+  cancelledBy?: Prisma.StringNullableFilter<"Order"> | string | null
+  cancellationReason?: Prisma.StringNullableFilter<"Order"> | string | null
+  cancellationNote?: Prisma.StringNullableFilter<"Order"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Order"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Order"> | Date | string
   restaurant?: Prisma.XOR<Prisma.RestaurantScalarRelationFilter, Prisma.RestaurantWhereInput>
@@ -365,6 +409,8 @@ export type OrderWhereUniqueInput = Prisma.AtLeast<{
   invoice?: Prisma.XOR<Prisma.InvoiceNullableScalarRelationFilter, Prisma.InvoiceWhereInput> | null
   stockLedgers?: Prisma.StockLedgerListRelationFilter
   externalOrder?: Prisma.XOR<Prisma.ExternalOrderNullableScalarRelationFilter, Prisma.ExternalOrderWhereInput> | null
+  cancellationRequests?: Prisma.CancellationRequestListRelationFilter
+  refunds?: Prisma.RefundListRelationFilter
 }, "id" | "restaurantId_orderNumber">
 
 export type OrderOrderByWithAggregationInput = {
@@ -380,6 +426,10 @@ export type OrderOrderByWithAggregationInput = {
   taxAmount?: Prisma.SortOrder
   discountAmount?: Prisma.SortOrder
   totalAmount?: Prisma.SortOrder
+  cancelledAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  cancelledBy?: Prisma.SortOrderInput | Prisma.SortOrder
+  cancellationReason?: Prisma.SortOrderInput | Prisma.SortOrder
+  cancellationNote?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.OrderCountOrderByAggregateInput
@@ -405,6 +455,10 @@ export type OrderScalarWhereWithAggregatesInput = {
   taxAmount?: Prisma.DecimalWithAggregatesFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount?: Prisma.DecimalWithAggregatesFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount?: Prisma.DecimalWithAggregatesFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Order"> | Date | string | null
+  cancelledBy?: Prisma.StringNullableWithAggregatesFilter<"Order"> | string | null
+  cancellationReason?: Prisma.StringNullableWithAggregatesFilter<"Order"> | string | null
+  cancellationNote?: Prisma.StringNullableWithAggregatesFilter<"Order"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Order"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Order"> | Date | string
 }
@@ -418,6 +472,10 @@ export type OrderCreateInput = {
   taxAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Date | string | null
+  cancelledBy?: string | null
+  cancellationReason?: string | null
+  cancellationNote?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   restaurant: Prisma.RestaurantCreateNestedOneWithoutOrdersInput
@@ -429,6 +487,8 @@ export type OrderCreateInput = {
   invoice?: Prisma.InvoiceCreateNestedOneWithoutOrderInput
   stockLedgers?: Prisma.StockLedgerCreateNestedManyWithoutOrderInput
   externalOrder?: Prisma.ExternalOrderCreateNestedOneWithoutAtlasOrderInput
+  cancellationRequests?: Prisma.CancellationRequestCreateNestedManyWithoutOrderInput
+  refunds?: Prisma.RefundCreateNestedManyWithoutOrderInput
 }
 
 export type OrderUncheckedCreateInput = {
@@ -444,6 +504,10 @@ export type OrderUncheckedCreateInput = {
   taxAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Date | string | null
+  cancelledBy?: string | null
+  cancellationReason?: string | null
+  cancellationNote?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   items?: Prisma.OrderItemUncheckedCreateNestedManyWithoutOrderInput
@@ -451,6 +515,8 @@ export type OrderUncheckedCreateInput = {
   invoice?: Prisma.InvoiceUncheckedCreateNestedOneWithoutOrderInput
   stockLedgers?: Prisma.StockLedgerUncheckedCreateNestedManyWithoutOrderInput
   externalOrder?: Prisma.ExternalOrderUncheckedCreateNestedOneWithoutAtlasOrderInput
+  cancellationRequests?: Prisma.CancellationRequestUncheckedCreateNestedManyWithoutOrderInput
+  refunds?: Prisma.RefundUncheckedCreateNestedManyWithoutOrderInput
 }
 
 export type OrderUpdateInput = {
@@ -462,6 +528,10 @@ export type OrderUpdateInput = {
   taxAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   restaurant?: Prisma.RestaurantUpdateOneRequiredWithoutOrdersNestedInput
@@ -473,6 +543,8 @@ export type OrderUpdateInput = {
   invoice?: Prisma.InvoiceUpdateOneWithoutOrderNestedInput
   stockLedgers?: Prisma.StockLedgerUpdateManyWithoutOrderNestedInput
   externalOrder?: Prisma.ExternalOrderUpdateOneWithoutAtlasOrderNestedInput
+  cancellationRequests?: Prisma.CancellationRequestUpdateManyWithoutOrderNestedInput
+  refunds?: Prisma.RefundUpdateManyWithoutOrderNestedInput
 }
 
 export type OrderUncheckedUpdateInput = {
@@ -488,6 +560,10 @@ export type OrderUncheckedUpdateInput = {
   taxAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.OrderItemUncheckedUpdateManyWithoutOrderNestedInput
@@ -495,6 +571,8 @@ export type OrderUncheckedUpdateInput = {
   invoice?: Prisma.InvoiceUncheckedUpdateOneWithoutOrderNestedInput
   stockLedgers?: Prisma.StockLedgerUncheckedUpdateManyWithoutOrderNestedInput
   externalOrder?: Prisma.ExternalOrderUncheckedUpdateOneWithoutAtlasOrderNestedInput
+  cancellationRequests?: Prisma.CancellationRequestUncheckedUpdateManyWithoutOrderNestedInput
+  refunds?: Prisma.RefundUncheckedUpdateManyWithoutOrderNestedInput
 }
 
 export type OrderCreateManyInput = {
@@ -510,6 +588,10 @@ export type OrderCreateManyInput = {
   taxAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Date | string | null
+  cancelledBy?: string | null
+  cancellationReason?: string | null
+  cancellationNote?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -523,6 +605,10 @@ export type OrderUpdateManyMutationInput = {
   taxAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -540,6 +626,10 @@ export type OrderUncheckedUpdateManyInput = {
   taxAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -572,6 +662,10 @@ export type OrderCountOrderByAggregateInput = {
   taxAmount?: Prisma.SortOrder
   discountAmount?: Prisma.SortOrder
   totalAmount?: Prisma.SortOrder
+  cancelledAt?: Prisma.SortOrder
+  cancelledBy?: Prisma.SortOrder
+  cancellationReason?: Prisma.SortOrder
+  cancellationNote?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -596,6 +690,10 @@ export type OrderMaxOrderByAggregateInput = {
   taxAmount?: Prisma.SortOrder
   discountAmount?: Prisma.SortOrder
   totalAmount?: Prisma.SortOrder
+  cancelledAt?: Prisma.SortOrder
+  cancelledBy?: Prisma.SortOrder
+  cancellationReason?: Prisma.SortOrder
+  cancellationNote?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -613,6 +711,10 @@ export type OrderMinOrderByAggregateInput = {
   taxAmount?: Prisma.SortOrder
   discountAmount?: Prisma.SortOrder
   totalAmount?: Prisma.SortOrder
+  cancelledAt?: Prisma.SortOrder
+  cancelledBy?: Prisma.SortOrder
+  cancellationReason?: Prisma.SortOrder
+  cancellationNote?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -824,6 +926,34 @@ export type OrderUpdateOneRequiredWithoutItemsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.OrderUpdateToOneWithWhereWithoutItemsInput, Prisma.OrderUpdateWithoutItemsInput>, Prisma.OrderUncheckedUpdateWithoutItemsInput>
 }
 
+export type OrderCreateNestedOneWithoutCancellationRequestsInput = {
+  create?: Prisma.XOR<Prisma.OrderCreateWithoutCancellationRequestsInput, Prisma.OrderUncheckedCreateWithoutCancellationRequestsInput>
+  connectOrCreate?: Prisma.OrderCreateOrConnectWithoutCancellationRequestsInput
+  connect?: Prisma.OrderWhereUniqueInput
+}
+
+export type OrderUpdateOneRequiredWithoutCancellationRequestsNestedInput = {
+  create?: Prisma.XOR<Prisma.OrderCreateWithoutCancellationRequestsInput, Prisma.OrderUncheckedCreateWithoutCancellationRequestsInput>
+  connectOrCreate?: Prisma.OrderCreateOrConnectWithoutCancellationRequestsInput
+  upsert?: Prisma.OrderUpsertWithoutCancellationRequestsInput
+  connect?: Prisma.OrderWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.OrderUpdateToOneWithWhereWithoutCancellationRequestsInput, Prisma.OrderUpdateWithoutCancellationRequestsInput>, Prisma.OrderUncheckedUpdateWithoutCancellationRequestsInput>
+}
+
+export type OrderCreateNestedOneWithoutRefundsInput = {
+  create?: Prisma.XOR<Prisma.OrderCreateWithoutRefundsInput, Prisma.OrderUncheckedCreateWithoutRefundsInput>
+  connectOrCreate?: Prisma.OrderCreateOrConnectWithoutRefundsInput
+  connect?: Prisma.OrderWhereUniqueInput
+}
+
+export type OrderUpdateOneRequiredWithoutRefundsNestedInput = {
+  create?: Prisma.XOR<Prisma.OrderCreateWithoutRefundsInput, Prisma.OrderUncheckedCreateWithoutRefundsInput>
+  connectOrCreate?: Prisma.OrderCreateOrConnectWithoutRefundsInput
+  upsert?: Prisma.OrderUpsertWithoutRefundsInput
+  connect?: Prisma.OrderWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.OrderUpdateToOneWithWhereWithoutRefundsInput, Prisma.OrderUpdateWithoutRefundsInput>, Prisma.OrderUncheckedUpdateWithoutRefundsInput>
+}
+
 export type OrderCreateNestedOneWithoutPaymentsInput = {
   create?: Prisma.XOR<Prisma.OrderCreateWithoutPaymentsInput, Prisma.OrderUncheckedCreateWithoutPaymentsInput>
   connectOrCreate?: Prisma.OrderCreateOrConnectWithoutPaymentsInput
@@ -893,6 +1023,10 @@ export type OrderCreateWithoutRestaurantInput = {
   taxAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Date | string | null
+  cancelledBy?: string | null
+  cancellationReason?: string | null
+  cancellationNote?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   branch: Prisma.BranchCreateNestedOneWithoutOrdersInput
@@ -903,6 +1037,8 @@ export type OrderCreateWithoutRestaurantInput = {
   invoice?: Prisma.InvoiceCreateNestedOneWithoutOrderInput
   stockLedgers?: Prisma.StockLedgerCreateNestedManyWithoutOrderInput
   externalOrder?: Prisma.ExternalOrderCreateNestedOneWithoutAtlasOrderInput
+  cancellationRequests?: Prisma.CancellationRequestCreateNestedManyWithoutOrderInput
+  refunds?: Prisma.RefundCreateNestedManyWithoutOrderInput
 }
 
 export type OrderUncheckedCreateWithoutRestaurantInput = {
@@ -917,6 +1053,10 @@ export type OrderUncheckedCreateWithoutRestaurantInput = {
   taxAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Date | string | null
+  cancelledBy?: string | null
+  cancellationReason?: string | null
+  cancellationNote?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   items?: Prisma.OrderItemUncheckedCreateNestedManyWithoutOrderInput
@@ -924,6 +1064,8 @@ export type OrderUncheckedCreateWithoutRestaurantInput = {
   invoice?: Prisma.InvoiceUncheckedCreateNestedOneWithoutOrderInput
   stockLedgers?: Prisma.StockLedgerUncheckedCreateNestedManyWithoutOrderInput
   externalOrder?: Prisma.ExternalOrderUncheckedCreateNestedOneWithoutAtlasOrderInput
+  cancellationRequests?: Prisma.CancellationRequestUncheckedCreateNestedManyWithoutOrderInput
+  refunds?: Prisma.RefundUncheckedCreateNestedManyWithoutOrderInput
 }
 
 export type OrderCreateOrConnectWithoutRestaurantInput = {
@@ -968,6 +1110,10 @@ export type OrderScalarWhereInput = {
   taxAmount?: Prisma.DecimalFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount?: Prisma.DecimalFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount?: Prisma.DecimalFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Prisma.DateTimeNullableFilter<"Order"> | Date | string | null
+  cancelledBy?: Prisma.StringNullableFilter<"Order"> | string | null
+  cancellationReason?: Prisma.StringNullableFilter<"Order"> | string | null
+  cancellationNote?: Prisma.StringNullableFilter<"Order"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Order"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Order"> | Date | string
 }
@@ -981,6 +1127,10 @@ export type OrderCreateWithoutBranchInput = {
   taxAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Date | string | null
+  cancelledBy?: string | null
+  cancellationReason?: string | null
+  cancellationNote?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   restaurant: Prisma.RestaurantCreateNestedOneWithoutOrdersInput
@@ -991,6 +1141,8 @@ export type OrderCreateWithoutBranchInput = {
   invoice?: Prisma.InvoiceCreateNestedOneWithoutOrderInput
   stockLedgers?: Prisma.StockLedgerCreateNestedManyWithoutOrderInput
   externalOrder?: Prisma.ExternalOrderCreateNestedOneWithoutAtlasOrderInput
+  cancellationRequests?: Prisma.CancellationRequestCreateNestedManyWithoutOrderInput
+  refunds?: Prisma.RefundCreateNestedManyWithoutOrderInput
 }
 
 export type OrderUncheckedCreateWithoutBranchInput = {
@@ -1005,6 +1157,10 @@ export type OrderUncheckedCreateWithoutBranchInput = {
   taxAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Date | string | null
+  cancelledBy?: string | null
+  cancellationReason?: string | null
+  cancellationNote?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   items?: Prisma.OrderItemUncheckedCreateNestedManyWithoutOrderInput
@@ -1012,6 +1168,8 @@ export type OrderUncheckedCreateWithoutBranchInput = {
   invoice?: Prisma.InvoiceUncheckedCreateNestedOneWithoutOrderInput
   stockLedgers?: Prisma.StockLedgerUncheckedCreateNestedManyWithoutOrderInput
   externalOrder?: Prisma.ExternalOrderUncheckedCreateNestedOneWithoutAtlasOrderInput
+  cancellationRequests?: Prisma.CancellationRequestUncheckedCreateNestedManyWithoutOrderInput
+  refunds?: Prisma.RefundUncheckedCreateNestedManyWithoutOrderInput
 }
 
 export type OrderCreateOrConnectWithoutBranchInput = {
@@ -1049,6 +1207,10 @@ export type OrderCreateWithoutTableInput = {
   taxAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Date | string | null
+  cancelledBy?: string | null
+  cancellationReason?: string | null
+  cancellationNote?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   restaurant: Prisma.RestaurantCreateNestedOneWithoutOrdersInput
@@ -1059,6 +1221,8 @@ export type OrderCreateWithoutTableInput = {
   invoice?: Prisma.InvoiceCreateNestedOneWithoutOrderInput
   stockLedgers?: Prisma.StockLedgerCreateNestedManyWithoutOrderInput
   externalOrder?: Prisma.ExternalOrderCreateNestedOneWithoutAtlasOrderInput
+  cancellationRequests?: Prisma.CancellationRequestCreateNestedManyWithoutOrderInput
+  refunds?: Prisma.RefundCreateNestedManyWithoutOrderInput
 }
 
 export type OrderUncheckedCreateWithoutTableInput = {
@@ -1073,6 +1237,10 @@ export type OrderUncheckedCreateWithoutTableInput = {
   taxAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Date | string | null
+  cancelledBy?: string | null
+  cancellationReason?: string | null
+  cancellationNote?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   items?: Prisma.OrderItemUncheckedCreateNestedManyWithoutOrderInput
@@ -1080,6 +1248,8 @@ export type OrderUncheckedCreateWithoutTableInput = {
   invoice?: Prisma.InvoiceUncheckedCreateNestedOneWithoutOrderInput
   stockLedgers?: Prisma.StockLedgerUncheckedCreateNestedManyWithoutOrderInput
   externalOrder?: Prisma.ExternalOrderUncheckedCreateNestedOneWithoutAtlasOrderInput
+  cancellationRequests?: Prisma.CancellationRequestUncheckedCreateNestedManyWithoutOrderInput
+  refunds?: Prisma.RefundUncheckedCreateNestedManyWithoutOrderInput
 }
 
 export type OrderCreateOrConnectWithoutTableInput = {
@@ -1117,6 +1287,10 @@ export type OrderCreateWithoutCustomerSessionInput = {
   taxAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Date | string | null
+  cancelledBy?: string | null
+  cancellationReason?: string | null
+  cancellationNote?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   restaurant: Prisma.RestaurantCreateNestedOneWithoutOrdersInput
@@ -1127,6 +1301,8 @@ export type OrderCreateWithoutCustomerSessionInput = {
   invoice?: Prisma.InvoiceCreateNestedOneWithoutOrderInput
   stockLedgers?: Prisma.StockLedgerCreateNestedManyWithoutOrderInput
   externalOrder?: Prisma.ExternalOrderCreateNestedOneWithoutAtlasOrderInput
+  cancellationRequests?: Prisma.CancellationRequestCreateNestedManyWithoutOrderInput
+  refunds?: Prisma.RefundCreateNestedManyWithoutOrderInput
 }
 
 export type OrderUncheckedCreateWithoutCustomerSessionInput = {
@@ -1141,6 +1317,10 @@ export type OrderUncheckedCreateWithoutCustomerSessionInput = {
   taxAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Date | string | null
+  cancelledBy?: string | null
+  cancellationReason?: string | null
+  cancellationNote?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   items?: Prisma.OrderItemUncheckedCreateNestedManyWithoutOrderInput
@@ -1148,6 +1328,8 @@ export type OrderUncheckedCreateWithoutCustomerSessionInput = {
   invoice?: Prisma.InvoiceUncheckedCreateNestedOneWithoutOrderInput
   stockLedgers?: Prisma.StockLedgerUncheckedCreateNestedManyWithoutOrderInput
   externalOrder?: Prisma.ExternalOrderUncheckedCreateNestedOneWithoutAtlasOrderInput
+  cancellationRequests?: Prisma.CancellationRequestUncheckedCreateNestedManyWithoutOrderInput
+  refunds?: Prisma.RefundUncheckedCreateNestedManyWithoutOrderInput
 }
 
 export type OrderCreateOrConnectWithoutCustomerSessionInput = {
@@ -1185,6 +1367,10 @@ export type OrderCreateWithoutItemsInput = {
   taxAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Date | string | null
+  cancelledBy?: string | null
+  cancellationReason?: string | null
+  cancellationNote?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   restaurant: Prisma.RestaurantCreateNestedOneWithoutOrdersInput
@@ -1195,6 +1381,8 @@ export type OrderCreateWithoutItemsInput = {
   invoice?: Prisma.InvoiceCreateNestedOneWithoutOrderInput
   stockLedgers?: Prisma.StockLedgerCreateNestedManyWithoutOrderInput
   externalOrder?: Prisma.ExternalOrderCreateNestedOneWithoutAtlasOrderInput
+  cancellationRequests?: Prisma.CancellationRequestCreateNestedManyWithoutOrderInput
+  refunds?: Prisma.RefundCreateNestedManyWithoutOrderInput
 }
 
 export type OrderUncheckedCreateWithoutItemsInput = {
@@ -1210,12 +1398,18 @@ export type OrderUncheckedCreateWithoutItemsInput = {
   taxAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Date | string | null
+  cancelledBy?: string | null
+  cancellationReason?: string | null
+  cancellationNote?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutOrderInput
   invoice?: Prisma.InvoiceUncheckedCreateNestedOneWithoutOrderInput
   stockLedgers?: Prisma.StockLedgerUncheckedCreateNestedManyWithoutOrderInput
   externalOrder?: Prisma.ExternalOrderUncheckedCreateNestedOneWithoutAtlasOrderInput
+  cancellationRequests?: Prisma.CancellationRequestUncheckedCreateNestedManyWithoutOrderInput
+  refunds?: Prisma.RefundUncheckedCreateNestedManyWithoutOrderInput
 }
 
 export type OrderCreateOrConnectWithoutItemsInput = {
@@ -1243,6 +1437,10 @@ export type OrderUpdateWithoutItemsInput = {
   taxAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   restaurant?: Prisma.RestaurantUpdateOneRequiredWithoutOrdersNestedInput
@@ -1253,6 +1451,8 @@ export type OrderUpdateWithoutItemsInput = {
   invoice?: Prisma.InvoiceUpdateOneWithoutOrderNestedInput
   stockLedgers?: Prisma.StockLedgerUpdateManyWithoutOrderNestedInput
   externalOrder?: Prisma.ExternalOrderUpdateOneWithoutAtlasOrderNestedInput
+  cancellationRequests?: Prisma.CancellationRequestUpdateManyWithoutOrderNestedInput
+  refunds?: Prisma.RefundUpdateManyWithoutOrderNestedInput
 }
 
 export type OrderUncheckedUpdateWithoutItemsInput = {
@@ -1268,12 +1468,266 @@ export type OrderUncheckedUpdateWithoutItemsInput = {
   taxAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutOrderNestedInput
   invoice?: Prisma.InvoiceUncheckedUpdateOneWithoutOrderNestedInput
   stockLedgers?: Prisma.StockLedgerUncheckedUpdateManyWithoutOrderNestedInput
   externalOrder?: Prisma.ExternalOrderUncheckedUpdateOneWithoutAtlasOrderNestedInput
+  cancellationRequests?: Prisma.CancellationRequestUncheckedUpdateManyWithoutOrderNestedInput
+  refunds?: Prisma.RefundUncheckedUpdateManyWithoutOrderNestedInput
+}
+
+export type OrderCreateWithoutCancellationRequestsInput = {
+  id?: string
+  orderNumber: string
+  status?: $Enums.OrderStatus
+  source?: $Enums.OrderSource
+  subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
+  taxAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Date | string | null
+  cancelledBy?: string | null
+  cancellationReason?: string | null
+  cancellationNote?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  restaurant: Prisma.RestaurantCreateNestedOneWithoutOrdersInput
+  branch: Prisma.BranchCreateNestedOneWithoutOrdersInput
+  table?: Prisma.TableCreateNestedOneWithoutOrdersInput
+  customerSession?: Prisma.CustomerSessionCreateNestedOneWithoutOrdersInput
+  items?: Prisma.OrderItemCreateNestedManyWithoutOrderInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutOrderInput
+  invoice?: Prisma.InvoiceCreateNestedOneWithoutOrderInput
+  stockLedgers?: Prisma.StockLedgerCreateNestedManyWithoutOrderInput
+  externalOrder?: Prisma.ExternalOrderCreateNestedOneWithoutAtlasOrderInput
+  refunds?: Prisma.RefundCreateNestedManyWithoutOrderInput
+}
+
+export type OrderUncheckedCreateWithoutCancellationRequestsInput = {
+  id?: string
+  restaurantId: string
+  branchId: string
+  tableId?: string | null
+  customerSessionId?: string | null
+  orderNumber: string
+  status?: $Enums.OrderStatus
+  source?: $Enums.OrderSource
+  subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
+  taxAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Date | string | null
+  cancelledBy?: string | null
+  cancellationReason?: string | null
+  cancellationNote?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  items?: Prisma.OrderItemUncheckedCreateNestedManyWithoutOrderInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutOrderInput
+  invoice?: Prisma.InvoiceUncheckedCreateNestedOneWithoutOrderInput
+  stockLedgers?: Prisma.StockLedgerUncheckedCreateNestedManyWithoutOrderInput
+  externalOrder?: Prisma.ExternalOrderUncheckedCreateNestedOneWithoutAtlasOrderInput
+  refunds?: Prisma.RefundUncheckedCreateNestedManyWithoutOrderInput
+}
+
+export type OrderCreateOrConnectWithoutCancellationRequestsInput = {
+  where: Prisma.OrderWhereUniqueInput
+  create: Prisma.XOR<Prisma.OrderCreateWithoutCancellationRequestsInput, Prisma.OrderUncheckedCreateWithoutCancellationRequestsInput>
+}
+
+export type OrderUpsertWithoutCancellationRequestsInput = {
+  update: Prisma.XOR<Prisma.OrderUpdateWithoutCancellationRequestsInput, Prisma.OrderUncheckedUpdateWithoutCancellationRequestsInput>
+  create: Prisma.XOR<Prisma.OrderCreateWithoutCancellationRequestsInput, Prisma.OrderUncheckedCreateWithoutCancellationRequestsInput>
+  where?: Prisma.OrderWhereInput
+}
+
+export type OrderUpdateToOneWithWhereWithoutCancellationRequestsInput = {
+  where?: Prisma.OrderWhereInput
+  data: Prisma.XOR<Prisma.OrderUpdateWithoutCancellationRequestsInput, Prisma.OrderUncheckedUpdateWithoutCancellationRequestsInput>
+}
+
+export type OrderUpdateWithoutCancellationRequestsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  orderNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  source?: Prisma.EnumOrderSourceFieldUpdateOperationsInput | $Enums.OrderSource
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  taxAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  restaurant?: Prisma.RestaurantUpdateOneRequiredWithoutOrdersNestedInput
+  branch?: Prisma.BranchUpdateOneRequiredWithoutOrdersNestedInput
+  table?: Prisma.TableUpdateOneWithoutOrdersNestedInput
+  customerSession?: Prisma.CustomerSessionUpdateOneWithoutOrdersNestedInput
+  items?: Prisma.OrderItemUpdateManyWithoutOrderNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutOrderNestedInput
+  invoice?: Prisma.InvoiceUpdateOneWithoutOrderNestedInput
+  stockLedgers?: Prisma.StockLedgerUpdateManyWithoutOrderNestedInput
+  externalOrder?: Prisma.ExternalOrderUpdateOneWithoutAtlasOrderNestedInput
+  refunds?: Prisma.RefundUpdateManyWithoutOrderNestedInput
+}
+
+export type OrderUncheckedUpdateWithoutCancellationRequestsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  restaurantId?: Prisma.StringFieldUpdateOperationsInput | string
+  branchId?: Prisma.StringFieldUpdateOperationsInput | string
+  tableId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  customerSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  orderNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  source?: Prisma.EnumOrderSourceFieldUpdateOperationsInput | $Enums.OrderSource
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  taxAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  items?: Prisma.OrderItemUncheckedUpdateManyWithoutOrderNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutOrderNestedInput
+  invoice?: Prisma.InvoiceUncheckedUpdateOneWithoutOrderNestedInput
+  stockLedgers?: Prisma.StockLedgerUncheckedUpdateManyWithoutOrderNestedInput
+  externalOrder?: Prisma.ExternalOrderUncheckedUpdateOneWithoutAtlasOrderNestedInput
+  refunds?: Prisma.RefundUncheckedUpdateManyWithoutOrderNestedInput
+}
+
+export type OrderCreateWithoutRefundsInput = {
+  id?: string
+  orderNumber: string
+  status?: $Enums.OrderStatus
+  source?: $Enums.OrderSource
+  subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
+  taxAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Date | string | null
+  cancelledBy?: string | null
+  cancellationReason?: string | null
+  cancellationNote?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  restaurant: Prisma.RestaurantCreateNestedOneWithoutOrdersInput
+  branch: Prisma.BranchCreateNestedOneWithoutOrdersInput
+  table?: Prisma.TableCreateNestedOneWithoutOrdersInput
+  customerSession?: Prisma.CustomerSessionCreateNestedOneWithoutOrdersInput
+  items?: Prisma.OrderItemCreateNestedManyWithoutOrderInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutOrderInput
+  invoice?: Prisma.InvoiceCreateNestedOneWithoutOrderInput
+  stockLedgers?: Prisma.StockLedgerCreateNestedManyWithoutOrderInput
+  externalOrder?: Prisma.ExternalOrderCreateNestedOneWithoutAtlasOrderInput
+  cancellationRequests?: Prisma.CancellationRequestCreateNestedManyWithoutOrderInput
+}
+
+export type OrderUncheckedCreateWithoutRefundsInput = {
+  id?: string
+  restaurantId: string
+  branchId: string
+  tableId?: string | null
+  customerSessionId?: string | null
+  orderNumber: string
+  status?: $Enums.OrderStatus
+  source?: $Enums.OrderSource
+  subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
+  taxAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Date | string | null
+  cancelledBy?: string | null
+  cancellationReason?: string | null
+  cancellationNote?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  items?: Prisma.OrderItemUncheckedCreateNestedManyWithoutOrderInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutOrderInput
+  invoice?: Prisma.InvoiceUncheckedCreateNestedOneWithoutOrderInput
+  stockLedgers?: Prisma.StockLedgerUncheckedCreateNestedManyWithoutOrderInput
+  externalOrder?: Prisma.ExternalOrderUncheckedCreateNestedOneWithoutAtlasOrderInput
+  cancellationRequests?: Prisma.CancellationRequestUncheckedCreateNestedManyWithoutOrderInput
+}
+
+export type OrderCreateOrConnectWithoutRefundsInput = {
+  where: Prisma.OrderWhereUniqueInput
+  create: Prisma.XOR<Prisma.OrderCreateWithoutRefundsInput, Prisma.OrderUncheckedCreateWithoutRefundsInput>
+}
+
+export type OrderUpsertWithoutRefundsInput = {
+  update: Prisma.XOR<Prisma.OrderUpdateWithoutRefundsInput, Prisma.OrderUncheckedUpdateWithoutRefundsInput>
+  create: Prisma.XOR<Prisma.OrderCreateWithoutRefundsInput, Prisma.OrderUncheckedCreateWithoutRefundsInput>
+  where?: Prisma.OrderWhereInput
+}
+
+export type OrderUpdateToOneWithWhereWithoutRefundsInput = {
+  where?: Prisma.OrderWhereInput
+  data: Prisma.XOR<Prisma.OrderUpdateWithoutRefundsInput, Prisma.OrderUncheckedUpdateWithoutRefundsInput>
+}
+
+export type OrderUpdateWithoutRefundsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  orderNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  source?: Prisma.EnumOrderSourceFieldUpdateOperationsInput | $Enums.OrderSource
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  taxAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  restaurant?: Prisma.RestaurantUpdateOneRequiredWithoutOrdersNestedInput
+  branch?: Prisma.BranchUpdateOneRequiredWithoutOrdersNestedInput
+  table?: Prisma.TableUpdateOneWithoutOrdersNestedInput
+  customerSession?: Prisma.CustomerSessionUpdateOneWithoutOrdersNestedInput
+  items?: Prisma.OrderItemUpdateManyWithoutOrderNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutOrderNestedInput
+  invoice?: Prisma.InvoiceUpdateOneWithoutOrderNestedInput
+  stockLedgers?: Prisma.StockLedgerUpdateManyWithoutOrderNestedInput
+  externalOrder?: Prisma.ExternalOrderUpdateOneWithoutAtlasOrderNestedInput
+  cancellationRequests?: Prisma.CancellationRequestUpdateManyWithoutOrderNestedInput
+}
+
+export type OrderUncheckedUpdateWithoutRefundsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  restaurantId?: Prisma.StringFieldUpdateOperationsInput | string
+  branchId?: Prisma.StringFieldUpdateOperationsInput | string
+  tableId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  customerSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  orderNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
+  source?: Prisma.EnumOrderSourceFieldUpdateOperationsInput | $Enums.OrderSource
+  subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  taxAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  items?: Prisma.OrderItemUncheckedUpdateManyWithoutOrderNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutOrderNestedInput
+  invoice?: Prisma.InvoiceUncheckedUpdateOneWithoutOrderNestedInput
+  stockLedgers?: Prisma.StockLedgerUncheckedUpdateManyWithoutOrderNestedInput
+  externalOrder?: Prisma.ExternalOrderUncheckedUpdateOneWithoutAtlasOrderNestedInput
+  cancellationRequests?: Prisma.CancellationRequestUncheckedUpdateManyWithoutOrderNestedInput
 }
 
 export type OrderCreateWithoutPaymentsInput = {
@@ -1285,6 +1739,10 @@ export type OrderCreateWithoutPaymentsInput = {
   taxAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Date | string | null
+  cancelledBy?: string | null
+  cancellationReason?: string | null
+  cancellationNote?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   restaurant: Prisma.RestaurantCreateNestedOneWithoutOrdersInput
@@ -1295,6 +1753,8 @@ export type OrderCreateWithoutPaymentsInput = {
   invoice?: Prisma.InvoiceCreateNestedOneWithoutOrderInput
   stockLedgers?: Prisma.StockLedgerCreateNestedManyWithoutOrderInput
   externalOrder?: Prisma.ExternalOrderCreateNestedOneWithoutAtlasOrderInput
+  cancellationRequests?: Prisma.CancellationRequestCreateNestedManyWithoutOrderInput
+  refunds?: Prisma.RefundCreateNestedManyWithoutOrderInput
 }
 
 export type OrderUncheckedCreateWithoutPaymentsInput = {
@@ -1310,12 +1770,18 @@ export type OrderUncheckedCreateWithoutPaymentsInput = {
   taxAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Date | string | null
+  cancelledBy?: string | null
+  cancellationReason?: string | null
+  cancellationNote?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   items?: Prisma.OrderItemUncheckedCreateNestedManyWithoutOrderInput
   invoice?: Prisma.InvoiceUncheckedCreateNestedOneWithoutOrderInput
   stockLedgers?: Prisma.StockLedgerUncheckedCreateNestedManyWithoutOrderInput
   externalOrder?: Prisma.ExternalOrderUncheckedCreateNestedOneWithoutAtlasOrderInput
+  cancellationRequests?: Prisma.CancellationRequestUncheckedCreateNestedManyWithoutOrderInput
+  refunds?: Prisma.RefundUncheckedCreateNestedManyWithoutOrderInput
 }
 
 export type OrderCreateOrConnectWithoutPaymentsInput = {
@@ -1343,6 +1809,10 @@ export type OrderUpdateWithoutPaymentsInput = {
   taxAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   restaurant?: Prisma.RestaurantUpdateOneRequiredWithoutOrdersNestedInput
@@ -1353,6 +1823,8 @@ export type OrderUpdateWithoutPaymentsInput = {
   invoice?: Prisma.InvoiceUpdateOneWithoutOrderNestedInput
   stockLedgers?: Prisma.StockLedgerUpdateManyWithoutOrderNestedInput
   externalOrder?: Prisma.ExternalOrderUpdateOneWithoutAtlasOrderNestedInput
+  cancellationRequests?: Prisma.CancellationRequestUpdateManyWithoutOrderNestedInput
+  refunds?: Prisma.RefundUpdateManyWithoutOrderNestedInput
 }
 
 export type OrderUncheckedUpdateWithoutPaymentsInput = {
@@ -1368,12 +1840,18 @@ export type OrderUncheckedUpdateWithoutPaymentsInput = {
   taxAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.OrderItemUncheckedUpdateManyWithoutOrderNestedInput
   invoice?: Prisma.InvoiceUncheckedUpdateOneWithoutOrderNestedInput
   stockLedgers?: Prisma.StockLedgerUncheckedUpdateManyWithoutOrderNestedInput
   externalOrder?: Prisma.ExternalOrderUncheckedUpdateOneWithoutAtlasOrderNestedInput
+  cancellationRequests?: Prisma.CancellationRequestUncheckedUpdateManyWithoutOrderNestedInput
+  refunds?: Prisma.RefundUncheckedUpdateManyWithoutOrderNestedInput
 }
 
 export type OrderCreateWithoutInvoiceInput = {
@@ -1385,6 +1863,10 @@ export type OrderCreateWithoutInvoiceInput = {
   taxAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Date | string | null
+  cancelledBy?: string | null
+  cancellationReason?: string | null
+  cancellationNote?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   restaurant: Prisma.RestaurantCreateNestedOneWithoutOrdersInput
@@ -1395,6 +1877,8 @@ export type OrderCreateWithoutInvoiceInput = {
   payments?: Prisma.PaymentCreateNestedManyWithoutOrderInput
   stockLedgers?: Prisma.StockLedgerCreateNestedManyWithoutOrderInput
   externalOrder?: Prisma.ExternalOrderCreateNestedOneWithoutAtlasOrderInput
+  cancellationRequests?: Prisma.CancellationRequestCreateNestedManyWithoutOrderInput
+  refunds?: Prisma.RefundCreateNestedManyWithoutOrderInput
 }
 
 export type OrderUncheckedCreateWithoutInvoiceInput = {
@@ -1410,12 +1894,18 @@ export type OrderUncheckedCreateWithoutInvoiceInput = {
   taxAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Date | string | null
+  cancelledBy?: string | null
+  cancellationReason?: string | null
+  cancellationNote?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   items?: Prisma.OrderItemUncheckedCreateNestedManyWithoutOrderInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutOrderInput
   stockLedgers?: Prisma.StockLedgerUncheckedCreateNestedManyWithoutOrderInput
   externalOrder?: Prisma.ExternalOrderUncheckedCreateNestedOneWithoutAtlasOrderInput
+  cancellationRequests?: Prisma.CancellationRequestUncheckedCreateNestedManyWithoutOrderInput
+  refunds?: Prisma.RefundUncheckedCreateNestedManyWithoutOrderInput
 }
 
 export type OrderCreateOrConnectWithoutInvoiceInput = {
@@ -1443,6 +1933,10 @@ export type OrderUpdateWithoutInvoiceInput = {
   taxAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   restaurant?: Prisma.RestaurantUpdateOneRequiredWithoutOrdersNestedInput
@@ -1453,6 +1947,8 @@ export type OrderUpdateWithoutInvoiceInput = {
   payments?: Prisma.PaymentUpdateManyWithoutOrderNestedInput
   stockLedgers?: Prisma.StockLedgerUpdateManyWithoutOrderNestedInput
   externalOrder?: Prisma.ExternalOrderUpdateOneWithoutAtlasOrderNestedInput
+  cancellationRequests?: Prisma.CancellationRequestUpdateManyWithoutOrderNestedInput
+  refunds?: Prisma.RefundUpdateManyWithoutOrderNestedInput
 }
 
 export type OrderUncheckedUpdateWithoutInvoiceInput = {
@@ -1468,12 +1964,18 @@ export type OrderUncheckedUpdateWithoutInvoiceInput = {
   taxAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.OrderItemUncheckedUpdateManyWithoutOrderNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutOrderNestedInput
   stockLedgers?: Prisma.StockLedgerUncheckedUpdateManyWithoutOrderNestedInput
   externalOrder?: Prisma.ExternalOrderUncheckedUpdateOneWithoutAtlasOrderNestedInput
+  cancellationRequests?: Prisma.CancellationRequestUncheckedUpdateManyWithoutOrderNestedInput
+  refunds?: Prisma.RefundUncheckedUpdateManyWithoutOrderNestedInput
 }
 
 export type OrderCreateWithoutStockLedgersInput = {
@@ -1485,6 +1987,10 @@ export type OrderCreateWithoutStockLedgersInput = {
   taxAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Date | string | null
+  cancelledBy?: string | null
+  cancellationReason?: string | null
+  cancellationNote?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   restaurant: Prisma.RestaurantCreateNestedOneWithoutOrdersInput
@@ -1495,6 +2001,8 @@ export type OrderCreateWithoutStockLedgersInput = {
   payments?: Prisma.PaymentCreateNestedManyWithoutOrderInput
   invoice?: Prisma.InvoiceCreateNestedOneWithoutOrderInput
   externalOrder?: Prisma.ExternalOrderCreateNestedOneWithoutAtlasOrderInput
+  cancellationRequests?: Prisma.CancellationRequestCreateNestedManyWithoutOrderInput
+  refunds?: Prisma.RefundCreateNestedManyWithoutOrderInput
 }
 
 export type OrderUncheckedCreateWithoutStockLedgersInput = {
@@ -1510,12 +2018,18 @@ export type OrderUncheckedCreateWithoutStockLedgersInput = {
   taxAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Date | string | null
+  cancelledBy?: string | null
+  cancellationReason?: string | null
+  cancellationNote?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   items?: Prisma.OrderItemUncheckedCreateNestedManyWithoutOrderInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutOrderInput
   invoice?: Prisma.InvoiceUncheckedCreateNestedOneWithoutOrderInput
   externalOrder?: Prisma.ExternalOrderUncheckedCreateNestedOneWithoutAtlasOrderInput
+  cancellationRequests?: Prisma.CancellationRequestUncheckedCreateNestedManyWithoutOrderInput
+  refunds?: Prisma.RefundUncheckedCreateNestedManyWithoutOrderInput
 }
 
 export type OrderCreateOrConnectWithoutStockLedgersInput = {
@@ -1543,6 +2057,10 @@ export type OrderUpdateWithoutStockLedgersInput = {
   taxAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   restaurant?: Prisma.RestaurantUpdateOneRequiredWithoutOrdersNestedInput
@@ -1553,6 +2071,8 @@ export type OrderUpdateWithoutStockLedgersInput = {
   payments?: Prisma.PaymentUpdateManyWithoutOrderNestedInput
   invoice?: Prisma.InvoiceUpdateOneWithoutOrderNestedInput
   externalOrder?: Prisma.ExternalOrderUpdateOneWithoutAtlasOrderNestedInput
+  cancellationRequests?: Prisma.CancellationRequestUpdateManyWithoutOrderNestedInput
+  refunds?: Prisma.RefundUpdateManyWithoutOrderNestedInput
 }
 
 export type OrderUncheckedUpdateWithoutStockLedgersInput = {
@@ -1568,12 +2088,18 @@ export type OrderUncheckedUpdateWithoutStockLedgersInput = {
   taxAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.OrderItemUncheckedUpdateManyWithoutOrderNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutOrderNestedInput
   invoice?: Prisma.InvoiceUncheckedUpdateOneWithoutOrderNestedInput
   externalOrder?: Prisma.ExternalOrderUncheckedUpdateOneWithoutAtlasOrderNestedInput
+  cancellationRequests?: Prisma.CancellationRequestUncheckedUpdateManyWithoutOrderNestedInput
+  refunds?: Prisma.RefundUncheckedUpdateManyWithoutOrderNestedInput
 }
 
 export type OrderCreateWithoutExternalOrderInput = {
@@ -1585,6 +2111,10 @@ export type OrderCreateWithoutExternalOrderInput = {
   taxAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Date | string | null
+  cancelledBy?: string | null
+  cancellationReason?: string | null
+  cancellationNote?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   restaurant: Prisma.RestaurantCreateNestedOneWithoutOrdersInput
@@ -1595,6 +2125,8 @@ export type OrderCreateWithoutExternalOrderInput = {
   payments?: Prisma.PaymentCreateNestedManyWithoutOrderInput
   invoice?: Prisma.InvoiceCreateNestedOneWithoutOrderInput
   stockLedgers?: Prisma.StockLedgerCreateNestedManyWithoutOrderInput
+  cancellationRequests?: Prisma.CancellationRequestCreateNestedManyWithoutOrderInput
+  refunds?: Prisma.RefundCreateNestedManyWithoutOrderInput
 }
 
 export type OrderUncheckedCreateWithoutExternalOrderInput = {
@@ -1610,12 +2142,18 @@ export type OrderUncheckedCreateWithoutExternalOrderInput = {
   taxAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Date | string | null
+  cancelledBy?: string | null
+  cancellationReason?: string | null
+  cancellationNote?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   items?: Prisma.OrderItemUncheckedCreateNestedManyWithoutOrderInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutOrderInput
   invoice?: Prisma.InvoiceUncheckedCreateNestedOneWithoutOrderInput
   stockLedgers?: Prisma.StockLedgerUncheckedCreateNestedManyWithoutOrderInput
+  cancellationRequests?: Prisma.CancellationRequestUncheckedCreateNestedManyWithoutOrderInput
+  refunds?: Prisma.RefundUncheckedCreateNestedManyWithoutOrderInput
 }
 
 export type OrderCreateOrConnectWithoutExternalOrderInput = {
@@ -1643,6 +2181,10 @@ export type OrderUpdateWithoutExternalOrderInput = {
   taxAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   restaurant?: Prisma.RestaurantUpdateOneRequiredWithoutOrdersNestedInput
@@ -1653,6 +2195,8 @@ export type OrderUpdateWithoutExternalOrderInput = {
   payments?: Prisma.PaymentUpdateManyWithoutOrderNestedInput
   invoice?: Prisma.InvoiceUpdateOneWithoutOrderNestedInput
   stockLedgers?: Prisma.StockLedgerUpdateManyWithoutOrderNestedInput
+  cancellationRequests?: Prisma.CancellationRequestUpdateManyWithoutOrderNestedInput
+  refunds?: Prisma.RefundUpdateManyWithoutOrderNestedInput
 }
 
 export type OrderUncheckedUpdateWithoutExternalOrderInput = {
@@ -1668,12 +2212,18 @@ export type OrderUncheckedUpdateWithoutExternalOrderInput = {
   taxAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.OrderItemUncheckedUpdateManyWithoutOrderNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutOrderNestedInput
   invoice?: Prisma.InvoiceUncheckedUpdateOneWithoutOrderNestedInput
   stockLedgers?: Prisma.StockLedgerUncheckedUpdateManyWithoutOrderNestedInput
+  cancellationRequests?: Prisma.CancellationRequestUncheckedUpdateManyWithoutOrderNestedInput
+  refunds?: Prisma.RefundUncheckedUpdateManyWithoutOrderNestedInput
 }
 
 export type OrderCreateManyRestaurantInput = {
@@ -1688,6 +2238,10 @@ export type OrderCreateManyRestaurantInput = {
   taxAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Date | string | null
+  cancelledBy?: string | null
+  cancellationReason?: string | null
+  cancellationNote?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1701,6 +2255,10 @@ export type OrderUpdateWithoutRestaurantInput = {
   taxAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   branch?: Prisma.BranchUpdateOneRequiredWithoutOrdersNestedInput
@@ -1711,6 +2269,8 @@ export type OrderUpdateWithoutRestaurantInput = {
   invoice?: Prisma.InvoiceUpdateOneWithoutOrderNestedInput
   stockLedgers?: Prisma.StockLedgerUpdateManyWithoutOrderNestedInput
   externalOrder?: Prisma.ExternalOrderUpdateOneWithoutAtlasOrderNestedInput
+  cancellationRequests?: Prisma.CancellationRequestUpdateManyWithoutOrderNestedInput
+  refunds?: Prisma.RefundUpdateManyWithoutOrderNestedInput
 }
 
 export type OrderUncheckedUpdateWithoutRestaurantInput = {
@@ -1725,6 +2285,10 @@ export type OrderUncheckedUpdateWithoutRestaurantInput = {
   taxAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.OrderItemUncheckedUpdateManyWithoutOrderNestedInput
@@ -1732,6 +2296,8 @@ export type OrderUncheckedUpdateWithoutRestaurantInput = {
   invoice?: Prisma.InvoiceUncheckedUpdateOneWithoutOrderNestedInput
   stockLedgers?: Prisma.StockLedgerUncheckedUpdateManyWithoutOrderNestedInput
   externalOrder?: Prisma.ExternalOrderUncheckedUpdateOneWithoutAtlasOrderNestedInput
+  cancellationRequests?: Prisma.CancellationRequestUncheckedUpdateManyWithoutOrderNestedInput
+  refunds?: Prisma.RefundUncheckedUpdateManyWithoutOrderNestedInput
 }
 
 export type OrderUncheckedUpdateManyWithoutRestaurantInput = {
@@ -1746,6 +2312,10 @@ export type OrderUncheckedUpdateManyWithoutRestaurantInput = {
   taxAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1762,6 +2332,10 @@ export type OrderCreateManyBranchInput = {
   taxAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Date | string | null
+  cancelledBy?: string | null
+  cancellationReason?: string | null
+  cancellationNote?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1775,6 +2349,10 @@ export type OrderUpdateWithoutBranchInput = {
   taxAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   restaurant?: Prisma.RestaurantUpdateOneRequiredWithoutOrdersNestedInput
@@ -1785,6 +2363,8 @@ export type OrderUpdateWithoutBranchInput = {
   invoice?: Prisma.InvoiceUpdateOneWithoutOrderNestedInput
   stockLedgers?: Prisma.StockLedgerUpdateManyWithoutOrderNestedInput
   externalOrder?: Prisma.ExternalOrderUpdateOneWithoutAtlasOrderNestedInput
+  cancellationRequests?: Prisma.CancellationRequestUpdateManyWithoutOrderNestedInput
+  refunds?: Prisma.RefundUpdateManyWithoutOrderNestedInput
 }
 
 export type OrderUncheckedUpdateWithoutBranchInput = {
@@ -1799,6 +2379,10 @@ export type OrderUncheckedUpdateWithoutBranchInput = {
   taxAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.OrderItemUncheckedUpdateManyWithoutOrderNestedInput
@@ -1806,6 +2390,8 @@ export type OrderUncheckedUpdateWithoutBranchInput = {
   invoice?: Prisma.InvoiceUncheckedUpdateOneWithoutOrderNestedInput
   stockLedgers?: Prisma.StockLedgerUncheckedUpdateManyWithoutOrderNestedInput
   externalOrder?: Prisma.ExternalOrderUncheckedUpdateOneWithoutAtlasOrderNestedInput
+  cancellationRequests?: Prisma.CancellationRequestUncheckedUpdateManyWithoutOrderNestedInput
+  refunds?: Prisma.RefundUncheckedUpdateManyWithoutOrderNestedInput
 }
 
 export type OrderUncheckedUpdateManyWithoutBranchInput = {
@@ -1820,6 +2406,10 @@ export type OrderUncheckedUpdateManyWithoutBranchInput = {
   taxAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1836,6 +2426,10 @@ export type OrderCreateManyTableInput = {
   taxAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Date | string | null
+  cancelledBy?: string | null
+  cancellationReason?: string | null
+  cancellationNote?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1849,6 +2443,10 @@ export type OrderUpdateWithoutTableInput = {
   taxAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   restaurant?: Prisma.RestaurantUpdateOneRequiredWithoutOrdersNestedInput
@@ -1859,6 +2457,8 @@ export type OrderUpdateWithoutTableInput = {
   invoice?: Prisma.InvoiceUpdateOneWithoutOrderNestedInput
   stockLedgers?: Prisma.StockLedgerUpdateManyWithoutOrderNestedInput
   externalOrder?: Prisma.ExternalOrderUpdateOneWithoutAtlasOrderNestedInput
+  cancellationRequests?: Prisma.CancellationRequestUpdateManyWithoutOrderNestedInput
+  refunds?: Prisma.RefundUpdateManyWithoutOrderNestedInput
 }
 
 export type OrderUncheckedUpdateWithoutTableInput = {
@@ -1873,6 +2473,10 @@ export type OrderUncheckedUpdateWithoutTableInput = {
   taxAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.OrderItemUncheckedUpdateManyWithoutOrderNestedInput
@@ -1880,6 +2484,8 @@ export type OrderUncheckedUpdateWithoutTableInput = {
   invoice?: Prisma.InvoiceUncheckedUpdateOneWithoutOrderNestedInput
   stockLedgers?: Prisma.StockLedgerUncheckedUpdateManyWithoutOrderNestedInput
   externalOrder?: Prisma.ExternalOrderUncheckedUpdateOneWithoutAtlasOrderNestedInput
+  cancellationRequests?: Prisma.CancellationRequestUncheckedUpdateManyWithoutOrderNestedInput
+  refunds?: Prisma.RefundUncheckedUpdateManyWithoutOrderNestedInput
 }
 
 export type OrderUncheckedUpdateManyWithoutTableInput = {
@@ -1894,6 +2500,10 @@ export type OrderUncheckedUpdateManyWithoutTableInput = {
   taxAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1910,6 +2520,10 @@ export type OrderCreateManyCustomerSessionInput = {
   taxAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Date | string | null
+  cancelledBy?: string | null
+  cancellationReason?: string | null
+  cancellationNote?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1923,6 +2537,10 @@ export type OrderUpdateWithoutCustomerSessionInput = {
   taxAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   restaurant?: Prisma.RestaurantUpdateOneRequiredWithoutOrdersNestedInput
@@ -1933,6 +2551,8 @@ export type OrderUpdateWithoutCustomerSessionInput = {
   invoice?: Prisma.InvoiceUpdateOneWithoutOrderNestedInput
   stockLedgers?: Prisma.StockLedgerUpdateManyWithoutOrderNestedInput
   externalOrder?: Prisma.ExternalOrderUpdateOneWithoutAtlasOrderNestedInput
+  cancellationRequests?: Prisma.CancellationRequestUpdateManyWithoutOrderNestedInput
+  refunds?: Prisma.RefundUpdateManyWithoutOrderNestedInput
 }
 
 export type OrderUncheckedUpdateWithoutCustomerSessionInput = {
@@ -1947,6 +2567,10 @@ export type OrderUncheckedUpdateWithoutCustomerSessionInput = {
   taxAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   items?: Prisma.OrderItemUncheckedUpdateManyWithoutOrderNestedInput
@@ -1954,6 +2578,8 @@ export type OrderUncheckedUpdateWithoutCustomerSessionInput = {
   invoice?: Prisma.InvoiceUncheckedUpdateOneWithoutOrderNestedInput
   stockLedgers?: Prisma.StockLedgerUncheckedUpdateManyWithoutOrderNestedInput
   externalOrder?: Prisma.ExternalOrderUncheckedUpdateOneWithoutAtlasOrderNestedInput
+  cancellationRequests?: Prisma.CancellationRequestUncheckedUpdateManyWithoutOrderNestedInput
+  refunds?: Prisma.RefundUncheckedUpdateManyWithoutOrderNestedInput
 }
 
 export type OrderUncheckedUpdateManyWithoutCustomerSessionInput = {
@@ -1968,6 +2594,10 @@ export type OrderUncheckedUpdateManyWithoutCustomerSessionInput = {
   taxAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   discountAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancellationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1981,12 +2611,16 @@ export type OrderCountOutputType = {
   items: number
   payments: number
   stockLedgers: number
+  cancellationRequests: number
+  refunds: number
 }
 
 export type OrderCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   items?: boolean | OrderCountOutputTypeCountItemsArgs
   payments?: boolean | OrderCountOutputTypeCountPaymentsArgs
   stockLedgers?: boolean | OrderCountOutputTypeCountStockLedgersArgs
+  cancellationRequests?: boolean | OrderCountOutputTypeCountCancellationRequestsArgs
+  refunds?: boolean | OrderCountOutputTypeCountRefundsArgs
 }
 
 /**
@@ -2020,6 +2654,20 @@ export type OrderCountOutputTypeCountStockLedgersArgs<ExtArgs extends runtime.Ty
   where?: Prisma.StockLedgerWhereInput
 }
 
+/**
+ * OrderCountOutputType without action
+ */
+export type OrderCountOutputTypeCountCancellationRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CancellationRequestWhereInput
+}
+
+/**
+ * OrderCountOutputType without action
+ */
+export type OrderCountOutputTypeCountRefundsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.RefundWhereInput
+}
+
 
 export type OrderSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -2034,6 +2682,10 @@ export type OrderSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   taxAmount?: boolean
   discountAmount?: boolean
   totalAmount?: boolean
+  cancelledAt?: boolean
+  cancelledBy?: boolean
+  cancellationReason?: boolean
+  cancellationNote?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   restaurant?: boolean | Prisma.RestaurantDefaultArgs<ExtArgs>
@@ -2045,6 +2697,8 @@ export type OrderSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   invoice?: boolean | Prisma.Order$invoiceArgs<ExtArgs>
   stockLedgers?: boolean | Prisma.Order$stockLedgersArgs<ExtArgs>
   externalOrder?: boolean | Prisma.Order$externalOrderArgs<ExtArgs>
+  cancellationRequests?: boolean | Prisma.Order$cancellationRequestsArgs<ExtArgs>
+  refunds?: boolean | Prisma.Order$refundsArgs<ExtArgs>
   _count?: boolean | Prisma.OrderCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["order"]>
 
@@ -2061,6 +2715,10 @@ export type OrderSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   taxAmount?: boolean
   discountAmount?: boolean
   totalAmount?: boolean
+  cancelledAt?: boolean
+  cancelledBy?: boolean
+  cancellationReason?: boolean
+  cancellationNote?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   restaurant?: boolean | Prisma.RestaurantDefaultArgs<ExtArgs>
@@ -2082,6 +2740,10 @@ export type OrderSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   taxAmount?: boolean
   discountAmount?: boolean
   totalAmount?: boolean
+  cancelledAt?: boolean
+  cancelledBy?: boolean
+  cancellationReason?: boolean
+  cancellationNote?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   restaurant?: boolean | Prisma.RestaurantDefaultArgs<ExtArgs>
@@ -2103,11 +2765,15 @@ export type OrderSelectScalar = {
   taxAmount?: boolean
   discountAmount?: boolean
   totalAmount?: boolean
+  cancelledAt?: boolean
+  cancelledBy?: boolean
+  cancellationReason?: boolean
+  cancellationNote?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type OrderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "restaurantId" | "branchId" | "tableId" | "customerSessionId" | "orderNumber" | "status" | "source" | "subtotal" | "taxAmount" | "discountAmount" | "totalAmount" | "createdAt" | "updatedAt", ExtArgs["result"]["order"]>
+export type OrderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "restaurantId" | "branchId" | "tableId" | "customerSessionId" | "orderNumber" | "status" | "source" | "subtotal" | "taxAmount" | "discountAmount" | "totalAmount" | "cancelledAt" | "cancelledBy" | "cancellationReason" | "cancellationNote" | "createdAt" | "updatedAt", ExtArgs["result"]["order"]>
 export type OrderInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   restaurant?: boolean | Prisma.RestaurantDefaultArgs<ExtArgs>
   branch?: boolean | Prisma.BranchDefaultArgs<ExtArgs>
@@ -2118,6 +2784,8 @@ export type OrderInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   invoice?: boolean | Prisma.Order$invoiceArgs<ExtArgs>
   stockLedgers?: boolean | Prisma.Order$stockLedgersArgs<ExtArgs>
   externalOrder?: boolean | Prisma.Order$externalOrderArgs<ExtArgs>
+  cancellationRequests?: boolean | Prisma.Order$cancellationRequestsArgs<ExtArgs>
+  refunds?: boolean | Prisma.Order$refundsArgs<ExtArgs>
   _count?: boolean | Prisma.OrderCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type OrderIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2145,6 +2813,8 @@ export type $OrderPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     invoice: Prisma.$InvoicePayload<ExtArgs> | null
     stockLedgers: Prisma.$StockLedgerPayload<ExtArgs>[]
     externalOrder: Prisma.$ExternalOrderPayload<ExtArgs> | null
+    cancellationRequests: Prisma.$CancellationRequestPayload<ExtArgs>[]
+    refunds: Prisma.$RefundPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2159,6 +2829,10 @@ export type $OrderPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     taxAmount: runtime.Decimal
     discountAmount: runtime.Decimal
     totalAmount: runtime.Decimal
+    cancelledAt: Date | null
+    cancelledBy: string | null
+    cancellationReason: string | null
+    cancellationNote: string | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["order"]>
@@ -2564,6 +3238,8 @@ export interface Prisma__OrderClient<T, Null = never, ExtArgs extends runtime.Ty
   invoice<T extends Prisma.Order$invoiceArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Order$invoiceArgs<ExtArgs>>): Prisma.Prisma__InvoiceClient<runtime.Types.Result.GetResult<Prisma.$InvoicePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   stockLedgers<T extends Prisma.Order$stockLedgersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Order$stockLedgersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StockLedgerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   externalOrder<T extends Prisma.Order$externalOrderArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Order$externalOrderArgs<ExtArgs>>): Prisma.Prisma__ExternalOrderClient<runtime.Types.Result.GetResult<Prisma.$ExternalOrderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  cancellationRequests<T extends Prisma.Order$cancellationRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Order$cancellationRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CancellationRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  refunds<T extends Prisma.Order$refundsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Order$refundsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RefundPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2605,6 +3281,10 @@ export interface OrderFieldRefs {
   readonly taxAmount: Prisma.FieldRef<"Order", 'Decimal'>
   readonly discountAmount: Prisma.FieldRef<"Order", 'Decimal'>
   readonly totalAmount: Prisma.FieldRef<"Order", 'Decimal'>
+  readonly cancelledAt: Prisma.FieldRef<"Order", 'DateTime'>
+  readonly cancelledBy: Prisma.FieldRef<"Order", 'String'>
+  readonly cancellationReason: Prisma.FieldRef<"Order", 'String'>
+  readonly cancellationNote: Prisma.FieldRef<"Order", 'String'>
   readonly createdAt: Prisma.FieldRef<"Order", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Order", 'DateTime'>
 }
@@ -3153,6 +3833,54 @@ export type Order$externalOrderArgs<ExtArgs extends runtime.Types.Extensions.Int
    */
   include?: Prisma.ExternalOrderInclude<ExtArgs> | null
   where?: Prisma.ExternalOrderWhereInput
+}
+
+/**
+ * Order.cancellationRequests
+ */
+export type Order$cancellationRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CancellationRequest
+   */
+  select?: Prisma.CancellationRequestSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the CancellationRequest
+   */
+  omit?: Prisma.CancellationRequestOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CancellationRequestInclude<ExtArgs> | null
+  where?: Prisma.CancellationRequestWhereInput
+  orderBy?: Prisma.CancellationRequestOrderByWithRelationInput | Prisma.CancellationRequestOrderByWithRelationInput[]
+  cursor?: Prisma.CancellationRequestWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.CancellationRequestScalarFieldEnum | Prisma.CancellationRequestScalarFieldEnum[]
+}
+
+/**
+ * Order.refunds
+ */
+export type Order$refundsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Refund
+   */
+  select?: Prisma.RefundSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Refund
+   */
+  omit?: Prisma.RefundOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RefundInclude<ExtArgs> | null
+  where?: Prisma.RefundWhereInput
+  orderBy?: Prisma.RefundOrderByWithRelationInput | Prisma.RefundOrderByWithRelationInput[]
+  cursor?: Prisma.RefundWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.RefundScalarFieldEnum | Prisma.RefundScalarFieldEnum[]
 }
 
 /**

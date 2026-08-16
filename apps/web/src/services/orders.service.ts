@@ -35,3 +35,30 @@ export async function getOrderById(id: string) {
 export async function updateOrderStatus(id: string, status: OrderStatus) {
   return apiClient.patch<OrderResponse>(`/orders/${id}/status`, { status });
 }
+
+export async function cancelOrder(id: string, reason: string, note?: string) {
+  return apiClient.post<OrderResponse>(`/orders/${id}/cancel`, { reason, note });
+}
+
+export async function createCancellationRequest(id: string, reason: string, note?: string) {
+  return apiClient.post<any>(`/orders/${id}/cancellation-request`, { reason, note });
+}
+
+export async function getCancellationRequests(status?: string) {
+  const query = status ? `?status=${encodeURIComponent(status)}` : '';
+  return apiClient.get<{ success: boolean; data: any[] }>(`/orders/cancellation-requests${query}`);
+}
+
+export async function reviewCancellationRequest(
+  id: string,
+  action: 'APPROVE' | 'REJECT',
+  rejectionReason?: string,
+  refundAmount?: number,
+) {
+  return apiClient.post<any>(`/orders/cancellation-requests/${id}/review`, {
+    action,
+    rejectionReason,
+    refundAmount,
+  });
+}
+

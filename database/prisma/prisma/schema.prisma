@@ -519,6 +519,11 @@ model Order {
   discountAmount    Decimal     @db.Decimal(10, 2)
   totalAmount       Decimal     @db.Decimal(10, 2)
 
+  cancelledAt         DateTime?
+  cancelledBy         String?
+  cancellationReason  String?
+  cancellationNote    String?
+
   createdAt         DateTime    @default(now())
   updatedAt         DateTime    @updatedAt
 
@@ -532,6 +537,8 @@ model Order {
   invoice Invoice?
   stockLedgers StockLedger[]
   externalOrder ExternalOrder?
+  cancellationRequests CancellationRequest[]
+  refunds Refund[]
 
   @@unique([restaurantId, orderNumber])
   @@index([restaurantId])
@@ -597,11 +604,76 @@ model OrderItemAddon {
   @@map("order_item_addons")
 }
 
+enum CancellationRequestStatus {
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+}
+
+enum RefundStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+model CancellationRequest {
+  id              String                    @id @default(uuid())
+  restaurantId    String
+  orderId         String
+  requestedBy     String
+  requestedByName String?
+  reason          String
+  note            String?
+  status          CancellationRequestStatus @default(PENDING_REVIEW)
+  reviewedBy      String?
+  reviewedByName  String?
+  reviewedAt      DateTime?
+  rejectionReason String?
+  createdAt       DateTime                  @default(now())
+  updatedAt       DateTime                  @updatedAt
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([restaurantId])
+  @@index([orderId])
+  @@index([status])
+  @@map("cancellation_requests")
+}
+
+model Refund {
+  id               String       @id @default(uuid())
+  restaurantId     String
+  orderId          String
+  paymentId        String
+  amount           Decimal      @db.Decimal(10, 2)
+  reason           String
+  note             String?
+  status           RefundStatus @default(PENDING)
+  requestedBy      String?
+  approvedBy       String?
+  processedAt      DateTime?
+  providerRefundId String?
+  failureReason    String?
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  payment Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+
+  @@index([restaurantId])
+  @@index([orderId])
+  @@index([paymentId])
+  @@index([status])
+  @@map("refunds")
+}
+
 enum PaymentStatus {
   PENDING
   SUCCESS
   FAILED
+  PARTIALLY_REFUNDED
   REFUNDED
+  REFUND_FAILED
 }
 
 enum PaymentMethod {
@@ -631,6 +703,7 @@ model Payment {
   order           Order?           @relation(fields: [orderId], references: [id], onDelete: Cascade)
   customerSession CustomerSession? @relation(fields: [customerSessionId], references: [id], onDelete: Cascade)
   invoice         Invoice?         @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  refunds         Refund[]
 
   @@index([tenantId])
   @@index([restaurantId])
