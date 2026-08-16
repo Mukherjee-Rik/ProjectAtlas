@@ -1,9 +1,13 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma/prisma.service';
+import { CacheKeys, TtlCacheService } from '../../common/cache/ttl-cache.service';
 
 @Injectable()
 export class SubscriptionsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly cache: TtlCacheService,
+  ) {}
 
   // ==========================================
   // PLANS MANAGEMENT (Platform Admin CRUD)
@@ -114,7 +118,7 @@ export class SubscriptionsService {
       periodEnd.setMonth(now.getMonth() + 1);
     }
 
-    return this.prisma.subscription.create({
+    const created = await this.prisma.subscription.create({
       data: {
         restaurantId,
         planId,
@@ -125,6 +129,12 @@ export class SubscriptionsService {
       },
       include: { plan: true },
     });
+
+    // The subscription guard caches per restaurant — a plan change must be
+    // visible on the next request, not one TTL later.
+    this.cache.invalidate(CacheKeys.subscription(restaurantId));
+
+    return created;
   }
 
   async extendTrial(subscriptionId: string, extensionDays: number) {
@@ -140,7 +150,7 @@ export class SubscriptionsService {
     const currentTrialEnd = subscription.trialEnd ? new Date(subscription.trialEnd) : new Date();
     currentTrialEnd.setDate(currentTrialEnd.getDate() + extensionDays);
 
-    return this.prisma.subscription.update({
+    const extended = await this.prisma.subscription.update({
       where: { id: subscriptionId },
       data: {
         trialEnd: currentTrialEnd,
@@ -148,6 +158,10 @@ export class SubscriptionsService {
       },
       include: { plan: true },
     });
+
+    this.cache.invalidate(CacheKeys.subscription(subscription.restaurantId));
+
+    return extended;
   }
 
   async updateStatus(subscriptionId: string, status: any) {
@@ -161,10 +175,15 @@ export class SubscriptionsService {
       data.cancelledAt = new Date();
     }
 
-    return this.prisma.subscription.update({
+    const updated = await this.prisma.subscription.update({
       where: { id: subscriptionId },
       data,
       include: { plan: true },
     });
+
+    // Suspending or cancelling must revoke access immediately.
+    this.cache.invalidate(CacheKeys.subscription(subscription.restaurantId));
+
+    return updated;
   }
 }

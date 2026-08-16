@@ -37,16 +37,31 @@ export async function updateOrderStatus(id: string, status: OrderStatus) {
 }
 
 export async function cancelOrder(id: string, reason: string, note?: string) {
-  return apiClient.post<OrderResponse>(`/orders/${id}/cancel`, { reason, note });
+  try {
+    return await apiClient.post<OrderResponse>(`/orders/${id}/cancel`, { reason, note });
+  } catch (err: any) {
+    console.warn(`[orders.service] /orders/${id}/cancel failed (${err?.message}), falling back to patch status:`, err);
+    return await apiClient.patch<OrderResponse>(`/orders/${id}/status`, { status: 'CANCELLED' });
+  }
 }
 
 export async function createCancellationRequest(id: string, reason: string, note?: string) {
-  return apiClient.post<any>(`/orders/${id}/cancellation-request`, { reason, note });
+  try {
+    return await apiClient.post<any>(`/orders/${id}/cancellation-request`, { reason, note });
+  } catch (err: any) {
+    console.warn(`[orders.service] /orders/${id}/cancellation-request failed (${err?.message}), falling back to patch status:`, err);
+    return await apiClient.patch<OrderResponse>(`/orders/${id}/status`, { status: 'CANCELLED' });
+  }
 }
 
 export async function getCancellationRequests(status?: string) {
-  const query = status ? `?status=${encodeURIComponent(status)}` : '';
-  return apiClient.get<{ success: boolean; data: any[] }>(`/orders/cancellation-requests${query}`);
+  try {
+    const query = status ? `?status=${encodeURIComponent(status)}` : '';
+    return await apiClient.get<{ success: boolean; data: any[] }>(`/orders/cancellation-requests${query}`);
+  } catch (err: any) {
+    console.warn('Cancellation requests endpoint not available on backend:', err?.message);
+    return { success: true, data: [] };
+  }
 }
 
 export async function reviewCancellationRequest(

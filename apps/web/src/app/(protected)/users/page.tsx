@@ -184,64 +184,62 @@ export default function UsersPage() {
       </div>
 
       {/* Table Container */}
-      <div className="overflow-hidden rounded-xl border border-[#26313C] bg-[#111820] shadow-xl">
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[700px] text-left">
-            <thead className="border-b border-[#26313C] bg-[#18212B]">
-              <tr>
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
-                  Staff Name
-                </th>
+      <div className="table-responsive rounded-xl border border-[#26313C] bg-[#111820] shadow-xl">
+        <table className="w-full min-w-[700px] text-left">
+          <thead className="border-b border-[#26313C] bg-[#18212B]">
+            <tr>
+              <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
+                Staff Name
+              </th>
 
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
-                  Email
-                </th>
+              <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
+                Email
+              </th>
 
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
-                  Phone
-                </th>
+              <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
+                Phone
+              </th>
 
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
-                  Role
-                </th>
+              <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
+                Role
+              </th>
 
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
-                  Status
-                </th>
+              <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
+                Status
+              </th>
+            </tr>
+          </thead>
+
+          <tbody className="divide-y divide-[#26313C]">
+            {users.map((user) => (
+              <tr
+                key={user.id}
+                onClick={() => router.push(`/users/${user.id}`)}
+                className="cursor-pointer transition-colors hover:bg-[#18212B]"
+              >
+                <td className="px-4 py-4 text-sm font-medium text-[#F5F7FA]">
+                  {user.name}
+                </td>
+
+                <td className="px-4 py-4 text-sm text-[#9AA6B2]">
+                  {user.email}
+                </td>
+
+                <td className="px-4 py-4 text-sm text-[#9AA6B2]">
+                  {user.phone ?? '—'}
+                </td>
+
+                <td className="px-4 py-4 text-sm">
+                  <UserRoleBadge role={user.role} />
+                </td>
+
+                <td className="px-4 py-4 text-sm">
+                  <UserStatusBadge status={user.status} />
+                </td>
               </tr>
-            </thead>
-
-            <tbody className="divide-y divide-[#26313C]">
-              {users.map((user) => (
-                <tr
-                  key={user.id}
-                  onClick={() => router.push(`/users/${user.id}`)}
-                  className="cursor-pointer transition-colors hover:bg-[#18212B]"
-                >
-                  <td className="px-4 py-4 text-sm font-medium text-[#F5F7FA]">
-                    {user.name}
-                  </td>
-
-                  <td className="px-4 py-4 text-sm text-[#9AA6B2]">
-                    {user.email}
-                  </td>
-
-                  <td className="px-4 py-4 text-sm text-[#9AA6B2]">
-                    {user.phone ?? '—'}
-                  </td>
-
-                  <td className="px-4 py-4 text-sm">
-                    <UserRoleBadge role={user.role} />
-                  </td>
-
-                  <td className="px-4 py-4 text-sm">
-                    <UserStatusBadge status={user.status} />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </table>
 
         {/* Empty State */}
         {users.length === 0 && (

@@ -22,15 +22,38 @@ async function bootstrap() {
   app.use(json({ limit: '1mb' }));
   app.use(cookieParser());
 
+  // Railway (and any PaaS load balancer) terminates TLS and forwards the real
+  // client address in X-Forwarded-For. Without trusting that hop, req.ip is
+  // the balancer's address for every request — which would put all users into
+  // a single rate-limit bucket and let one busy client 429 everyone else.
+  const trustProxyHops = Number(process.env.TRUST_PROXY_HOPS ?? 1);
+  app.getHttpAdapter().getInstance().set('trust proxy', trustProxyHops);
+
   app.enableShutdownHooks();
 
   app.useLogger(app.get(Logger));
 
   const configService = app.get(ConfigService);
 
+  const allowedOrigins = configService.get<string[]>('cors.origins') ?? [];
+
+  if (allowedOrigins.length === 0) {
+    // Reflecting every origin while also allowing credentials lets any site
+    // make authenticated calls on a signed-in user's behalf. Kept as the
+    // fallback so an unset variable cannot take the deployment down, but it
+    // should be set in production.
+    console.warn(
+      '[CORS] CORS_ORIGIN is not set — reflecting all origins with credentials enabled. Set CORS_ORIGIN to a comma-separated allowlist in production.',
+    );
+  }
+
   app.enableCors({
-    origin: true,
+    origin: allowedOrigins.length > 0 ? allowedOrigins : true,
     credentials: true,
+    // Without this the browser re-runs a preflight every ~5s per endpoint,
+    // doubling the round trips for any cross-origin request that carries the
+    // x-tenant-id / x-restaurant-id / x-branch-id headers.
+    maxAge: 86_400,
   });
 
   const port = Number(process.env.PORT) || 3000;

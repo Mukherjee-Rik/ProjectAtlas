@@ -162,4 +162,16 @@ export class TablesController {
     }
     return this.tablesService.remove(id, branch.id);
   }
+
+  @Post(':id/clear')
+  @Permissions(PERMISSIONS.TABLES_UPDATE)
+  async clear(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @CurrentBranch() branch: CurrentBranchType,
+  ) {
+    if (!branch) {
+      throw new BadRequestException('No active branch selected');
+    }
+    return this.tablesService.clearTable(id, branch.id);
+  }
 }

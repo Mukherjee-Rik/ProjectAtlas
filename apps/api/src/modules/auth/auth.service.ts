@@ -8,6 +8,7 @@ import { PrismaService } from '../../database/prisma/prisma.service';
 import { RegisterRestaurantDto } from './dto/register-restaurant.dto';
 import { UserRole } from '../../generated/prisma/enums';
 import { AuditService } from '../audit/audit.service';
+import { CacheKeys, TtlCacheService } from '../../common/cache/ttl-cache.service';
 
 @Injectable()
 export class AuthService {
@@ -16,6 +17,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly logger: Logger,
     private readonly auditService: AuditService,
+    private readonly cache: TtlCacheService,
   ) {}
 
   async validateUser(email: string, password: string, ip?: string, userAgent?: string) {
@@ -368,6 +370,9 @@ export class AuthService {
           data: { revokedAt: new Date() },
         });
 
+        // Evict immediately so the revoked session cannot survive its TTL.
+        this.cache.invalidate(CacheKeys.session(sessionId));
+
         await this.auditService.log({
           actorUserId: session.user.id,
           actorEmail: session.user.email,
@@ -390,10 +395,21 @@ export class AuthService {
 
     if (!user) return;
 
+    const revoked = await this.prisma.session.findMany({
+      where: { userId, revokedAt: null },
+      select: { id: true },
+    });
+
     await this.prisma.session.updateMany({
       where: { userId, revokedAt: null },
       data: { revokedAt: new Date() },
     });
+
+    // Evict every session we just revoked, plus the user row itself.
+    for (const session of revoked) {
+      this.cache.invalidate(CacheKeys.session(session.id));
+    }
+    this.cache.invalidate(CacheKeys.user(userId));
 
     await this.auditService.log({
       actorUserId: user.id,
@@ -436,6 +452,8 @@ export class AuthService {
       where: { id: sessionId },
       data: { revokedAt: new Date() },
     });
+
+    this.cache.invalidate(CacheKeys.session(sessionId));
 
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
 

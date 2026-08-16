@@ -1071,7 +1071,7 @@ export type $RefundPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
 export type RefundGetPayload<S extends boolean | null | undefined | RefundDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$RefundPayload, S>
 
 export type RefundCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<RefundFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<RefundFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: RefundCountAggregateInputType | true
   }
 
@@ -1528,6 +1528,7 @@ export type RefundFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Filter, which Refund to fetch.
    */
   where: Prisma.RefundWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1550,6 +1551,7 @@ export type RefundFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensions
    * Filter, which Refund to fetch.
    */
   where: Prisma.RefundWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1602,6 +1604,7 @@ export type RefundFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Filter by unique combinations of Refunds.
    */
   distinct?: Prisma.RefundScalarFieldEnum | Prisma.RefundScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1654,6 +1657,7 @@ export type RefundFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions.
    * Filter by unique combinations of Refunds.
    */
   distinct?: Prisma.RefundScalarFieldEnum | Prisma.RefundScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1706,6 +1710,7 @@ export type RefundFindManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Filter by unique combinations of Refunds.
    */
   distinct?: Prisma.RefundScalarFieldEnum | Prisma.RefundScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1728,6 +1733,7 @@ export type RefundCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
    * The data needed to create a Refund.
    */
   data: Prisma.XOR<Prisma.RefundCreateInput, Prisma.RefundUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1788,6 +1794,7 @@ export type RefundUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
    * Choose, which Refund to update.
    */
   where: Prisma.RefundWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1866,6 +1873,7 @@ export type RefundUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
    * In case the Refund was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.RefundUpdateInput, Prisma.RefundUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1888,6 +1896,7 @@ export type RefundDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
    * Filter which Refund to delete.
    */
   where: Prisma.RefundWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

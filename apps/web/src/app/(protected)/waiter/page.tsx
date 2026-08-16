@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRestaurant } from '@/hooks/use-restaurant';
 import { useBranch } from '@/hooks/use-branch';
 import { getTables } from '@/services/tables.service';
@@ -20,31 +20,28 @@ function playGuitarSound() {
     if (!AudioContext) return;
     const ctx = new AudioContext();
     const now = ctx.currentTime;
-    
-    const playPluck = (freq: number, startTime: number, duration: number) => {
+
+    const notes = [220, 277.18, 329.63, 440, 554.37, 659.25];
+    notes.forEach((freq, index) => {
+      const startTime = now + index * 0.07;
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
-      
-      osc.type = 'triangle'; // triangle wave gives a warm acoustic pluck timbre
+
+      osc.type = 'triangle';
       osc.frequency.setValueAtTime(freq, startTime);
-      
-      gain.gain.setValueAtTime(0, startTime);
-      gain.gain.linearRampToValueAtTime(0.25, startTime + 0.04); // quick pluck attack
-      gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration); // smooth string vibration decay
-      
+
+      gain.gain.setValueAtTime(0.001, startTime);
+      gain.gain.exponentialRampToValueAtTime(0.12, startTime + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, startTime + 1.2);
+
       osc.connect(gain);
       gain.connect(ctx.destination);
-      osc.start(startTime);
-      osc.stop(startTime + duration);
-    };
 
-    // Calming C major classical guitar arpeggio
-    playPluck(261.63, now, 1.0);       // C4
-    playPluck(329.63, now + 0.2, 1.0); // E4
-    playPluck(392.00, now + 0.4, 1.0);  // G4
-    playPluck(523.25, now + 0.6, 1.2); // C5
+      osc.start(startTime);
+      osc.stop(startTime + 1.25);
+    });
   } catch (err) {
-    console.error('Audio synthesis failed', err);
+    console.warn('Audio feedback failed to play', err);
   }
 }
 
@@ -59,10 +56,17 @@ export default function WaiterDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [updatingTableId, setUpdatingTableId] = useState<string | null>(null);
+  const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
 
-  // Selected table modal detail
+  // Selected table detail
   const [selectedTable, setSelectedTable] = useState<RestaurantTable | null>(null);
-  
+  const selectedTableIdRef = useRef<string | null>(null);
+
+  // Keep ref synchronized
+  useEffect(() => {
+    selectedTableIdRef.current = selectedTable?.id ?? null;
+  }, [selectedTable]);
+
   // Printing states
   const [printOrders, setPrintOrders] = useState<any[]>([]);
   const [isPrinting, setIsPrinting] = useState(false);
@@ -116,29 +120,63 @@ export default function WaiterDashboard() {
           cancellationReason,
           cancellationNote,
         );
-        alert(`Order #${cancellationOrder.orderNumber} has been cancelled.`);
+
+        // Optimistically update order status in local state
+        setSelectedTable((prev) => {
+          if (!prev) return null;
+          return {
+            ...prev,
+            customerSessions: prev.customerSessions?.map((s) => ({
+              ...s,
+              orders: s.orders?.map((o) =>
+                o.id === cancellationOrder.id
+                  ? { ...o, status: 'CANCELLED' as any, cancellationReason }
+                  : o,
+              ),
+            })),
+          };
+        });
+
+        setTables((prevTables) =>
+          prevTables.map((t) => {
+            if (t.id !== selectedTableIdRef.current) return t;
+            return {
+              ...t,
+              customerSessions: t.customerSessions?.map((s) => ({
+                ...s,
+                orders: s.orders?.map((o) =>
+                  o.id === cancellationOrder.id
+                    ? { ...o, status: 'CANCELLED' as any, cancellationReason }
+                    : o,
+                ),
+              })),
+            };
+          }),
+        );
       }
 
       setCancellationOrder(null);
       setCancellationReason('CUSTOMER_REQUESTED');
       setCancellationNote('');
-      await loadData();
+      void loadDataSilently(notifiedOrderIds, notifiedCallIds);
     } catch (err: any) {
-      console.error(err);
+      console.error('Cancellation error:', err);
       alert(err?.message ?? 'Failed to process cancellation.');
     } finally {
       setIsSubmittingCancel(false);
     }
   };
 
-  const loadData = useCallback(async () => {
+  const loadData = useCallback(async (showFullLoader = true) => {
     if (!currentBranch) {
       setTables([]);
       setDiningAreas([]);
       setIsLoading(false);
       return;
     }
-    setIsLoading(true);
+    if (showFullLoader) {
+      setIsLoading(true);
+    }
     setError('');
     try {
       const [areasRes, tablesRes] = await Promise.all([
@@ -149,12 +187,15 @@ export default function WaiterDashboard() {
       setDiningAreas(areasRes.data ?? []);
       setTables(initialTables);
 
-      // On initial load, record existing pending orders/calls as processed
-      // to avoid sound alerts playing for pre-existing items on page refresh.
+      if (selectedTableIdRef.current) {
+        const fresh = initialTables.find((t: any) => t.id === selectedTableIdRef.current);
+        if (fresh) setSelectedTable(fresh);
+      }
+
       const historicOrderIds = new Set<string>();
-      initialTables.forEach((table) => {
-        table.customerSessions?.forEach((session) => {
-          session.orders?.forEach((order) => {
+      initialTables.forEach((table: any) => {
+        table.customerSessions?.forEach((session: any) => {
+          session.orders?.forEach((order: any) => {
             if (order.status === 'PENDING') {
               historicOrderIds.add(order.id);
             }
@@ -171,7 +212,6 @@ export default function WaiterDashboard() {
       } catch (err) {
         console.error('Failed to pre-fetch table calls', err);
       }
-
     } catch (err: any) {
       console.error(err);
       setError('Failed to load table floor details.');
@@ -204,8 +244,7 @@ export default function WaiterDashboard() {
       if (!currentNotified.has(o.orderId)) {
         foundNew = true;
         nextNotified.add(o.orderId);
-        
-        // Add order toast
+
         setOrderToasts((prev) => [
           ...prev,
           {
@@ -230,7 +269,7 @@ export default function WaiterDashboard() {
     try {
       const res = await apiClient.get<any>('/table-calls');
       const activeCalls = res.data ?? [];
-      
+
       let foundNew = false;
       const nextNotified = new Set(currentNotified);
 
@@ -238,8 +277,7 @@ export default function WaiterDashboard() {
         if (!currentNotified.has(call.id)) {
           foundNew = true;
           nextNotified.add(call.id);
-          
-          // Add assistance toast
+
           setCallToasts((prev) => [
             ...prev,
             {
@@ -272,7 +310,15 @@ export default function WaiterDashboard() {
       setDiningAreas(areasRes.data ?? []);
       const nextTables = tablesRes.data ?? [];
       setTables(nextTables);
-      
+
+      // Keep open selected table fresh
+      if (selectedTableIdRef.current) {
+        const freshSelected = nextTables.find((t: any) => t.id === selectedTableIdRef.current);
+        if (freshSelected) {
+          setSelectedTable(freshSelected);
+        }
+      }
+
       checkForNewOrders(nextTables, orderIds);
       void fetchTableCalls(callIds);
     } catch (err) {
@@ -281,10 +327,10 @@ export default function WaiterDashboard() {
   }, [currentBranch, checkForNewOrders, fetchTableCalls]);
 
   useEffect(() => {
-    void loadData();
+    void loadData(true);
   }, [loadData]);
 
-  // Set up polling loop
+  // Polling loop
   useEffect(() => {
     if (!currentBranch || isLoading) return;
 
@@ -319,7 +365,6 @@ export default function WaiterDashboard() {
     if (table) {
       setSelectedTable(table);
     }
-    // Remove toast from list
     setOrderToasts((prev) => prev.filter((t) => t.id !== toastId));
   };
 
@@ -332,53 +377,117 @@ export default function WaiterDashboard() {
     }
   };
 
-  // 1. Manual Seat Guests
+  // Manual Seat Guests
   const handleSeatGuests = async (table: RestaurantTable) => {
     setUpdatingTableId(table.id);
     try {
       await apiClient.post(`/public/tables/${table.publicToken}/session`);
-      await loadData();
-      // Auto expand detail
-      const updated = tables.find((t) => t.id === table.id);
+      const [areasRes, tablesRes] = await Promise.all([
+        getDiningAreas(),
+        getTables(),
+      ]);
+      setDiningAreas(areasRes.data ?? []);
+      const freshTables = tablesRes.data ?? [];
+      setTables(freshTables);
+
+      const updated = freshTables.find((t: any) => t.id === table.id);
       if (updated) setSelectedTable(updated);
     } catch (err: any) {
-      alert(err?.message ?? 'Failed to sit guests.');
+      alert(err?.message ?? 'Failed to seat guests.');
     } finally {
       setUpdatingTableId(null);
     }
   };
 
-  // 2. Clear table (End active session)
+  // Clear table
   const handleClearTable = async (table: RestaurantTable) => {
     if (!confirm(`End session and clear Table ${table.name}?`)) return;
     setUpdatingTableId(table.id);
+
+    // 1. Optimistically clear active session in UI (turns green immediately)
+    setTables((prevTables) =>
+      prevTables.map((t) =>
+        t.id === table.id ? { ...t, customerSessions: [] } : t,
+      ),
+    );
+    setSelectedTable(null);
+
+    // 2. Perform authenticated clear with public fallback
     try {
-      await apiClient.post(`/public/tables/${table.publicToken}/session/end`);
-      setSelectedTable(null);
-      await loadData();
+      try {
+        await apiClient.post(`/tables/${table.id}/clear`);
+      } catch (authErr) {
+        if (table.publicToken) {
+          await apiClient.post(`/public/tables/${table.publicToken}/session/end`);
+        } else {
+          throw authErr;
+        }
+      }
+      void loadDataSilently(notifiedOrderIds, notifiedCallIds);
     } catch (err: any) {
+      console.error('Failed to clear table:', err);
       alert(err?.message ?? 'Failed to end table session.');
+      void loadData(false);
     } finally {
       setUpdatingTableId(null);
     }
   };
 
-  // 3. Update order status (Serve or Complete)
+  // Instant 1-Click Order Status Update (Serve / Complete) with immediate optimistic UI
   const handleUpdateOrderStatus = async (orderId: string, nextStatus: string, label: string) => {
+    if (updatingOrderId === orderId) return;
+    setUpdatingOrderId(orderId);
+
+    // 1. Immediate optimistic update (0ms UI feedback)
+    setSelectedTable((prev) => {
+      if (!prev) return null;
+      return {
+        ...prev,
+        customerSessions: prev.customerSessions?.map((s) => ({
+          ...s,
+          orders: s.orders?.map((o) => (o.id === orderId ? { ...o, status: nextStatus as any } : o)),
+        })),
+      };
+    });
+
+    setTables((prevTables) =>
+      prevTables.map((t) => {
+        if (t.id !== selectedTableIdRef.current) return t;
+        return {
+          ...t,
+          customerSessions: t.customerSessions?.map((s) => ({
+            ...s,
+            orders: s.orders?.map((o) => (o.id === orderId ? { ...o, status: nextStatus as any } : o)),
+          })),
+        };
+      })
+    );
+
+    // 2. Perform API update & background refresh
     try {
       await apiClient.patch(`/orders/${orderId}/status`, { status: nextStatus });
-      await loadData();
-      // Re-fetch selected table row
-      if (selectedTable) {
-        const updated = tables.find((t) => t.id === selectedTable.id);
-        if (updated) setSelectedTable(updated);
+      const [areasRes, tablesRes] = await Promise.all([
+        getDiningAreas(),
+        getTables(),
+      ]);
+      setDiningAreas(areasRes.data ?? []);
+      const freshTables = tablesRes.data ?? [];
+      setTables(freshTables);
+
+      if (selectedTableIdRef.current) {
+        const freshTable = freshTables.find((t: any) => t.id === selectedTableIdRef.current);
+        if (freshTable) setSelectedTable(freshTable);
       }
     } catch (err: any) {
+      console.error(err);
       alert(err?.message ?? `Failed to update status to ${label.toLowerCase()}.`);
+      void loadDataSilently(notifiedOrderIds, notifiedCallIds);
+    } finally {
+      setUpdatingOrderId(null);
     }
   };
 
-  // 4. Print consolidated session bill
+  // Print bill receipt
   const handlePrintBill = async (table: RestaurantTable) => {
     setIsPrinting(true);
     try {
@@ -389,7 +498,6 @@ export default function WaiterDashboard() {
         return;
       }
       setPrintOrders(fetchedOrders);
-      // Wait for React to render the print container, then trigger print dialog
       setTimeout(() => {
         window.print();
       }, 300);
@@ -418,702 +526,612 @@ export default function WaiterDashboard() {
     setQuantity(1);
   };
 
-  // Checkout manual order
-  const handleCheckoutManualOrder = async () => {
+  // Submit manual booking orders
+  const handleSubmitManualOrder = async () => {
     if (!selectedTable || cartItems.length === 0) return;
     setIsLoading(true);
     try {
-      // 1. Add all items to public cart on behalf of table token
-      for (const cartItem of cartItems) {
+      for (const item of cartItems) {
         await apiClient.post(`/public/tables/${selectedTable.publicToken}/cart/items`, {
-          menuItemId: cartItem.menuItemId,
-          quantity: cartItem.quantity,
-          variantIds: cartItem.variantIds,
-          addonIds: cartItem.addonIds,
+          menuItemId: item.menuItemId,
+          quantity: item.quantity,
+          variantIds: item.variantIds,
+          addonIds: item.addonIds,
         });
       }
-      // 2. Submit order checkout
+
       await apiClient.post(`/public/tables/${selectedTable.publicToken}/orders`, {});
+
       setCartItems([]);
       setIsOrdering(false);
-      await loadData();
-      setSelectedTable(null);
+      await loadData(false);
+      alert('Order placed successfully for table!');
     } catch (err: any) {
-      alert(err?.message ?? 'Failed to dispatch manual order.');
+      alert(err?.message ?? 'Failed to submit order.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  if (!currentRestaurant || !currentBranch) {
+  if (!currentBranch) {
     return (
       <div className="flex flex-col items-center justify-center rounded-xl border border-[#26313C] bg-[#111820] p-12 text-center shadow-xl space-y-4">
         <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#18212B] text-2xl">
-          🧑💼
+          📍
         </div>
         <h2 className="text-xl font-bold text-[#F5F7FA]">
-          Select restaurant & branch
+          Select branch for Waiter floor
         </h2>
         <p className="text-sm text-[#9AA6B2]">
-          Choose the operating workspace context from the header filters to launch table monitoring.
+          Choose the restaurant branch from the header selector to open the service tables floor.
         </p>
       </div>
     );
   }
 
-  // Filter tables by active dining area tab
-  const filteredTables = tables.filter(
-    (t) => activeAreaId === 'ALL' || t.diningAreaId === activeAreaId,
+  // Filter tables by active dining area
+  const filteredTables = tables.filter((t) =>
+    activeAreaId === 'ALL' ? true : t.diningAreaId === activeAreaId,
   );
 
+  // Calculate quick stats
+  const totalTables = tables.length;
+  const occupiedCount = tables.filter(
+    (t) => t.customerSessions?.some((s) => s.status === 'ACTIVE'),
+  ).length;
+  const availableCount = totalTables - occupiedCount;
+  const readyCount = tables.filter((t) =>
+    t.customerSessions?.some((s) => s.orders?.some((o) => o.status === 'READY')),
+  ).length;
+
   return (
-    <div className="space-y-6 no-print">
-      {/* Floor Monitor Header */}
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#26313C] pb-4">
+    <div className="space-y-6">
+      {/* Printable Receipt Container */}
+      <div className="hidden print:block print:p-4 text-black bg-white font-mono text-xs w-80 mx-auto">
+        <div className="text-center border-b pb-2 mb-2">
+          <h2 className="text-base font-bold uppercase">{currentRestaurant?.name}</h2>
+          <p className="text-[10px]">{currentBranch?.name}</p>
+          <p className="mt-1 font-bold">TABLE {selectedTable?.name}</p>
+          <p className="text-[10px] text-gray-600">{new Date().toLocaleString()}</p>
+        </div>
+
+        <div className="space-y-2 border-b pb-2 mb-2">
+          {printOrders.map((o) => (
+            <div key={o.id} className="space-y-1">
+              <div className="flex justify-between font-bold text-[11px]">
+                <span>Order #{o.orderNumber}</span>
+                <span>{formatCurrency(o.totalAmount)}</span>
+              </div>
+              {o.items?.map((item: any) => (
+                <div key={item.id} className="flex justify-between text-[10px] pl-2 text-gray-800">
+                  <span>{item.quantity}x {item.name}</span>
+                  <span>{formatCurrency(item.totalPrice)}</span>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+
+        {(() => {
+          const grandTotal = printOrders.reduce((sum, o) => sum + Number(o.totalAmount || 0), 0);
+          return (
+            <div className="pt-2 text-sm font-black flex justify-between">
+              <span>GRAND TOTAL:</span>
+              <span>{formatCurrency(grandTotal)}</span>
+            </div>
+          );
+        })()}
+
+        <div className="mt-4 text-center text-[9px] text-gray-500">
+          *** Thank you for dining with us ***
+        </div>
+      </div>
+
+      {/* Screen Control Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#26313C] pb-4 no-print">
         <div>
-          <h1 className="text-3xl font-bold text-[#F5F7FA]">Floor Monitor</h1>
-          <p className="text-xs text-[#9AA6B2]">
-            Branch: <span className="font-semibold text-[#F5F7FA]">{currentBranch.name}</span>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#F5F7FA]">Waiter Service Floor</h1>
+          <p className="text-xs sm:text-sm text-[#9AA6B2] mt-0.5">
+            Active Station: <span className="font-semibold text-[#F5F7FA]">{currentBranch.name}</span>
           </p>
         </div>
-        <div className="flex gap-2">
+
+        {/* Quick Floor Stats Bar */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 w-full sm:w-auto">
+          <div className="rounded-xl border border-[#26313C] bg-[#111820] px-3 py-2 text-center">
+            <span className="block text-[10px] font-bold uppercase text-[#9AA6B2]">Total</span>
+            <span className="text-sm font-extrabold text-[#F5F7FA]">{totalTables}</span>
+          </div>
+          <div className="rounded-xl border border-[#22C55E]/30 bg-[#22C55E]/5 px-3 py-2 text-center">
+            <span className="block text-[10px] font-bold uppercase text-[#22C55E]">Available</span>
+            <span className="text-sm font-extrabold text-[#22C55E]">{availableCount}</span>
+          </div>
+          <div className="rounded-xl border border-[#EF4444]/30 bg-[#EF4444]/5 px-3 py-2 text-center">
+            <span className="block text-[10px] font-bold uppercase text-[#EF4444]">Occupied</span>
+            <span className="text-sm font-extrabold text-[#EF4444]">{occupiedCount}</span>
+          </div>
+          <div className="rounded-xl border border-[#EAB308]/30 bg-[#EAB308]/5 px-3 py-2 text-center">
+            <span className="block text-[10px] font-bold uppercase text-[#EAB308]">Ready</span>
+            <span className="text-sm font-extrabold text-[#EAB308]">{readyCount}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Horizontally Scrollable Dining Area Tabs */}
+      <div className="no-print">
+        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none touch-pan-x flex-nowrap">
           <button
             type="button"
             onClick={() => setActiveAreaId('ALL')}
-            className={`rounded-lg px-3 py-1.5 text-xs font-semibold ${
+            className={`whitespace-nowrap rounded-xl px-4 py-2 text-xs font-bold transition-all shrink-0 ${
               activeAreaId === 'ALL'
-                ? 'bg-[#2AFEB7] text-[#0B0F14]'
-                : 'border border-[#26313C] text-[#9AA6B2] hover:text-[#F5F7FA]'
+                ? 'bg-[#2AFEB7] text-[#0B0F14] shadow-sm'
+                : 'border border-[#26313C] bg-[#111820] text-[#9AA6B2] hover:text-[#F5F7FA]'
             }`}
           >
-            All Areas
+            All Dining Areas ({tables.length})
           </button>
-          {diningAreas.map((area) => (
-            <button
-              key={area.id}
-              type="button"
-              onClick={() => setActiveAreaId(area.id)}
-              className={`rounded-lg px-3 py-1.5 text-xs font-semibold ${
-                activeAreaId === area.id
-                  ? 'bg-[#2AFEB7] text-[#0B0F14]'
-                  : 'border border-[#26313C] text-[#9AA6B2] hover:text-[#F5F7FA]'
-              }`}
-            >
-              {area.name}
-            </button>
-          ))}
+          {diningAreas.map((area) => {
+            const count = tables.filter((t) => t.diningAreaId === area.id).length;
+            return (
+              <button
+                key={area.id}
+                type="button"
+                onClick={() => setActiveAreaId(area.id)}
+                className={`whitespace-nowrap rounded-xl px-4 py-2 text-xs font-bold transition-all shrink-0 ${
+                  activeAreaId === area.id
+                    ? 'bg-[#2AFEB7] text-[#0B0F14] shadow-sm'
+                    : 'border border-[#26313C] bg-[#111820] text-[#9AA6B2] hover:text-[#F5F7FA]'
+                }`}
+              >
+                {area.name} ({count})
+              </button>
+            );
+          })}
         </div>
       </div>
 
       {/* Main Floor Grid Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left: Floor Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 no-print">
+        {/* Left: Floor Tables Grid */}
         <div className="lg:col-span-2 space-y-4">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            {filteredTables.map((table) => {
-              const activeSession = table.customerSessions?.[0];
-              const isOccupied = !!activeSession;
-              const hasReadyOrders = activeSession?.orders.some((o) => o.status === 'READY');
+          {isLoading && tables.length === 0 ? (
+            <div className="rounded-xl border border-[#26313C] bg-[#111820] p-12 text-center text-[#9AA6B2]">
+              Loading dining floor...
+            </div>
+          ) : filteredTables.length === 0 ? (
+            <div className="rounded-xl border border-[#26313C] bg-[#111820] p-12 text-center space-y-2">
+              <div className="text-3xl">🍽️</div>
+              <h3 className="text-sm font-bold text-[#F5F7FA]">No tables found</h3>
+              <p className="text-xs text-[#9AA6B2]">Configure tables in the Tables section to populate this area.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+              {filteredTables.map((table) => {
+                const activeSession = table.customerSessions?.find((s) => s.status === 'ACTIVE');
+                const isOccupied = !!activeSession;
+                const orders = activeSession?.orders ?? [];
+                const hasReadyOrders = orders.some((o) => o.status === 'READY');
+                const isSelected = selectedTable?.id === table.id;
 
-              // Color indicators
-              const cardBorder = hasReadyOrders
-                ? 'border-[#EAB308]/60 bg-[#EAB308]/5 hover:border-[#EAB308]'
-                : isOccupied
+                const cardBorder = isSelected
+                  ? 'border-[#2AFEB7] bg-[#2AFEB7]/10 shadow-[0_0_15px_rgba(42,254,183,0.15)] ring-1 ring-[#2AFEB7]'
+                  : hasReadyOrders
+                  ? 'border-[#EAB308]/70 bg-[#EAB308]/5 hover:border-[#EAB308] shadow-[0_0_10px_rgba(234,179,8,0.1)]'
+                  : isOccupied
                   ? 'border-[#EF4444]/40 bg-[#EF4444]/5 hover:border-[#EF4444]'
                   : 'border-[#26313C] bg-[#111820] hover:border-[#2AFEB7]/40';
 
-              const indicatorDot = hasReadyOrders
-                ? 'bg-[#EAB308]'
-                : isOccupied
+                const indicatorDot = hasReadyOrders
+                  ? 'bg-[#EAB308] animate-ping'
+                  : isOccupied
                   ? 'bg-[#EF4444]'
                   : 'bg-[#22C55E]';
 
-              return (
-                <div
-                  key={table.id}
-                  onClick={() => setSelectedTable(table)}
-                  className={`flex cursor-pointer flex-col justify-between rounded-xl border p-4 shadow-md transition-all ${cardBorder}`}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-bold text-[#F5F7FA]">Table {table.name}</span>
-                    <span className={`h-2.5 w-2.5 rounded-full ${indicatorDot}`} />
-                  </div>
-                  <div className="mt-4 flex items-center justify-between text-[11px] text-[#9AA6B2]">
-                    <span>Cap: {table.capacity}</span>
-                    <span>{isOccupied ? 'Occupied' : 'Available'}</span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Right Detail Pane / Drawer */}
-        <div className="rounded-2xl border border-[#26313C] bg-[#111820] p-6 shadow-xl space-y-6 self-start">
-          {selectedTable ? (
-            <>
-              <div className="flex items-start justify-between border-b border-[#26313C] pb-3">
-                <div>
-                  <h3 className="text-lg font-bold text-[#F5F7FA]">Table {selectedTable.name}</h3>
-                  <span className="font-mono text-xs text-[#9AA6B2]">{selectedTable.code}</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setSelectedTable(null)}
-                  className="text-xs text-[#9AA6B2] hover:text-[#F5F7FA]"
-                >
-                  Close
-                </button>
-              </div>
-
-              {/* Occupancy details */}
-              {selectedTable.customerSessions && selectedTable.customerSessions.length > 0 ? (
-                <div className="space-y-4">
-                  <div className="rounded-lg bg-[#EF4444]/10 border border-[#EF4444]/20 p-3 text-xs text-[#EF4444] flex flex-col gap-2.5">
-                    <div className="flex items-center justify-between font-semibold">
-                      <span>Occupied Session Active</span>
-                      <span className="h-2 w-2 rounded-full bg-[#EF4444] animate-pulse" />
-                    </div>
-                    <div className="flex gap-2">
-                      <button
-                        type="button"
-                        disabled={isPrinting}
-                        onClick={() => handlePrintBill(selectedTable)}
-                        className="flex-1 rounded bg-[#2AFEB7] py-1.5 px-3 font-bold text-[#0B0F14] hover:bg-[#22E5A4] transition-all disabled:opacity-50 text-center text-xs"
-                      >
-                        {isPrinting ? 'Preparing...' : '🖨️ Print Bill'}
-                      </button>
-                      <button
-                        type="button"
-                        disabled={updatingTableId === selectedTable.id}
-                        onClick={() => handleClearTable(selectedTable)}
-                        className="flex-1 rounded bg-[#EF4444]/20 py-1.5 px-3 font-bold text-[#EF4444] hover:bg-[#EF4444]/30 transition-all disabled:opacity-50 text-center text-xs"
-                      >
-                        Clear Table
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Active orders */}
-                  <div className="space-y-3">
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-[#9AA6B2]">
-                      Session Orders
-                    </h4>
-                    {(() => {
-                      const allOrders = selectedTable.customerSessions.flatMap((s) => s.orders ?? []);
-                      if (allOrders.length === 0) {
-                        return <p className="text-xs text-[#9AA6B2]">No orders placed yet.</p>;
-                      }
-                      return (
-                        <div className="space-y-2.5">
-                          {allOrders.map((o) => {
-                            const isCancelled = o.status === 'CANCELLED';
-                            const isCompleted = o.status === 'COMPLETED';
-                            const hasPendingReview = o.cancellationRequests?.some(
-                              (cr: any) => cr.status === 'PENDING_REVIEW',
-                            );
-                            const hasPaid = o.payments?.some(
-                              (p: any) => p.status === 'SUCCESS' || p.status === 'PARTIALLY_REFUNDED',
-                            );
-
-                            return (
-                              <div
-                                key={o.id}
-                                className={`rounded-xl p-3 text-xs border transition-all ${
-                                  isCancelled
-                                    ? 'border-red-500/20 bg-red-500/5 opacity-75'
-                                    : 'border-[#26313C] bg-[#18212B]'
-                                }`}
-                              >
-                                <div className="flex items-center justify-between">
-                                  <div>
-                                    <div className="flex items-center gap-2">
-                                      <span className="font-mono font-bold text-[#2AFEB7]">
-                                        {o.orderNumber}
-                                      </span>
-                                      <span
-                                        className={`rounded px-1.5 py-0.2 text-[9px] font-bold uppercase ${
-                                          isCancelled
-                                            ? 'bg-red-500/20 text-red-400 border border-red-500/30'
-                                            : isCompleted
-                                            ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
-                                            : hasPendingReview
-                                            ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                                            : 'bg-[#111820] text-[#9AA6B2]'
-                                        }`}
-                                      >
-                                        {hasPendingReview ? 'Review Pending' : o.status}
-                                      </span>
-                                    </div>
-                                    {isCancelled && o.cancellationReason && (
-                                      <p className="mt-1 text-[10px] text-red-400/80">
-                                        Reason: {o.cancellationReason}
-                                      </p>
-                                    )}
-                                  </div>
-
-                                  <div className="flex items-center gap-1.5">
-                                    {['PENDING', 'CONFIRMED', 'PREPARING', 'READY'].includes(o.status) && (
-                                      <button
-                                        type="button"
-                                        onClick={() => handleUpdateOrderStatus(o.id, 'SERVED', 'Served')}
-                                        className={`rounded px-2 py-1 text-[10px] font-bold transition-all ${
-                                          o.status === 'READY'
-                                            ? 'bg-[#2AFEB7] text-[#0B0F14] hover:bg-[#22E5A4]'
-                                            : 'bg-[#111820] border border-[#26313C] text-[#9AA6B2] hover:border-[#2AFEB7]/40 hover:text-[#2AFEB7]'
-                                        }`}
-                                      >
-                                        {o.status === 'READY' ? '🔔 Serve' : 'Serve'}
-                                      </button>
-                                    )}
-                                    {o.status === 'SERVED' && (
-                                      <button
-                                        type="button"
-                                        onClick={() => handleUpdateOrderStatus(o.id, 'COMPLETED', 'Completed')}
-                                        className="rounded bg-[#A855F7] px-2 py-1 text-[10px] font-bold text-white hover:bg-[#9333EA] transition-all"
-                                      >
-                                        Complete
-                                      </button>
-                                    )}
-                                    {!isCancelled && !isCompleted && !hasPendingReview && (
-                                      <button
-                                        type="button"
-                                        onClick={() => {
-                                          setCancellationOrder(o);
-                                          setCancellationReason('CUSTOMER_REQUESTED');
-                                          setCancellationNote('');
-                                        }}
-                                        className="rounded border border-red-500/30 bg-red-500/10 px-2 py-1 text-[10px] font-bold text-red-400 hover:bg-red-500/20"
-                                      >
-                                        {hasPaid ? 'Req Cancel' : 'Cancel'}
-                                      </button>
-                                    )}
-                                    <span className="font-bold text-[#F5F7FA] pl-1">
-                                      {formatCurrency(o.totalAmount)}
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      );
-                    })()}
-                  </div>
-
-                  {/* manual booking CTA */}
+                return (
                   <button
+                    key={table.id}
                     type="button"
-                    onClick={() => setIsOrdering(true)}
-                    className="w-full rounded-lg bg-[#2AFEB7] py-2 text-xs font-bold text-[#0B0F14] hover:bg-[#22E5A4]"
+                    onClick={() => setSelectedTable(table)}
+                    className={`flex flex-col justify-between rounded-xl border p-3.5 sm:p-4 text-left shadow-md transition-all active:scale-[0.98] ${cardBorder}`}
                   >
-                    Take New Order
+                    <div className="flex items-center justify-between w-full">
+                      <span className="text-sm font-extrabold text-[#F5F7FA]">
+                        Table {table.name}
+                      </span>
+                      <div className="flex items-center gap-1.5">
+                        {hasReadyOrders && (
+                          <span className="text-[10px] font-bold text-[#EAB308]">READY</span>
+                        )}
+                        <span className={`h-2.5 w-2.5 rounded-full ${indicatorDot}`} />
+                      </div>
+                    </div>
+
+                    <div className="mt-3 pt-2 border-t border-[#26313C]/40 flex items-center justify-between text-[10px] sm:text-[11px] text-[#9AA6B2] w-full">
+                      <span>👥 {table.capacity}p</span>
+                      <span className={isOccupied ? 'font-bold text-[#F5F7FA]' : 'text-[#22C55E]'}>
+                        {isOccupied ? `${orders.length} orders` : 'Available'}
+                      </span>
+                    </div>
                   </button>
-                </div>
-              ) : (
-                <div className="space-y-4 text-center py-6">
-                  <p className="text-xs text-[#9AA6B2]">Table is currently empty.</p>
-                  <button
-                    type="button"
-                    disabled={updatingTableId === selectedTable.id}
-                    onClick={() => handleSeatGuests(selectedTable)}
-                    className="rounded-lg bg-[#2AFEB7] px-6 py-2 text-xs font-bold text-[#0B0F14] hover:bg-[#22E5A4]"
-                  >
-                    Sit Guests
-                  </button>
-                </div>
-              )}
-            </>
-          ) : (
-            <div className="text-center py-12 text-sm text-[#9AA6B2]">
-              Select a table from the floor map grid to monitor occupancy or manage active sessions.
+                );
+              })}
             </div>
           )}
         </div>
+
+        {/* Right Detail Pane / Drawer (Sticky Desktop, Sheet on Mobile) */}
+        <div className="lg:col-span-1">
+          <div className="sticky top-6 rounded-2xl border border-[#26313C] bg-[#111820] p-5 sm:p-6 shadow-xl space-y-5">
+            {selectedTable ? (
+              <>
+                <div className="flex items-start justify-between border-b border-[#26313C] pb-3">
+                  <div>
+                    <h3 className="text-lg font-extrabold text-[#F5F7FA]">
+                      Table {selectedTable.name}
+                    </h3>
+                    <span className="font-mono text-xs text-[#9AA6B2]">
+                      {selectedTable.code} • {selectedTable.diningArea?.name}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedTable(null)}
+                    className="rounded-lg border border-[#26313C] bg-[#18212B] px-2.5 py-1 text-xs text-[#9AA6B2] hover:text-[#F5F7FA]"
+                  >
+                    ✕ Close
+                  </button>
+                </div>
+
+                {/* Occupancy details */}
+                {selectedTable.customerSessions && selectedTable.customerSessions.some((s) => s.status === 'ACTIVE') ? (
+                  (() => {
+                    const activeSession = selectedTable.customerSessions.find((s) => s.status === 'ACTIVE')!;
+                    const allOrders = activeSession.orders ?? [];
+
+                    return (
+                      <div className="space-y-4">
+                        <div className="rounded-xl bg-[#EF4444]/10 border border-[#EF4444]/20 p-3 text-xs text-[#EF4444] space-y-2.5">
+                          <div className="flex items-center justify-between font-bold">
+                            <span>Occupied Guest Session</span>
+                            <span className="h-2 w-2 rounded-full bg-[#EF4444] animate-pulse" />
+                          </div>
+                          <div className="flex gap-2">
+                            <button
+                              type="button"
+                              disabled={isPrinting}
+                              onClick={() => handlePrintBill(selectedTable)}
+                              className="flex-1 rounded-lg bg-[#18212B] border border-[#26313C] py-2 text-xs font-bold text-[#F5F7FA] hover:border-[#2AFEB7] transition-all text-center"
+                            >
+                              {isPrinting ? 'Printing...' : '🖨️ Print Bill'}
+                            </button>
+                            <button
+                              type="button"
+                              disabled={updatingTableId === selectedTable.id}
+                              onClick={() => handleClearTable(selectedTable)}
+                              className="flex-1 rounded-lg bg-[#EF4444]/20 py-2 text-xs font-bold text-[#EF4444] hover:bg-[#EF4444]/30 transition-all disabled:opacity-50 text-center"
+                            >
+                              Clear Table
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Active Session Orders */}
+                        <div className="space-y-2.5">
+                          <h4 className="text-xs font-bold uppercase tracking-wider text-[#9AA6B2]">
+                            Session Orders ({allOrders.length})
+                          </h4>
+
+                          {allOrders.length === 0 ? (
+                            <p className="text-xs text-[#9AA6B2]">No orders placed yet.</p>
+                          ) : (
+                            <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
+                              {allOrders.map((o) => {
+                                const isCancelled = o.status === 'CANCELLED';
+                                const isCompleted = o.status === 'COMPLETED';
+                                const isReady = o.status === 'READY';
+                                const hasPendingReview = o.cancellationRequests?.some(
+                                  (cr: any) => cr.status === 'PENDING_REVIEW',
+                                );
+                                const hasPaid = o.payments?.some(
+                                  (p: any) => p.status === 'SUCCESS' || p.status === 'PARTIALLY_REFUNDED',
+                                );
+                                const isOrderUpdating = updatingOrderId === o.id;
+
+                                return (
+                                  <div
+                                    key={o.id}
+                                    className={`rounded-xl p-3 text-xs border transition-all ${
+                                      isReady
+                                        ? 'border-[#EAB308]/60 bg-[#EAB308]/10 shadow-[0_0_10px_rgba(234,179,8,0.15)]'
+                                        : isCancelled
+                                        ? 'border-red-500/20 bg-red-500/5 opacity-75'
+                                        : 'border-[#26313C] bg-[#18212B]'
+                                    }`}
+                                  >
+                                    <div className="flex items-center justify-between">
+                                      <div>
+                                        <div className="flex items-center gap-2">
+                                          <span className="font-mono font-extrabold text-[#2AFEB7]">
+                                            {o.orderNumber}
+                                          </span>
+                                          <span
+                                            className={`rounded px-1.5 py-0.2 text-[9px] font-bold uppercase ${
+                                              isCancelled
+                                                ? 'bg-red-500/20 text-red-400 border border-red-500/30'
+                                                : isCompleted
+                                                ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
+                                                : isReady
+                                                ? 'bg-[#EAB308]/25 text-[#EAB308] border border-[#EAB308]/40 animate-pulse'
+                                                : hasPendingReview
+                                                ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                                                : 'bg-[#111820] text-[#9AA6B2]'
+                                            }`}
+                                          >
+                                            {hasPendingReview ? 'Review Pending' : o.status}
+                                          </span>
+                                        </div>
+                                        {isCancelled && o.cancellationReason && (
+                                          <p className="mt-1 text-[10px] text-red-400/80">
+                                            Reason: {o.cancellationReason}
+                                          </p>
+                                        )}
+                                      </div>
+
+                                      <div className="flex items-center gap-1.5">
+                                        {['PENDING', 'CONFIRMED', 'PREPARING', 'READY'].includes(o.status) && (
+                                          <button
+                                            type="button"
+                                            disabled={isOrderUpdating}
+                                            onClick={() => handleUpdateOrderStatus(o.id, 'SERVED', 'Served')}
+                                            className={`rounded px-2.5 py-1.5 text-[10px] font-bold transition-all active:scale-[0.97] disabled:opacity-50 ${
+                                              isReady
+                                                ? 'bg-[#2AFEB7] text-[#0B0F14] hover:bg-[#22E5A4] shadow-[0_0_8px_rgba(42,254,183,0.3)]'
+                                                : 'bg-[#111820] border border-[#26313C] text-[#9AA6B2] hover:border-[#2AFEB7]/40 hover:text-[#2AFEB7]'
+                                            }`}
+                                          >
+                                            {isOrderUpdating ? 'Serving...' : isReady ? '🔔 Serve' : 'Serve'}
+                                          </button>
+                                        )}
+                                        {o.status === 'SERVED' && (
+                                          <button
+                                            type="button"
+                                            disabled={isOrderUpdating}
+                                            onClick={() => handleUpdateOrderStatus(o.id, 'COMPLETED', 'Completed')}
+                                            className="rounded bg-[#A855F7] px-2.5 py-1.5 text-[10px] font-bold text-white hover:bg-[#9333EA] transition-all active:scale-[0.97] disabled:opacity-50"
+                                          >
+                                            {isOrderUpdating ? 'Completing...' : 'Complete'}
+                                          </button>
+                                        )}
+                                        {!isCancelled && !isCompleted && !hasPendingReview && (
+                                          <button
+                                            type="button"
+                                            onClick={() => {
+                                              setCancellationOrder(o);
+                                              setCancellationReason('CUSTOMER_REQUESTED');
+                                              setCancellationNote('');
+                                            }}
+                                            className="rounded border border-red-500/30 bg-red-500/10 px-2 py-1.5 text-[10px] font-bold text-red-400 hover:bg-red-500/20"
+                                          >
+                                            {hasPaid ? 'Req Cancel' : 'Cancel'}
+                                          </button>
+                                        )}
+                                        <span className="font-bold text-[#F5F7FA] pl-1">
+                                          {formatCurrency(o.totalAmount)}
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* CTA Take Order */}
+                        <button
+                          type="button"
+                          onClick={() => setIsOrdering(true)}
+                          className="w-full rounded-xl bg-[#2AFEB7] py-2.5 text-xs font-bold text-[#0B0F14] hover:bg-[#22E5A4] transition-all"
+                        >
+                          + Take New Order
+                        </button>
+                      </div>
+                    );
+                  })()
+                ) : (
+                  <div className="space-y-4 text-center py-6">
+                    <p className="text-xs text-[#9AA6B2]">Table is currently unoccupied.</p>
+                    <button
+                      type="button"
+                      disabled={updatingTableId === selectedTable.id}
+                      onClick={() => handleSeatGuests(selectedTable)}
+                      className="rounded-xl bg-[#2AFEB7] px-6 py-2.5 text-xs font-bold text-[#0B0F14] hover:bg-[#22E5A4] transition-all"
+                    >
+                      Seat Guests
+                    </button>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="text-center py-12 text-xs text-[#9AA6B2] space-y-2">
+                <div className="text-2xl">👈</div>
+                <p>Select any dining table on the floor to view active orders or seat guests.</p>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
-      {/* Manual order taking popup */}
-      {isOrdering && activeMenu && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
-          <div className="flex h-[90vh] w-full max-w-4xl flex-col rounded-2xl border border-[#26313C] bg-[#111820] text-[#F5F7FA] shadow-2xl">
-            {/* Header */}
-            <div className="flex items-center justify-between border-b border-[#26313C] p-4">
-              <div>
-                <h2 className="text-base font-bold">Manual Order — Table {selectedTable?.name}</h2>
-                <p className="text-xs text-[#9AA6B2]">Select items from the restaurant menu</p>
-              </div>
+      {/* Manual Ordering Modal */}
+      {isOrdering && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 no-print">
+          <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl border border-[#26313C] bg-[#111820] p-6 shadow-2xl space-y-6">
+            <div className="flex items-center justify-between border-b border-[#26313C] pb-3">
+              <h2 className="text-base font-bold text-[#F5F7FA]">
+                Manual Order — Table {selectedTable?.name}
+              </h2>
               <button
                 type="button"
-                onClick={() => {
-                  setIsOrdering(false);
-                  setCartItems([]);
-                }}
+                onClick={() => setIsOrdering(false)}
                 className="text-xs text-[#9AA6B2] hover:text-[#F5F7FA]"
               >
-                Cancel Order
+                ✕ Close
               </button>
             </div>
 
-            {/* Content split */}
-            <div className="flex flex-1 overflow-hidden">
-              {/* Menu items selection grid */}
-              <div className="w-2/3 overflow-y-auto p-4 space-y-4 border-r border-[#26313C]">
-                {activeMenu.categories.map((cat: any) => (
+            {/* Menu categories & items */}
+            {activeMenu ? (
+              <div className="space-y-4 max-h-80 overflow-y-auto pr-1">
+                {activeMenu.categories?.map((cat: any) => (
                   <div key={cat.id} className="space-y-2">
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-[#2AFEB7]">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-[#9AA6B2]">
                       {cat.name}
                     </h3>
-                    <div className="grid grid-cols-2 gap-3">
-                      {cat.items.map((item: any) => (
-                        <div
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {cat.items?.map((item: any) => (
+                        <button
                           key={item.id}
-                          onClick={() => setSelectedItem(item)}
-                          className="cursor-pointer rounded-xl border border-[#26313C] bg-[#0F141C] p-3 text-xs hover:border-[#2AFEB7]/50"
+                          type="button"
+                          onClick={() => {
+                            setSelectedItem(item);
+                            setChosenVariantId(item.variants?.[0]?.id ?? '');
+                            setChosenAddonIds([]);
+                            setQuantity(1);
+                          }}
+                          className="flex items-center justify-between rounded-xl border border-[#26313C] bg-[#18212B] p-3 text-left hover:border-[#2AFEB7]/40 transition-colors"
                         >
-                          <div className="font-semibold">{item.name}</div>
-                          <div className="mt-2 text-[#2AFEB7] font-bold">
-                            {formatCurrency(item.price)}
+                          <div>
+                            <span className="block text-xs font-bold text-[#F5F7FA]">{item.name}</span>
+                            <span className="text-[10px] text-[#2AFEB7]">{formatCurrency(item.price)}</span>
                           </div>
-                        </div>
+                          <span className="rounded bg-[#2AFEB7]/10 px-2 py-1 text-[10px] font-bold text-[#2AFEB7]">
+                            + Select
+                          </span>
+                        </button>
                       ))}
                     </div>
                   </div>
                 ))}
               </div>
+            ) : (
+              <div className="py-8 text-center text-xs text-[#9AA6B2]">Loading menu catalog...</div>
+            )}
 
-              {/* Order Cart Details Summary */}
-              <div className="w-1/3 overflow-y-auto p-4 flex flex-col justify-between">
-                <div className="space-y-4">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-[#9AA6B2]">
-                    Order Summary
-                  </h3>
-                  <div className="space-y-2">
-                    {cartItems.length === 0 ? (
-                      <p className="text-xs text-[#9AA6B2]">No items selected.</p>
-                    ) : (
-                      cartItems.map((cartItem, idx) => (
-                        <div
-                          key={idx}
-                          className="flex justify-between text-xs border-b border-[#26313C]/50 pb-2"
-                        >
-                          <div>
-                            <span className="font-bold text-[#2AFEB7]">{cartItem.quantity}x </span>
-                            <span>{cartItem.name}</span>
-                          </div>
-                          <span className="font-semibold">
-                            {formatCurrency(cartItem.price * cartItem.quantity)}
-                          </span>
-                        </div>
-                      ))
-                    )}
-                  </div>
+            {/* Selected item configurator */}
+            {selectedItem && (
+              <div className="rounded-xl border border-[#2AFEB7]/40 bg-[#18212B] p-4 space-y-4">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-sm font-bold text-[#F5F7FA]">Configure: {selectedItem.name}</h4>
+                  <span className="text-xs font-bold text-[#2AFEB7]">{formatCurrency(selectedItem.price)}</span>
                 </div>
 
-                <div className="pt-4 border-t border-[#26313C] space-y-3">
-                  <button
-                    type="button"
-                    disabled={cartItems.length === 0}
-                    onClick={handleCheckoutManualOrder}
-                    className="w-full rounded-lg bg-[#2AFEB7] py-3 text-xs font-bold text-[#0B0F14] hover:bg-[#22E5A4]"
-                  >
-                    Send Order to Kitchen
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Item options sub-popup */}
-      {selectedItem && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4">
-          <div className="w-full max-w-sm rounded-xl border border-[#26313C] bg-[#111820] p-4 text-xs space-y-4">
-            <h3 className="text-sm font-bold text-[#F5F7FA]">{selectedItem.name}</h3>
-
-            {/* Variants selection */}
-            {selectedItem.variantGroups?.map((group: any) => (
-              <div key={group.id} className="space-y-2">
-                <div className="font-semibold text-[#9AA6B2]">{group.name}</div>
-                <div className="flex gap-2">
-                  {group.variants.map((v: any) => (
+                {/* Quantity */}
+                <div className="flex items-center gap-3">
+                  <span className="text-xs text-[#9AA6B2]">Quantity:</span>
+                  <div className="flex items-center gap-2">
                     <button
-                      key={v.id}
                       type="button"
-                      onClick={() => setChosenVariantId(v.id)}
-                      className={`rounded px-3 py-1.5 border text-[11px] ${
-                        chosenVariantId === v.id
-                          ? 'border-[#2AFEB7] bg-[#2AFEB7]/10 text-[#2AFEB7]'
-                          : 'border-[#26313C] text-[#F5F7FA]'
-                      }`}
+                      onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                      className="h-7 w-7 rounded bg-[#111820] border border-[#26313C] text-xs font-bold"
                     >
-                      {v.name} (+{v.price})
+                      -
                     </button>
+                    <span className="w-6 text-center text-xs font-bold text-[#F5F7FA]">{quantity}</span>
+                    <button
+                      type="button"
+                      onClick={() => setQuantity((q) => q + 1)}
+                      className="h-7 w-7 rounded bg-[#111820] border border-[#26313C] text-xs font-bold"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleAddCartItem}
+                  className="w-full rounded-lg bg-[#2AFEB7] py-2 text-xs font-bold text-[#0B0F14] hover:bg-[#22E5A4]"
+                >
+                  Add to Table Cart
+                </button>
+              </div>
+            )}
+
+            {/* Current Cart */}
+            {cartItems.length > 0 && (
+              <div className="border-t border-[#26313C] pt-4 space-y-3">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-[#9AA6B2]">
+                  Order Cart ({cartItems.length} items)
+                </h4>
+                <div className="space-y-1.5 max-h-36 overflow-y-auto">
+                  {cartItems.map((ci, idx) => (
+                    <div key={idx} className="flex items-center justify-between rounded bg-[#18212B] p-2 text-xs">
+                      <span>{ci.quantity}x {ci.name}</span>
+                      <span className="font-bold text-[#F5F7FA]">{formatCurrency(ci.price * ci.quantity)}</span>
+                    </div>
                   ))}
                 </div>
-              </div>
-            ))}
-
-            {/* Addons selection */}
-            {selectedItem.addonGroups?.map((group: any) => (
-              <div key={group.id} className="space-y-2">
-                <div className="font-semibold text-[#9AA6B2]">{group.name}</div>
-                <div className="flex flex-wrap gap-2">
-                  {group.addons.map((a: any) => {
-                    const active = chosenAddonIds.includes(a.id);
-                    return (
-                      <button
-                        key={a.id}
-                        type="button"
-                        onClick={() =>
-                          setChosenAddonIds((prev) =>
-                            active ? prev.filter((id) => id !== a.id) : [...prev, a.id],
-                          )
-                        }
-                        className={`rounded px-3 py-1.5 border text-[11px] ${
-                          active
-                            ? 'border-[#2AFEB7] bg-[#2AFEB7]/10 text-[#2AFEB7]'
-                            : 'border-[#26313C] text-[#F5F7FA]'
-                        }`}
-                      >
-                        {a.name} (+{a.price})
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
-
-            {/* Quantity */}
-            <div className="flex items-center justify-between border-t border-[#26313C] pt-3">
-              <span>Quantity</span>
-              <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                  className="rounded border border-[#26313C] px-2 py-1 text-sm font-bold text-[#F5F7FA]"
+                  disabled={isLoading}
+                  onClick={handleSubmitManualOrder}
+                  className="w-full rounded-xl bg-[#2AFEB7] py-3 text-xs font-bold text-[#0B0F14] hover:bg-[#22E5A4] transition-all disabled:opacity-50"
                 >
-                  −
-                </button>
-                <span className="w-6 text-center font-bold">{quantity}</span>
-                <button
-                  type="button"
-                  onClick={() => setQuantity((q) => q + 1)}
-                  className="rounded border border-[#26313C] px-2 py-1 text-sm font-bold text-[#F5F7FA]"
-                >
-                  +
+                  {isLoading ? 'Submitting...' : 'Send Order to Kitchen'}
                 </button>
               </div>
-            </div>
-
-            <div className="flex justify-end gap-2 pt-2">
-              <button
-                type="button"
-                onClick={() => setSelectedItem(null)}
-                className="rounded border border-[#26313C] px-3 py-1.5 text-xs text-[#9AA6B2]"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleAddCartItem}
-                className="rounded bg-[#2AFEB7] px-3 py-1.5 text-xs font-bold text-[#0B0F14]"
-              >
-                Confirm Add
-              </button>
-            </div>
+            )}
           </div>
         </div>
       )}
 
-      {/* Print-only receipt layout */}
-      {printOrders.length > 0 && (
-        <div className="hidden print:block bg-white text-black font-mono p-6 w-[80mm] text-xs leading-relaxed mx-auto">
-          <div className="text-center font-bold text-sm mb-2 uppercase tracking-wide">
-            {currentRestaurant.name}
+      {/* Popups & Assistance Overlays */}
+      <div className="fixed bottom-4 right-4 left-4 sm:left-auto sm:max-w-sm z-50 flex flex-col gap-3 no-print">
+        {orderToasts.map((t) => (
+          <div
+            key={t.id}
+            onClick={() => handleOpenOrderTable(t.tableId, t.id)}
+            className="flex items-center justify-between rounded-xl border border-[#2AFEB7]/50 bg-[#111820]/95 p-3.5 shadow-2xl backdrop-blur-md cursor-pointer hover:bg-[#18212B] transition-all"
+          >
+            <div>
+              <p className="text-xs font-bold text-[#F5F7FA]">
+                Order <span className="font-mono text-[#2AFEB7]">#{t.orderNumber}</span> placed
+              </p>
+              <p className="text-[10px] text-[#9AA6B2] mt-0.5">
+                Tap to open details for Table <span className="text-white font-bold">{t.tableName}</span>
+              </p>
+            </div>
+            <span className="text-xl">🍽️</span>
           </div>
-          <div className="text-center mb-4">
-            {currentBranch.name}
-            <br />
-            Table {selectedTable?.name} ({selectedTable?.code})
-            <br />
-            Date: {new Date().toLocaleString()}
-          </div>
-          
-          <div className="border-t border-dashed border-black my-2" />
-          
-          <div className="space-y-1">
-            {(() => {
-              // Group items across all orders in the session
-              const consolidatedItems: Record<string, { name: string; quantity: number; price: number }> = {};
-              let subtotal = 0;
-              let taxAmount = 0;
-              let discountAmount = 0;
-              
-              printOrders.forEach(o => {
-                subtotal += Number(o.subtotal);
-                taxAmount += Number(o.taxAmount);
-                discountAmount += Number(o.discountAmount);
-                
-                o.items.forEach((item: any) => {
-                  const key = item.menuItemId;
-                  if (consolidatedItems[key]) {
-                    consolidatedItems[key].quantity += item.quantity;
-                  } else {
-                    consolidatedItems[key] = {
-                      name: item.name,
-                      quantity: item.quantity,
-                      price: Number(item.unitPrice),
-                    };
-                  }
-                });
-              });
-              
-              const total = subtotal + taxAmount - discountAmount;
-              
-              return (
-                <>
-                  <div className="grid grid-cols-12 gap-1 font-bold border-b border-dashed border-black pb-1 mb-1">
-                    <span className="col-span-7">Item</span>
-                    <span className="col-span-2 text-right">Qty</span>
-                    <span className="col-span-3 text-right">Price</span>
-                  </div>
-                  {Object.values(consolidatedItems).map((item: any, idx) => (
-                    <div key={idx} className="grid grid-cols-12 gap-1 py-0.5">
-                      <span className="col-span-7 truncate">{item.name}</span>
-                      <span className="col-span-2 text-right">{item.quantity}</span>
-                      <span className="col-span-3 text-right">{formatCurrency(item.price * item.quantity)}</span>
-                    </div>
-                  ))}
-                  <div className="border-t border-dashed border-black my-2" />
-                  <div className="space-y-1 text-right text-[11px]">
-                    <div>Subtotal: {formatCurrency(subtotal)}</div>
-                    {taxAmount > 0 && (
-                      <>
-                        <div>CGST (2.5%): {formatCurrency(taxAmount / 2)}</div>
-                        <div>SGST (2.5%): {formatCurrency(taxAmount / 2)}</div>
-                      </>
-                    )}
-                    {discountAmount > 0 && (
-                      <div>Discount: -{formatCurrency(discountAmount)}</div>
-                    )}
-                    <div className="font-bold border-t border-dashed border-black pt-1 text-sm mt-1">
-                      Total Due: {formatCurrency(total)}
-                    </div>
-                  </div>
-                </>
-              );
-            })()}
-          </div>
-          
-          <div className="border-t border-dashed border-black my-4" />
-          <div className="text-center font-bold text-[10px] uppercase">
-            Thank you for dining with us!
-          </div>
-        </div>
-      )}
+        ))}
 
-      {/* Printable POS CSS overrides */}
-      <style dangerouslySetInnerHTML={{ __html: `
-        @media print {
-          body, main, html, #__next, [data-overlay-container], .protected-layout-content {
-            background: white !important;
-            color: black !important;
-            min-height: auto !important;
-            padding: 0 !important;
-            margin: 0 !important;
-          }
-          .no-print, header, nav, aside, button, select, dialog, [role="dialog"], .protected-sidebar, .protected-header {
-            display: none !important;
-          }
-          .print\\:block {
-            display: block !important;
-          }
-        }
-      `}} />
-
-      {/* Popups Overlays */}
-      <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-4 max-w-sm w-full no-print">
-        {/* Order Toasts Stacking Column */}
-        {orderToasts.length > 0 && (
-          <div className="space-y-2">
-            <span className="text-[10px] font-black uppercase tracking-widest text-[#2AFEB7] pl-1">
-              🔔 New Table Orders ({orderToasts.length})
-            </span>
-            {orderToasts.map((t) => (
-              <div
-                key={t.id}
-                onClick={() => handleOpenOrderTable(t.tableId, t.id)}
-                className="flex items-center justify-between rounded-xl border border-[#2AFEB7]/40 bg-[#111820]/95 p-4 shadow-[0_0_15px_rgba(42,254,183,0.15)] backdrop-blur-md cursor-pointer hover:bg-[#18212B] transition-all transform hover:scale-[1.02]"
-              >
-                <div>
-                  <p className="text-xs font-bold text-[#F5F7FA]">
-                    Order <span className="font-mono text-[#2AFEB7]">#{t.orderNumber}</span> placed
-                  </p>
-                  <p className="text-[10px] text-[#9AA6B2] mt-0.5">
-                    Click to open details for Table <span className="text-white font-bold">{t.tableName}</span>
-                  </p>
-                </div>
-                <span className="text-xl">🍽️</span>
-              </div>
-            ))}
+        {callToasts.map((t) => (
+          <div
+            key={t.id}
+            className="flex items-center justify-between rounded-xl border border-yellow-500/50 bg-[#111820]/95 p-3.5 shadow-2xl backdrop-blur-md"
+          >
+            <div>
+              <span className="rounded bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 px-1.5 py-0.5 text-[9px] font-bold">
+                {t.type} Assistance
+              </span>
+              <p className="text-xs font-bold text-[#F5F7FA] mt-1">Table {t.tableName}</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => void handleResolveCall(t.id)}
+              className="ml-3 rounded-lg bg-[#2AFEB7] px-3 py-1.5 text-xs font-bold text-[#0B0F14] hover:bg-[#22E5A4]"
+            >
+              Resolve
+            </button>
           </div>
-        )}
-
-        {/* Call Toasts Stacking Column */}
-        {callToasts.length > 0 && (
-          <div className="space-y-2">
-            <span className="text-[10px] font-black uppercase tracking-widest text-[#EAB308] pl-1">
-              🛎️ Assistance Alerts ({callToasts.length})
-            </span>
-            {callToasts.map((t) => {
-              let title = 'Waiter Called';
-              let badgeColor = 'bg-blue-500/20 text-blue-400 border-blue-500/30';
-              if (t.type === 'WATER') {
-                title = 'Request Water';
-                badgeColor = 'bg-blue-500/20 text-blue-400 border-blue-500/30';
-              } else if (t.type === 'BILL') {
-                title = 'Request Bill';
-                badgeColor = 'bg-green-500/20 text-green-400 border-green-500/30';
-              } else if (t.type === 'WAITER') {
-                title = 'Call Waiter';
-                badgeColor = 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
-              }
-
-              return (
-                <div
-                  key={t.id}
-                  className="flex items-center justify-between rounded-xl border border-[#26313C] bg-[#111820]/95 p-4 shadow-xl backdrop-blur-md"
-                >
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className={`rounded px-1.5 py-0.5 text-[9px] font-bold border ${badgeColor}`}>
-                        {title}
-                      </span>
-                      <p className="text-xs font-bold text-[#F5F7FA]">Table {t.tableName}</p>
-                    </div>
-                    <p className="text-[10px] text-[#9AA6B2] mt-1">
-                      Assistance request logged. Click resolve when completed.
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => void handleResolveCall(t.id)}
-                    className="ml-3 rounded-lg bg-[#2AFEB7] p-2 text-xs font-bold text-[#0B0F14] hover:bg-[#22E5A4] transition-all"
-                  >
-                    Resolve
-                  </button>
-                </div>
-              );
-            })}
-          </div>
-        )}
+        ))}
       </div>
 
       {/* Order Cancellation Modal */}
       {cancellationOrder && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 no-print">
-          <div className="w-full max-w-md rounded-2xl border border-[#26313C] bg-[#111820] p-6 shadow-2xl space-y-4">
+          <div className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-2xl border border-[#26313C] bg-[#111820] p-6 shadow-2xl space-y-4">
             <div>
               {(() => {
                 const hasPaid = cancellationOrder.payments?.some(

@@ -355,4 +355,21 @@ export class TablesService {
       qrCodeSvg,
     };
   }
+
+  async clearTable(id: string, branchId: string) {
+    const table = await this.prisma.table.findFirst({
+      where: { id, diningArea: { branchId } },
+    });
+
+    if (!table) {
+      throw new ForbiddenException('Table not found or does not belong to active branch');
+    }
+
+    await this.prisma.customerSession.updateMany({
+      where: { tableId: id, status: 'ACTIVE' },
+      data: { status: 'ENDED', endedAt: new Date() },
+    });
+
+    return { success: true, message: `Table ${table.name} session ended and cleared.` };
+  }
 }

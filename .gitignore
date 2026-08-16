@@ -11,3 +11,9 @@ coverage/
 .next/
 
 .vscode/settings.json
+
+# Playwright end-to-end artefacts
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/

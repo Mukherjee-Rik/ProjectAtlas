@@ -6,6 +6,11 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { PrismaService } from '../../../database/prisma/prisma.service';
+import {
+  CacheKeys,
+  CacheTtl,
+  TtlCacheService,
+} from '../../../common/cache/ttl-cache.service';
 import { RESTAURANT_HEADER } from '../constants/tenant.constants';
 import { REQUIRES_FEATURE_KEY } from '../decorators/requires-feature.decorator';
 
@@ -14,6 +19,7 @@ export class SubscriptionGuard implements CanActivate {
   constructor(
     private readonly prisma: PrismaService,
     private readonly reflector: Reflector,
+    private readonly cache: TtlCacheService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -46,17 +52,22 @@ export class SubscriptionGuard implements CanActivate {
     }
 
     // Fetch active subscription
-    const subscription = await this.prisma.subscription.findFirst({
-      where: {
-        restaurantId,
-      },
-      include: {
-        plan: true,
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
+    const subscription = await this.cache.wrap(
+      CacheKeys.subscription(restaurantId),
+      CacheTtl.subscription,
+      () =>
+        this.prisma.subscription.findFirst({
+          where: {
+            restaurantId,
+          },
+          include: {
+            plan: true,
+          },
+          orderBy: {
+            createdAt: 'desc',
+          },
+        }),
+    );
 
     if (!subscription) {
       throw new ForbiddenException(
@@ -72,6 +83,8 @@ export class SubscriptionGuard implements CanActivate {
           where: { id: subscription.id },
           data: { status: 'EXPIRED' },
         });
+        // Drop the cached TRIALING row so the next request sees EXPIRED.
+        this.cache.invalidate(CacheKeys.subscription(restaurantId));
         throw new ForbiddenException('Your trial has expired. Please choose a paid plan to restore access.');
       }
     }

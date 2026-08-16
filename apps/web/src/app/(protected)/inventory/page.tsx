@@ -486,10 +486,10 @@ export default function InventoryPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-2 border-b border-gray-800 mb-6 overflow-x-auto">
+      <div className="flex items-center gap-2 border-b border-gray-800 mb-6 overflow-x-auto no-scrollbar touch-pan-x flex-nowrap shrink-0">
         <button
           onClick={() => setActiveTab('ingredients')}
-          className={`px-5 py-3 font-semibold text-sm border-b-2 transition-all whitespace-nowrap flex items-center gap-2 ${
+          className={`px-5 py-3 font-semibold text-sm border-b-2 transition-all whitespace-nowrap shrink-0 flex items-center gap-2 ${
             activeTab === 'ingredients'
               ? 'border-indigo-500 text-indigo-400 bg-indigo-500/5'
               : 'border-transparent text-gray-400 hover:text-gray-200'
@@ -500,7 +500,7 @@ export default function InventoryPage() {
 
         <button
           onClick={() => setActiveTab('recipes')}
-          className={`px-5 py-3 font-semibold text-sm border-b-2 transition-all whitespace-nowrap flex items-center gap-2 ${
+          className={`px-5 py-3 font-semibold text-sm border-b-2 transition-all whitespace-nowrap shrink-0 flex items-center gap-2 ${
             activeTab === 'recipes'
               ? 'border-indigo-500 text-indigo-400 bg-indigo-500/5'
               : 'border-transparent text-gray-400 hover:text-gray-200'
@@ -511,7 +511,7 @@ export default function InventoryPage() {
 
         <button
           onClick={() => setActiveTab('movements')}
-          className={`px-5 py-3 font-semibold text-sm border-b-2 transition-all whitespace-nowrap flex items-center gap-2 ${
+          className={`px-5 py-3 font-semibold text-sm border-b-2 transition-all whitespace-nowrap shrink-0 flex items-center gap-2 ${
             activeTab === 'movements'
               ? 'border-indigo-500 text-indigo-400 bg-indigo-500/5'
               : 'border-transparent text-gray-400 hover:text-gray-200'
@@ -522,7 +522,7 @@ export default function InventoryPage() {
 
         <button
           onClick={() => setActiveTab('suppliers')}
-          className={`px-5 py-3 font-semibold text-sm border-b-2 transition-all whitespace-nowrap flex items-center gap-2 ${
+          className={`px-5 py-3 font-semibold text-sm border-b-2 transition-all whitespace-nowrap shrink-0 flex items-center gap-2 ${
             activeTab === 'suppliers'
               ? 'border-indigo-500 text-indigo-400 bg-indigo-500/5'
               : 'border-transparent text-gray-400 hover:text-gray-200'
@@ -548,10 +548,10 @@ export default function InventoryPage() {
               <span className="absolute left-3 top-2.5 text-gray-500">🔍</span>
             </div>
 
-            <div className="flex items-center gap-2 w-full sm:w-auto">
+            <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto no-scrollbar touch-pan-x flex-nowrap">
               <button
                 onClick={() => setStatusFilter('ALL')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap shrink-0 ${
                   statusFilter === 'ALL' ? 'bg-indigo-600 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
                 }`}
               >
@@ -559,7 +559,7 @@ export default function InventoryPage() {
               </button>
               <button
                 onClick={() => setStatusFilter('LOW_STOCK')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap shrink-0 ${
                   statusFilter === 'LOW_STOCK'
                     ? 'bg-amber-600 text-white'
                     : 'bg-gray-800 text-amber-400 hover:bg-gray-700'
@@ -569,7 +569,7 @@ export default function InventoryPage() {
               </button>
               <button
                 onClick={() => setStatusFilter('OUT_OF_STOCK')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap shrink-0 ${
                   statusFilter === 'OUT_OF_STOCK'
                     ? 'bg-rose-600 text-white'
                     : 'bg-gray-800 text-rose-400 hover:bg-gray-700'
@@ -581,20 +581,19 @@ export default function InventoryPage() {
           </div>
 
           {/* Table */}
-          <div className="bg-[#161b22] border border-gray-800 rounded-2xl overflow-hidden shadow-sm">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="border-b border-gray-800 text-xs font-bold text-gray-400 uppercase tracking-wider bg-gray-900/40">
-                    <th className="py-4 px-5">Ingredient</th>
-                    <th className="py-4 px-5">Current Stock</th>
-                    <th className="py-4 px-5">Min Level</th>
-                    <th className="py-4 px-5">Cost / Unit</th>
-                    <th className="py-4 px-5">Valuation</th>
-                    <th className="py-4 px-5">Status</th>
-                    <th className="py-4 px-5 text-right">Actions</th>
-                  </tr>
-                </thead>
+          <div className="bg-[#161b22] border border-gray-800 rounded-2xl overflow-hidden shadow-sm table-responsive">
+            <table className="w-full min-w-[700px] text-left border-collapse">
+              <thead>
+                <tr className="border-b border-gray-800 text-xs font-bold text-gray-400 uppercase tracking-wider bg-gray-900/40">
+                  <th className="py-4 px-5">Ingredient</th>
+                  <th className="py-4 px-5">Current Stock</th>
+                  <th className="py-4 px-5">Min Level</th>
+                  <th className="py-4 px-5">Cost / Unit</th>
+                  <th className="py-4 px-5">Valuation</th>
+                  <th className="py-4 px-5">Status</th>
+                  <th className="py-4 px-5 text-right">Actions</th>
+                </tr>
+              </thead>
                 <tbody className="divide-y divide-gray-800/60 text-sm">
                   {filteredIngredients.length === 0 ? (
                     <tr>
@@ -721,8 +720,7 @@ export default function InventoryPage() {
               </table>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
       {/* TAB 2: RECIPES */}
       {activeTab === 'recipes' && (
@@ -826,9 +824,8 @@ export default function InventoryPage() {
             </div>
           </div>
 
-          <div className="bg-[#161b22] border border-gray-800 rounded-2xl overflow-hidden shadow-sm">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse text-sm">
+          <div className="bg-[#161b22] border border-gray-800 rounded-2xl overflow-hidden shadow-sm table-responsive">
+            <table className="w-full min-w-[700px] text-left border-collapse text-sm">
                 <thead>
                   <tr className="border-b border-gray-800 text-xs font-bold text-gray-400 uppercase tracking-wider bg-gray-900/40">
                     <th className="py-4 px-5">Timestamp</th>
@@ -904,8 +901,7 @@ export default function InventoryPage() {
               </table>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
       {/* TAB 4: SUPPLIERS & LOCATIONS */}
       {activeTab === 'suppliers' && (

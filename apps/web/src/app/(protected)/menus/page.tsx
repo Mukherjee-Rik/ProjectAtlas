@@ -97,54 +97,52 @@ export default function MenusPage() {
           </button>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-xl border border-[#26313C] bg-[#111820] shadow-xl">
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[600px] text-left">
-              <thead className="border-b border-[#26313C] bg-[#18212B]">
-                <tr>
-                  {['Menu Name', 'Code', 'Status', 'Actions'].map((h) => (
-                    <th key={h} className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#26313C]">
-                {menus.map((menu) => (
-                  <tr
-                    key={menu.id}
-                    onClick={() => router.push(`/menus/${menu.id}`)}
-                    className="cursor-pointer transition-colors hover:bg-[#18212B]"
-                  >
-                    <td className="px-6 py-4 text-sm font-semibold text-[#F5F7FA]">{menu.name}</td>
-                    <td className="px-6 py-4 font-mono text-sm text-[#2AFEB7]">{menu.code}</td>
-                    <td className="px-6 py-4">
-                      <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold border ${menu.status === 'ACTIVE' ? 'bg-[#22C55E]/15 text-[#22C55E] border-[#22C55E]/30' : 'bg-[#9AA6B2]/15 text-[#9AA6B2] border-[#9AA6B2]/30'}`}>
-                        <span className={`h-1.5 w-1.5 rounded-full ${menu.status === 'ACTIVE' ? 'bg-[#22C55E]' : 'bg-[#9AA6B2]'}`} />
-                        {menu.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}>
-                      <div className="flex gap-2">
-                        <button
-                          type="button"
-                          onClick={() => router.push(`/menus/${menu.id}/edit`)}
-                          className="rounded-lg border border-[#26313C] bg-[#18212B] px-2.5 py-1 text-xs text-[#F5F7FA] hover:border-[#2AFEB7]"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setDeletingMenu(menu)}
-                          className="rounded-lg border border-[#EF4444]/40 bg-[#EF4444]/10 px-2.5 py-1 text-xs text-[#EF4444] hover:bg-[#EF4444]/20"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
+        <div className="table-responsive rounded-xl border border-[#26313C] bg-[#111820] shadow-xl">
+          <table className="w-full min-w-[600px] text-left">
+            <thead className="border-b border-[#26313C] bg-[#18212B]">
+              <tr>
+                {['Menu Name', 'Code', 'Status', 'Actions'].map((h) => (
+                  <th key={h} className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">{h}</th>
                 ))}
-              </tbody>
-            </table>
-          </div>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[#26313C]">
+              {menus.map((menu) => (
+                <tr
+                  key={menu.id}
+                  onClick={() => router.push(`/menus/${menu.id}`)}
+                  className="cursor-pointer transition-colors hover:bg-[#18212B]"
+                >
+                  <td className="px-6 py-4 text-sm font-semibold text-[#F5F7FA]">{menu.name}</td>
+                  <td className="px-6 py-4 font-mono text-sm text-[#2AFEB7]">{menu.code}</td>
+                  <td className="px-6 py-4">
+                    <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold border ${menu.status === 'ACTIVE' ? 'bg-[#22C55E]/15 text-[#22C55E] border-[#22C55E]/30' : 'bg-[#9AA6B2]/15 text-[#9AA6B2] border-[#9AA6B2]/30'}`}>
+                      <span className={`h-1.5 w-1.5 rounded-full ${menu.status === 'ACTIVE' ? 'bg-[#22C55E]' : 'bg-[#9AA6B2]'}`} />
+                      {menu.status}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => router.push(`/menus/${menu.id}/edit`)}
+                        className="rounded-lg border border-[#26313C] bg-[#18212B] px-2.5 py-1 text-xs text-[#F5F7FA] hover:border-[#2AFEB7]"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setDeletingMenu(menu)}
+                        className="rounded-lg border border-[#EF4444]/40 bg-[#EF4444]/10 px-2.5 py-1 text-xs text-[#EF4444] hover:bg-[#EF4444]/20"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
 

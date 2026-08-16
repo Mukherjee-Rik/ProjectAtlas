@@ -814,7 +814,7 @@ export type $CancellationRequestPayload<ExtArgs extends runtime.Types.Extensions
 export type CancellationRequestGetPayload<S extends boolean | null | undefined | CancellationRequestDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$CancellationRequestPayload, S>
 
 export type CancellationRequestCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<CancellationRequestFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<CancellationRequestFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: CancellationRequestCountAggregateInputType | true
   }
 
@@ -1269,6 +1269,7 @@ export type CancellationRequestFindUniqueArgs<ExtArgs extends runtime.Types.Exte
    * Filter, which CancellationRequest to fetch.
    */
   where: Prisma.CancellationRequestWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1291,6 +1292,7 @@ export type CancellationRequestFindUniqueOrThrowArgs<ExtArgs extends runtime.Typ
    * Filter, which CancellationRequest to fetch.
    */
   where: Prisma.CancellationRequestWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1343,6 +1345,7 @@ export type CancellationRequestFindFirstArgs<ExtArgs extends runtime.Types.Exten
    * Filter by unique combinations of CancellationRequests.
    */
   distinct?: Prisma.CancellationRequestScalarFieldEnum | Prisma.CancellationRequestScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1395,6 +1398,7 @@ export type CancellationRequestFindFirstOrThrowArgs<ExtArgs extends runtime.Type
    * Filter by unique combinations of CancellationRequests.
    */
   distinct?: Prisma.CancellationRequestScalarFieldEnum | Prisma.CancellationRequestScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1447,6 +1451,7 @@ export type CancellationRequestFindManyArgs<ExtArgs extends runtime.Types.Extens
    * Filter by unique combinations of CancellationRequests.
    */
   distinct?: Prisma.CancellationRequestScalarFieldEnum | Prisma.CancellationRequestScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1469,6 +1474,7 @@ export type CancellationRequestCreateArgs<ExtArgs extends runtime.Types.Extensio
    * The data needed to create a CancellationRequest.
    */
   data: Prisma.XOR<Prisma.CancellationRequestCreateInput, Prisma.CancellationRequestUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1529,6 +1535,7 @@ export type CancellationRequestUpdateArgs<ExtArgs extends runtime.Types.Extensio
    * Choose, which CancellationRequest to update.
    */
   where: Prisma.CancellationRequestWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1607,6 +1614,7 @@ export type CancellationRequestUpsertArgs<ExtArgs extends runtime.Types.Extensio
    * In case the CancellationRequest was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.CancellationRequestUpdateInput, Prisma.CancellationRequestUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1629,6 +1637,7 @@ export type CancellationRequestDeleteArgs<ExtArgs extends runtime.Types.Extensio
    * Filter which CancellationRequest to delete.
    */
   where: Prisma.CancellationRequestWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

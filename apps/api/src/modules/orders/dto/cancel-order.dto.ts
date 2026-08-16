@@ -3,6 +3,12 @@ import { IsIn, IsNotEmpty, IsOptional, IsString, ValidateIf } from 'class-valida
 
 export const CANCELLATION_REASONS = [
   'CUSTOMER_REQUESTED',
+  'FOOD_QUALITY_ISSUE',
+  'TOO_OILY',
+  'UNHYGIENIC',
+  'UNDERCOOKED_OVERCOOKED',
+  'COLD_FOOD',
+  'WRONG_ITEM',
   'WRONG_ORDER',
   'DUPLICATE_ORDER',
   'ITEM_UNAVAILABLE',

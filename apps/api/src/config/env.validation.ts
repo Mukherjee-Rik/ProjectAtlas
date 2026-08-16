@@ -17,5 +17,6 @@ export const envValidationSchema = Joi.object({
 
   JWT_EXPIRES_IN: Joi.string().default('7d'),
 
-  CORS_ORIGIN: Joi.string().uri().optional(),
+  // Comma-separated list of allowed browser origins.
+  CORS_ORIGIN: Joi.string().optional(),
 });

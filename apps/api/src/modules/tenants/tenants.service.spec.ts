@@ -2,12 +2,12 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { TenantsService } from './tenants.service';
 import { PrismaService } from '../../database/prisma/prisma.service';
 
-describe('TenantsService', () => {
+describe('TenantsService.findAllForUser', () => {
   let service: TenantsService;
-  let prismaService: any;
+  let prisma: any;
 
   beforeEach(async () => {
-    prismaService = {
+    prisma = {
       tenant: {
         findMany: jest.fn().mockResolvedValue([]),
         findUnique: jest.fn(),
@@ -16,40 +16,35 @@ describe('TenantsService', () => {
     };
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        TenantsService,
-        { provide: PrismaService, useValue: prismaService },
-      ],
+      providers: [TenantsService, { provide: PrismaService, useValue: prisma }],
     }).compile();
 
     service = module.get<TenantsService>(TenantsService);
   });
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
+  it('restricts a normal user to tenants they are a member of', async () => {
+    await service.findAllForUser('u-1', 'OWNER');
+
+    const args = prisma.tenant.findMany.mock.calls[0][0];
+
+    // The whole point of the fix: an owner must not see other businesses.
+    expect(args.where).toEqual({ memberships: { some: { userId: 'u-1' } } });
   });
 
-  it('create should create a new tenant', async () => {
-    prismaService.tenant.findUnique.mockResolvedValue(null);
-    const mockTenant = {
-      id: 't-1',
-      name: 'Tenant 1',
-      slug: 'tenant-1',
-      status: 'ACTIVE',
-    };
-    prismaService.tenant.create.mockResolvedValue(mockTenant);
+  it.each(['PLATFORM_ADMIN', 'ADMIN'])(
+    'lets %s see every tenant',
+    async (role) => {
+      await service.findAllForUser('admin-1', role);
 
-    const result = await service.create({
-      name: 'Tenant 1',
-      slug: 'tenant-1',
-    });
+      const args = prisma.tenant.findMany.mock.calls[0][0];
+      expect(args.where).toBeUndefined();
+    },
+  );
 
-    expect(result).toEqual(mockTenant);
-  });
+  it('does not widen access for an unrecognised role', async () => {
+    await service.findAllForUser('u-2', 'SOMETHING_NEW');
 
-  it('findAll should return all tenants', async () => {
-    prismaService.tenant.findMany.mockResolvedValue([{ id: 't-1' }]);
-    const result = await service.findAll();
-    expect(result).toHaveLength(1);
+    const args = prisma.tenant.findMany.mock.calls[0][0];
+    expect(args.where).toEqual({ memberships: { some: { userId: 'u-2' } } });
   });
 });

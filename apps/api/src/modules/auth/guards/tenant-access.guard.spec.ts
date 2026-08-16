@@ -1,7 +1,13 @@
-import { BadRequestException, ExecutionContext, ForbiddenException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ExecutionContext,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { TenantAccessGuard } from './tenant-access.guard';
 import { PrismaService } from '../../../database/prisma/prisma.service';
+import { TtlCacheService } from '../../../common/cache/ttl-cache.service';
 
 describe('TenantAccessGuard', () => {
   let guard: TenantAccessGuard;
@@ -22,6 +28,7 @@ describe('TenantAccessGuard', () => {
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
+        TtlCacheService,
         TenantAccessGuard,
         { provide: PrismaService, useValue: prismaService },
       ],
@@ -69,16 +76,16 @@ describe('TenantAccessGuard', () => {
   });
 
   it('should allow USER access if membership exists', async () => {
-    prismaService.tenant.findUnique.mockResolvedValue({
-      id: validTenantId,
-      name: 'Tenant A',
-      slug: 'tenant-a',
-      status: 'ACTIVE',
-    });
+    // The membership row carries the tenant, so one query answers both
+    // "does the tenant exist" and "may this user use it".
     prismaService.tenantMembership.findUnique.mockResolvedValue({
       id: 'tm-1',
-      userId: 'u-1',
-      tenantId: validTenantId,
+      tenant: {
+        id: validTenantId,
+        name: 'Tenant A',
+        slug: 'tenant-a',
+        status: 'ACTIVE',
+      },
     });
 
     const context = createMockExecutionContext(
@@ -86,17 +93,53 @@ describe('TenantAccessGuard', () => {
       { 'x-tenant-id': validTenantId },
     );
     const result = await guard.canActivate(context);
+
     expect(result).toBe(true);
+    // The happy path must not fall back to a separate tenant lookup.
+    expect(prismaService.tenant.findUnique).not.toHaveBeenCalled();
   });
 
-  it('should throw ForbiddenException if user lacks membership to target tenant', async () => {
+  it('should populate request.tenant from the membership', async () => {
+    prismaService.tenantMembership.findUnique.mockResolvedValue({
+      id: 'tm-1',
+      tenant: {
+        id: validTenantId,
+        name: 'Tenant A',
+        slug: 'tenant-a',
+        status: 'ACTIVE',
+      },
+    });
+
+    const req = {
+      user: { id: 'u-1', role: 'USER' },
+      params: {},
+      query: {},
+      headers: { 'x-tenant-id': validTenantId },
+      body: {},
+    };
+    const context = {
+      switchToHttp: () => ({ getRequest: () => req }),
+    } as any;
+
+    await guard.canActivate(context);
+
+    expect(req).toHaveProperty('tenant');
+    expect((req as any).tenant).toEqual({
+      id: validTenantId,
+      name: 'Tenant A',
+      slug: 'tenant-a',
+      status: 'ACTIVE',
+    });
+  });
+
+  it('should throw ForbiddenException if user lacks membership to an existing tenant', async () => {
+    prismaService.tenantMembership.findUnique.mockResolvedValue(null);
     prismaService.tenant.findUnique.mockResolvedValue({
       id: validTenantId,
       name: 'Tenant B',
       slug: 'tenant-b',
       status: 'ACTIVE',
     });
-    prismaService.tenantMembership.findUnique.mockResolvedValue(null);
 
     const context = createMockExecutionContext(
       { id: 'u-1', role: 'USER' },
@@ -104,5 +147,17 @@ describe('TenantAccessGuard', () => {
     );
 
     await expect(guard.canActivate(context)).rejects.toThrow(ForbiddenException);
+  });
+
+  it('should throw NotFoundException if the tenant does not exist at all', async () => {
+    prismaService.tenantMembership.findUnique.mockResolvedValue(null);
+    prismaService.tenant.findUnique.mockResolvedValue(null);
+
+    const context = createMockExecutionContext(
+      { id: 'u-1', role: 'USER' },
+      { 'x-tenant-id': validTenantId },
+    );
+
+    await expect(guard.canActivate(context)).rejects.toThrow(NotFoundException);
   });
 });

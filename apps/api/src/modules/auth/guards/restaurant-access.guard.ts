@@ -8,12 +8,20 @@ import {
 } from '@nestjs/common';
 import { isUUID } from 'class-validator';
 import { PrismaService } from '../../../database/prisma/prisma.service';
+import {
+  CacheKeys,
+  CacheTtl,
+  TtlCacheService,
+} from '../../../common/cache/ttl-cache.service';
 import { RESTAURANT_HEADER } from '../constants/tenant.constants';
 import type { CurrentRestaurant } from '../types/current-restaurant.type';
 
 @Injectable()
 export class RestaurantAccessGuard implements CanActivate {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly cache: TtlCacheService,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
@@ -35,14 +43,19 @@ export class RestaurantAccessGuard implements CanActivate {
       throw new BadRequestException('Invalid restaurant ID');
     }
 
-    const restaurant = await this.prisma.restaurant.findUnique({
-      where: { id: restaurantId },
-      select: {
-        id: true,
-        name: true,
-        tenantId: true,
-      },
-    });
+    const restaurant = await this.cache.wrap(
+      CacheKeys.restaurant(restaurantId),
+      CacheTtl.restaurant,
+      () =>
+        this.prisma.restaurant.findUnique({
+          where: { id: restaurantId },
+          select: {
+            id: true,
+            name: true,
+            tenantId: true,
+          },
+        }),
+    );
 
     if (!restaurant) {
       throw new NotFoundException('Restaurant not found');

@@ -1092,7 +1092,7 @@ export type $AutomationRulePayload<ExtArgs extends runtime.Types.Extensions.Inte
 export type AutomationRuleGetPayload<S extends boolean | null | undefined | AutomationRuleDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$AutomationRulePayload, S>
 
 export type AutomationRuleCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<AutomationRuleFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<AutomationRuleFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: AutomationRuleCountAggregateInputType | true
   }
 
@@ -1550,6 +1550,7 @@ export type AutomationRuleFindUniqueArgs<ExtArgs extends runtime.Types.Extension
    * Filter, which AutomationRule to fetch.
    */
   where: Prisma.AutomationRuleWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1572,6 +1573,7 @@ export type AutomationRuleFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Ex
    * Filter, which AutomationRule to fetch.
    */
   where: Prisma.AutomationRuleWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1624,6 +1626,7 @@ export type AutomationRuleFindFirstArgs<ExtArgs extends runtime.Types.Extensions
    * Filter by unique combinations of AutomationRules.
    */
   distinct?: Prisma.AutomationRuleScalarFieldEnum | Prisma.AutomationRuleScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1676,6 +1679,7 @@ export type AutomationRuleFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Ext
    * Filter by unique combinations of AutomationRules.
    */
   distinct?: Prisma.AutomationRuleScalarFieldEnum | Prisma.AutomationRuleScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1728,6 +1732,7 @@ export type AutomationRuleFindManyArgs<ExtArgs extends runtime.Types.Extensions.
    * Filter by unique combinations of AutomationRules.
    */
   distinct?: Prisma.AutomationRuleScalarFieldEnum | Prisma.AutomationRuleScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1750,6 +1755,7 @@ export type AutomationRuleCreateArgs<ExtArgs extends runtime.Types.Extensions.In
    * The data needed to create a AutomationRule.
    */
   data: Prisma.XOR<Prisma.AutomationRuleCreateInput, Prisma.AutomationRuleUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1810,6 +1816,7 @@ export type AutomationRuleUpdateArgs<ExtArgs extends runtime.Types.Extensions.In
    * Choose, which AutomationRule to update.
    */
   where: Prisma.AutomationRuleWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1888,6 +1895,7 @@ export type AutomationRuleUpsertArgs<ExtArgs extends runtime.Types.Extensions.In
    * In case the AutomationRule was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.AutomationRuleUpdateInput, Prisma.AutomationRuleUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1910,6 +1918,7 @@ export type AutomationRuleDeleteArgs<ExtArgs extends runtime.Types.Extensions.In
    * Filter which AutomationRule to delete.
    */
   where: Prisma.AutomationRuleWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

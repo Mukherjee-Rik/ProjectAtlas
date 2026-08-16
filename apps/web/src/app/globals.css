@@ -38,4 +38,132 @@ body {
   background-color: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ---------------------------------------------------------------------------
+   Accessibility
+   Keyboard users previously had no visible focus indicator anywhere in the
+   app. :focus-visible keeps it off mouse clicks and on for keyboard nav.
+--------------------------------------------------------------------------- */
+:focus-visible {
+  outline: 2px solid var(--primary-mint);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Let a keyboard user jump straight to page content past the nav. */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+}
+.skip-link:focus {
+  left: 0.5rem;
+  top: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--primary-mint);
+  color: var(--background);
+  font-weight: 700;
+  border-radius: 0.5rem;
+}
+
+/* ---------------------------------------------------------------------------
+   Motion
+   Everything animated here is decorative, so honour a reduced-motion request.
+--------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Skeleton shimmer used by loading placeholders. */
+@keyframes atlas-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.atlas-skeleton {
+  background-image: linear-gradient(
+    90deg,
+    var(--surface-elevated) 25%,
+    #22303d 50%,
+    var(--surface-elevated) 75%
+  );
+  background-size: 200% 100%;
+  animation: atlas-shimmer 1.4s ease-in-out infinite;
+}
+
+/* ---------------------------------------------------------------------------
+   Touch targets
+   Pointer-coarse devices get a minimum hit area so controls sized for a mouse
+   remain usable on phones and tablets.
+--------------------------------------------------------------------------- */
+@media (pointer: coarse) {
+  button:not(.allow-small-target),
+  [role='button']:not(.allow-small-target),
+  a[role='button'],
+  select,
+  input[type='checkbox'],
+  input[type='radio'] {
+    min-height: 44px;
+  }
+
+  button:not(.allow-small-target),
+  [role='button']:not(.allow-small-target) {
+    min-width: 44px;
+  }
+}
+
+/* Inputs below 16px cause iOS Safari to zoom the viewport on focus. */
+@media (max-width: 767px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
+
+/* Mobile Smooth Touch Horizontal Scrolling */
+.table-container, .table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x pan-y;
+  scrollbar-width: thin;
+  scrollbar-color: #26313C #111820;
+}
+
+.table-container::-webkit-scrollbar, .table-responsive::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+
+.table-container::-webkit-scrollbar-track, .table-responsive::-webkit-scrollbar-track {
+  background: #111820;
+  border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb, .table-responsive::-webkit-scrollbar-thumb {
+  background: #26313C;
+  border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover, .table-responsive::-webkit-scrollbar-thumb:hover {
+  background: #2AFEB7;
+}
+
+/* Hide scrollbar utility */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

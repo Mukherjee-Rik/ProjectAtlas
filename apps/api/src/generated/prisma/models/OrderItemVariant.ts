@@ -548,7 +548,7 @@ export type $OrderItemVariantPayload<ExtArgs extends runtime.Types.Extensions.In
 export type OrderItemVariantGetPayload<S extends boolean | null | undefined | OrderItemVariantDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$OrderItemVariantPayload, S>
 
 export type OrderItemVariantCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<OrderItemVariantFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<OrderItemVariantFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: OrderItemVariantCountAggregateInputType | true
   }
 
@@ -994,6 +994,7 @@ export type OrderItemVariantFindUniqueArgs<ExtArgs extends runtime.Types.Extensi
    * Filter, which OrderItemVariant to fetch.
    */
   where: Prisma.OrderItemVariantWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1016,6 +1017,7 @@ export type OrderItemVariantFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.
    * Filter, which OrderItemVariant to fetch.
    */
   where: Prisma.OrderItemVariantWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1068,6 +1070,7 @@ export type OrderItemVariantFindFirstArgs<ExtArgs extends runtime.Types.Extensio
    * Filter by unique combinations of OrderItemVariants.
    */
   distinct?: Prisma.OrderItemVariantScalarFieldEnum | Prisma.OrderItemVariantScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1120,6 +1123,7 @@ export type OrderItemVariantFindFirstOrThrowArgs<ExtArgs extends runtime.Types.E
    * Filter by unique combinations of OrderItemVariants.
    */
   distinct?: Prisma.OrderItemVariantScalarFieldEnum | Prisma.OrderItemVariantScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1172,6 +1176,7 @@ export type OrderItemVariantFindManyArgs<ExtArgs extends runtime.Types.Extension
    * Filter by unique combinations of OrderItemVariants.
    */
   distinct?: Prisma.OrderItemVariantScalarFieldEnum | Prisma.OrderItemVariantScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1194,6 +1199,7 @@ export type OrderItemVariantCreateArgs<ExtArgs extends runtime.Types.Extensions.
    * The data needed to create a OrderItemVariant.
    */
   data: Prisma.XOR<Prisma.OrderItemVariantCreateInput, Prisma.OrderItemVariantUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1254,6 +1260,7 @@ export type OrderItemVariantUpdateArgs<ExtArgs extends runtime.Types.Extensions.
    * Choose, which OrderItemVariant to update.
    */
   where: Prisma.OrderItemVariantWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1332,6 +1339,7 @@ export type OrderItemVariantUpsertArgs<ExtArgs extends runtime.Types.Extensions.
    * In case the OrderItemVariant was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.OrderItemVariantUpdateInput, Prisma.OrderItemVariantUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1354,6 +1362,7 @@ export type OrderItemVariantDeleteArgs<ExtArgs extends runtime.Types.Extensions.
    * Filter which OrderItemVariant to delete.
    */
   where: Prisma.OrderItemVariantWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

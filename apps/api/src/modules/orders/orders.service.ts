@@ -15,10 +15,10 @@ import { AuditService } from '../audit/audit.service';
 const ALLOWED_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
   PENDING: [OrderStatus.CONFIRMED, OrderStatus.PREPARING, OrderStatus.SERVED, OrderStatus.CANCELLED],
   CONFIRMED: [OrderStatus.PREPARING, OrderStatus.SERVED, OrderStatus.CANCELLED],
-  PREPARING: [OrderStatus.READY, OrderStatus.SERVED],
-  READY: [OrderStatus.SERVED],
-  SERVED: [OrderStatus.COMPLETED],
-  COMPLETED: [],
+  PREPARING: [OrderStatus.READY, OrderStatus.SERVED, OrderStatus.CANCELLED],
+  READY: [OrderStatus.SERVED, OrderStatus.CANCELLED],
+  SERVED: [OrderStatus.COMPLETED, OrderStatus.CANCELLED],
+  COMPLETED: [OrderStatus.CANCELLED],
   CANCELLED: [],
 };
 
@@ -98,6 +98,10 @@ const ORDER_SELECT_FULL = {
 };
 
 type DbOrderPayload = Prisma.OrderGetPayload<{ select: typeof ORDER_SELECT_FULL }>;
+
+/** Covers a busy service period without loading a restaurant's whole history. */
+const DEFAULT_ORDERS_PAGE_SIZE = 50;
+const MAX_ORDERS_PAGE_SIZE = 200;
 
 @Injectable()
 export class OrdersService {
@@ -338,18 +342,49 @@ export class OrdersService {
     return this.formatOrderResponse(order);
   }
 
-  async findRestaurantOrders(restaurantId: string, branchId?: string, status?: OrderStatus) {
-    const orders = await this.prisma.order.findMany({
-      where: {
-        restaurantId,
-        ...(branchId && { branchId }),
-        ...(status && { status }),
-      },
-      select: ORDER_SELECT_FULL,
-      orderBy: { createdAt: 'desc' },
-    });
+  async findRestaurantOrders(
+    restaurantId: string,
+    branchId?: string,
+    status?: OrderStatus,
+    page = 1,
+    limit = DEFAULT_ORDERS_PAGE_SIZE,
+  ) {
+    // This list used to be unbounded: every order the restaurant had ever
+    // taken, each with six nested relations. It got measurably slower every
+    // day of trading, so it is paginated now.
+    const safeLimit = Math.min(Math.max(Math.trunc(limit) || DEFAULT_ORDERS_PAGE_SIZE, 1), MAX_ORDERS_PAGE_SIZE);
+    const safePage = Math.max(Math.trunc(page) || 1, 1);
 
-    return orders.map((o) => this.formatOrderResponse(o));
+    const where = {
+      restaurantId,
+      ...(branchId && { branchId }),
+      ...(status && { status }),
+    };
+
+    const [orders, total] = await Promise.all([
+      this.prisma.order.findMany({
+        where,
+        // ORDER_SELECT_FULL pulls six relations. Without a join strategy
+        // Prisma issues one query per relation, and each is a round trip to
+        // another region.
+        relationLoadStrategy: 'join',
+        select: ORDER_SELECT_FULL,
+        orderBy: { createdAt: 'desc' },
+        skip: (safePage - 1) * safeLimit,
+        take: safeLimit,
+      }),
+      this.prisma.order.count({ where }),
+    ]);
+
+    return {
+      data: orders.map((o) => this.formatOrderResponse(o)),
+      meta: {
+        page: safePage,
+        limit: safeLimit,
+        total,
+        totalPages: Math.max(Math.ceil(total / safeLimit), 1),
+      },
+    };
   }
 
   async findRestaurantOrderById(id: string, restaurantId: string, branchId?: string) {

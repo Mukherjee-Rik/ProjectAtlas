@@ -592,7 +592,7 @@ export type $MenuItemVariantPayload<ExtArgs extends runtime.Types.Extensions.Int
 export type MenuItemVariantGetPayload<S extends boolean | null | undefined | MenuItemVariantDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$MenuItemVariantPayload, S>
 
 export type MenuItemVariantCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<MenuItemVariantFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<MenuItemVariantFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: MenuItemVariantCountAggregateInputType | true
   }
 
@@ -1039,6 +1039,7 @@ export type MenuItemVariantFindUniqueArgs<ExtArgs extends runtime.Types.Extensio
    * Filter, which MenuItemVariant to fetch.
    */
   where: Prisma.MenuItemVariantWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1061,6 +1062,7 @@ export type MenuItemVariantFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.E
    * Filter, which MenuItemVariant to fetch.
    */
   where: Prisma.MenuItemVariantWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1113,6 +1115,7 @@ export type MenuItemVariantFindFirstArgs<ExtArgs extends runtime.Types.Extension
    * Filter by unique combinations of MenuItemVariants.
    */
   distinct?: Prisma.MenuItemVariantScalarFieldEnum | Prisma.MenuItemVariantScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1165,6 +1168,7 @@ export type MenuItemVariantFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Ex
    * Filter by unique combinations of MenuItemVariants.
    */
   distinct?: Prisma.MenuItemVariantScalarFieldEnum | Prisma.MenuItemVariantScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1217,6 +1221,7 @@ export type MenuItemVariantFindManyArgs<ExtArgs extends runtime.Types.Extensions
    * Filter by unique combinations of MenuItemVariants.
    */
   distinct?: Prisma.MenuItemVariantScalarFieldEnum | Prisma.MenuItemVariantScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1239,6 +1244,7 @@ export type MenuItemVariantCreateArgs<ExtArgs extends runtime.Types.Extensions.I
    * The data needed to create a MenuItemVariant.
    */
   data: Prisma.XOR<Prisma.MenuItemVariantCreateInput, Prisma.MenuItemVariantUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1299,6 +1305,7 @@ export type MenuItemVariantUpdateArgs<ExtArgs extends runtime.Types.Extensions.I
    * Choose, which MenuItemVariant to update.
    */
   where: Prisma.MenuItemVariantWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1377,6 +1384,7 @@ export type MenuItemVariantUpsertArgs<ExtArgs extends runtime.Types.Extensions.I
    * In case the MenuItemVariant was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.MenuItemVariantUpdateInput, Prisma.MenuItemVariantUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1399,6 +1407,7 @@ export type MenuItemVariantDeleteArgs<ExtArgs extends runtime.Types.Extensions.I
    * Filter which MenuItemVariant to delete.
    */
   where: Prisma.MenuItemVariantWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

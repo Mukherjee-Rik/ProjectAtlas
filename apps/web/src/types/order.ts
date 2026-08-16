@@ -100,14 +100,20 @@ export interface CreateOrderPayload {
 }
 
 export const CANCELLATION_REASONS = [
-  { code: 'CUSTOMER_REQUESTED', label: 'Customer requested cancellation' },
-  { code: 'WRONG_ORDER', label: 'Wrong order / Incorrect items' },
-  { code: 'DUPLICATE_ORDER', label: 'Duplicate order' },
-  { code: 'ITEM_UNAVAILABLE', label: 'Item unavailable in kitchen' },
-  { code: 'KITCHEN_ISSUE', label: 'Kitchen / Equipment issue' },
-  { code: 'PAYMENT_ISSUE', label: 'Payment issue' },
-  { code: 'STAFF_MISTAKE', label: 'Staff mistake' },
-  { code: 'TECHNICAL_ISSUE', label: 'Technical / POS issue' },
-  { code: 'OTHER', label: 'Other (specify note)' },
+  { code: 'CUSTOMER_REQUESTED', label: '🙋 Customer requested cancellation' },
+  { code: 'FOOD_QUALITY_ISSUE', label: '🥘 Bad food quality / Taste issue' },
+  { code: 'TOO_OILY', label: '🛢️ Too oily / Greasy food' },
+  { code: 'UNHYGIENIC', label: '🪰 Unhygienic / Foreign object in food' },
+  { code: 'UNDERCOOKED_OVERCOOKED', label: '🔥 Undercooked / Overcooked / Burnt' },
+  { code: 'COLD_FOOD', label: '❄️ Food served cold' },
+  { code: 'WRONG_ITEM', label: '❌ Wrong item served / Returned by customer' },
+  { code: 'WRONG_ORDER', label: '📋 Wrong order / Incorrect punching' },
+  { code: 'DUPLICATE_ORDER', label: '🔄 Duplicate order' },
+  { code: 'ITEM_UNAVAILABLE', label: '🚫 Item unavailable in kitchen' },
+  { code: 'KITCHEN_ISSUE', label: '👨‍🍳 Kitchen / Equipment issue' },
+  { code: 'PAYMENT_ISSUE', label: '💳 Payment issue' },
+  { code: 'STAFF_MISTAKE', label: '🙇 Staff mistake' },
+  { code: 'TECHNICAL_ISSUE', label: '💻 Technical / POS issue' },
+  { code: 'OTHER', label: '📝 Other (specify note)' },
 ] as const;
 

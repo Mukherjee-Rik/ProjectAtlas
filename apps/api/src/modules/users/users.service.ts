@@ -10,10 +10,14 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { UpdateMyProfileDto } from './dto/update-my-profile.dto';
 import { UsersQueryDto } from './dto/users-query.dto';
 import { UserRole } from '../../generated/prisma/enums';
+import { CacheKeys, TtlCacheService } from '../../common/cache/ttl-cache.service';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly cache: TtlCacheService,
+  ) {}
 
   async findAll(query: UsersQueryDto = new UsersQueryDto(), tenantId?: string) {
     const {
@@ -176,7 +180,7 @@ export class UsersService {
       }
     }
 
-    return this.prisma.user.update({
+    const updated = await this.prisma.user.update({
       where: {
         id,
       },
@@ -198,6 +202,12 @@ export class UsersService {
         updatedAt: true,
       },
     });
+
+    // Role and status gate access, so evict once the write has committed —
+    // evicting earlier would let a concurrent read cache the stale row again.
+    this.cache.invalidate(CacheKeys.user(id));
+
+    return updated;
   }
 
   async updateMyProfile(id: string, updateMyProfileDto: UpdateMyProfileDto) {
@@ -218,7 +228,7 @@ export class UsersService {
       }
     }
 
-    return this.prisma.user.update({
+    const updated = await this.prisma.user.update({
       where: {
         id,
       },
@@ -237,6 +247,10 @@ export class UsersService {
         updatedAt: true,
       },
     });
+
+    this.cache.invalidate(CacheKeys.user(id));
+
+    return updated;
   }
 
   async remove(id: string, currentUserId: string, tenantId?: string) {
@@ -267,7 +281,7 @@ export class UsersService {
       throw new ConflictException('User is already inactive');
     }
 
-    return this.prisma.user.update({
+    const deactivated = await this.prisma.user.update({
       where: {
         id,
       },
@@ -285,6 +299,12 @@ export class UsersService {
         updatedAt: true,
       },
     });
+
+    // A deactivated user must lose access on their next request, not when
+    // the cache entry happens to expire.
+    this.cache.invalidate(CacheKeys.user(id));
+
+    return deactivated;
   }
 
   async create(createUserDto: CreateUserDto, tenantId?: string) {

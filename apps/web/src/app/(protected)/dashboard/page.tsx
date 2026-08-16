@@ -346,9 +346,12 @@ export default function DashboardPage() {
           {/* Main Grid: Live Orders Stream + Restaurant Staff */}
           <div className="grid gap-6 lg:grid-cols-3">
             {/* Recent Orders Stream */}
-            <div className="lg:col-span-2 space-y-4 rounded-2xl border border-[#26313C] bg-[#111820] p-6 shadow-xl">
-              <div className="flex items-center justify-between">
-                <div>
+            {/* min-w-0: a grid item defaults to min-width:auto and will not
+                shrink below its content, so without this the table below
+                stretched the whole page wider than the phone viewport. */}
+            <div className="min-w-0 lg:col-span-2 space-y-4 rounded-2xl border border-[#26313C] bg-[#111820] p-4 shadow-xl sm:p-6">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="min-w-0">
                   <h2 className="text-base font-bold text-[#F5F7FA]">Live Recent Orders</h2>
                   <p className="text-[11px] text-[#9AA6B2]">
                     Latest customer table orders for {currentRestaurant?.name ?? 'this restaurant'}.
@@ -360,7 +363,7 @@ export default function DashboardPage() {
                 </Link>
               </div>
 
-              <div className="overflow-x-auto">
+              <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
                 <table className="w-full text-left text-xs">
                   <thead>
                     <tr className="border-b border-[#26313C] text-[#9AA6B2] uppercase tracking-wider">

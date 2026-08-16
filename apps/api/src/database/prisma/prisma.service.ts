@@ -13,6 +13,13 @@ export class PrismaService
     const connectionString = process.env.DATABASE_URL;
     const adapter = new PrismaPg({
       connectionString,
+      // The database is reached over the network, so connection setup costs a
+      // full round trip. Keeping a warm pool avoids paying it per request.
+      max: Number(process.env.DATABASE_POOL_MAX ?? 10),
+      idleTimeoutMillis: 30_000,
+      connectionTimeoutMillis: 10_000,
+      // Fail fast instead of hanging a request behind a stalled socket.
+      statement_timeout: Number(process.env.DATABASE_STATEMENT_TIMEOUT_MS ?? 15_000),
     });
 
     super({

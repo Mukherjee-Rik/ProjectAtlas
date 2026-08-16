@@ -233,8 +233,8 @@ export function PlatformSubscriptionsView() {
         </div>
 
         {/* Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
+        <div className="table-responsive">
+          <table className="w-full min-w-[750px] text-left text-xs">
             <thead>
               <tr className="border-b border-[#26313C] text-[#9AA6B2] uppercase tracking-wider">
                 <th className="py-3 px-4">Restaurant</th>

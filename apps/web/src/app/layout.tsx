@@ -4,6 +4,8 @@ import { AuthProvider } from "@/hooks/use-auth";
 import { TenantProvider } from "@/hooks/use-tenant";
 import { RestaurantProvider } from "@/hooks/use-restaurant";
 import { BranchProvider } from "@/hooks/use-branch";
+import { QueryProvider } from "@/lib/query-client";
+import { ToastProvider } from "@/components/ui/toast";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -32,13 +34,17 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}
     >
       <body className="min-h-full flex flex-col bg-[#0B0F14] text-[#F5F7FA] font-sans selection:bg-[#2AFEB7] selection:text-[#0B0F14]">
-        <AuthProvider>
-          <TenantProvider>
-            <RestaurantProvider>
-              <BranchProvider>{children}</BranchProvider>
-            </RestaurantProvider>
-          </TenantProvider>
-        </AuthProvider>
+        <QueryProvider>
+          <ToastProvider>
+            <AuthProvider>
+              <TenantProvider>
+                <RestaurantProvider>
+                  <BranchProvider>{children}</BranchProvider>
+                </RestaurantProvider>
+              </TenantProvider>
+            </AuthProvider>
+          </ToastProvider>
+        </QueryProvider>
       </body>
     </html>
   );

@@ -7,6 +7,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { LoggerModule } from 'nestjs-pino';
 
 import { configuration, envValidationSchema } from './config/index';
+import { CacheModule } from './common/cache/cache.module';
 import { PrismaModule } from './database/prisma/prisma.module';
 import { HealthModule } from './modules/health/health.module';
 import { UsersModule } from './modules/users/users.module';
@@ -54,6 +55,7 @@ import { QueueService } from './common/queue/queue.service';
         transport: process.env.NODE_ENV !== 'production' ? { target: 'pino-pretty', options: { singleLine: true, colorize: true } } : undefined,
       },
     }),
+    CacheModule,
     PrismaModule, HealthModule, MonitoringModule, UsersModule, AuthModule, DashboardModule,
     TenantsModule, RestaurantsModule, TenantMembershipsModule,
     BranchesModule, DiningAreasModule, TablesModule, PublicTablesModule,

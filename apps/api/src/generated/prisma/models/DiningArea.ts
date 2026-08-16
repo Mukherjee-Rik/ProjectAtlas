@@ -702,7 +702,7 @@ export type $DiningAreaPayload<ExtArgs extends runtime.Types.Extensions.Internal
 export type DiningAreaGetPayload<S extends boolean | null | undefined | DiningAreaDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$DiningAreaPayload, S>
 
 export type DiningAreaCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<DiningAreaFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<DiningAreaFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: DiningAreaCountAggregateInputType | true
   }
 
@@ -1151,6 +1151,7 @@ export type DiningAreaFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.In
    * Filter, which DiningArea to fetch.
    */
   where: Prisma.DiningAreaWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1173,6 +1174,7 @@ export type DiningAreaFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extens
    * Filter, which DiningArea to fetch.
    */
   where: Prisma.DiningAreaWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1225,6 +1227,7 @@ export type DiningAreaFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Filter by unique combinations of DiningAreas.
    */
   distinct?: Prisma.DiningAreaScalarFieldEnum | Prisma.DiningAreaScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1277,6 +1280,7 @@ export type DiningAreaFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensi
    * Filter by unique combinations of DiningAreas.
    */
   distinct?: Prisma.DiningAreaScalarFieldEnum | Prisma.DiningAreaScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1329,6 +1333,7 @@ export type DiningAreaFindManyArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Filter by unique combinations of DiningAreas.
    */
   distinct?: Prisma.DiningAreaScalarFieldEnum | Prisma.DiningAreaScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1351,6 +1356,7 @@ export type DiningAreaCreateArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * The data needed to create a DiningArea.
    */
   data: Prisma.XOR<Prisma.DiningAreaCreateInput, Prisma.DiningAreaUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1411,6 +1417,7 @@ export type DiningAreaUpdateArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Choose, which DiningArea to update.
    */
   where: Prisma.DiningAreaWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1489,6 +1496,7 @@ export type DiningAreaUpsertArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * In case the DiningArea was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.DiningAreaUpdateInput, Prisma.DiningAreaUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1511,6 +1519,7 @@ export type DiningAreaDeleteArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Filter which DiningArea to delete.
    */
   where: Prisma.DiningAreaWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { BranchesController } from './branches.controller';
 import { BranchesService } from './branches.service';
 import { PrismaService } from '../../database/prisma/prisma.service';
+import { TtlCacheService } from '../../common/cache/ttl-cache.service';
 
 describe('BranchesController', () => {
   let controller: BranchesController;
@@ -26,6 +27,7 @@ describe('BranchesController', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [BranchesController],
       providers: [
+        TtlCacheService,
         { provide: BranchesService, useValue: service },
         { provide: PrismaService, useValue: {} },
       ],

@@ -7,6 +7,7 @@ import { AuthService } from './auth.service';
 import { PrismaService } from '../../database/prisma/prisma.service';
 
 import { AuditService } from '../audit/audit.service';
+import { TtlCacheService } from '../../common/cache/ttl-cache.service';
 
 jest.mock('bcrypt', () => ({
   compare: jest.fn(),
@@ -62,6 +63,7 @@ describe('AuthService', () => {
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
+        TtlCacheService,
         AuthService,
         { provide: PrismaService, useValue: prismaService },
         { provide: JwtService, useValue: jwtService },

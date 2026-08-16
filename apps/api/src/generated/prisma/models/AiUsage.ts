@@ -833,7 +833,7 @@ export type $AiUsagePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
 export type AiUsageGetPayload<S extends boolean | null | undefined | AiUsageDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$AiUsagePayload, S>
 
 export type AiUsageCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<AiUsageFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<AiUsageFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: AiUsageCountAggregateInputType | true
   }
 
@@ -1284,6 +1284,7 @@ export type AiUsageFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Filter, which AiUsage to fetch.
    */
   where: Prisma.AiUsageWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1306,6 +1307,7 @@ export type AiUsageFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extension
    * Filter, which AiUsage to fetch.
    */
   where: Prisma.AiUsageWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1358,6 +1360,7 @@ export type AiUsageFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Filter by unique combinations of AiUsages.
    */
   distinct?: Prisma.AiUsageScalarFieldEnum | Prisma.AiUsageScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1410,6 +1413,7 @@ export type AiUsageFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions
    * Filter by unique combinations of AiUsages.
    */
   distinct?: Prisma.AiUsageScalarFieldEnum | Prisma.AiUsageScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1462,6 +1466,7 @@ export type AiUsageFindManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Filter by unique combinations of AiUsages.
    */
   distinct?: Prisma.AiUsageScalarFieldEnum | Prisma.AiUsageScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1484,6 +1489,7 @@ export type AiUsageCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * The data needed to create a AiUsage.
    */
   data: Prisma.XOR<Prisma.AiUsageCreateInput, Prisma.AiUsageUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1544,6 +1550,7 @@ export type AiUsageUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Choose, which AiUsage to update.
    */
   where: Prisma.AiUsageWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1622,6 +1629,7 @@ export type AiUsageUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * In case the AiUsage was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.AiUsageUpdateInput, Prisma.AiUsageUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1644,6 +1652,7 @@ export type AiUsageDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Filter which AiUsage to delete.
    */
   where: Prisma.AiUsageWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**

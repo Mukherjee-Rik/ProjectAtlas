@@ -1,9 +1,10 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRestaurant } from '@/hooks/use-restaurant';
 import { useBranch } from '@/hooks/use-branch';
-import { getOrders, updateOrderStatus } from '@/services/orders.service';
+import { useOrders, useUpdateOrderStatus } from '@/hooks/use-orders';
+import { useToast } from '@/components/ui/toast';
 import type { Order, OrderStatus } from '@/types/order';
 
 interface KDSTicketProps {
@@ -133,51 +134,36 @@ export default function KitchenKDSPage() {
   const { currentRestaurant } = useRestaurant();
   const { currentBranch } = useBranch();
 
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [updatingId, setUpdatingId] = useState<string | null>(null);
-  const [error, setError] = useState('');
-  const [lastRefreshed, setLastRefreshed] = useState<Date>(new Date());
+  // Declared before any early return — see the note on the guard below.
+  const [mobileTab, setMobileTab] = useState<'QUEUE' | 'PREP' | 'READY'>('QUEUE');
 
-  const fetchActiveOrders = useCallback(async () => {
-    if (!currentRestaurant) return;
-    try {
-      const res = await getOrders();
-      // Only keep orders that are in prep stages (exclude Completed/Cancelled)
-      const kdsOrders = (res.data ?? []).filter((o) =>
-        ['PENDING', 'CONFIRMED', 'PREPARING', 'READY'].includes(o.status),
-      );
-      setOrders(kdsOrders);
-      setLastRefreshed(new Date());
-    } catch (err: any) {
-      console.error(err);
-      setError('KDS failed to refresh sync.');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [currentRestaurant]);
+  // The kitchen display refreshes every 5s while it is on screen. The hook
+  // stops polling when the tab is hidden, so a KDS left open overnight no
+  // longer issues ~17k needless authenticated requests.
+  const {
+    data: allOrders = [],
+    isPending,
+    isError,
+    dataUpdatedAt,
+    refetch,
+  } = useOrders({ pollMs: 5000 });
 
-  // Initial load & Polling interval of 5 seconds for sub-second visual updates
-  useEffect(() => {
-    void fetchActiveOrders();
-    const interval = setInterval(() => {
-      void fetchActiveOrders();
-    }, 5000);
+  const updateStatus = useUpdateOrderStatus();
+  const toast = useToast();
 
-    return () => clearInterval(interval);
-  }, [fetchActiveOrders]);
+  const orders = allOrders.filter((o) =>
+    ['PENDING', 'CONFIRMED', 'PREPARING', 'READY'].includes(o.status),
+  );
+
+  const isLoading = isPending;
+  const updatingId = updateStatus.isPending ? updateStatus.variables?.orderId : null;
+  const lastRefreshed = new Date(dataUpdatedAt || Date.now());
 
   const handleStatusChange = async (orderId: string, nextStatus: OrderStatus) => {
-    setUpdatingId(orderId);
-    setError('');
     try {
-      await updateOrderStatus(orderId, nextStatus);
-      await fetchActiveOrders();
+      await updateStatus.mutateAsync({ orderId, status: nextStatus });
     } catch (err: any) {
-      console.error(err);
-      setError(err?.message ?? 'Failed to update ticket status.');
-    } finally {
-      setUpdatingId(null);
+      toast.error(err?.message ?? 'Failed to update ticket status.');
     }
   };
 
@@ -203,7 +189,7 @@ export default function KitchenKDSPage() {
   const readyTickets = orders.filter((o) => o.status === 'READY');
 
   return (
-    <div className="flex h-[calc(100vh-6rem)] flex-col space-y-4">
+    <div className="flex flex-col space-y-4 min-h-[calc(100vh-6rem)]">
       {/* KDS Control Header */}
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#26313C] pb-4">
         <div>
@@ -212,29 +198,72 @@ export default function KitchenKDSPage() {
             Active station: <span className="font-semibold text-[#F5F7FA]">{currentBranch?.name ?? 'Main'}</span>
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          {error && (
-            <span className="text-[11px] font-semibold text-[#EF4444] bg-[#EF4444]/10 border border-[#EF4444]/20 rounded px-2.5 py-1">
-              ⚠️ {error}
+        <div className="flex flex-wrap items-center gap-3">
+          {isError && (
+            <span
+              role="alert"
+              className="rounded border border-[#EF4444]/20 bg-[#EF4444]/10 px-2.5 py-1 text-[11px] font-semibold text-[#EF4444]"
+            >
+              KDS failed to refresh sync.
             </span>
           )}
-          <div className="text-[10px] font-mono text-[#9AA6B2]">
+          <div className="font-mono text-[10px] text-[#9AA6B2]">
             Sync: {lastRefreshed.toLocaleTimeString()}
           </div>
           <button
             type="button"
-            onClick={() => void fetchActiveOrders()}
-            className="rounded bg-[#18212B] border border-[#26313C] px-3 py-1.5 text-xs text-[#F5F7FA] hover:border-[#2AFEB7]"
+            onClick={() => void refetch()}
+            className="rounded border border-[#26313C] bg-[#18212B] px-3 py-1.5 text-xs text-[#F5F7FA] hover:border-[#2AFEB7]"
           >
             Refresh
           </button>
         </div>
       </div>
 
+      {/* Mobile-only Segment Switcher */}
+      <div className="grid grid-cols-3 gap-2 md:hidden">
+        <button
+          type="button"
+          onClick={() => setMobileTab('QUEUE')}
+          className={`flex items-center justify-center gap-1.5 rounded-xl py-2 text-xs font-bold transition-all ${
+            mobileTab === 'QUEUE'
+              ? 'bg-[#EAB308]/20 text-[#EAB308] border border-[#EAB308]/40'
+              : 'bg-[#111820] text-[#9AA6B2] border border-[#26313C]'
+          }`}
+        >
+          <span className="h-2 w-2 rounded-full bg-[#EAB308]" />
+          <span>Queue ({queueTickets.length})</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => setMobileTab('PREP')}
+          className={`flex items-center justify-center gap-1.5 rounded-xl py-2 text-xs font-bold transition-all ${
+            mobileTab === 'PREP'
+              ? 'bg-[#A855F7]/20 text-[#A855F7] border border-[#A855F7]/40'
+              : 'bg-[#111820] text-[#9AA6B2] border border-[#26313C]'
+          }`}
+        >
+          <span className="h-2 w-2 rounded-full bg-[#A855F7]" />
+          <span>Prep ({preparingTickets.length})</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => setMobileTab('READY')}
+          className={`flex items-center justify-center gap-1.5 rounded-xl py-2 text-xs font-bold transition-all ${
+            mobileTab === 'READY'
+              ? 'bg-[#22C55E]/20 text-[#22C55E] border border-[#22C55E]/40'
+              : 'bg-[#111820] text-[#9AA6B2] border border-[#26313C]'
+          }`}
+        >
+          <span className="h-2 w-2 rounded-full bg-[#22C55E]" />
+          <span>Ready ({readyTickets.length})</span>
+        </button>
+      </div>
+
       {/* Grid Columns */}
-      <div className="grid flex-1 grid-cols-1 md:grid-cols-3 gap-6 overflow-hidden">
+      <div className="grid flex-1 grid-cols-1 md:grid-cols-3 gap-6">
         {/* COLUMN 1: Queue (New/Confirmed) */}
-        <div className="flex flex-col rounded-2xl border border-[#26313C] bg-[#111820] p-4 overflow-hidden">
+        <div className={`flex flex-col rounded-2xl border border-[#26313C] bg-[#111820] p-4 ${mobileTab !== 'QUEUE' ? 'hidden md:flex' : 'flex'}`}>
           <div className="flex items-center justify-between border-b border-[#26313C] pb-3 mb-4">
             <h3 className="text-sm font-extrabold uppercase tracking-wider text-[#F5F7FA] flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-[#EAB308]" />
@@ -258,7 +287,7 @@ export default function KitchenKDSPage() {
         </div>
 
         {/* COLUMN 2: In Prep (Preparing) */}
-        <div className="flex flex-col rounded-2xl border border-[#26313C] bg-[#111820] p-4 overflow-hidden">
+        <div className={`flex flex-col rounded-2xl border border-[#26313C] bg-[#111820] p-4 ${mobileTab !== 'PREP' ? 'hidden md:flex' : 'flex'}`}>
           <div className="flex items-center justify-between border-b border-[#26313C] pb-3 mb-4">
             <h3 className="text-sm font-extrabold uppercase tracking-wider text-[#F5F7FA] flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-[#A855F7]" />
@@ -282,7 +311,7 @@ export default function KitchenKDSPage() {
         </div>
 
         {/* COLUMN 3: Ready to Serve (Ready) */}
-        <div className="flex flex-col rounded-2xl border border-[#26313C] bg-[#111820] p-4 overflow-hidden">
+        <div className={`flex flex-col rounded-2xl border border-[#26313C] bg-[#111820] p-4 ${mobileTab !== 'READY' ? 'hidden md:flex' : 'flex'}`}>
           <div className="flex items-center justify-between border-b border-[#26313C] pb-3 mb-4">
             <h3 className="text-sm font-extrabold uppercase tracking-wider text-[#F5F7FA] flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-[#22C55E]" />

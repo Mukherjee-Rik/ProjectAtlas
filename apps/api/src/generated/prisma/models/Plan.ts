@@ -733,7 +733,7 @@ export type $PlanPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
 export type PlanGetPayload<S extends boolean | null | undefined | PlanDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$PlanPayload, S>
 
 export type PlanCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> =
-  Omit<PlanFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+  Omit<PlanFindManyArgs, 'select' | 'include' | 'distinct' | 'omit' | 'relationLoadStrategy'> & {
     select?: PlanCountAggregateInputType | true
   }
 
@@ -1186,6 +1186,7 @@ export type PlanFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Filter, which Plan to fetch.
    */
   where: Prisma.PlanWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1208,6 +1209,7 @@ export type PlanFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensions.I
    * Filter, which Plan to fetch.
    */
   where: Prisma.PlanWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1260,6 +1262,7 @@ export type PlanFindFirstArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Filter by unique combinations of Plans.
    */
   distinct?: Prisma.PlanScalarFieldEnum | Prisma.PlanScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1312,6 +1315,7 @@ export type PlanFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions.In
    * Filter by unique combinations of Plans.
    */
   distinct?: Prisma.PlanScalarFieldEnum | Prisma.PlanScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1364,6 +1368,7 @@ export type PlanFindManyArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
    * Filter by unique combinations of Plans.
    */
   distinct?: Prisma.PlanScalarFieldEnum | Prisma.PlanScalarFieldEnum[]
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1386,6 +1391,7 @@ export type PlanCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
    * The data needed to create a Plan.
    */
   data: Prisma.XOR<Prisma.PlanCreateInput, Prisma.PlanUncheckedCreateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1442,6 +1448,7 @@ export type PlanUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
    * Choose, which Plan to update.
    */
   where: Prisma.PlanWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1516,6 +1523,7 @@ export type PlanUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
    * In case the Plan was found with the provided `where` argument, update it with this data.
    */
   update: Prisma.XOR<Prisma.PlanUpdateInput, Prisma.PlanUncheckedUpdateInput>
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
@@ -1538,6 +1546,7 @@ export type PlanDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
    * Filter which Plan to delete.
    */
   where: Prisma.PlanWhereUniqueInput
+  relationLoadStrategy?: Prisma.RelationLoadStrategy
 }
 
 /**
