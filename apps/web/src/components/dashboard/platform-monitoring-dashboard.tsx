@@ -57,11 +57,13 @@ export function PlatformMonitoringDashboard() {
   const fetchMonitoringData = useCallback(async () => {
     try {
       const [overviewData, deadLetterData] = await Promise.all([
-        apiClient.get<TelemetryOverview>('/monitoring/overview'),
-        apiClient.get<DeadLetterJob[]>('/monitoring/dead-letter').catch(() => []),
+        apiClient.get<any>('/monitoring/overview').catch(() => null),
+        apiClient.get<any>('/monitoring/dead-letter').catch(() => []),
       ]);
-      setOverview(overviewData);
-      setDeadLetterJobs(deadLetterData || []);
+      const extractedOverview = (overviewData as any)?.data ?? overviewData ?? null;
+      const extractedDeadLetter = Array.isArray(deadLetterData) ? deadLetterData : (deadLetterData as any)?.data ?? [];
+      setOverview(extractedOverview);
+      setDeadLetterJobs(extractedDeadLetter);
     } catch (err) {
       console.error('Failed to load telemetry overview:', err);
     } finally {
@@ -159,17 +161,17 @@ export function PlatformMonitoringDashboard() {
             <span className="h-2 w-2 rounded-full bg-emerald-400" />
           </div>
           <p className="text-xl font-bold text-[#F5F7FA] mt-2">HTTP / Express</p>
-          <p className="text-xs text-emerald-400 mt-1 font-mono">Uptime: {formatUptime(overview?.telemetry.uptimeSeconds || 0)}</p>
+          <p className="text-xs text-emerald-400 mt-1 font-mono">Uptime: {formatUptime(overview?.telemetry?.uptimeSeconds || 0)}</p>
         </div>
 
         <div className="rounded-xl border border-[#26313C] bg-[#111820] p-4">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-[#9AA6B2]">PostgreSQL Database</span>
-            <span className={`h-2 w-2 rounded-full ${overview?.components.database.status === 'UP' ? 'bg-emerald-400' : 'bg-red-400'}`} />
+            <span className={`h-2 w-2 rounded-full ${overview?.components?.database?.status === 'UP' ? 'bg-emerald-400' : 'bg-red-400'}`} />
           </div>
           <p className="text-xl font-bold text-[#F5F7FA] mt-2">Prisma ORM</p>
           <p className="text-xs text-emerald-400 mt-1 font-mono">
-            Latency: {overview?.components.database.latencyMs ?? 0} ms (UP)
+            Latency: {overview?.components?.database?.latencyMs ?? 0} ms (UP)
           </p>
         </div>
 
@@ -180,7 +182,7 @@ export function PlatformMonitoringDashboard() {
           </div>
           <p className="text-xl font-bold text-[#F5F7FA] mt-2">Async Engine</p>
           <p className="text-xs text-[#2AFEB7] mt-1 font-mono">
-            {overview?.queue.active || 0} active • {overview?.queue.waiting || 0} waiting
+            {overview?.queue?.active || 0} active • {overview?.queue?.waiting || 0} waiting
           </p>
         </div>
 
@@ -189,9 +191,9 @@ export function PlatformMonitoringDashboard() {
             <span className="text-xs font-medium text-[#9AA6B2]">Memory Footprint</span>
             <span className="h-2 w-2 rounded-full bg-emerald-400" />
           </div>
-          <p className="text-xl font-bold text-[#F5F7FA] mt-2">{overview?.telemetry.memory.heapUsedMb ?? 0} MB</p>
+          <p className="text-xl font-bold text-[#F5F7FA] mt-2">{overview?.telemetry?.memory?.heapUsedMb ?? 0} MB</p>
           <p className="text-xs text-[#9AA6B2] mt-1 font-mono">
-            RSS: {overview?.telemetry.memory.rssMb ?? 0} MB
+            RSS: {overview?.telemetry?.memory?.rssMb ?? 0} MB
           </p>
         </div>
       </div>
@@ -208,21 +210,21 @@ export function PlatformMonitoringDashboard() {
           <div className="grid grid-cols-3 gap-3">
             <div className="rounded-lg bg-[#18212B] p-3 text-center border border-[#26313C]">
               <span className="text-[10px] font-mono text-[#9AA6B2] uppercase">P50 (Median)</span>
-              <p className="text-lg font-bold text-[#2AFEB7] mt-1">{overview?.telemetry.latencyMs.p50 ?? 0} ms</p>
+              <p className="text-lg font-bold text-[#2AFEB7] mt-1">{overview?.telemetry?.latencyMs?.p50 ?? 0} ms</p>
             </div>
             <div className="rounded-lg bg-[#18212B] p-3 text-center border border-[#26313C]">
               <span className="text-[10px] font-mono text-[#9AA6B2] uppercase">P95</span>
-              <p className="text-lg font-bold text-amber-400 mt-1">{overview?.telemetry.latencyMs.p95 ?? 0} ms</p>
+              <p className="text-lg font-bold text-amber-400 mt-1">{overview?.telemetry?.latencyMs?.p95 ?? 0} ms</p>
             </div>
             <div className="rounded-lg bg-[#18212B] p-3 text-center border border-[#26313C]">
               <span className="text-[10px] font-mono text-[#9AA6B2] uppercase">P99</span>
-              <p className="text-lg font-bold text-red-400 mt-1">{overview?.telemetry.latencyMs.p99 ?? 0} ms</p>
+              <p className="text-lg font-bold text-red-400 mt-1">{overview?.telemetry?.latencyMs?.p99 ?? 0} ms</p>
             </div>
           </div>
 
           <div className="pt-2 border-t border-[#26313C] flex items-center justify-between text-xs text-[#9AA6B2]">
             <span>Average API Latency</span>
-            <span className="font-mono text-[#F5F7FA] font-semibold">{overview?.telemetry.latencyMs.avg ?? 0} ms</span>
+            <span className="font-mono text-[#F5F7FA] font-semibold">{overview?.telemetry?.latencyMs?.avg ?? 0} ms</span>
           </div>
         </div>
 
@@ -236,18 +238,18 @@ export function PlatformMonitoringDashboard() {
           <div className="space-y-3">
             <div className="flex items-center justify-between text-xs">
               <span className="text-[#9AA6B2]">Requests per Minute</span>
-              <span className="font-mono text-sm font-bold text-[#F5F7FA]">{overview?.telemetry.throughput.requestsPerMinute ?? 0} req/min</span>
+              <span className="font-mono text-sm font-bold text-[#F5F7FA]">{overview?.telemetry?.throughput?.requestsPerMinute ?? 0} req/min</span>
             </div>
             <div className="flex items-center justify-between text-xs">
               <span className="text-[#9AA6B2]">Total Handled Requests</span>
               <span className="font-mono text-sm font-bold text-[#2AFEB7]">
-                {(overview?.telemetry.throughput.totalRequests ?? 0).toLocaleString()}
+                {(overview?.telemetry?.throughput?.totalRequests ?? 0).toLocaleString()}
               </span>
             </div>
             <div className="flex items-center justify-between text-xs">
               <span className="text-[#9AA6B2]">Error Rate</span>
-              <span className={`font-mono text-sm font-bold ${(overview?.telemetry.errors.errorRatePercent ?? 0) > 5 ? 'text-red-400' : 'text-emerald-400'}`}>
-                {overview?.telemetry.errors.errorRatePercent ?? '0.00'}%
+              <span className={`font-mono text-sm font-bold ${(overview?.telemetry?.errors?.errorRatePercent ?? 0) > 5 ? 'text-red-400' : 'text-emerald-400'}`}>
+                {overview?.telemetry?.errors?.errorRatePercent ?? '0.00'}%
               </span>
             </div>
           </div>
@@ -257,25 +259,25 @@ export function PlatformMonitoringDashboard() {
         <div className="rounded-xl border border-[#26313C] bg-[#111820] p-5 space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-semibold text-[#F5F7FA]">Queue Engine Lifecycle</h3>
-            <span className="text-xs font-mono text-[#9AA6B2]">{overview?.queue.totalJobs ?? 0} Jobs</span>
+            <span className="text-xs font-mono text-[#9AA6B2]">{overview?.queue?.totalJobs ?? 0} Jobs</span>
           </div>
 
           <div className="grid grid-cols-2 gap-2 text-xs">
             <div className="rounded-lg bg-[#18212B] p-2.5 border border-[#26313C]">
               <span className="text-[#9AA6B2]">Completed</span>
-              <p className="text-base font-bold text-emerald-400 mt-0.5">{overview?.queue.completed ?? 0}</p>
+              <p className="text-base font-bold text-emerald-400 mt-0.5">{overview?.queue?.completed ?? 0}</p>
             </div>
             <div className="rounded-lg bg-[#18212B] p-2.5 border border-[#26313C]">
               <span className="text-[#9AA6B2]">Active / Running</span>
-              <p className="text-base font-bold text-[#2AFEB7] mt-0.5">{overview?.queue.active ?? 0}</p>
+              <p className="text-base font-bold text-[#2AFEB7] mt-0.5">{overview?.queue?.active ?? 0}</p>
             </div>
             <div className="rounded-lg bg-[#18212B] p-2.5 border border-[#26313C]">
               <span className="text-[#9AA6B2]">Waiting</span>
-              <p className="text-base font-bold text-amber-400 mt-0.5">{overview?.queue.waiting ?? 0}</p>
+              <p className="text-base font-bold text-amber-400 mt-0.5">{overview?.queue?.waiting ?? 0}</p>
             </div>
             <div className="rounded-lg bg-[#18212B] p-2.5 border border-[#26313C]">
               <span className="text-[#9AA6B2]">Dead Letter / Failed</span>
-              <p className="text-base font-bold text-red-400 mt-0.5">{overview?.queue.deadLetter ?? 0}</p>
+              <p className="text-base font-bold text-red-400 mt-0.5">{overview?.queue?.deadLetter ?? 0}</p>
             </div>
           </div>
         </div>

@@ -41,9 +41,12 @@ export default function PlatformAdminPage() {
         getRestaurants().catch(() => ({ success: false, data: [] as Restaurant[] })),
         getPlatformDashboardOverview().catch(() => ({ success: false, data: null as any })),
       ]);
-      setTenants(tRes.data ?? []);
-      setRestaurants(rRes.data ?? []);
-      setPlatformOverview(pRes?.data ?? null);
+      const extractedTenants = Array.isArray(tRes) ? tRes : (tRes as any)?.data ?? [];
+      const extractedRestaurants = Array.isArray(rRes) ? rRes : (rRes as any)?.data ?? [];
+      const extractedOverview = (pRes as any)?.metrics ? pRes : (pRes as any)?.data ?? null;
+      setTenants(extractedTenants);
+      setRestaurants(extractedRestaurants);
+      setPlatformOverview(extractedOverview);
     } catch (err: any) {
       console.error(err);
       setError(err?.message ?? 'Failed to load platform admin overview');
@@ -197,31 +200,31 @@ export default function PlatformAdminPage() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <StatCard
           title="ONBOARDED TENANTS"
-          value={tenants.length}
+          value={Array.isArray(tenants) ? tenants.length : 0}
           description="Total active tenant organizations"
         />
 
         <StatCard
           title="RESTAURANTS"
-          value={restaurants.length}
+          value={Array.isArray(restaurants) ? restaurants.length : 0}
           description="Total active restaurants in platform"
         />
 
         <StatCard
           title="GLOBAL USERS"
-          value={platformOverview?.metrics.totalUsers ?? 0}
+          value={platformOverview?.metrics?.totalUsers ?? 0}
           description="Total registered user accounts"
         />
 
         <StatCard
           title="TOTAL ORDERS"
-          value={platformOverview?.metrics.totalOrders ?? 0}
+          value={platformOverview?.metrics?.totalOrders ?? 0}
           description="Orders processed across all outlets"
         />
 
         <StatCard
           title="TOTAL REVENUE"
-          value={formatCurrency(platformOverview?.metrics.totalRevenue ?? 0)}
+          value={formatCurrency(platformOverview?.metrics?.totalRevenue ?? 0)}
           description="Aggregated platform billing volume"
         />
       </div>
@@ -240,22 +243,22 @@ export default function PlatformAdminPage() {
               <span className="text-[#9AA6B2]">Platform Status:</span>
               <span className="flex items-center gap-1.5 font-bold text-[#22C55E]">
                 <span className="h-2.5 w-2.5 rounded-full bg-[#22C55E] animate-pulse" />
-                {platformOverview?.systemMetrics.systemStatus || 'HEALTHY'}
+                {platformOverview?.systemMetrics?.systemStatus || 'HEALTHY'}
               </span>
             </div>
             
             <div className="flex justify-between items-center border-b border-[#26313C]/50 pb-2">
               <span className="text-[#9AA6B2]">Core API Latency:</span>
-              <span className="font-mono font-bold text-[#2AFEB7]">{platformOverview?.systemMetrics.apiLatencyMs || 12}ms</span>
+              <span className="font-mono font-bold text-[#2AFEB7]">{platformOverview?.systemMetrics?.apiLatencyMs || 12}ms</span>
             </div>
 
             <div className="flex justify-between items-center border-b border-[#26313C]/50 pb-2">
               <span className="text-[#9AA6B2]">System Uptime:</span>
               <span className="font-mono font-bold text-[#F5F7FA]">
-                {platformOverview ? (
+                {platformOverview?.systemMetrics?.uptimeSeconds !== undefined ? (
                   `${Math.floor(platformOverview.systemMetrics.uptimeSeconds / 86400)}d ${Math.floor((platformOverview.systemMetrics.uptimeSeconds % 86400) / 3600)}h ${Math.floor((platformOverview.systemMetrics.uptimeSeconds % 3600) / 60)}m`
                 ) : (
-                  'N/A'
+                  'Active'
                 )}
               </span>
             </div>
@@ -265,14 +268,14 @@ export default function PlatformAdminPage() {
               <div className="flex justify-between">
                 <span className="text-[#9AA6B2]">API Server Memory:</span>
                 <span className="font-mono font-bold text-[#F5F7FA]">
-                  {platformOverview?.systemMetrics.memoryHeapUsedMB || 0}MB / {platformOverview?.systemMetrics.memoryHeapTotalMB || 512}MB
+                  {platformOverview?.systemMetrics?.memoryHeapUsedMB || 0}MB / {platformOverview?.systemMetrics?.memoryHeapTotalMB || 512}MB
                 </span>
               </div>
               <div className="h-2 w-full rounded-full bg-[#18212B] overflow-hidden">
                 <div
                   style={{
                     width: `${
-                      platformOverview
+                      platformOverview?.systemMetrics?.memoryHeapUsedMB && platformOverview?.systemMetrics?.memoryHeapTotalMB
                         ? Math.min(100, (platformOverview.systemMetrics.memoryHeapUsedMB / platformOverview.systemMetrics.memoryHeapTotalMB) * 100)
                         : 20
                     }%`
@@ -364,7 +367,7 @@ export default function PlatformAdminPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#26313C]/50">
-                {restaurants.map((res) => (
+                {(Array.isArray(restaurants) ? restaurants : []).map((res) => (
                   <tr
                     key={res.id}
                     onClick={() => setSelectedRestaurantId(res.id)}
@@ -400,7 +403,7 @@ export default function PlatformAdminPage() {
                   </tr>
                 ))}
 
-                {restaurants.length === 0 && (
+                {(!Array.isArray(restaurants) || restaurants.length === 0) && (
                   <tr>
                     <td colSpan={5} className="py-8 text-center text-[#9AA6B2]">
                       No restaurants registered on the platform yet.
@@ -420,7 +423,7 @@ export default function PlatformAdminPage() {
           </div>
 
           <div className="space-y-3 max-h-[350px] overflow-y-auto pr-1">
-            {platformOverview?.recentGlobalOrders && platformOverview.recentGlobalOrders.length > 0 ? (
+            {Array.isArray(platformOverview?.recentGlobalOrders) && platformOverview.recentGlobalOrders.length > 0 ? (
               platformOverview.recentGlobalOrders.map((ord) => {
                 const getStatusStyle = (st: string) => {
                   switch (st) {
