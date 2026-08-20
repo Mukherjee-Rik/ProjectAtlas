@@ -21,10 +21,12 @@ import type { RestaurantTable } from '@/types/table';
 import type { Order } from '@/types/order';
 import { formatCurrency } from '@/lib/currency';
 import { DataCache } from '@/lib/data-cache';
+import { useToast } from '@/components/ui/toast';
 
 export default function CashierPage() {
   const { currentRestaurant } = useRestaurant();
   const { currentBranch } = useBranch();
+  const { success: toastSuccess, error: toastError, warning: toastWarning } = useToast();
 
   // Navigation tab: 'POS' | 'REFUNDS_CANCELLATIONS' | 'LEDGER'
   const [activeMainTab, setActiveMainTab] = useState<'POS' | 'REFUNDS_CANCELLATIONS' | 'LEDGER'>('POS');
@@ -143,8 +145,9 @@ export default function CashierPage() {
         await apiClient.post(`/public/tables/${selectedTable.publicToken}/session/end`);
         setSelectedTable(null);
         await loadData();
+        toastSuccess('Empty table session cleared!');
       } catch (err: any) {
-        alert(err?.message ?? 'Failed to clear empty table session.');
+        toastError(err?.message ?? 'Failed to clear empty table session.');
       } finally {
         setIsProcessing(false);
       }
@@ -159,7 +162,7 @@ export default function CashierPage() {
       cashVal = Number(splitCashAmount || 0);
       upiVal = Number(splitUpiAmount || 0);
       if (Math.abs(cashVal + upiVal - totalAmount) > 0.01) {
-        alert(
+        toastWarning(
           `The total split amount (${formatCurrency(cashVal + upiVal)}) must exactly match the total due (${formatCurrency(totalAmount)}).`,
         );
         return;
@@ -238,10 +241,10 @@ export default function CashierPage() {
       setSplitUpiAmount('');
       setSelectedTable(null);
       await loadData();
-      alert('Table bill settled successfully & table cleared!');
+      toastSuccess('Table bill settled successfully & table cleared!');
     } catch (err: any) {
       console.error(err);
-      alert(err?.message ?? 'Payment settlement failed.');
+      toastError(err?.message ?? 'Payment settlement failed.');
     } finally {
       setIsProcessing(false);
     }
@@ -251,7 +254,7 @@ export default function CashierPage() {
   const handleReviewSubmit = async () => {
     if (!activeReviewRequest) return;
     if (reviewAction === 'REJECT' && !rejectionReason.trim()) {
-      alert('Please enter a reason for rejecting the request.');
+      toastWarning('Please enter a reason for rejecting the request.');
       return;
     }
 
@@ -276,14 +279,14 @@ export default function CashierPage() {
       setCustomRefundAmount('');
       setIsCustomRefund(false);
       await loadData();
-      alert(
+      toastSuccess(
         reviewAction === 'APPROVE'
           ? 'Cancellation request approved & refund initiated successfully!'
           : 'Cancellation request rejected.',
       );
     } catch (err: any) {
       console.error(err);
-      alert(err?.message ?? 'Failed to review cancellation request.');
+      toastError(err?.message ?? 'Failed to review cancellation request.');
     } finally {
       setIsProcessing(false);
     }
@@ -294,7 +297,7 @@ export default function CashierPage() {
     if (!directRefundPayment) return;
     const amount = Number(directRefundAmount);
     if (!amount || amount <= 0) {
-      alert('Please enter a valid refund amount.');
+      toastWarning('Please enter a valid refund amount.');
       return;
     }
 
@@ -312,10 +315,10 @@ export default function CashierPage() {
       setDirectRefundReason('Customer requested refund');
       setDirectRefundNote('');
       await loadData();
-      alert(`Refund of ${formatCurrency(amount)} processed successfully!`);
+      toastSuccess(`Refund of ${formatCurrency(amount)} processed successfully!`);
     } catch (err: any) {
       console.error(err);
-      alert(err?.message ?? 'Failed to process refund.');
+      toastError(err?.message ?? 'Failed to process refund.');
     } finally {
       setIsProcessing(false);
     }
@@ -331,9 +334,13 @@ export default function CashierPage() {
     );
   }
 
-  const occupiedTables = tables.filter((t) =>
-    t.customerSessions?.some((s) => s.status === 'ACTIVE'),
-  );
+  const occupiedTables = tables.filter((t) => {
+    const session = t.customerSessions?.find((s) => s.status === 'ACTIVE');
+    if (!session) return false;
+    const orders = session.orders ?? [];
+    // Only show tables in Cashier POS if they have active unsettled orders (avoids 0 amount ghost tables)
+    return orders.some((o) => !['CANCELLED', 'COMPLETED'].includes(o.status));
+  });
 
   const pendingRequests = cancellationRequests.filter((r) => r.status === 'PENDING_REVIEW');
 
@@ -353,7 +360,7 @@ export default function CashierPage() {
           <button
             type="button"
             onClick={() => setActiveMainTab('POS')}
-            className={`flex items-center gap-2 rounded-lg px-3.5 sm:px-4 py-2 text-xs font-bold transition-all whitespace-nowrap shrink-0 ${
+            className={`flex items-center gap-2 rounded-lg px-3.5 sm:px-4 py-2 text-xs font-bold transition-all whitespace-nowrap shrink-0 cursor-pointer ${
               activeMainTab === 'POS'
                 ? 'bg-[#2AFEB7] text-[#0B0F14] shadow-sm'
                 : 'text-[#9AA6B2] hover:text-[#F5F7FA]'
@@ -368,15 +375,15 @@ export default function CashierPage() {
           <button
             type="button"
             onClick={() => setActiveMainTab('REFUNDS_CANCELLATIONS')}
-            className={`flex items-center gap-2 rounded-lg px-3.5 sm:px-4 py-2 text-xs font-bold transition-all whitespace-nowrap shrink-0 ${
+            className={`flex items-center gap-2 rounded-lg px-3.5 sm:px-4 py-2 text-xs font-bold transition-all whitespace-nowrap shrink-0 cursor-pointer ${
               activeMainTab === 'REFUNDS_CANCELLATIONS'
                 ? 'bg-[#2AFEB7] text-[#0B0F14] shadow-sm'
                 : 'text-[#9AA6B2] hover:text-[#F5F7FA]'
             }`}
           >
-            <span>💰 Refunds & Cancellations</span>
+            <span>🔄 Cancellations & Refunds</span>
             {pendingRequests.length > 0 && (
-              <span className="rounded-full bg-red-500 text-white px-1.5 py-0.2 text-[10px] animate-pulse">
+              <span className="rounded-full bg-[#EF4444] px-1.5 py-0.2 text-[10px] text-white animate-pulse">
                 {pendingRequests.length}
               </span>
             )}
@@ -385,13 +392,16 @@ export default function CashierPage() {
           <button
             type="button"
             onClick={() => setActiveMainTab('LEDGER')}
-            className={`flex items-center gap-2 rounded-lg px-3.5 sm:px-4 py-2 text-xs font-bold transition-all whitespace-nowrap shrink-0 ${
+            className={`flex items-center gap-2 rounded-lg px-3.5 sm:px-4 py-2 text-xs font-bold transition-all whitespace-nowrap shrink-0 cursor-pointer ${
               activeMainTab === 'LEDGER'
                 ? 'bg-[#2AFEB7] text-[#0B0F14] shadow-sm'
                 : 'text-[#9AA6B2] hover:text-[#F5F7FA]'
             }`}
           >
-            <span>📜 Payments Ledger</span>
+            <span>📑 Payment Ledger</span>
+            <span className="rounded-full bg-black/20 px-1.5 py-0.2 text-[10px]">
+              {payments.length}
+            </span>
           </button>
         </div>
       </div>
@@ -402,7 +412,7 @@ export default function CashierPage() {
           {/* Left: Occupied Tables */}
           <div className="lg:col-span-7 space-y-4">
             <h2 className="text-xs font-bold uppercase tracking-wider text-[#9AA6B2]">
-              Occupied Dining Tables ({occupiedTables.length})
+              Dining Tables with Pending Bills ({occupiedTables.length})
             </h2>
 
             {isLoading ? (
@@ -412,8 +422,8 @@ export default function CashierPage() {
             ) : occupiedTables.length === 0 ? (
               <div className="rounded-xl border border-[#26313C] bg-[#111820] p-12 text-center space-y-3">
                 <div className="text-3xl">🎉</div>
-                <h3 className="text-sm font-bold text-[#F5F7FA]">All Tables Clear</h3>
-                <p className="text-xs text-[#9AA6B2]">No active guest sessions are currently registered.</p>
+                <h3 className="text-sm font-bold text-[#F5F7FA]">All Tables Settled & Clear</h3>
+                <p className="text-xs text-[#9AA6B2]">No tables have unpaid bills at this moment.</p>
               </div>
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -421,7 +431,7 @@ export default function CashierPage() {
                   const session = t.customerSessions?.find((s) => s.status === 'ACTIVE');
                   const orders = session?.orders ?? [];
                   const totalDue = orders
-                    .filter((o) => !['CANCELLED'].includes(o.status))
+                    .filter((o) => !['CANCELLED', 'COMPLETED'].includes(o.status))
                     .reduce((acc, o) => acc + Number(o.totalAmount), 0);
 
                   const isSelected = selectedTable?.id === t.id;
@@ -433,7 +443,7 @@ export default function CashierPage() {
                         setSelectedTable(t);
                         setTxReference('');
                       }}
-                      className={`flex flex-col rounded-xl border p-4 text-left transition-all ${
+                      className={`flex flex-col rounded-xl border p-4 text-left transition-all cursor-pointer ${
                         isSelected
                           ? 'border-[#2AFEB7] bg-[#2AFEB7]/5 shadow-[0_0_15px_rgba(42,254,183,0.1)]'
                           : 'border-[#26313C] bg-[#111820] hover:border-[#2AFEB7]/30'
@@ -447,7 +457,7 @@ export default function CashierPage() {
                       </span>
                       <div className="mt-3 flex items-center justify-between border-t border-[#26313C] pt-2 w-full">
                         <span className="text-[10px] text-[#9AA6B2]">
-                          {orders.length} Order{orders.length !== 1 ? 's' : ''}
+                          {orders.filter((o) => !['CANCELLED', 'COMPLETED'].includes(o.status)).length} Unpaid
                         </span>
                         <span className="text-xs font-black text-[#2AFEB7]">
                           {formatCurrency(totalDue)}
@@ -471,8 +481,27 @@ export default function CashierPage() {
                 (() => {
                   const session = selectedTable.customerSessions?.find((s) => s.status === 'ACTIVE');
                   const orders = session?.orders ?? [];
-                  const unpaidOrders = orders.filter((o) => !['CANCELLED'].includes(o.status));
+                  const unpaidOrders = orders.filter((o) => !['CANCELLED', 'COMPLETED'].includes(o.status));
                   const totalAmount = unpaidOrders.reduce((acc, o) => acc + Number(o.totalAmount), 0);
+
+                  if (unpaidOrders.length === 0) {
+                    return (
+                      <div className="rounded-xl border border-[#22C55E]/40 bg-[#22C55E]/10 p-6 text-center space-y-3">
+                        <div className="text-2xl">✓</div>
+                        <h4 className="text-sm font-bold text-[#22C55E]">All Bills Settled</h4>
+                        <p className="text-xs text-[#9AA6B2]">
+                          Table {selectedTable.name} has no pending payments due.
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedTable(null)}
+                          className="rounded-lg border border-[#26313C] bg-[#18212B] px-4 py-2 text-xs font-bold text-[#F5F7FA] hover:text-[#2AFEB7] transition-all cursor-pointer"
+                        >
+                          Close Details
+                        </button>
+                      </div>
+                    );
+                  }
 
                   return (
                     <div className="space-y-5">

@@ -10,6 +10,10 @@ export interface NavigationItem {
 export const navigationItems: NavigationItem[] = [
   // Root Level
   { label: 'Dashboard', href: '/dashboard', permission: PERMISSIONS.DASHBOARD_READ },
+  // [V2 Analytics & BI Features - Commented out]
+  // { label: 'Analytics Engine', href: '/analytics', permission: PERMISSIONS.DASHBOARD_READ },
+  // { label: 'Custom Reports', href: '/reports', permission: PERMISSIONS.DASHBOARD_READ },
+  // { label: 'Forecasting Engine', href: '/forecasts', permission: PERMISSIONS.DASHBOARD_READ },
 
   // Operations Group
   { label: 'Orders List', href: '/orders', permission: PERMISSIONS.ORDERS_READ, group: 'Operations' },

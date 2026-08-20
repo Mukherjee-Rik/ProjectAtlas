@@ -31,6 +31,22 @@ export default function TableDetailsPage({
 
   const [showRegenerateConfirm, setShowRegenerateConfirm] = useState(false);
   const [isRegenerating, setIsRegenerating] = useState(false);
+  const [detectedBaseUrl, setDetectedBaseUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+      setDetectedBaseUrl(window.location.origin);
+    } else {
+      fetch('/api/server-ip')
+        .then((r) => r.json())
+        .then((data: { ip: string | null; baseUrl: string | null }) => {
+          setDetectedBaseUrl(data.baseUrl || window.location.origin);
+        })
+        .catch(() => {
+          setDetectedBaseUrl(window.location.origin);
+        });
+    }
+  }, []);
 
   const loadTable = useCallback(async () => {
     setIsLoading(true);
@@ -47,10 +63,10 @@ export default function TableDetailsPage({
     }
   }, [id]);
 
-  const loadQr = useCallback(async () => {
+  const loadQr = useCallback(async (baseUrl?: string) => {
     setIsLoadingQr(true);
     try {
-      const response = await getTableQr(id);
+      const response = await getTableQr(id, baseUrl);
       setQrData(response.data);
     } catch (err: any) {
       console.error(err);
@@ -61,8 +77,8 @@ export default function TableDetailsPage({
 
   useEffect(() => {
     void loadTable();
-    void loadQr();
-  }, [loadTable, loadQr]);
+    void loadQr(detectedBaseUrl ?? undefined);
+  }, [loadTable, loadQr, detectedBaseUrl]);
 
   const handleDelete = async () => {
     setIsDeleting(true);
@@ -80,7 +96,7 @@ export default function TableDetailsPage({
   const handleRegenerateQr = async () => {
     setIsRegenerating(true);
     try {
-      const response = await regenerateTableQr(id);
+      const response = await regenerateTableQr(id, detectedBaseUrl ?? undefined);
       setQrData(response.data);
       setShowRegenerateConfirm(false);
     } catch (err: any) {

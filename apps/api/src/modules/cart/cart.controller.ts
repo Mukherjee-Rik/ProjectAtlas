@@ -21,9 +21,24 @@ export class CartController {
     return this.cartService.addItem(token, dto);
   }
 
+  @Post('set-item')
+  @ApiOperation({ summary: 'Set exact quantity of a menu item (idempotent)' })
+  async setItemQuantity(@Param('token') token: string, @Body() dto: AddCartItemDto) {
+    return this.cartService.setItemQuantity(token, dto);
+  }
+
   @Patch('items/:itemId')
   @ApiOperation({ summary: 'Update the quantity of a cart line' })
   async updateItemQuantity(
+    @Param('token') token: string,
+    @Param('itemId') itemId: string,
+    @Body() dto: UpdateCartItemDto,
+  ) {
+    return this.cartService.updateItemQuantity(token, itemId, dto);
+  }
+
+  @Post('items/:itemId')
+  async updateItemQuantityPost(
     @Param('token') token: string,
     @Param('itemId') itemId: string,
     @Body() dto: UpdateCartItemDto,

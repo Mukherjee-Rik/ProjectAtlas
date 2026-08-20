@@ -8,6 +8,7 @@ import { SubscriptionGuard } from '../auth/guards/subscription.guard';
 import { PlatformAdminGuard } from '../auth/guards/platform-admin.guard';
 import { Permissions } from '../auth/decorators/permissions.decorator';
 import { RequiresFeature } from '../auth/decorators/requires-feature.decorator';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { PERMISSIONS } from '../auth/permissions/permissions';
 
 @ApiTags('Dashboard')
@@ -24,12 +25,13 @@ export class DashboardController {
   @Permissions(PERMISSIONS.DASHBOARD_READ)
   @ApiOperation({ summary: 'Get restaurant dashboard operational overview metrics' })
   async getOverview(
+    @CurrentUser() user: any,
     @Headers('x-restaurant-id') restaurantId?: string,
     @Headers('x-branch-id') branchId?: string,
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string,
   ) {
-    return this.dashboardService.getRestaurantOverview(restaurantId, branchId, startDate, endDate);
+    return this.dashboardService.getRestaurantOverview(user, restaurantId, branchId, startDate, endDate);
   }
 
   @Get('analytics')
@@ -37,12 +39,13 @@ export class DashboardController {
   @RequiresFeature('analytics')
   @ApiOperation({ summary: 'Get restaurant analytics metrics' })
   async getAnalytics(
+    @CurrentUser() user: any,
     @Headers('x-restaurant-id') restaurantId?: string,
     @Headers('x-branch-id') branchId?: string,
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string,
   ) {
-    return this.dashboardService.getRestaurantAnalytics(restaurantId, branchId, startDate, endDate);
+    return this.dashboardService.getRestaurantAnalytics(user, restaurantId, branchId, startDate, endDate);
   }
 
   @Get('platform-overview')

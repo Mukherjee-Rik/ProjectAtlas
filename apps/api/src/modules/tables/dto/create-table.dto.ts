@@ -24,22 +24,22 @@ export class CreateTableDto {
 
   @ApiProperty({
     example: 'Table 1',
-    description: 'Name of the table',
+    description: 'Name of the table (2-50 characters)',
   })
   @IsString()
-  @MinLength(1)
-  @MaxLength(100)
+  @MinLength(2)
+  @MaxLength(50)
   name: string;
 
   @ApiProperty({
     example: 'T01',
-    description: 'Unique table code within this dining area',
+    description: 'Unique table code within this dining area (1-10 characters)',
   })
   @IsString()
   @MinLength(1)
-  @MaxLength(50)
+  @MaxLength(10)
   @Matches(/^[A-Za-z0-9-]+$/, {
-    message: 'Code can only contain alphanumeric characters and hyphens',
+    message: 'Code can only contain alphanumeric characters and hyphens (max 10 chars)',
   })
   code: string;
 

@@ -1,7 +1,6 @@
 'use client';
 
 import { FormEvent, useState } from 'react';
-
 import type {
   CreateUserPayload,
   UpdateUserPayload,
@@ -11,6 +10,8 @@ import type {
   UserRole,
   UserStatus,
 } from '@/types/user';
+import { ValidatedInput, ValidatedSelect } from '@/components/ui/validated-input';
+import { validateText, validateEmail, validatePhone, validatePassword } from '@/lib/validation';
 
 interface UserFormProps {
   user?: User;
@@ -40,16 +41,84 @@ export function UserForm({
     user?.status ?? 'ACTIVE',
   );
 
+  const [errors, setErrors] = useState<{
+    name?: string;
+    email?: string;
+    phone?: string;
+    password?: string;
+  }>({});
+
+  const [formError, setFormError] = useState('');
+
+  const validateField = (field: string, val: any) => {
+    const nextErrors = { ...errors };
+
+    switch (field) {
+      case 'name': {
+        const res = validateText(val, 'Full name', 2, 100);
+        if (!res.isValid) nextErrors.name = res.error;
+        else delete nextErrors.name;
+        break;
+      }
+
+      case 'email': {
+        const res = validateEmail(val, true);
+        if (!res.isValid) nextErrors.email = res.error;
+        else delete nextErrors.email;
+        break;
+      }
+
+      case 'phone': {
+        const res = validatePhone(val, false);
+        if (!res.isValid) nextErrors.phone = res.error;
+        else delete nextErrors.phone;
+        break;
+      }
+
+      case 'password': {
+        if (!isEdit) {
+          const res = validatePassword(val, 8, true);
+          if (!res.isValid) nextErrors.password = res.error;
+          else delete nextErrors.password;
+        }
+        break;
+      }
+    }
+
+    setErrors(nextErrors);
+    return nextErrors;
+  };
+
   async function handleSubmit(
     event: FormEvent<HTMLFormElement>,
   ) {
     event.preventDefault();
 
+    const nameRes = validateText(name, 'Full name', 2, 100);
+    const emailRes = validateEmail(email, true);
+    const phoneRes = validatePhone(phone, false);
+    const passwordRes = !isEdit ? validatePassword(password, 8, true) : { isValid: true };
+
+    const validationErrors: typeof errors = {};
+    if (!nameRes.isValid) validationErrors.name = nameRes.error;
+    if (!emailRes.isValid) validationErrors.email = emailRes.error;
+    if (!phoneRes.isValid) validationErrors.phone = phoneRes.error;
+    if (!passwordRes.isValid) validationErrors.password = passwordRes.error;
+
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      setFormError('Please resolve the highlighted errors before saving.');
+      return;
+    }
+
+    setFormError('');
+    setErrors({});
+
     if (isEdit) {
       await onSubmit({
-        name,
-        email,
-        phone: phone || null,
+        name: name.trim(),
+        email: email.trim().toLowerCase(),
+        phone: phone.trim() || null,
         role,
         status,
       } as UpdateUserPayload);
@@ -58,9 +127,9 @@ export function UserForm({
     }
 
     await onSubmit({
-      name,
-      email,
-      phone: phone || undefined,
+      name: name.trim(),
+      email: email.trim().toLowerCase(),
+      phone: phone.trim() || undefined,
       password,
       role,
     });
@@ -70,145 +139,103 @@ export function UserForm({
     <form
       onSubmit={handleSubmit}
       className="space-y-5"
+      noValidate
     >
-      <div>
-        <label
-          htmlFor="name"
-          className="mb-2 block text-sm font-medium text-[#F5F7FA]"
-        >
-          Staff Full Name
-        </label>
-
-        <input
-          id="name"
-          value={name}
-          onChange={(event) =>
-            setName(event.target.value)
-          }
-          required
-          minLength={2}
-          maxLength={100}
-          placeholder="e.g. Rahul Sharma"
-          className="w-full rounded-lg border border-[#26313C] bg-[#18212B] px-4 py-2.5 text-[#F5F7FA] placeholder-[#9AA6B2] transition-colors outline-none focus:border-[#2AFEB7] focus:ring-1 focus:ring-[#2AFEB7]"
-        />
-      </div>
-
-      <div>
-        <label
-          htmlFor="email"
-          className="mb-2 block text-sm font-medium text-[#F5F7FA]"
-        >
-          Email Address
-        </label>
-
-        <input
-          id="email"
-          type="email"
-          value={email}
-          onChange={(event) =>
-            setEmail(event.target.value)
-          }
-          required
-          maxLength={255}
-          placeholder="waiter@spicegarden.com"
-          className="w-full rounded-lg border border-[#26313C] bg-[#18212B] px-4 py-2.5 text-[#F5F7FA] placeholder-[#9AA6B2] transition-colors outline-none focus:border-[#2AFEB7] focus:ring-1 focus:ring-[#2AFEB7]"
-        />
-      </div>
-
-      <div>
-        <label
-          htmlFor="phone"
-          className="mb-2 block text-sm font-medium text-[#F5F7FA]"
-        >
-          Phone Number
-        </label>
-
-        <input
-          id="phone"
-          value={phone}
-          onChange={(event) =>
-            setPhone(event.target.value)
-          }
-          maxLength={20}
-          placeholder="9876543210"
-          className="w-full rounded-lg border border-[#26313C] bg-[#18212B] px-4 py-2.5 text-[#F5F7FA] placeholder-[#9AA6B2] transition-colors outline-none focus:border-[#2AFEB7] focus:ring-1 focus:ring-[#2AFEB7]"
-        />
-      </div>
-
-      {!isEdit && (
-        <div>
-          <label
-            htmlFor="password"
-            className="mb-2 block text-sm font-medium text-[#F5F7FA]"
-          >
-            Password
-          </label>
-
-          <input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(event) =>
-              setPassword(event.target.value)
-            }
-            required
-            minLength={8}
-            placeholder="••••••••"
-            className="w-full rounded-lg border border-[#26313C] bg-[#18212B] px-4 py-2.5 text-[#F5F7FA] placeholder-[#9AA6B2] transition-colors outline-none focus:border-[#2AFEB7] focus:ring-1 focus:ring-[#2AFEB7]"
-          />
+      {formError && (
+        <div className="rounded-xl border border-[#EF4444]/40 bg-[#EF4444]/10 p-4 text-sm text-[#EF4444] animate-in fade-in">
+          {formError}
         </div>
       )}
 
-      <div>
-        <label
-          htmlFor="role"
-          className="mb-2 block text-sm font-medium text-[#F5F7FA]"
-        >
-          Restaurant Role
-        </label>
+      <ValidatedInput
+        label="Staff Full Name"
+        required
+        maxLength={100}
+        showCount
+        placeholder="e.g. Rahul Sharma"
+        value={name}
+        error={errors.name}
+        onChange={(e) => {
+          setName(e.target.value);
+          validateField('name', e.target.value);
+        }}
+        onBlur={(e) => validateField('name', e.target.value)}
+      />
 
-        <select
-          id="role"
-          value={role}
-          onChange={(event) =>
-            setRole(event.target.value as UserRole)
-          }
-          className="w-full rounded-lg border border-[#26313C] bg-[#18212B] px-4 py-2.5 text-[#F5F7FA] outline-none focus:border-[#2AFEB7] focus:ring-1 focus:ring-[#2AFEB7]"
-        >
-          <option value="CASHIER">Cashier (POS & Kitchen)</option>
-          <option value="WAITER">Waiter / Floor Staff</option>
-          <option value="KITCHEN">Kitchen Staff</option>
-          <option value="MANAGER">Restaurant Manager</option>
-          <option value="STAFF">General Staff</option>
-          <option value="OWNER">Restaurant Owner</option>
-          <option value="ADMIN">Administrator</option>
-        </select>
-      </div>
+      <ValidatedInput
+        label="Email Address"
+        required
+        type="email"
+        maxLength={255}
+        placeholder="waiter@spicegarden.com"
+        value={email}
+        error={errors.email}
+        helperText="Strict email address (e.g. name@restaurant.com)"
+        onChange={(e) => {
+          setEmail(e.target.value);
+          validateField('email', e.target.value);
+        }}
+        onBlur={(e) => validateField('email', e.target.value)}
+      />
+
+      <ValidatedInput
+        label="Phone Number"
+        type="tel"
+        maxLength={15}
+        placeholder="9876543210"
+        value={phone}
+        error={errors.phone}
+        helperText="7 to 15 digits with optional country code"
+        onChange={(e) => {
+          setPhone(e.target.value);
+          validateField('phone', e.target.value);
+        }}
+        onBlur={(e) => validateField('phone', e.target.value)}
+      />
+
+      {!isEdit && (
+        <ValidatedInput
+          label="Password"
+          required
+          type="password"
+          minLength={8}
+          maxLength={100}
+          placeholder="••••••••"
+          value={password}
+          error={errors.password}
+          helperText="Must be at least 8 characters"
+          onChange={(e) => {
+            setPassword(e.target.value);
+            validateField('password', e.target.value);
+          }}
+          onBlur={(e) => validateField('password', e.target.value)}
+        />
+      )}
+
+      <ValidatedSelect
+        label="Restaurant Role"
+        value={role}
+        onChange={(e) => setRole(e.target.value as UserRole)}
+      >
+        <option value="CASHIER">Cashier (POS & Kitchen)</option>
+        <option value="WAITER">Waiter / Floor Staff</option>
+        <option value="KITCHEN">Kitchen Staff</option>
+        <option value="MANAGER">Restaurant Manager</option>
+        <option value="STAFF">General Staff</option>
+        <option value="OWNER">Restaurant Owner</option>
+        <option value="ADMIN">Administrator</option>
+      </ValidatedSelect>
 
       {isEdit && (
-        <div>
-          <label
-            htmlFor="status"
-            className="mb-2 block text-sm font-medium text-[#F5F7FA]"
-          >
-            Status
-          </label>
-
-          <select
-            id="status"
-            value={status}
-            onChange={(event) =>
-              setStatus(
-                event.target.value as UserStatus,
-              )
-            }
-            className="w-full rounded-lg border border-[#26313C] bg-[#18212B] px-4 py-2.5 text-[#F5F7FA] outline-none focus:border-[#2AFEB7] focus:ring-1 focus:ring-[#2AFEB7]"
-          >
-            <option value="ACTIVE">Active</option>
-            <option value="INACTIVE">Inactive</option>
-            <option value="SUSPENDED">Suspended</option>
-          </select>
-        </div>
+        <ValidatedSelect
+          label="Status"
+          value={status}
+          onChange={(e) => setStatus(e.target.value as UserStatus)}
+        >
+          <option value="ACTIVE">Active</option>
+          <option value="INACTIVE">Inactive</option>
+          <option value="SUSPENDED">Suspended</option>
+        </ValidatedSelect>
       )}
 
       <div className="flex justify-end gap-3 pt-4">
@@ -224,7 +251,7 @@ export function UserForm({
         <button
           type="submit"
           disabled={isSubmitting}
-          className="rounded-lg bg-[#2AFEB7] px-4 py-2 text-sm font-semibold text-[#0B0F14] transition-all hover:bg-[#22E5A4] active:scale-[0.99] disabled:opacity-50"
+          className="rounded-lg bg-[#2AFEB7] px-4 py-2 text-sm font-semibold text-[#0B0F14] transition-all hover:bg-[#22E5A4] active:scale-[0.99] disabled:opacity-50 font-bold"
         >
           {isSubmitting
             ? 'Saving...'

@@ -316,7 +316,10 @@ export class OrdersService {
   }
 
   async getCustomerOrders(token: string) {
-    const { session } = await this.publicTablesService.getOrCreateSessionRecord(token);
+    const { session } = await this.publicTablesService.getActiveSessionRecord(token);
+    if (!session) {
+      return [];
+    }
 
     const orders = await this.prisma.order.findMany({
       where: { customerSessionId: session.id },
@@ -328,10 +331,14 @@ export class OrdersService {
   }
 
   async getCustomerOrderById(token: string, orderId: string) {
-    const { session } = await this.publicTablesService.getOrCreateSessionRecord(token);
+    const { resolved, session } = await this.publicTablesService.getActiveSessionRecord(token);
 
     const order = await this.prisma.order.findFirst({
-      where: { id: orderId, customerSessionId: session.id },
+      where: {
+        id: orderId,
+        tableId: resolved.table.id,
+        ...(session && { customerSessionId: session.id }),
+      },
       select: ORDER_SELECT_FULL,
     });
 

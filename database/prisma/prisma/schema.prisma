@@ -175,6 +175,12 @@ model Restaurant {
   automationRules AutomationRule[]
   notifications   Notification[]
   supportTickets  SupportTicket[]
+  customers       Customer[]
+  dailySalesAggregates DailySalesAggregate[]
+  menuItemDailyMetrics MenuItemDailyMetrics[]
+  savedReports    SavedReport[]
+  customReports   CustomReport[]
+  forecasts       Forecast[]
 
   @@index([tenantId])
   @@unique([tenantId, slug])
@@ -217,6 +223,9 @@ model Branch {
   restaurant  Restaurant   @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
   diningAreas DiningArea[]
   orders      Order[]
+  dailySalesAggregates DailySalesAggregate[]
+  menuItemDailyMetrics MenuItemDailyMetrics[]
+  forecasts   Forecast[]
 
   @@unique([restaurantId, code])
   @@index([restaurantId])
@@ -352,6 +361,7 @@ model MenuItem {
   cartItems     CartItem[]
   orderItems    OrderItem[]
   recipe        Recipe?
+  dailyMetrics  MenuItemDailyMetrics[]
 
   @@unique([categoryId, code])
   @@index([categoryId])
@@ -512,6 +522,7 @@ model Order {
   branchId          String
   tableId           String?
   customerSessionId String?
+  customerId        String?
 
   orderNumber       String
 
@@ -535,6 +546,7 @@ model Order {
   branch          Branch           @relation(fields: [branchId], references: [id], onDelete: Cascade)
   table           Table?           @relation(fields: [tableId], references: [id], onDelete: SetNull)
   customerSession CustomerSession? @relation(fields: [customerSessionId], references: [id], onDelete: SetNull)
+  customer        Customer?        @relation(fields: [customerId], references: [id], onDelete: SetNull)
 
   items OrderItem[]
   payments Payment[]
@@ -549,6 +561,7 @@ model Order {
   @@index([branchId])
   @@index([tableId])
   @@index([customerSessionId])
+  @@index([customerId])
   @@index([status])
   @@index([restaurantId, status, createdAt])
   @@index([restaurantId, createdAt])
@@ -1131,4 +1144,297 @@ model SupportTicket {
   @@index([status])
   @@index([priority])
   @@map("support_tickets")
+}
+
+model Customer {
+  id                String    @id @default(uuid())
+  tenantId          String
+  restaurantId      String
+  name              String?
+  phone             String?
+  email             String?
+  firstOrderAt      DateTime?
+  lastOrderAt       DateTime?
+  totalOrders       Int       @default(0)
+  totalSpend        Decimal   @default(0.00) @db.Decimal(10, 2)
+  averageOrderValue Decimal   @default(0.00) @db.Decimal(10, 2)
+  preferredBranchId String?
+  segment           String    @default("NEW") // 'NEW', 'RETURNING', 'FREQUENT', 'HIGH_VALUE', 'AT_RISK', 'INACTIVE'
+  cohortMonth       String?   // 'YYYY-MM'
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  orders     Order[]
+
+  @@unique([restaurantId, phone])
+  @@index([tenantId])
+  @@index([restaurantId])
+  @@index([segment])
+  @@index([cohortMonth])
+  @@map("customers")
+}
+
+model OperationalEvent {
+  id           String   @id @default(uuid())
+  tenantId     String
+  restaurantId String
+  branchId     String
+  eventType    String   // 'ORDER_CREATED', 'ORDER_COMPLETED', 'ORDER_CANCELLED', 'PAYMENT_COMPLETED', 'REFUND_CREATED', 'STOCK_LOW', etc.
+  entityType   String   // 'ORDER', 'PAYMENT', 'CUSTOMER', 'MENU_ITEM', 'STOCK', 'STAFF'
+  entityId     String
+  actorUserId  String?
+  metadata     Json?
+  timestamp    DateTime @default(now())
+
+  @@index([restaurantId, eventType, timestamp])
+  @@index([branchId, timestamp])
+  @@index([entityId])
+  @@map("operational_events")
+}
+
+model DailySalesAggregate {
+  id                String   @id @default(uuid())
+  tenantId          String
+  restaurantId      String
+  branchId          String
+  date              DateTime @db.Date
+  grossSales        Decimal  @default(0.00) @db.Decimal(12, 2)
+  netSales          Decimal  @default(0.00) @db.Decimal(12, 2)
+  taxAmount         Decimal  @default(0.00) @db.Decimal(12, 2)
+  discountAmount    Decimal  @default(0.00) @db.Decimal(12, 2)
+  refundAmount      Decimal  @default(0.00) @db.Decimal(12, 2)
+  cancelledAmount   Decimal  @default(0.00) @db.Decimal(12, 2)
+  totalOrders       Int      @default(0)
+  completedOrders   Int      @default(0)
+  cancelledOrders   Int      @default(0)
+  dineInOrders      Int      @default(0)
+  takeoutOrders     Int      @default(0)
+  averageOrderValue Decimal  @default(0.00) @db.Decimal(10, 2)
+  uniqueCustomers   Int      @default(0)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  branch     Branch     @relation(fields: [branchId], references: [id], onDelete: Cascade)
+
+  @@unique([restaurantId, branchId, date])
+  @@index([tenantId])
+  @@index([restaurantId, date])
+  @@map("daily_sales_aggregates")
+}
+
+model MenuItemDailyMetrics {
+  id             String   @id @default(uuid())
+  tenantId       String
+  restaurantId   String
+  branchId       String
+  menuItemId     String
+  date           DateTime @db.Date
+  quantitySold   Int      @default(0)
+  grossRevenue   Decimal  @default(0.00) @db.Decimal(12, 2)
+  discountImpact Decimal  @default(0.00) @db.Decimal(12, 2)
+  ordersCount    Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  branch     Branch     @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  menuItem   MenuItem   @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+
+  @@unique([restaurantId, branchId, menuItemId, date])
+  @@index([restaurantId, date])
+  @@index([menuItemId])
+  @@map("menu_item_daily_metrics")
+}
+
+model SavedReport {
+  id           String   @id @default(uuid())
+  tenantId     String
+  restaurantId String
+  userId       String
+  name         String
+  description  String?
+  reportType   String   // 'REVENUE', 'MENU', 'BRANCH', 'CUSTOMER', 'COHORT', 'OPERATIONS'
+  filters      Json
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  @@index([restaurantId, userId])
+  @@map("saved_reports")
+}
+
+model IntelligenceQueryAudit {
+  id              String   @id @default(uuid())
+  tenantId        String
+  restaurantId    String
+  branchId        String?
+  actorUserId     String?
+  serviceName     String
+  queryType       String
+  queryParameters Json?
+  executionTimeMs Int
+  timestamp       DateTime @default(now())
+
+  @@index([restaurantId, timestamp])
+  @@map("intelligence_query_audits")
+}
+
+model CustomReport {
+  id            String   @id @default(uuid())
+  tenantId      String
+  restaurantId  String
+  createdById   String
+  name          String
+  description   String?
+  dataSource    String   // 'SALES' | 'ORDERS' | 'MENU' | 'CUSTOMERS' | 'STAFF' | 'BRANCHES' | 'PAYMENTS'
+  configuration Json     // { metrics, dimensions, filters, dateRange, sorting, limit, visualization }
+  visibility    String   @default("RESTAURANT") // 'PRIVATE' | 'RESTAURANT' | 'BRANCH'
+  branchId      String?
+  version       Int      @default(1)
+  isTemplate    Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  restaurant    Restaurant             @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  schedules     ReportSchedule[]
+  executions    ReportExecutionHistory[]
+
+  @@index([restaurantId, createdById])
+  @@index([restaurantId, dataSource])
+  @@map("custom_reports")
+}
+
+model ReportSchedule {
+  id             String   @id @default(uuid())
+  tenantId       String
+  restaurantId   String
+  reportId       String
+  name           String
+  frequency      String   // 'DAILY' | 'WEEKLY' | 'MONTHLY'
+  cronExpression String?
+  timeOfDay      String   @default("09:00")
+  dayOfWeek      Int?
+  dayOfMonth     Int?
+  timezone       String   @default("Asia/Kolkata")
+  recipients     Json     // list of email strings
+  deliveryFormat String   @default("CSV")
+  enabled        Boolean  @default(true)
+  lastRunAt      DateTime?
+  nextRunAt      DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  report         CustomReport           @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  executions     ReportExecutionHistory[]
+
+  @@index([restaurantId, enabled])
+  @@index([reportId])
+  @@map("report_schedules")
+}
+
+model ReportExecutionHistory {
+  id           String   @id @default(uuid())
+  tenantId     String
+  restaurantId String
+  reportId     String
+  scheduleId   String?
+  triggeredBy  String   // 'MANUAL' | 'SCHEDULED'
+  actorUserId  String?
+  status       String   // 'PENDING' | 'SUCCESS' | 'FAILED'
+  durationMs   Int      @default(0)
+  recordsCount Int      @default(0)
+  errorMessage String?
+  createdAt    DateTime @default(now())
+
+  report       CustomReport    @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  schedule     ReportSchedule? @relation(fields: [scheduleId], references: [id], onDelete: SetNull)
+
+  @@index([restaurantId, createdAt])
+  @@index([reportId])
+  @@map("report_execution_histories")
+}
+
+// ==========================================
+// V2.4 ADVANCED FORECASTING FOUNDATION
+// ==========================================
+model Forecast {
+  id           String   @id @default(uuid())
+  tenantId     String
+  restaurantId String
+  branchId     String?
+  forecastType String   // 'SALES' | 'ORDERS' | 'MENU_DEMAND'
+  granularity  String   // 'HOURLY' | 'DAILY' | 'WEEKLY'
+  startDate    DateTime @db.Date
+  endDate      DateTime @db.Date
+  modelVersion String   @default("baseline-v1")
+  status       String   @default("COMPLETED")
+  metadata     Json?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  restaurant   Restaurant      @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  branch       Branch?         @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  points       ForecastPoint[]
+
+  @@index([restaurantId, forecastType, startDate])
+  @@index([branchId, startDate])
+  @@map("forecasts")
+}
+
+model ForecastPoint {
+  id             String   @id @default(uuid())
+  forecastId     String
+  timestamp      DateTime
+  metric         String   // 'GROSS_SALES', 'TOTAL_ORDERS', 'ITEM_UNITS'
+  entityType     String   // 'RESTAURANT', 'BRANCH', 'MENU_ITEM', 'CATEGORY'
+  entityId       String?
+  predictedValue Decimal  @db.Decimal(12, 2)
+  lowerBound     Decimal  @db.Decimal(12, 2)
+  upperBound     Decimal  @db.Decimal(12, 2)
+  confidence     Decimal  @db.Decimal(5, 2) // e.g. 85.50
+
+  forecast       Forecast @relation(fields: [forecastId], references: [id], onDelete: Cascade)
+
+  @@index([forecastId, timestamp])
+  @@index([entityType, entityId])
+  @@map("forecast_points")
+}
+
+model ForecastRun {
+  id               String   @id @default(uuid())
+  tenantId         String
+  restaurantId     String
+  branchId         String?
+  modelVersion     String
+  recordsProcessed Int      @default(0)
+  errorCount       Int      @default(0)
+  executionTimeMs  Int      @default(0)
+  status           String   // 'SUCCESS' | 'FAILED'
+  errorMessage     String?
+  startedAt        DateTime @default(now())
+  completedAt      DateTime @default(now())
+
+  @@index([restaurantId, startedAt])
+  @@map("forecast_runs")
+}
+
+model ForecastAccuracy {
+  id              String   @id @default(uuid())
+  tenantId        String
+  restaurantId    String
+  branchId        String?
+  metric          String
+  evalDate        DateTime @db.Date
+  predictedValue  Decimal  @db.Decimal(12, 2)
+  actualValue     Decimal  @db.Decimal(12, 2)
+  absoluteError   Decimal  @db.Decimal(12, 2)
+  percentageError Decimal  @db.Decimal(6, 2)
+  modelVersion    String
+  createdAt       DateTime @default(now())
+
+  @@index([restaurantId, metric, evalDate])
+  @@map("forecast_accuracies")
 }
