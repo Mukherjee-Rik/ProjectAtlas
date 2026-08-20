@@ -50,7 +50,7 @@ export class TenantsService {
    * every other business on the platform.
    */
   async findAllForUser(userId: string, role: string) {
-    const isPlatformOperator = role === 'PLATFORM_ADMIN' || role === 'ADMIN';
+    const isPlatformOperator = role === 'PLATFORM_ADMIN';
 
     return this.prisma.tenant.findMany({
       ...(isPlatformOperator

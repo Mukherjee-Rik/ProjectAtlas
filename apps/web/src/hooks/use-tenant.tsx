@@ -68,8 +68,8 @@ export function TenantProvider({ children }: { children: ReactNode }) {
 
     setIsLoadingMemberships(true);
     try {
-      // Platform ADMINs can fetch all tenants
-      if (user.role === 'ADMIN') {
+      // Platform operators with PLATFORM_ADMIN role can access all platform tenants
+      if (user.role === 'PLATFORM_ADMIN') {
         const response = await apiClient.get<{ success: boolean; data: Tenant[] }>('/tenants');
         const tenants = response.data ?? [];
 
@@ -96,7 +96,11 @@ export function TenantProvider({ children }: { children: ReactNode }) {
         const userMemberships = response.data ?? [];
         setMemberships(userMemberships);
 
-        if (!currentTenant && userMemberships.length > 0 && userMemberships[0].tenant) {
+        // Ensure currentTenant strictly belongs to the user's valid memberships
+        const isValidCurrentTenant =
+          currentTenant && userMemberships.some((m) => m.tenantId === currentTenant.id);
+
+        if (!isValidCurrentTenant && userMemberships.length > 0 && userMemberships[0].tenant) {
           setCurrentTenant(userMemberships[0].tenant);
         }
       }
