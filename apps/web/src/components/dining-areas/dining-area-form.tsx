@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import type { DiningAreaStatus } from '@/types/dining-area';
+import { ValidatedInput, ValidatedSelect } from '@/components/ui/validated-input';
+import { validateText, validateCode } from '@/lib/validation';
 
 export interface DiningAreaFormData {
   name: string;
@@ -30,81 +32,113 @@ export function DiningAreaForm({
     initialValues?.status ?? 'ACTIVE',
   );
 
+  const [errors, setErrors] = useState<{
+    name?: string;
+    code?: string;
+  }>({});
+
   const [formError, setFormError] = useState('');
+
+  const validateField = (field: string, val: any) => {
+    const nextErrors = { ...errors };
+
+    switch (field) {
+      case 'name': {
+        const res = validateText(val, 'Dining area name', 2, 50);
+        if (!res.isValid) nextErrors.name = res.error;
+        else delete nextErrors.name;
+        break;
+      }
+
+      case 'code': {
+        const res = validateCode(val, 2, 10, 'Dining area code');
+        if (!res.isValid) nextErrors.code = res.error;
+        else delete nextErrors.code;
+        break;
+      }
+    }
+
+    setErrors(nextErrors);
+    return nextErrors;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!name.trim()) {
-      setFormError('Dining area name is required.');
-      return;
-    }
+    const nameRes = validateText(name, 'Dining area name', 2, 50);
+    const codeRes = validateCode(code, 2, 10, 'Dining area code');
 
-    if (!code.trim()) {
-      setFormError('Dining area code is required.');
+    const validationErrors: typeof errors = {};
+    if (!nameRes.isValid) validationErrors.name = nameRes.error;
+    if (!codeRes.isValid) validationErrors.code = codeRes.error;
+
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      setFormError('Please resolve the highlighted errors before saving.');
       return;
     }
 
     setFormError('');
+    setErrors({});
+
     await onSubmit({
       name: name.trim(),
-      code: code.trim(),
+      code: code.trim().toUpperCase(),
       status,
     });
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6" noValidate>
       {formError && (
-        <div className="rounded-lg border border-[#EF4444]/40 bg-[#EF4444]/10 p-4 text-sm text-[#EF4444]">
+        <div className="rounded-xl border border-[#EF4444]/40 bg-[#EF4444]/10 p-4 text-sm text-[#EF4444] animate-in fade-in">
           {formError}
         </div>
       )}
 
       <div className="space-y-4 rounded-xl border border-[#26313C] bg-[#111820] p-6 shadow-xl">
         <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
-              Dining Area Name *
-            </label>
-            <input
-              type="text"
-              required
-              placeholder="e.g. Indoor Dining"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="mt-1.5 w-full rounded-lg border border-[#26313C] bg-[#18212B] px-3.5 py-2 text-sm text-[#F5F7FA] placeholder-[#9AA6B2] outline-none focus:border-[#2AFEB7]"
-            />
-          </div>
+          <ValidatedInput
+            label="Dining Area Name"
+            required
+            maxLength={50}
+            showCount
+            placeholder="e.g. Indoor Dining"
+            value={name}
+            error={errors.name}
+            onChange={(e) => {
+              setName(e.target.value);
+              validateField('name', e.target.value);
+            }}
+            onBlur={(e) => validateField('name', e.target.value)}
+          />
 
-          <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
-              Code *
-            </label>
-            <input
-              type="text"
-              required
-              placeholder="e.g. INDOOR"
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-              className="mt-1.5 w-full rounded-lg border border-[#26313C] bg-[#18212B] px-3.5 py-2 text-sm text-[#F5F7FA] placeholder-[#9AA6B2] outline-none focus:border-[#2AFEB7]"
-            />
-          </div>
+          <ValidatedInput
+            label="Code"
+            required
+            maxLength={10}
+            uppercase
+            showCount
+            placeholder="e.g. INDOOR"
+            value={code}
+            error={errors.code}
+            helperText="2-10 chars, uppercase alphanumeric"
+            onChange={(e) => {
+              setCode(e.target.value);
+              validateField('code', e.target.value);
+            }}
+            onBlur={(e) => validateField('code', e.target.value)}
+          />
         </div>
 
-        <div>
-          <label className="block text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
-            Status
-          </label>
-          <select
-            value={status}
-            onChange={(e) => setStatus(e.target.value as DiningAreaStatus)}
-            className="mt-1.5 w-full rounded-lg border border-[#26313C] bg-[#18212B] px-3.5 py-2 text-sm text-[#F5F7FA] outline-none focus:border-[#2AFEB7]"
-          >
-            <option value="ACTIVE">ACTIVE</option>
-            <option value="INACTIVE">INACTIVE</option>
-          </select>
-        </div>
+        <ValidatedSelect
+          label="Status"
+          value={status}
+          onChange={(e) => setStatus(e.target.value as DiningAreaStatus)}
+        >
+          <option value="ACTIVE">ACTIVE</option>
+          <option value="INACTIVE">INACTIVE</option>
+        </ValidatedSelect>
       </div>
 
       <div className="flex justify-end gap-3">
@@ -119,7 +153,7 @@ export function DiningAreaForm({
         <button
           type="submit"
           disabled={isLoading}
-          className="rounded-lg bg-[#2AFEB7] px-6 py-2.5 text-sm font-semibold text-[#0B0F14] transition-all hover:bg-[#22E5A4] disabled:opacity-50"
+          className="rounded-lg bg-[#2AFEB7] px-6 py-2.5 text-sm font-semibold text-[#0B0F14] transition-all hover:bg-[#22E5A4] disabled:opacity-50 font-bold"
         >
           {isLoading
             ? 'Saving...'

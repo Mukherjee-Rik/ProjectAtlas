@@ -289,7 +289,7 @@ export class TablesService {
     });
   }
 
-  async getQrCode(id: string, branchId: string, baseUrl = 'http://localhost:3001') {
+  async getQrCode(id: string, branchId: string, baseUrl = 'http://localhost:4001') {
     const table = await this.prisma.table.findFirst({
       where: {
         id,

@@ -1,0 +1,68 @@
+/**
+ * Atlas V2.1 Data Intelligence Layer
+ * Single Source of Truth (SSOT) Constants & Canonical Definitions
+ */
+
+export const OPERATIONAL_EVENT_TYPES = {
+  // Order Lifecycle
+  ORDER_CREATED: 'ORDER_CREATED',
+  ORDER_CONFIRMED: 'ORDER_CONFIRMED',
+  ORDER_PREPARING: 'ORDER_PREPARING',
+  ORDER_READY: 'ORDER_READY',
+  ORDER_SERVED: 'ORDER_SERVED',
+  ORDER_COMPLETED: 'ORDER_COMPLETED',
+  ORDER_CANCELLED: 'ORDER_CANCELLED',
+
+  // Payment Lifecycle
+  PAYMENT_COMPLETED: 'PAYMENT_COMPLETED',
+  PAYMENT_FAILED: 'PAYMENT_FAILED',
+  REFUND_CREATED: 'REFUND_CREATED',
+
+  // Customer Lifecycle
+  CUSTOMER_CREATED: 'CUSTOMER_CREATED',
+  CUSTOMER_UPDATED: 'CUSTOMER_UPDATED',
+  CUSTOMER_SESSION_STARTED: 'CUSTOMER_SESSION_STARTED',
+  CUSTOMER_SESSION_ENDED: 'CUSTOMER_SESSION_ENDED',
+
+  // Menu Lifecycle
+  MENU_ITEM_CREATED: 'MENU_ITEM_CREATED',
+  MENU_ITEM_UPDATED: 'MENU_ITEM_UPDATED',
+  MENU_ITEM_DEACTIVATED: 'MENU_ITEM_DEACTIVATED',
+
+  // Inventory Lifecycle
+  STOCK_ADJUSTED: 'STOCK_ADJUSTED',
+  STOCK_DEDUCTED: 'STOCK_DEDUCTED',
+  STOCK_LOW: 'STOCK_LOW',
+
+  // Staff & Operational
+  STAFF_LOGIN: 'STAFF_LOGIN',
+  STAFF_LOGOUT: 'STAFF_LOGOUT',
+  STAFF_ORDER_ACTION: 'STAFF_ORDER_ACTION',
+} as const;
+
+export type OperationalEventType =
+  typeof OPERATIONAL_EVENT_TYPES[keyof typeof OPERATIONAL_EVENT_TYPES];
+
+export const CUSTOMER_SEGMENTS = {
+  NEW: 'NEW',               // 1st order
+  RETURNING: 'RETURNING',   // 2-4 orders
+  FREQUENT: 'FREQUENT',     // 5+ orders
+  HIGH_VALUE: 'HIGH_VALUE', // Top 10% spend
+  AT_RISK: 'AT_RISK',       // > 45 days since last order
+  INACTIVE: 'INACTIVE',     // > 90 days since last order
+} as const;
+
+export type CustomerSegment =
+  typeof CUSTOMER_SEGMENTS[keyof typeof CUSTOMER_SEGMENTS];
+
+export const CANONICAL_TIME_INTERVALS = {
+  HOURLY: 'HOURLY',
+  DAILY: 'DAILY',
+  WEEKLY: 'WEEKLY',
+  MONTHLY: 'MONTHLY',
+  QUARTERLY: 'QUARTERLY',
+  YEARLY: 'YEARLY',
+} as const;
+
+export type CanonicalTimeInterval =
+  typeof CANONICAL_TIME_INTERVALS[keyof typeof CANONICAL_TIME_INTERVALS];

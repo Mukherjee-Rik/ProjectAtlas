@@ -241,6 +241,9 @@ export type BranchWhereInput = {
   restaurant?: Prisma.XOR<Prisma.RestaurantScalarRelationFilter, Prisma.RestaurantWhereInput>
   diningAreas?: Prisma.DiningAreaListRelationFilter
   orders?: Prisma.OrderListRelationFilter
+  dailySalesAggregates?: Prisma.DailySalesAggregateListRelationFilter
+  menuItemDailyMetrics?: Prisma.MenuItemDailyMetricsListRelationFilter
+  forecasts?: Prisma.ForecastListRelationFilter
 }
 
 export type BranchOrderByWithRelationInput = {
@@ -259,6 +262,9 @@ export type BranchOrderByWithRelationInput = {
   restaurant?: Prisma.RestaurantOrderByWithRelationInput
   diningAreas?: Prisma.DiningAreaOrderByRelationAggregateInput
   orders?: Prisma.OrderOrderByRelationAggregateInput
+  dailySalesAggregates?: Prisma.DailySalesAggregateOrderByRelationAggregateInput
+  menuItemDailyMetrics?: Prisma.MenuItemDailyMetricsOrderByRelationAggregateInput
+  forecasts?: Prisma.ForecastOrderByRelationAggregateInput
 }
 
 export type BranchWhereUniqueInput = Prisma.AtLeast<{
@@ -281,6 +287,9 @@ export type BranchWhereUniqueInput = Prisma.AtLeast<{
   restaurant?: Prisma.XOR<Prisma.RestaurantScalarRelationFilter, Prisma.RestaurantWhereInput>
   diningAreas?: Prisma.DiningAreaListRelationFilter
   orders?: Prisma.OrderListRelationFilter
+  dailySalesAggregates?: Prisma.DailySalesAggregateListRelationFilter
+  menuItemDailyMetrics?: Prisma.MenuItemDailyMetricsListRelationFilter
+  forecasts?: Prisma.ForecastListRelationFilter
 }, "id" | "restaurantId_code">
 
 export type BranchOrderByWithAggregationInput = {
@@ -334,6 +343,9 @@ export type BranchCreateInput = {
   restaurant: Prisma.RestaurantCreateNestedOneWithoutBranchesInput
   diningAreas?: Prisma.DiningAreaCreateNestedManyWithoutBranchInput
   orders?: Prisma.OrderCreateNestedManyWithoutBranchInput
+  dailySalesAggregates?: Prisma.DailySalesAggregateCreateNestedManyWithoutBranchInput
+  menuItemDailyMetrics?: Prisma.MenuItemDailyMetricsCreateNestedManyWithoutBranchInput
+  forecasts?: Prisma.ForecastCreateNestedManyWithoutBranchInput
 }
 
 export type BranchUncheckedCreateInput = {
@@ -351,6 +363,9 @@ export type BranchUncheckedCreateInput = {
   updatedAt?: Date | string
   diningAreas?: Prisma.DiningAreaUncheckedCreateNestedManyWithoutBranchInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutBranchInput
+  dailySalesAggregates?: Prisma.DailySalesAggregateUncheckedCreateNestedManyWithoutBranchInput
+  menuItemDailyMetrics?: Prisma.MenuItemDailyMetricsUncheckedCreateNestedManyWithoutBranchInput
+  forecasts?: Prisma.ForecastUncheckedCreateNestedManyWithoutBranchInput
 }
 
 export type BranchUpdateInput = {
@@ -368,6 +383,9 @@ export type BranchUpdateInput = {
   restaurant?: Prisma.RestaurantUpdateOneRequiredWithoutBranchesNestedInput
   diningAreas?: Prisma.DiningAreaUpdateManyWithoutBranchNestedInput
   orders?: Prisma.OrderUpdateManyWithoutBranchNestedInput
+  dailySalesAggregates?: Prisma.DailySalesAggregateUpdateManyWithoutBranchNestedInput
+  menuItemDailyMetrics?: Prisma.MenuItemDailyMetricsUpdateManyWithoutBranchNestedInput
+  forecasts?: Prisma.ForecastUpdateManyWithoutBranchNestedInput
 }
 
 export type BranchUncheckedUpdateInput = {
@@ -385,6 +403,9 @@ export type BranchUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   diningAreas?: Prisma.DiningAreaUncheckedUpdateManyWithoutBranchNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutBranchNestedInput
+  dailySalesAggregates?: Prisma.DailySalesAggregateUncheckedUpdateManyWithoutBranchNestedInput
+  menuItemDailyMetrics?: Prisma.MenuItemDailyMetricsUncheckedUpdateManyWithoutBranchNestedInput
+  forecasts?: Prisma.ForecastUncheckedUpdateManyWithoutBranchNestedInput
 }
 
 export type BranchCreateManyInput = {
@@ -496,6 +517,11 @@ export type BranchScalarRelationFilter = {
   isNot?: Prisma.BranchWhereInput
 }
 
+export type BranchNullableScalarRelationFilter = {
+  is?: Prisma.BranchWhereInput | null
+  isNot?: Prisma.BranchWhereInput | null
+}
+
 export type BranchCreateNestedManyWithoutRestaurantInput = {
   create?: Prisma.XOR<Prisma.BranchCreateWithoutRestaurantInput, Prisma.BranchUncheckedCreateWithoutRestaurantInput> | Prisma.BranchCreateWithoutRestaurantInput[] | Prisma.BranchUncheckedCreateWithoutRestaurantInput[]
   connectOrCreate?: Prisma.BranchCreateOrConnectWithoutRestaurantInput | Prisma.BranchCreateOrConnectWithoutRestaurantInput[]
@@ -570,6 +596,50 @@ export type BranchUpdateOneRequiredWithoutOrdersNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.BranchUpdateToOneWithWhereWithoutOrdersInput, Prisma.BranchUpdateWithoutOrdersInput>, Prisma.BranchUncheckedUpdateWithoutOrdersInput>
 }
 
+export type BranchCreateNestedOneWithoutDailySalesAggregatesInput = {
+  create?: Prisma.XOR<Prisma.BranchCreateWithoutDailySalesAggregatesInput, Prisma.BranchUncheckedCreateWithoutDailySalesAggregatesInput>
+  connectOrCreate?: Prisma.BranchCreateOrConnectWithoutDailySalesAggregatesInput
+  connect?: Prisma.BranchWhereUniqueInput
+}
+
+export type BranchUpdateOneRequiredWithoutDailySalesAggregatesNestedInput = {
+  create?: Prisma.XOR<Prisma.BranchCreateWithoutDailySalesAggregatesInput, Prisma.BranchUncheckedCreateWithoutDailySalesAggregatesInput>
+  connectOrCreate?: Prisma.BranchCreateOrConnectWithoutDailySalesAggregatesInput
+  upsert?: Prisma.BranchUpsertWithoutDailySalesAggregatesInput
+  connect?: Prisma.BranchWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.BranchUpdateToOneWithWhereWithoutDailySalesAggregatesInput, Prisma.BranchUpdateWithoutDailySalesAggregatesInput>, Prisma.BranchUncheckedUpdateWithoutDailySalesAggregatesInput>
+}
+
+export type BranchCreateNestedOneWithoutMenuItemDailyMetricsInput = {
+  create?: Prisma.XOR<Prisma.BranchCreateWithoutMenuItemDailyMetricsInput, Prisma.BranchUncheckedCreateWithoutMenuItemDailyMetricsInput>
+  connectOrCreate?: Prisma.BranchCreateOrConnectWithoutMenuItemDailyMetricsInput
+  connect?: Prisma.BranchWhereUniqueInput
+}
+
+export type BranchUpdateOneRequiredWithoutMenuItemDailyMetricsNestedInput = {
+  create?: Prisma.XOR<Prisma.BranchCreateWithoutMenuItemDailyMetricsInput, Prisma.BranchUncheckedCreateWithoutMenuItemDailyMetricsInput>
+  connectOrCreate?: Prisma.BranchCreateOrConnectWithoutMenuItemDailyMetricsInput
+  upsert?: Prisma.BranchUpsertWithoutMenuItemDailyMetricsInput
+  connect?: Prisma.BranchWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.BranchUpdateToOneWithWhereWithoutMenuItemDailyMetricsInput, Prisma.BranchUpdateWithoutMenuItemDailyMetricsInput>, Prisma.BranchUncheckedUpdateWithoutMenuItemDailyMetricsInput>
+}
+
+export type BranchCreateNestedOneWithoutForecastsInput = {
+  create?: Prisma.XOR<Prisma.BranchCreateWithoutForecastsInput, Prisma.BranchUncheckedCreateWithoutForecastsInput>
+  connectOrCreate?: Prisma.BranchCreateOrConnectWithoutForecastsInput
+  connect?: Prisma.BranchWhereUniqueInput
+}
+
+export type BranchUpdateOneWithoutForecastsNestedInput = {
+  create?: Prisma.XOR<Prisma.BranchCreateWithoutForecastsInput, Prisma.BranchUncheckedCreateWithoutForecastsInput>
+  connectOrCreate?: Prisma.BranchCreateOrConnectWithoutForecastsInput
+  upsert?: Prisma.BranchUpsertWithoutForecastsInput
+  disconnect?: Prisma.BranchWhereInput | boolean
+  delete?: Prisma.BranchWhereInput | boolean
+  connect?: Prisma.BranchWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.BranchUpdateToOneWithWhereWithoutForecastsInput, Prisma.BranchUpdateWithoutForecastsInput>, Prisma.BranchUncheckedUpdateWithoutForecastsInput>
+}
+
 export type BranchCreateWithoutRestaurantInput = {
   id?: string
   name: string
@@ -584,6 +654,9 @@ export type BranchCreateWithoutRestaurantInput = {
   updatedAt?: Date | string
   diningAreas?: Prisma.DiningAreaCreateNestedManyWithoutBranchInput
   orders?: Prisma.OrderCreateNestedManyWithoutBranchInput
+  dailySalesAggregates?: Prisma.DailySalesAggregateCreateNestedManyWithoutBranchInput
+  menuItemDailyMetrics?: Prisma.MenuItemDailyMetricsCreateNestedManyWithoutBranchInput
+  forecasts?: Prisma.ForecastCreateNestedManyWithoutBranchInput
 }
 
 export type BranchUncheckedCreateWithoutRestaurantInput = {
@@ -600,6 +673,9 @@ export type BranchUncheckedCreateWithoutRestaurantInput = {
   updatedAt?: Date | string
   diningAreas?: Prisma.DiningAreaUncheckedCreateNestedManyWithoutBranchInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutBranchInput
+  dailySalesAggregates?: Prisma.DailySalesAggregateUncheckedCreateNestedManyWithoutBranchInput
+  menuItemDailyMetrics?: Prisma.MenuItemDailyMetricsUncheckedCreateNestedManyWithoutBranchInput
+  forecasts?: Prisma.ForecastUncheckedCreateNestedManyWithoutBranchInput
 }
 
 export type BranchCreateOrConnectWithoutRestaurantInput = {
@@ -660,6 +736,9 @@ export type BranchCreateWithoutDiningAreasInput = {
   updatedAt?: Date | string
   restaurant: Prisma.RestaurantCreateNestedOneWithoutBranchesInput
   orders?: Prisma.OrderCreateNestedManyWithoutBranchInput
+  dailySalesAggregates?: Prisma.DailySalesAggregateCreateNestedManyWithoutBranchInput
+  menuItemDailyMetrics?: Prisma.MenuItemDailyMetricsCreateNestedManyWithoutBranchInput
+  forecasts?: Prisma.ForecastCreateNestedManyWithoutBranchInput
 }
 
 export type BranchUncheckedCreateWithoutDiningAreasInput = {
@@ -676,6 +755,9 @@ export type BranchUncheckedCreateWithoutDiningAreasInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutBranchInput
+  dailySalesAggregates?: Prisma.DailySalesAggregateUncheckedCreateNestedManyWithoutBranchInput
+  menuItemDailyMetrics?: Prisma.MenuItemDailyMetricsUncheckedCreateNestedManyWithoutBranchInput
+  forecasts?: Prisma.ForecastUncheckedCreateNestedManyWithoutBranchInput
 }
 
 export type BranchCreateOrConnectWithoutDiningAreasInput = {
@@ -708,6 +790,9 @@ export type BranchUpdateWithoutDiningAreasInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   restaurant?: Prisma.RestaurantUpdateOneRequiredWithoutBranchesNestedInput
   orders?: Prisma.OrderUpdateManyWithoutBranchNestedInput
+  dailySalesAggregates?: Prisma.DailySalesAggregateUpdateManyWithoutBranchNestedInput
+  menuItemDailyMetrics?: Prisma.MenuItemDailyMetricsUpdateManyWithoutBranchNestedInput
+  forecasts?: Prisma.ForecastUpdateManyWithoutBranchNestedInput
 }
 
 export type BranchUncheckedUpdateWithoutDiningAreasInput = {
@@ -724,6 +809,9 @@ export type BranchUncheckedUpdateWithoutDiningAreasInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   orders?: Prisma.OrderUncheckedUpdateManyWithoutBranchNestedInput
+  dailySalesAggregates?: Prisma.DailySalesAggregateUncheckedUpdateManyWithoutBranchNestedInput
+  menuItemDailyMetrics?: Prisma.MenuItemDailyMetricsUncheckedUpdateManyWithoutBranchNestedInput
+  forecasts?: Prisma.ForecastUncheckedUpdateManyWithoutBranchNestedInput
 }
 
 export type BranchCreateWithoutOrdersInput = {
@@ -740,6 +828,9 @@ export type BranchCreateWithoutOrdersInput = {
   updatedAt?: Date | string
   restaurant: Prisma.RestaurantCreateNestedOneWithoutBranchesInput
   diningAreas?: Prisma.DiningAreaCreateNestedManyWithoutBranchInput
+  dailySalesAggregates?: Prisma.DailySalesAggregateCreateNestedManyWithoutBranchInput
+  menuItemDailyMetrics?: Prisma.MenuItemDailyMetricsCreateNestedManyWithoutBranchInput
+  forecasts?: Prisma.ForecastCreateNestedManyWithoutBranchInput
 }
 
 export type BranchUncheckedCreateWithoutOrdersInput = {
@@ -756,6 +847,9 @@ export type BranchUncheckedCreateWithoutOrdersInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   diningAreas?: Prisma.DiningAreaUncheckedCreateNestedManyWithoutBranchInput
+  dailySalesAggregates?: Prisma.DailySalesAggregateUncheckedCreateNestedManyWithoutBranchInput
+  menuItemDailyMetrics?: Prisma.MenuItemDailyMetricsUncheckedCreateNestedManyWithoutBranchInput
+  forecasts?: Prisma.ForecastUncheckedCreateNestedManyWithoutBranchInput
 }
 
 export type BranchCreateOrConnectWithoutOrdersInput = {
@@ -788,6 +882,9 @@ export type BranchUpdateWithoutOrdersInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   restaurant?: Prisma.RestaurantUpdateOneRequiredWithoutBranchesNestedInput
   diningAreas?: Prisma.DiningAreaUpdateManyWithoutBranchNestedInput
+  dailySalesAggregates?: Prisma.DailySalesAggregateUpdateManyWithoutBranchNestedInput
+  menuItemDailyMetrics?: Prisma.MenuItemDailyMetricsUpdateManyWithoutBranchNestedInput
+  forecasts?: Prisma.ForecastUpdateManyWithoutBranchNestedInput
 }
 
 export type BranchUncheckedUpdateWithoutOrdersInput = {
@@ -804,6 +901,285 @@ export type BranchUncheckedUpdateWithoutOrdersInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   diningAreas?: Prisma.DiningAreaUncheckedUpdateManyWithoutBranchNestedInput
+  dailySalesAggregates?: Prisma.DailySalesAggregateUncheckedUpdateManyWithoutBranchNestedInput
+  menuItemDailyMetrics?: Prisma.MenuItemDailyMetricsUncheckedUpdateManyWithoutBranchNestedInput
+  forecasts?: Prisma.ForecastUncheckedUpdateManyWithoutBranchNestedInput
+}
+
+export type BranchCreateWithoutDailySalesAggregatesInput = {
+  id?: string
+  name: string
+  code: string
+  address?: string | null
+  city?: string | null
+  state?: string | null
+  postalCode?: string | null
+  phone?: string | null
+  status?: $Enums.BranchStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  restaurant: Prisma.RestaurantCreateNestedOneWithoutBranchesInput
+  diningAreas?: Prisma.DiningAreaCreateNestedManyWithoutBranchInput
+  orders?: Prisma.OrderCreateNestedManyWithoutBranchInput
+  menuItemDailyMetrics?: Prisma.MenuItemDailyMetricsCreateNestedManyWithoutBranchInput
+  forecasts?: Prisma.ForecastCreateNestedManyWithoutBranchInput
+}
+
+export type BranchUncheckedCreateWithoutDailySalesAggregatesInput = {
+  id?: string
+  restaurantId: string
+  name: string
+  code: string
+  address?: string | null
+  city?: string | null
+  state?: string | null
+  postalCode?: string | null
+  phone?: string | null
+  status?: $Enums.BranchStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  diningAreas?: Prisma.DiningAreaUncheckedCreateNestedManyWithoutBranchInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutBranchInput
+  menuItemDailyMetrics?: Prisma.MenuItemDailyMetricsUncheckedCreateNestedManyWithoutBranchInput
+  forecasts?: Prisma.ForecastUncheckedCreateNestedManyWithoutBranchInput
+}
+
+export type BranchCreateOrConnectWithoutDailySalesAggregatesInput = {
+  where: Prisma.BranchWhereUniqueInput
+  create: Prisma.XOR<Prisma.BranchCreateWithoutDailySalesAggregatesInput, Prisma.BranchUncheckedCreateWithoutDailySalesAggregatesInput>
+}
+
+export type BranchUpsertWithoutDailySalesAggregatesInput = {
+  update: Prisma.XOR<Prisma.BranchUpdateWithoutDailySalesAggregatesInput, Prisma.BranchUncheckedUpdateWithoutDailySalesAggregatesInput>
+  create: Prisma.XOR<Prisma.BranchCreateWithoutDailySalesAggregatesInput, Prisma.BranchUncheckedCreateWithoutDailySalesAggregatesInput>
+  where?: Prisma.BranchWhereInput
+}
+
+export type BranchUpdateToOneWithWhereWithoutDailySalesAggregatesInput = {
+  where?: Prisma.BranchWhereInput
+  data: Prisma.XOR<Prisma.BranchUpdateWithoutDailySalesAggregatesInput, Prisma.BranchUncheckedUpdateWithoutDailySalesAggregatesInput>
+}
+
+export type BranchUpdateWithoutDailySalesAggregatesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  postalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumBranchStatusFieldUpdateOperationsInput | $Enums.BranchStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  restaurant?: Prisma.RestaurantUpdateOneRequiredWithoutBranchesNestedInput
+  diningAreas?: Prisma.DiningAreaUpdateManyWithoutBranchNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutBranchNestedInput
+  menuItemDailyMetrics?: Prisma.MenuItemDailyMetricsUpdateManyWithoutBranchNestedInput
+  forecasts?: Prisma.ForecastUpdateManyWithoutBranchNestedInput
+}
+
+export type BranchUncheckedUpdateWithoutDailySalesAggregatesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  restaurantId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  postalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumBranchStatusFieldUpdateOperationsInput | $Enums.BranchStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  diningAreas?: Prisma.DiningAreaUncheckedUpdateManyWithoutBranchNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutBranchNestedInput
+  menuItemDailyMetrics?: Prisma.MenuItemDailyMetricsUncheckedUpdateManyWithoutBranchNestedInput
+  forecasts?: Prisma.ForecastUncheckedUpdateManyWithoutBranchNestedInput
+}
+
+export type BranchCreateWithoutMenuItemDailyMetricsInput = {
+  id?: string
+  name: string
+  code: string
+  address?: string | null
+  city?: string | null
+  state?: string | null
+  postalCode?: string | null
+  phone?: string | null
+  status?: $Enums.BranchStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  restaurant: Prisma.RestaurantCreateNestedOneWithoutBranchesInput
+  diningAreas?: Prisma.DiningAreaCreateNestedManyWithoutBranchInput
+  orders?: Prisma.OrderCreateNestedManyWithoutBranchInput
+  dailySalesAggregates?: Prisma.DailySalesAggregateCreateNestedManyWithoutBranchInput
+  forecasts?: Prisma.ForecastCreateNestedManyWithoutBranchInput
+}
+
+export type BranchUncheckedCreateWithoutMenuItemDailyMetricsInput = {
+  id?: string
+  restaurantId: string
+  name: string
+  code: string
+  address?: string | null
+  city?: string | null
+  state?: string | null
+  postalCode?: string | null
+  phone?: string | null
+  status?: $Enums.BranchStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  diningAreas?: Prisma.DiningAreaUncheckedCreateNestedManyWithoutBranchInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutBranchInput
+  dailySalesAggregates?: Prisma.DailySalesAggregateUncheckedCreateNestedManyWithoutBranchInput
+  forecasts?: Prisma.ForecastUncheckedCreateNestedManyWithoutBranchInput
+}
+
+export type BranchCreateOrConnectWithoutMenuItemDailyMetricsInput = {
+  where: Prisma.BranchWhereUniqueInput
+  create: Prisma.XOR<Prisma.BranchCreateWithoutMenuItemDailyMetricsInput, Prisma.BranchUncheckedCreateWithoutMenuItemDailyMetricsInput>
+}
+
+export type BranchUpsertWithoutMenuItemDailyMetricsInput = {
+  update: Prisma.XOR<Prisma.BranchUpdateWithoutMenuItemDailyMetricsInput, Prisma.BranchUncheckedUpdateWithoutMenuItemDailyMetricsInput>
+  create: Prisma.XOR<Prisma.BranchCreateWithoutMenuItemDailyMetricsInput, Prisma.BranchUncheckedCreateWithoutMenuItemDailyMetricsInput>
+  where?: Prisma.BranchWhereInput
+}
+
+export type BranchUpdateToOneWithWhereWithoutMenuItemDailyMetricsInput = {
+  where?: Prisma.BranchWhereInput
+  data: Prisma.XOR<Prisma.BranchUpdateWithoutMenuItemDailyMetricsInput, Prisma.BranchUncheckedUpdateWithoutMenuItemDailyMetricsInput>
+}
+
+export type BranchUpdateWithoutMenuItemDailyMetricsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  postalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumBranchStatusFieldUpdateOperationsInput | $Enums.BranchStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  restaurant?: Prisma.RestaurantUpdateOneRequiredWithoutBranchesNestedInput
+  diningAreas?: Prisma.DiningAreaUpdateManyWithoutBranchNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutBranchNestedInput
+  dailySalesAggregates?: Prisma.DailySalesAggregateUpdateManyWithoutBranchNestedInput
+  forecasts?: Prisma.ForecastUpdateManyWithoutBranchNestedInput
+}
+
+export type BranchUncheckedUpdateWithoutMenuItemDailyMetricsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  restaurantId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  postalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumBranchStatusFieldUpdateOperationsInput | $Enums.BranchStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  diningAreas?: Prisma.DiningAreaUncheckedUpdateManyWithoutBranchNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutBranchNestedInput
+  dailySalesAggregates?: Prisma.DailySalesAggregateUncheckedUpdateManyWithoutBranchNestedInput
+  forecasts?: Prisma.ForecastUncheckedUpdateManyWithoutBranchNestedInput
+}
+
+export type BranchCreateWithoutForecastsInput = {
+  id?: string
+  name: string
+  code: string
+  address?: string | null
+  city?: string | null
+  state?: string | null
+  postalCode?: string | null
+  phone?: string | null
+  status?: $Enums.BranchStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  restaurant: Prisma.RestaurantCreateNestedOneWithoutBranchesInput
+  diningAreas?: Prisma.DiningAreaCreateNestedManyWithoutBranchInput
+  orders?: Prisma.OrderCreateNestedManyWithoutBranchInput
+  dailySalesAggregates?: Prisma.DailySalesAggregateCreateNestedManyWithoutBranchInput
+  menuItemDailyMetrics?: Prisma.MenuItemDailyMetricsCreateNestedManyWithoutBranchInput
+}
+
+export type BranchUncheckedCreateWithoutForecastsInput = {
+  id?: string
+  restaurantId: string
+  name: string
+  code: string
+  address?: string | null
+  city?: string | null
+  state?: string | null
+  postalCode?: string | null
+  phone?: string | null
+  status?: $Enums.BranchStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  diningAreas?: Prisma.DiningAreaUncheckedCreateNestedManyWithoutBranchInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutBranchInput
+  dailySalesAggregates?: Prisma.DailySalesAggregateUncheckedCreateNestedManyWithoutBranchInput
+  menuItemDailyMetrics?: Prisma.MenuItemDailyMetricsUncheckedCreateNestedManyWithoutBranchInput
+}
+
+export type BranchCreateOrConnectWithoutForecastsInput = {
+  where: Prisma.BranchWhereUniqueInput
+  create: Prisma.XOR<Prisma.BranchCreateWithoutForecastsInput, Prisma.BranchUncheckedCreateWithoutForecastsInput>
+}
+
+export type BranchUpsertWithoutForecastsInput = {
+  update: Prisma.XOR<Prisma.BranchUpdateWithoutForecastsInput, Prisma.BranchUncheckedUpdateWithoutForecastsInput>
+  create: Prisma.XOR<Prisma.BranchCreateWithoutForecastsInput, Prisma.BranchUncheckedCreateWithoutForecastsInput>
+  where?: Prisma.BranchWhereInput
+}
+
+export type BranchUpdateToOneWithWhereWithoutForecastsInput = {
+  where?: Prisma.BranchWhereInput
+  data: Prisma.XOR<Prisma.BranchUpdateWithoutForecastsInput, Prisma.BranchUncheckedUpdateWithoutForecastsInput>
+}
+
+export type BranchUpdateWithoutForecastsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  postalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumBranchStatusFieldUpdateOperationsInput | $Enums.BranchStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  restaurant?: Prisma.RestaurantUpdateOneRequiredWithoutBranchesNestedInput
+  diningAreas?: Prisma.DiningAreaUpdateManyWithoutBranchNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutBranchNestedInput
+  dailySalesAggregates?: Prisma.DailySalesAggregateUpdateManyWithoutBranchNestedInput
+  menuItemDailyMetrics?: Prisma.MenuItemDailyMetricsUpdateManyWithoutBranchNestedInput
+}
+
+export type BranchUncheckedUpdateWithoutForecastsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  restaurantId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  postalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumBranchStatusFieldUpdateOperationsInput | $Enums.BranchStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  diningAreas?: Prisma.DiningAreaUncheckedUpdateManyWithoutBranchNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutBranchNestedInput
+  dailySalesAggregates?: Prisma.DailySalesAggregateUncheckedUpdateManyWithoutBranchNestedInput
+  menuItemDailyMetrics?: Prisma.MenuItemDailyMetricsUncheckedUpdateManyWithoutBranchNestedInput
 }
 
 export type BranchCreateManyRestaurantInput = {
@@ -834,6 +1210,9 @@ export type BranchUpdateWithoutRestaurantInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   diningAreas?: Prisma.DiningAreaUpdateManyWithoutBranchNestedInput
   orders?: Prisma.OrderUpdateManyWithoutBranchNestedInput
+  dailySalesAggregates?: Prisma.DailySalesAggregateUpdateManyWithoutBranchNestedInput
+  menuItemDailyMetrics?: Prisma.MenuItemDailyMetricsUpdateManyWithoutBranchNestedInput
+  forecasts?: Prisma.ForecastUpdateManyWithoutBranchNestedInput
 }
 
 export type BranchUncheckedUpdateWithoutRestaurantInput = {
@@ -850,6 +1229,9 @@ export type BranchUncheckedUpdateWithoutRestaurantInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   diningAreas?: Prisma.DiningAreaUncheckedUpdateManyWithoutBranchNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutBranchNestedInput
+  dailySalesAggregates?: Prisma.DailySalesAggregateUncheckedUpdateManyWithoutBranchNestedInput
+  menuItemDailyMetrics?: Prisma.MenuItemDailyMetricsUncheckedUpdateManyWithoutBranchNestedInput
+  forecasts?: Prisma.ForecastUncheckedUpdateManyWithoutBranchNestedInput
 }
 
 export type BranchUncheckedUpdateManyWithoutRestaurantInput = {
@@ -874,11 +1256,17 @@ export type BranchUncheckedUpdateManyWithoutRestaurantInput = {
 export type BranchCountOutputType = {
   diningAreas: number
   orders: number
+  dailySalesAggregates: number
+  menuItemDailyMetrics: number
+  forecasts: number
 }
 
 export type BranchCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   diningAreas?: boolean | BranchCountOutputTypeCountDiningAreasArgs
   orders?: boolean | BranchCountOutputTypeCountOrdersArgs
+  dailySalesAggregates?: boolean | BranchCountOutputTypeCountDailySalesAggregatesArgs
+  menuItemDailyMetrics?: boolean | BranchCountOutputTypeCountMenuItemDailyMetricsArgs
+  forecasts?: boolean | BranchCountOutputTypeCountForecastsArgs
 }
 
 /**
@@ -905,6 +1293,27 @@ export type BranchCountOutputTypeCountOrdersArgs<ExtArgs extends runtime.Types.E
   where?: Prisma.OrderWhereInput
 }
 
+/**
+ * BranchCountOutputType without action
+ */
+export type BranchCountOutputTypeCountDailySalesAggregatesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DailySalesAggregateWhereInput
+}
+
+/**
+ * BranchCountOutputType without action
+ */
+export type BranchCountOutputTypeCountMenuItemDailyMetricsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.MenuItemDailyMetricsWhereInput
+}
+
+/**
+ * BranchCountOutputType without action
+ */
+export type BranchCountOutputTypeCountForecastsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ForecastWhereInput
+}
+
 
 export type BranchSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -922,6 +1331,9 @@ export type BranchSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   restaurant?: boolean | Prisma.RestaurantDefaultArgs<ExtArgs>
   diningAreas?: boolean | Prisma.Branch$diningAreasArgs<ExtArgs>
   orders?: boolean | Prisma.Branch$ordersArgs<ExtArgs>
+  dailySalesAggregates?: boolean | Prisma.Branch$dailySalesAggregatesArgs<ExtArgs>
+  menuItemDailyMetrics?: boolean | Prisma.Branch$menuItemDailyMetricsArgs<ExtArgs>
+  forecasts?: boolean | Prisma.Branch$forecastsArgs<ExtArgs>
   _count?: boolean | Prisma.BranchCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["branch"]>
 
@@ -977,6 +1389,9 @@ export type BranchInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   restaurant?: boolean | Prisma.RestaurantDefaultArgs<ExtArgs>
   diningAreas?: boolean | Prisma.Branch$diningAreasArgs<ExtArgs>
   orders?: boolean | Prisma.Branch$ordersArgs<ExtArgs>
+  dailySalesAggregates?: boolean | Prisma.Branch$dailySalesAggregatesArgs<ExtArgs>
+  menuItemDailyMetrics?: boolean | Prisma.Branch$menuItemDailyMetricsArgs<ExtArgs>
+  forecasts?: boolean | Prisma.Branch$forecastsArgs<ExtArgs>
   _count?: boolean | Prisma.BranchCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type BranchIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -992,6 +1407,9 @@ export type $BranchPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     restaurant: Prisma.$RestaurantPayload<ExtArgs>
     diningAreas: Prisma.$DiningAreaPayload<ExtArgs>[]
     orders: Prisma.$OrderPayload<ExtArgs>[]
+    dailySalesAggregates: Prisma.$DailySalesAggregatePayload<ExtArgs>[]
+    menuItemDailyMetrics: Prisma.$MenuItemDailyMetricsPayload<ExtArgs>[]
+    forecasts: Prisma.$ForecastPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1403,6 +1821,9 @@ export interface Prisma__BranchClient<T, Null = never, ExtArgs extends runtime.T
   restaurant<T extends Prisma.RestaurantDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RestaurantDefaultArgs<ExtArgs>>): Prisma.Prisma__RestaurantClient<runtime.Types.Result.GetResult<Prisma.$RestaurantPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   diningAreas<T extends Prisma.Branch$diningAreasArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Branch$diningAreasArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DiningAreaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   orders<T extends Prisma.Branch$ordersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Branch$ordersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  dailySalesAggregates<T extends Prisma.Branch$dailySalesAggregatesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Branch$dailySalesAggregatesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DailySalesAggregatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  menuItemDailyMetrics<T extends Prisma.Branch$menuItemDailyMetricsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Branch$menuItemDailyMetricsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MenuItemDailyMetricsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  forecasts<T extends Prisma.Branch$forecastsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Branch$forecastsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ForecastPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1899,6 +2320,78 @@ export type Branch$ordersArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   distinct?: Prisma.OrderScalarFieldEnum | Prisma.OrderScalarFieldEnum[]
+}
+
+/**
+ * Branch.dailySalesAggregates
+ */
+export type Branch$dailySalesAggregatesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DailySalesAggregate
+   */
+  select?: Prisma.DailySalesAggregateSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DailySalesAggregate
+   */
+  omit?: Prisma.DailySalesAggregateOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DailySalesAggregateInclude<ExtArgs> | null
+  where?: Prisma.DailySalesAggregateWhereInput
+  orderBy?: Prisma.DailySalesAggregateOrderByWithRelationInput | Prisma.DailySalesAggregateOrderByWithRelationInput[]
+  cursor?: Prisma.DailySalesAggregateWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DailySalesAggregateScalarFieldEnum | Prisma.DailySalesAggregateScalarFieldEnum[]
+}
+
+/**
+ * Branch.menuItemDailyMetrics
+ */
+export type Branch$menuItemDailyMetricsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the MenuItemDailyMetrics
+   */
+  select?: Prisma.MenuItemDailyMetricsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the MenuItemDailyMetrics
+   */
+  omit?: Prisma.MenuItemDailyMetricsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MenuItemDailyMetricsInclude<ExtArgs> | null
+  where?: Prisma.MenuItemDailyMetricsWhereInput
+  orderBy?: Prisma.MenuItemDailyMetricsOrderByWithRelationInput | Prisma.MenuItemDailyMetricsOrderByWithRelationInput[]
+  cursor?: Prisma.MenuItemDailyMetricsWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.MenuItemDailyMetricsScalarFieldEnum | Prisma.MenuItemDailyMetricsScalarFieldEnum[]
+}
+
+/**
+ * Branch.forecasts
+ */
+export type Branch$forecastsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Forecast
+   */
+  select?: Prisma.ForecastSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Forecast
+   */
+  omit?: Prisma.ForecastOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ForecastInclude<ExtArgs> | null
+  where?: Prisma.ForecastWhereInput
+  orderBy?: Prisma.ForecastOrderByWithRelationInput | Prisma.ForecastOrderByWithRelationInput[]
+  cursor?: Prisma.ForecastWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ForecastScalarFieldEnum | Prisma.ForecastScalarFieldEnum[]
 }
 
 /**

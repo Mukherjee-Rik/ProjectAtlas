@@ -70,6 +70,19 @@ export class PublicTablesService {
   }
 
   /**
+   * Read-only lookup for the current active session without creating a new session row.
+   * Prevents customer polling from reviving cleared/ended tables.
+   */
+  async getActiveSessionRecord(token: string) {
+    const resolved = await this.resolveTableToken(token);
+    const session = await this.prisma.customerSession.findFirst({
+      where: { tableId: resolved.table.id, status: 'ACTIVE' },
+      orderBy: { startedAt: 'desc' },
+    });
+    return { session, resolved };
+  }
+
+  /**
    * Resolves the QR token and returns the live customer session row alongside the
    * resolved table context. Other public modules (cart, orders) need the session id,
    * so session creation lives here and is reused instead of duplicated.

@@ -6,7 +6,7 @@ export const runtime = 'nodejs';
 
 const EXPLICIT_BACKEND_URL = process.env.BACKEND_URL || process.env.API_INTERNAL_URL;
 
-const PRIMARY_BACKEND_URL = EXPLICIT_BACKEND_URL || 'http://localhost:3000/api/v1';
+const PRIMARY_BACKEND_URL = EXPLICIT_BACKEND_URL || 'http://localhost:4000/api/v1';
 
 /**
  * Last-resort target, used only when the primary is unreachable at the socket

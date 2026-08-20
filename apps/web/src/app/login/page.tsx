@@ -9,6 +9,7 @@ import { PublicOnlyRoute } from '@/components/auth/public-only-route';
 import { setCurrentTenant } from '@/lib/tenant-storage';
 import { setCurrentRestaurant } from '@/lib/restaurant-storage';
 import { setCurrentBranch } from '@/lib/branch-storage';
+import { validateEmail, validatePassword } from '@/lib/validation';
 
 export default function LoginPage() {
   return <LoginForm />;
@@ -22,11 +23,33 @@ function LoginForm() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
+    const emailRes = validateEmail(email, true);
+    const passRes = validatePassword(password, 6, true);
+
+    if (!emailRes.isValid) {
+      setEmailError(emailRes.error || '');
+    } else {
+      setEmailError('');
+    }
+
+    if (!passRes.isValid) {
+      setPasswordError(passRes.error || '');
+    } else {
+      setPasswordError('');
+    }
+
+    if (!emailRes.isValid || !passRes.isValid) {
+      return;
+    }
 
     setError('');
     setLoading(true);
@@ -157,19 +180,36 @@ function LoginForm() {
               htmlFor="email"
               className="mb-2 block text-sm font-medium text-[#F5F7FA]"
             >
-              Email Address
+              Email Address <span className="text-[#EF4444]">*</span>
             </label>
 
             <input
               id="email"
               type="email"
               value={email}
-              onChange={(event) => setEmail(event.target.value)}
+              onChange={(event) => {
+                setEmail(event.target.value);
+                if (emailError) setEmailError('');
+              }}
+              onBlur={(e) => {
+                const res = validateEmail(e.target.value, true);
+                if (!res.isValid) setEmailError(res.error || '');
+                else setEmailError('');
+              }}
               placeholder="you@restaurant.com"
               required
               autoComplete="email"
-              className="w-full rounded-lg border border-[#26313C] bg-[#18212B] px-4 py-2.5 text-[#F5F7FA] placeholder-[#9AA6B2] transition-colors outline-none focus:border-[#2AFEB7] focus:ring-1 focus:ring-[#2AFEB7]"
+              className={`w-full rounded-lg border bg-[#18212B] px-4 py-2.5 text-[#F5F7FA] placeholder-[#9AA6B2] transition-colors outline-none ${
+                emailError
+                  ? 'border-[#EF4444] focus:border-[#EF4444] focus:ring-1 focus:ring-[#EF4444]'
+                  : 'border-[#26313C] focus:border-[#2AFEB7] focus:ring-1 focus:ring-[#2AFEB7]'
+              }`}
             />
+            {emailError && (
+              <p className="mt-1.5 text-xs text-[#EF4444] flex items-center gap-1">
+                <span>⚠</span> {emailError}
+              </p>
+            )}
           </div>
 
           <div>
@@ -177,7 +217,7 @@ function LoginForm() {
               htmlFor="password"
               className="mb-2 block text-sm font-medium text-[#F5F7FA]"
             >
-              Password
+              Password <span className="text-[#EF4444]">*</span>
             </label>
 
             <div className="relative">
@@ -185,12 +225,24 @@ function LoginForm() {
                 id="password"
                 type={showPassword ? 'text' : 'password'}
                 value={password}
-                onChange={(event) => setPassword(event.target.value)}
+                onChange={(event) => {
+                  setPassword(event.target.value);
+                  if (passwordError) setPasswordError('');
+                }}
+                onBlur={(e) => {
+                  const res = validatePassword(e.target.value, 6, true);
+                  if (!res.isValid) setPasswordError(res.error || '');
+                  else setPasswordError('');
+                }}
                 placeholder="••••••••"
                 required
-                minLength={8}
+                minLength={6}
                 autoComplete="current-password"
-                className="w-full rounded-lg border border-[#26313C] bg-[#18212B] px-4 py-2.5 pr-12 text-[#F5F7FA] placeholder-[#9AA6B2] transition-colors outline-none focus:border-[#2AFEB7] focus:ring-1 focus:ring-[#2AFEB7]"
+                className={`w-full rounded-lg border bg-[#18212B] px-4 py-2.5 pr-12 text-[#F5F7FA] placeholder-[#9AA6B2] transition-colors outline-none ${
+                  passwordError
+                    ? 'border-[#EF4444] focus:border-[#EF4444] focus:ring-1 focus:ring-[#EF4444]'
+                    : 'border-[#26313C] focus:border-[#2AFEB7] focus:ring-1 focus:ring-[#2AFEB7]'
+                }`}
               />
               <button
                 type="button"
@@ -214,6 +266,11 @@ function LoginForm() {
                 )}
               </button>
             </div>
+            {passwordError && (
+              <p className="mt-1.5 text-xs text-[#EF4444] flex items-center gap-1">
+                <span>⚠</span> {passwordError}
+              </p>
+            )}
           </div>
 
           {error && (

@@ -25,17 +25,17 @@ export class UpdateTableDto {
   @ApiPropertyOptional({ example: 'Table 1 Main' })
   @IsOptional()
   @IsString()
-  @MinLength(1)
-  @MaxLength(100)
+  @MinLength(2)
+  @MaxLength(50)
   name?: string;
 
   @ApiPropertyOptional({ example: 'T01' })
   @IsOptional()
   @IsString()
   @MinLength(1)
-  @MaxLength(50)
+  @MaxLength(10)
   @Matches(/^[A-Za-z0-9-]+$/, {
-    message: 'Code can only contain alphanumeric characters and hyphens',
+    message: 'Code can only contain alphanumeric characters and hyphens (max 10 chars)',
   })
   code?: string;
 

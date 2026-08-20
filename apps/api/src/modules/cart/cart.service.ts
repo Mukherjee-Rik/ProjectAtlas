@@ -21,6 +21,56 @@ export class CartService {
     return this.buildCartResponse(cart.id);
   }
 
+  /**
+   * Idempotent item quantity setter: creates, updates, or deletes based on exact target quantity.
+   * Eliminates race conditions and delta merging errors.
+   */
+  async setItemQuantity(token: string, dto: AddCartItemDto) {
+    const { cart, restaurantId } = await this.getOrCreateCart(token);
+    const menuItem = await this.loadAvailableMenuItem(restaurantId, dto.menuItemId);
+
+    const variantIds = this.normalizeIds(dto.variantIds);
+    const addonIds = this.normalizeIds(dto.addonIds);
+    const { variants, addons } = this.validateSelections(menuItem, variantIds, addonIds);
+
+    const targetQuantity = dto.quantity ?? 1;
+    const existing = await this.findMatchingCartItem(cart.id, menuItem.id, variantIds, addonIds);
+
+    if (targetQuantity <= 0) {
+      if (existing) {
+        await this.prisma.cartItem.delete({ where: { id: existing.id } });
+      }
+      return this.buildCartResponse(cart.id);
+    }
+
+    if (targetQuantity > MAX_QUANTITY) {
+      throw new BadRequestException(`Maximum quantity per cart line is ${MAX_QUANTITY}`);
+    }
+
+    if (existing) {
+      const unitPrice = new Prisma.Decimal(existing.unitPrice);
+      await this.prisma.cartItem.update({
+        where: { id: existing.id },
+        data: { quantity: targetQuantity, totalPrice: unitPrice.mul(targetQuantity) },
+      });
+    } else {
+      const unitPrice = this.calculateItemPrice(menuItem.price, variants, addons);
+      await this.prisma.cartItem.create({
+        data: {
+          cartId: cart.id,
+          menuItemId: menuItem.id,
+          quantity: targetQuantity,
+          unitPrice,
+          totalPrice: unitPrice.mul(targetQuantity),
+          variantSelections: { create: variants.map((v) => ({ variantId: v.id, name: v.name, price: v.price })) },
+          addonSelections: { create: addons.map((a) => ({ addonId: a.id, name: a.name, price: a.price })) },
+        },
+      });
+    }
+
+    return this.buildCartResponse(cart.id);
+  }
+
   async addItem(token: string, dto: AddCartItemDto) {
     const { cart, restaurantId } = await this.getOrCreateCart(token);
 
@@ -214,7 +264,10 @@ export class CartService {
 
   private async loadOwnedCartItem(cartId: string, itemId: string) {
     const item = await this.prisma.cartItem.findFirst({
-      where: { id: itemId, cartId },
+      where: {
+        cartId,
+        OR: [{ id: itemId }, { menuItemId: itemId }],
+      },
       select: { id: true, quantity: true, unitPrice: true },
     });
     if (!item) throw new NotFoundException('Cart item not found');

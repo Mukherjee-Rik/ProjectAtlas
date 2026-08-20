@@ -107,9 +107,8 @@ export default function CustomerCartPage({
                 <button
                   type="button"
                   onClick={() => void removeItem(item.id)}
-                  disabled={isMutating}
                   aria-label={`Remove ${item.name}`}
-                  className="rounded-lg border border-[#26313C] px-2 py-1 text-[11px] text-[#9AA6B2] transition-colors hover:border-[#EF4444]/40 hover:text-[#EF4444] disabled:opacity-40"
+                  className="rounded-lg border border-[#26313C] px-2.5 py-1 text-[11px] text-[#9AA6B2] transition-all hover:border-[#EF4444]/40 hover:text-[#EF4444] active:scale-95 cursor-pointer"
                 >
                   Remove
                 </button>
@@ -120,19 +119,19 @@ export default function CustomerCartPage({
                   <button
                     type="button"
                     aria-label={`Decrease ${item.name} quantity`}
-                    disabled={isMutating || item.quantity <= 1}
+                    disabled={item.quantity <= 1}
                     onClick={() => void updateQuantity(item.id, item.quantity - 1)}
-                    className="h-8 w-8 rounded-lg border border-[#26313C] text-sm font-bold transition-colors hover:border-[#2AFEB7]/40 disabled:opacity-30"
+                    className="h-8 w-8 rounded-lg border border-[#26313C] text-sm font-bold transition-all hover:border-[#2AFEB7]/40 active:scale-75 disabled:opacity-30 cursor-pointer"
                   >
                     −
                   </button>
-                  <span className="w-6 text-center text-sm font-bold">{item.quantity}</span>
+                  <span className="w-6 text-center text-sm font-bold font-mono">{item.quantity}</span>
                   <button
                     type="button"
                     aria-label={`Increase ${item.name} quantity`}
-                    disabled={isMutating || item.quantity >= MAX_QUANTITY}
+                    disabled={item.quantity >= MAX_QUANTITY}
                     onClick={() => void updateQuantity(item.id, item.quantity + 1)}
-                    className="h-8 w-8 rounded-lg border border-[#26313C] text-sm font-bold transition-colors hover:border-[#2AFEB7]/40 disabled:opacity-30"
+                    className="h-8 w-8 rounded-lg border border-[#26313C] text-sm font-bold transition-all hover:border-[#2AFEB7]/40 active:scale-75 disabled:opacity-30 cursor-pointer"
                   >
                     +
                   </button>

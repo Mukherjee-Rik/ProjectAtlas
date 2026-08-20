@@ -247,3 +247,68 @@ export type Notification = Prisma.NotificationModel
  * 
  */
 export type SupportTicket = Prisma.SupportTicketModel
+/**
+ * Model Customer
+ * 
+ */
+export type Customer = Prisma.CustomerModel
+/**
+ * Model OperationalEvent
+ * 
+ */
+export type OperationalEvent = Prisma.OperationalEventModel
+/**
+ * Model DailySalesAggregate
+ * 
+ */
+export type DailySalesAggregate = Prisma.DailySalesAggregateModel
+/**
+ * Model MenuItemDailyMetrics
+ * 
+ */
+export type MenuItemDailyMetrics = Prisma.MenuItemDailyMetricsModel
+/**
+ * Model SavedReport
+ * 
+ */
+export type SavedReport = Prisma.SavedReportModel
+/**
+ * Model IntelligenceQueryAudit
+ * 
+ */
+export type IntelligenceQueryAudit = Prisma.IntelligenceQueryAuditModel
+/**
+ * Model CustomReport
+ * 
+ */
+export type CustomReport = Prisma.CustomReportModel
+/**
+ * Model ReportSchedule
+ * 
+ */
+export type ReportSchedule = Prisma.ReportScheduleModel
+/**
+ * Model ReportExecutionHistory
+ * 
+ */
+export type ReportExecutionHistory = Prisma.ReportExecutionHistoryModel
+/**
+ * Model Forecast
+ * 
+ */
+export type Forecast = Prisma.ForecastModel
+/**
+ * Model ForecastPoint
+ * 
+ */
+export type ForecastPoint = Prisma.ForecastPointModel
+/**
+ * Model ForecastRun
+ * 
+ */
+export type ForecastRun = Prisma.ForecastRunModel
+/**
+ * Model ForecastAccuracy
+ * 
+ */
+export type ForecastAccuracy = Prisma.ForecastAccuracyModel

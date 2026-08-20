@@ -168,7 +168,7 @@ export function AppShell({ children }: AppShellProps) {
       )}
 
       {/* Top Header */}
-      <header className="sticky top-0 z-40 border-b border-[#26313C] bg-[#111820]/90 backdrop-blur-md">
+      <header className="sticky top-0 z-40 border-b border-[#26313C] bg-[#111820]/90 backdrop-blur-md print:hidden">
         <div className="flex h-16 items-center justify-between px-4 md:px-8">
           <div className="flex items-center gap-3 flex-1">
             {/* Mobile Hamburger Button */}
@@ -275,12 +275,12 @@ export function AppShell({ children }: AppShellProps) {
       <div className="flex min-h-[calc(100vh-4rem)]">
         <aside
           aria-label="Main navigation"
-          className="hidden w-56 shrink-0 border-r border-[#26313C] bg-[#111820] md:block lg:w-64"
+          className="hidden w-64 shrink-0 border-r border-[#26313C] bg-[#111820] md:block lg:w-72 print:hidden"
         >
           <Sidebar />
         </aside>
 
-        <main id="main-content" className="min-w-0 flex-1 p-4 md:p-6 lg:p-8">
+        <main id="main-content" className="min-w-0 flex-1 p-4 md:p-6 lg:p-8 print:p-0">
           {children}
         </main>
       </div>

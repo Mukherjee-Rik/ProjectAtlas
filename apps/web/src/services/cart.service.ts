@@ -15,6 +15,10 @@ export async function addCartItem(token: string, payload: AddCartItemPayload) {
   return publicApiClient.post<CartResponse>(`${cartPath(token)}/items`, payload);
 }
 
+export async function setCartItem(token: string, payload: AddCartItemPayload) {
+  return publicApiClient.post<CartResponse>(`${cartPath(token)}/set-item`, payload);
+}
+
 export async function updateCartItemQuantity(
   token: string,
   itemId: string,

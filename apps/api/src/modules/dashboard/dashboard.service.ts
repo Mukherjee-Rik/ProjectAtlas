@@ -27,21 +27,54 @@ function parseEndOfDay(dateStr?: string): Date | undefined {
 export class DashboardService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getRestaurantOverview(restaurantId?: string, branchId?: string, startDate?: string, endDate?: string) {
-    if (!restaurantId) {
-      const firstRest = await this.prisma.restaurant.findFirst();
-      if (firstRest) {
-        restaurantId = firstRest.id;
-      }
-    }
-
+  async getRestaurantOverview(
+    user?: any,
+    restaurantId?: string,
+    branchId?: string,
+    startDate?: string,
+    endDate?: string,
+  ) {
     let tenantId: string | undefined;
+
+    // 1. If restaurantId was provided, verify it exists and retrieve its tenantId
     if (restaurantId) {
       const rest = await this.prisma.restaurant.findUnique({
         where: { id: restaurantId },
-        select: { tenantId: true },
+        select: { id: true, tenantId: true },
       });
-      tenantId = rest?.tenantId;
+      if (rest) {
+        restaurantId = rest.id;
+        tenantId = rest.tenantId;
+      } else {
+        restaurantId = undefined;
+      }
+    }
+
+    // 2. If restaurantId is missing, resolve strictly from user's tenant memberships (never global findFirst)
+    if (!restaurantId && user?.id) {
+      const membership = await this.prisma.tenantMembership.findFirst({
+        where: { userId: user.id },
+        include: { tenant: { include: { restaurants: true } } },
+      });
+      if (membership?.tenant?.restaurants?.[0]) {
+        restaurantId = membership.tenant.restaurants[0].id;
+        tenantId = membership.tenantId;
+      }
+    }
+
+    // If still no restaurant (e.g. fresh user with no restaurants yet), return clean empty state
+    if (!restaurantId) {
+      return {
+        metrics: {
+          totalOrders: 0,
+          totalSales: 0,
+          activeTables: 0,
+          menuItems: 0,
+          staffCount: 0,
+        },
+        recentOrders: [],
+        restaurantStaff: [],
+      };
     }
 
     const whereOrder: any = {};
@@ -168,12 +201,60 @@ export class DashboardService {
     };
   }
 
-  async getRestaurantAnalytics(restaurantId?: string, branchId?: string, startDate?: string, endDate?: string) {
-    if (!restaurantId) {
-      const firstRest = await this.prisma.restaurant.findFirst();
-      if (firstRest) {
-        restaurantId = firstRest.id;
+  async getRestaurantAnalytics(
+    user?: any,
+    restaurantId?: string,
+    branchId?: string,
+    startDate?: string,
+    endDate?: string,
+  ) {
+    // 1. If restaurantId was provided, verify it exists
+    if (restaurantId) {
+      const rest = await this.prisma.restaurant.findUnique({
+        where: { id: restaurantId },
+        select: { id: true },
+      });
+      if (!rest) {
+        restaurantId = undefined;
       }
+    }
+
+    // 2. If restaurantId is missing, resolve strictly from user's tenant memberships
+    if (!restaurantId && user?.id) {
+      const membership = await this.prisma.tenantMembership.findFirst({
+        where: { userId: user.id },
+        include: { tenant: { include: { restaurants: true } } },
+      });
+      if (membership?.tenant?.restaurants?.[0]) {
+        restaurantId = membership.tenant.restaurants[0].id;
+      }
+    }
+
+    if (!restaurantId) {
+      return {
+        metrics: {
+          totalOrders: 0,
+          totalRevenue: 0,
+          totalSubtotal: 0,
+          totalTaxAmount: 0,
+          totalDiscountAmount: 0,
+          netRevenue: 0,
+          averageOrderValue: 0,
+          averageTaxPerOrder: 0,
+          effectiveTaxRate: 0,
+          dineInOrdersCount: 0,
+          takeoutOrdersCount: 0,
+          totalItemsCount: 0,
+          averageItemsPerOrder: 0,
+          highestOrderAmount: 0,
+          lowestOrderAmount: 0,
+          ticketDistribution: { under500: 0, between500And1000: 0, above1000: 0 },
+          topTablesBySpend: [],
+          salesTrend: [],
+          statusDistribution: [],
+          topItems: [],
+        },
+      };
     }
 
     const whereOrder: any = {
