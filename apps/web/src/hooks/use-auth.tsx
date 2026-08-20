@@ -93,6 +93,9 @@ export function AuthProvider({
   }, []);
 
   function loginUser(token: string, authenticatedUser: AuthUser) {
+    clearCurrentTenant();
+    clearCurrentRestaurant();
+    clearCurrentBranch();
     setAccessToken(token);
     setStoredUser(authenticatedUser);
 

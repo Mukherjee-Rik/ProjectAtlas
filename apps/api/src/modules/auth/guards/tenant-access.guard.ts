@@ -38,8 +38,8 @@ export class TenantAccessGuard implements CanActivate {
       throw new ForbiddenException('User is not authenticated');
     }
 
-    // Platform ADMINs / PLATFORM_ADMINs have global management access and bypass scoping
-    if (user.role === 'PLATFORM_ADMIN' || user.role === 'ADMIN') {
+    // Only root PLATFORM_ADMIN has global management access across all tenants
+    if (user.role === 'PLATFORM_ADMIN') {
       const tenantHeaderValue = request.headers[TENANT_HEADER];
       const tenantId =
         (typeof tenantHeaderValue === 'string' ? tenantHeaderValue : undefined) ||
