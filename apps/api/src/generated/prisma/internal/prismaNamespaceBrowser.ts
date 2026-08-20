@@ -96,7 +96,20 @@ export const ModelName = {
   AutomationRule: 'AutomationRule',
   AutomationExecution: 'AutomationExecution',
   Notification: 'Notification',
-  SupportTicket: 'SupportTicket'
+  SupportTicket: 'SupportTicket',
+  Customer: 'Customer',
+  OperationalEvent: 'OperationalEvent',
+  DailySalesAggregate: 'DailySalesAggregate',
+  MenuItemDailyMetrics: 'MenuItemDailyMetrics',
+  SavedReport: 'SavedReport',
+  IntelligenceQueryAudit: 'IntelligenceQueryAudit',
+  CustomReport: 'CustomReport',
+  ReportSchedule: 'ReportSchedule',
+  ReportExecutionHistory: 'ReportExecutionHistory',
+  Forecast: 'Forecast',
+  ForecastPoint: 'ForecastPoint',
+  ForecastRun: 'ForecastRun',
+  ForecastAccuracy: 'ForecastAccuracy'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -396,6 +409,7 @@ export const OrderScalarFieldEnum = {
   branchId: 'branchId',
   tableId: 'tableId',
   customerSessionId: 'customerSessionId',
+  customerId: 'customerId',
   orderNumber: 'orderNumber',
   status: 'status',
   source: 'source',
@@ -809,6 +823,253 @@ export const SupportTicketScalarFieldEnum = {
 } as const
 
 export type SupportTicketScalarFieldEnum = (typeof SupportTicketScalarFieldEnum)[keyof typeof SupportTicketScalarFieldEnum]
+
+
+export const CustomerScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  restaurantId: 'restaurantId',
+  name: 'name',
+  phone: 'phone',
+  email: 'email',
+  firstOrderAt: 'firstOrderAt',
+  lastOrderAt: 'lastOrderAt',
+  totalOrders: 'totalOrders',
+  totalSpend: 'totalSpend',
+  averageOrderValue: 'averageOrderValue',
+  preferredBranchId: 'preferredBranchId',
+  segment: 'segment',
+  cohortMonth: 'cohortMonth',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CustomerScalarFieldEnum = (typeof CustomerScalarFieldEnum)[keyof typeof CustomerScalarFieldEnum]
+
+
+export const OperationalEventScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  restaurantId: 'restaurantId',
+  branchId: 'branchId',
+  eventType: 'eventType',
+  entityType: 'entityType',
+  entityId: 'entityId',
+  actorUserId: 'actorUserId',
+  metadata: 'metadata',
+  timestamp: 'timestamp'
+} as const
+
+export type OperationalEventScalarFieldEnum = (typeof OperationalEventScalarFieldEnum)[keyof typeof OperationalEventScalarFieldEnum]
+
+
+export const DailySalesAggregateScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  restaurantId: 'restaurantId',
+  branchId: 'branchId',
+  date: 'date',
+  grossSales: 'grossSales',
+  netSales: 'netSales',
+  taxAmount: 'taxAmount',
+  discountAmount: 'discountAmount',
+  refundAmount: 'refundAmount',
+  cancelledAmount: 'cancelledAmount',
+  totalOrders: 'totalOrders',
+  completedOrders: 'completedOrders',
+  cancelledOrders: 'cancelledOrders',
+  dineInOrders: 'dineInOrders',
+  takeoutOrders: 'takeoutOrders',
+  averageOrderValue: 'averageOrderValue',
+  uniqueCustomers: 'uniqueCustomers',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DailySalesAggregateScalarFieldEnum = (typeof DailySalesAggregateScalarFieldEnum)[keyof typeof DailySalesAggregateScalarFieldEnum]
+
+
+export const MenuItemDailyMetricsScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  restaurantId: 'restaurantId',
+  branchId: 'branchId',
+  menuItemId: 'menuItemId',
+  date: 'date',
+  quantitySold: 'quantitySold',
+  grossRevenue: 'grossRevenue',
+  discountImpact: 'discountImpact',
+  ordersCount: 'ordersCount',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type MenuItemDailyMetricsScalarFieldEnum = (typeof MenuItemDailyMetricsScalarFieldEnum)[keyof typeof MenuItemDailyMetricsScalarFieldEnum]
+
+
+export const SavedReportScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  restaurantId: 'restaurantId',
+  userId: 'userId',
+  name: 'name',
+  description: 'description',
+  reportType: 'reportType',
+  filters: 'filters',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SavedReportScalarFieldEnum = (typeof SavedReportScalarFieldEnum)[keyof typeof SavedReportScalarFieldEnum]
+
+
+export const IntelligenceQueryAuditScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  restaurantId: 'restaurantId',
+  branchId: 'branchId',
+  actorUserId: 'actorUserId',
+  serviceName: 'serviceName',
+  queryType: 'queryType',
+  queryParameters: 'queryParameters',
+  executionTimeMs: 'executionTimeMs',
+  timestamp: 'timestamp'
+} as const
+
+export type IntelligenceQueryAuditScalarFieldEnum = (typeof IntelligenceQueryAuditScalarFieldEnum)[keyof typeof IntelligenceQueryAuditScalarFieldEnum]
+
+
+export const CustomReportScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  restaurantId: 'restaurantId',
+  createdById: 'createdById',
+  name: 'name',
+  description: 'description',
+  dataSource: 'dataSource',
+  configuration: 'configuration',
+  visibility: 'visibility',
+  branchId: 'branchId',
+  version: 'version',
+  isTemplate: 'isTemplate',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CustomReportScalarFieldEnum = (typeof CustomReportScalarFieldEnum)[keyof typeof CustomReportScalarFieldEnum]
+
+
+export const ReportScheduleScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  restaurantId: 'restaurantId',
+  reportId: 'reportId',
+  name: 'name',
+  frequency: 'frequency',
+  cronExpression: 'cronExpression',
+  timeOfDay: 'timeOfDay',
+  dayOfWeek: 'dayOfWeek',
+  dayOfMonth: 'dayOfMonth',
+  timezone: 'timezone',
+  recipients: 'recipients',
+  deliveryFormat: 'deliveryFormat',
+  enabled: 'enabled',
+  lastRunAt: 'lastRunAt',
+  nextRunAt: 'nextRunAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ReportScheduleScalarFieldEnum = (typeof ReportScheduleScalarFieldEnum)[keyof typeof ReportScheduleScalarFieldEnum]
+
+
+export const ReportExecutionHistoryScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  restaurantId: 'restaurantId',
+  reportId: 'reportId',
+  scheduleId: 'scheduleId',
+  triggeredBy: 'triggeredBy',
+  actorUserId: 'actorUserId',
+  status: 'status',
+  durationMs: 'durationMs',
+  recordsCount: 'recordsCount',
+  errorMessage: 'errorMessage',
+  createdAt: 'createdAt'
+} as const
+
+export type ReportExecutionHistoryScalarFieldEnum = (typeof ReportExecutionHistoryScalarFieldEnum)[keyof typeof ReportExecutionHistoryScalarFieldEnum]
+
+
+export const ForecastScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  restaurantId: 'restaurantId',
+  branchId: 'branchId',
+  forecastType: 'forecastType',
+  granularity: 'granularity',
+  startDate: 'startDate',
+  endDate: 'endDate',
+  modelVersion: 'modelVersion',
+  status: 'status',
+  metadata: 'metadata',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ForecastScalarFieldEnum = (typeof ForecastScalarFieldEnum)[keyof typeof ForecastScalarFieldEnum]
+
+
+export const ForecastPointScalarFieldEnum = {
+  id: 'id',
+  forecastId: 'forecastId',
+  timestamp: 'timestamp',
+  metric: 'metric',
+  entityType: 'entityType',
+  entityId: 'entityId',
+  predictedValue: 'predictedValue',
+  lowerBound: 'lowerBound',
+  upperBound: 'upperBound',
+  confidence: 'confidence'
+} as const
+
+export type ForecastPointScalarFieldEnum = (typeof ForecastPointScalarFieldEnum)[keyof typeof ForecastPointScalarFieldEnum]
+
+
+export const ForecastRunScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  restaurantId: 'restaurantId',
+  branchId: 'branchId',
+  modelVersion: 'modelVersion',
+  recordsProcessed: 'recordsProcessed',
+  errorCount: 'errorCount',
+  executionTimeMs: 'executionTimeMs',
+  status: 'status',
+  errorMessage: 'errorMessage',
+  startedAt: 'startedAt',
+  completedAt: 'completedAt'
+} as const
+
+export type ForecastRunScalarFieldEnum = (typeof ForecastRunScalarFieldEnum)[keyof typeof ForecastRunScalarFieldEnum]
+
+
+export const ForecastAccuracyScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  restaurantId: 'restaurantId',
+  branchId: 'branchId',
+  metric: 'metric',
+  evalDate: 'evalDate',
+  predictedValue: 'predictedValue',
+  actualValue: 'actualValue',
+  absoluteError: 'absoluteError',
+  percentageError: 'percentageError',
+  modelVersion: 'modelVersion',
+  createdAt: 'createdAt'
+} as const
+
+export type ForecastAccuracyScalarFieldEnum = (typeof ForecastAccuracyScalarFieldEnum)[keyof typeof ForecastAccuracyScalarFieldEnum]
 
 
 export const SortOrder = {

@@ -16,6 +16,9 @@ import {
   setAccessToken,
   setStoredUser,
 } from '@/lib/auth-storage';
+import { clearCurrentTenant } from '@/lib/tenant-storage';
+import { clearCurrentRestaurant } from '@/lib/restaurant-storage';
+import { clearCurrentBranch } from '@/lib/branch-storage';
 import { AUTH_UNAUTHORIZED_EVENT } from '@/lib/auth-events';
 import { apiClient } from '@/services/api-client';
 
@@ -69,6 +72,9 @@ export function AuthProvider({
 
     function handleUnauthorized() {
       clearAuthStorage();
+      clearCurrentTenant();
+      clearCurrentRestaurant();
+      clearCurrentBranch();
       setAccessTokenState(null);
       setUser(null);
     }
@@ -101,6 +107,9 @@ export function AuthProvider({
       console.warn('Failed to logout on backend', err);
     }
     clearAuthStorage();
+    clearCurrentTenant();
+    clearCurrentRestaurant();
+    clearCurrentBranch();
     setAccessTokenState(null);
     setUser(null);
   }

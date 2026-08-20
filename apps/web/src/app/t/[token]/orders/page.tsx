@@ -27,8 +27,8 @@ export default function CustomerOrdersHistoryPage({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const loadOrders = useCallback(async () => {
-    setIsLoading(true);
+  const loadOrders = useCallback(async (showLoading = false) => {
+    if (showLoading) setIsLoading(true);
     try {
       const response = await getPublicOrders(token);
       setOrders(response.data ?? []);
@@ -36,13 +36,23 @@ export default function CustomerOrdersHistoryPage({
     } catch {
       setError('Unable to load order history');
     } finally {
-      setIsLoading(false);
+      if (showLoading) setIsLoading(false);
     }
   }, [token]);
 
   useEffect(() => {
-    void loadOrders();
+    void loadOrders(true);
+
+    // Poll every 3 seconds for live multi-token updates
+    const interval = setInterval(() => {
+      void loadOrders(false);
+    }, 3000);
+
+    return () => clearInterval(interval);
   }, [loadOrders]);
+
+  const activeOrders = orders.filter((o) => o.status !== 'CANCELLED');
+  const grandTotal = activeOrders.reduce((acc, o) => acc + Number(o.totalAmount || 0), 0);
 
   return (
     <main className="min-h-screen bg-[#0B0F14] pb-8 text-[#F5F7FA]">
@@ -51,14 +61,14 @@ export default function CustomerOrdersHistoryPage({
           <div>
             <h1 className="text-lg font-black">Your Table Orders</h1>
             <p className="text-[11px] text-[#9AA6B2]">
-              Orders placed during this session
+              {orders.length} {orders.length === 1 ? 'order' : 'orders'} placed during this session
             </p>
           </div>
           <Link
             href={`/t/${token}/menu`}
-            className="rounded-xl border border-[#26313C] px-3 py-2 text-[11px] font-semibold text-[#9AA6B2] transition-colors hover:border-[#2AFEB7]/40 hover:text-[#2AFEB7]"
+            className="rounded-xl border border-[#26313C] px-3 py-2 text-[11px] font-semibold text-[#2AFEB7] transition-colors hover:border-[#2AFEB7]/40 hover:bg-[#2AFEB7]/10"
           >
-            Browse Menu
+            + Add Items
           </Link>
         </div>
       </header>
@@ -85,45 +95,89 @@ export default function CustomerOrdersHistoryPage({
             </div>
             <p className="text-sm font-bold">No orders placed yet</p>
             <p className="text-xs text-[#9AA6B2]">
-              Orders created from this table will appear here.
+              Orders created from this table will appear here in real-time.
             </p>
             <Link
               href={`/t/${token}/menu`}
-              className="inline-block rounded-xl bg-[#2AFEB7] px-4 py-2.5 text-xs font-bold text-[#0B0F14]"
+              className="inline-block rounded-xl bg-[#2AFEB7] px-5 py-3 text-xs font-bold text-[#0B0F14] shadow-md hover:bg-[#22E5A4]"
             >
-              Browse the menu
+              Browse the Menu
             </Link>
           </div>
         )}
 
+        {/* Session Orders Summary Header */}
+        {!isLoading && orders.length > 0 && (
+          <div className="rounded-2xl border border-[#2AFEB7]/30 bg-gradient-to-b from-[#18212B] to-[#111820] p-4 flex items-center justify-between shadow-lg">
+            <div>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#9AA6B2]">
+                Session Total ({activeOrders.length} {activeOrders.length === 1 ? 'Order' : 'Orders'})
+              </span>
+              <p className="text-xl font-black text-[#2AFEB7] mt-0.5">
+                {formatCurrency(grandTotal)}
+              </p>
+            </div>
+
+            <Link
+              href={`/t/${token}/menu`}
+              className="rounded-xl bg-[#2AFEB7] px-3.5 py-2 text-xs font-bold text-[#0B0F14] hover:bg-[#22E5A4] transition-all"
+            >
+              + Order More
+            </Link>
+          </div>
+        )}
+
+        {/* Orders List with Old vs New Order Tokens */}
         {!isLoading &&
-          orders.map((order) => {
+          orders.map((order, idx) => {
             const style = STATUS_STYLE[order.status] ?? STATUS_STYLE.PENDING;
+            const isOld = idx === 0 && orders.length > 1;
+            const isNew = idx === orders.length - 1 && orders.length > 1;
+            const orderRound = isOld
+              ? 'Old Order (Round 1)'
+              : isNew
+              ? 'New Order (Round 2)'
+              : orders.length > 1
+              ? `Round ${idx + 1}`
+              : 'Initial Order';
+
             return (
               <Link
                 key={order.id}
                 href={`/t/${token}/orders/${order.id}`}
-                className="block space-y-3 rounded-2xl border border-[#26313C] bg-[#111820] p-4 transition-colors hover:border-[#2AFEB7]/40"
+                className="block space-y-3 rounded-2xl border border-[#26313C] bg-[#111820] p-4 transition-all hover:border-[#2AFEB7]/60 hover:shadow-[0_0_15px_rgba(42,254,183,0.1)] active:scale-[0.99]"
               >
                 <div className="flex items-center justify-between">
-                  <span className="font-mono text-sm font-bold text-[#2AFEB7]">
-                    {order.orderNumber}
-                  </span>
-                  <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-semibold border ${style.bg} ${style.text} ${style.border}`}>
-                    <span className="h-1 w-1 rounded-full bg-current" />
+                  <div className="space-y-0.5">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#2AFEB7]">
+                      {orderRound}
+                    </span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-xs text-[#9AA6B2]">Token:</span>
+                      <span className="font-mono text-sm font-black text-[#F5F7FA]">
+                        #{order.orderNumber}
+                      </span>
+                    </div>
+                  </div>
+
+                  <span
+                    className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-semibold border ${style.bg} ${style.text} ${style.border}`}
+                  >
+                    <span className="h-1.5 w-1.5 rounded-full bg-current animate-pulse" />
                     {order.status}
                   </span>
                 </div>
 
-                <div className="text-xs text-[#9AA6B2] line-clamp-1">
-                  {order.items.map((i) => `${i.quantity}x ${i.name}`).join(', ')}
+                {/* Items preview */}
+                <div className="text-xs text-[#9AA6B2] line-clamp-2 bg-[#0B0F14]/50 p-2.5 rounded-xl border border-[#26313C]/60">
+                  {order.items?.map((i) => `${i.quantity}x ${i.name}`).join(', ')}
                 </div>
 
                 <div className="flex items-center justify-between border-t border-[#26313C] pt-2 text-xs">
                   <span className="text-[#9AA6B2]">
-                    {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    🕒 {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </span>
-                  <span className="font-bold text-[#F5F7FA]">
+                  <span className="font-black text-[#F5F7FA] text-sm">
                     {formatCurrency(order.totalAmount)}
                   </span>
                 </div>

@@ -24,6 +24,8 @@ interface ToastContextValue {
   toast: (message: string, variant?: ToastVariant, duration?: number) => void;
   success: (message: string) => void;
   error: (message: string) => void;
+  warning: (message: string) => void;
+  info: (message: string) => void;
   dismiss: (id: number) => void;
 }
 
@@ -59,28 +61,28 @@ const VARIANT_STYLES: Record<
   },
 };
 
-let nextToastId = 0;
-
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
   const dismiss = useCallback((id: number) => {
-    setToasts((current) => current.filter((t) => t.id !== id));
+    setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
   const toast = useCallback(
-    (message: string, variant: ToastVariant = 'info', duration = 5000) => {
-      const id = nextToastId++;
-      setToasts((current) => [...current, { id, message, variant, duration }]);
+    (message: string, variant: ToastVariant = 'info', duration = 4000) => {
+      const id = Date.now() + Math.random();
+      setToasts((prev) => [...prev, { id, message, variant, duration }]);
     },
     [],
   );
 
-  const value = useMemo<ToastContextValue>(
+  const value = useMemo(
     () => ({
       toast,
       success: (message: string) => toast(message, 'success'),
       error: (message: string) => toast(message, 'error', 7000),
+      warning: (message: string) => toast(message, 'warning', 5000),
+      info: (message: string) => toast(message, 'info', 4000),
       dismiss,
     }),
     [toast, dismiss],

@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import type { Restaurant } from '@/types/restaurant';
 import type { BranchStatus } from '@/types/branch';
+import { ValidatedInput, ValidatedSelect } from '@/components/ui/validated-input';
+import { validateText, validateCode, validatePhone } from '@/lib/validation';
 
 export interface BranchFormData {
   restaurantId: string;
@@ -47,31 +49,85 @@ export function BranchForm({
     initialValues?.status ?? 'ACTIVE',
   );
 
+  const [errors, setErrors] = useState<{
+    restaurantId?: string;
+    name?: string;
+    code?: string;
+    phone?: string;
+    postalCode?: string;
+  }>({});
+
   const [formError, setFormError] = useState('');
+
+  const validateField = (field: string, val: any) => {
+    const nextErrors = { ...errors };
+
+    switch (field) {
+      case 'restaurantId':
+        if (!val && !isEdit) nextErrors.restaurantId = 'Please select a restaurant';
+        else delete nextErrors.restaurantId;
+        break;
+
+      case 'name': {
+        const res = validateText(val, 'Branch name', 2, 100);
+        if (!res.isValid) nextErrors.name = res.error;
+        else delete nextErrors.name;
+        break;
+      }
+
+      case 'code': {
+        const res = validateCode(val, 2, 10, 'Branch code');
+        if (!res.isValid) nextErrors.code = res.error;
+        else delete nextErrors.code;
+        break;
+      }
+
+      case 'phone': {
+        const res = validatePhone(val, false);
+        if (!res.isValid) nextErrors.phone = res.error;
+        else delete nextErrors.phone;
+        break;
+      }
+
+      case 'postalCode': {
+        if (val && val.trim().length > 10) nextErrors.postalCode = 'Postal code cannot exceed 10 characters';
+        else delete nextErrors.postalCode;
+        break;
+      }
+    }
+
+    setErrors(nextErrors);
+    return nextErrors;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!name.trim()) {
-      setFormError('Branch name is required.');
-      return;
-    }
+    const nameRes = validateText(name, 'Branch name', 2, 100);
+    const codeRes = validateCode(code, 2, 10, 'Branch code');
+    const phoneRes = validatePhone(phone, false);
+    const restValid = Boolean(restaurantId || isEdit);
 
-    if (!code.trim()) {
-      setFormError('Branch code is required.');
-      return;
-    }
+    const validationErrors: typeof errors = {};
+    if (!restValid) validationErrors.restaurantId = 'Please select a restaurant';
+    if (!nameRes.isValid) validationErrors.name = nameRes.error;
+    if (!codeRes.isValid) validationErrors.code = codeRes.error;
+    if (!phoneRes.isValid) validationErrors.phone = phoneRes.error;
+    if (postalCode && postalCode.trim().length > 10) validationErrors.postalCode = 'Postal code cannot exceed 10 characters';
 
-    if (!restaurantId && !isEdit) {
-      setFormError('Please select a restaurant.');
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      setFormError('Please resolve the highlighted errors before saving.');
       return;
     }
 
     setFormError('');
+    setErrors({});
+
     await onSubmit({
       restaurantId,
       name: name.trim(),
-      code: code.trim(),
+      code: code.trim().toUpperCase(),
       address: address.trim() || undefined,
       city: city.trim() || undefined,
       state: state.trim() || undefined,
@@ -82,146 +138,130 @@ export function BranchForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6" noValidate>
       {formError && (
-        <div className="rounded-lg border border-[#EF4444]/40 bg-[#EF4444]/10 p-4 text-sm text-[#EF4444]">
+        <div className="rounded-xl border border-[#EF4444]/40 bg-[#EF4444]/10 p-4 text-sm text-[#EF4444] animate-in fade-in">
           {formError}
         </div>
       )}
 
       <div className="space-y-4 rounded-xl border border-[#26313C] bg-[#111820] p-6 shadow-xl">
         {!isEdit && (
-          <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
-              Restaurant *
-            </label>
-            <select
-              value={restaurantId}
-              onChange={(e) => setRestaurantId(e.target.value)}
-              required
-              className="mt-1.5 w-full rounded-lg border border-[#26313C] bg-[#18212B] px-3.5 py-2.5 text-sm text-[#F5F7FA] outline-none focus:border-[#2AFEB7]"
-            >
-              {restaurants.map((r) => (
-                <option key={r.id} value={r.id}>
-                  {r.name} ({r.slug})
-                </option>
-              ))}
-            </select>
-          </div>
+          <ValidatedSelect
+            label="Restaurant"
+            required
+            value={restaurantId}
+            error={errors.restaurantId}
+            onChange={(e) => {
+              setRestaurantId(e.target.value);
+              validateField('restaurantId', e.target.value);
+            }}
+          >
+            {restaurants.map((r) => (
+              <option key={r.id} value={r.id}>
+                {r.name} ({r.slug})
+              </option>
+            ))}
+          </ValidatedSelect>
         )}
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
-              Branch Name *
-            </label>
-            <input
-              type="text"
-              required
-              placeholder="e.g. Agartala Branch"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="mt-1.5 w-full rounded-lg border border-[#26313C] bg-[#18212B] px-3.5 py-2 text-sm text-[#F5F7FA] placeholder-[#9AA6B2] outline-none focus:border-[#2AFEB7]"
-            />
-          </div>
+          <ValidatedInput
+            label="Branch Name"
+            required
+            maxLength={100}
+            showCount
+            placeholder="e.g. Agartala Branch"
+            value={name}
+            error={errors.name}
+            onChange={(e) => {
+              setName(e.target.value);
+              validateField('name', e.target.value);
+            }}
+            onBlur={(e) => validateField('name', e.target.value)}
+          />
 
-          <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
-              Branch Code *
-            </label>
-            <input
-              type="text"
-              required
-              placeholder="e.g. AGT-01"
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-              className="mt-1.5 w-full rounded-lg border border-[#26313C] bg-[#18212B] px-3.5 py-2 text-sm text-[#F5F7FA] placeholder-[#9AA6B2] outline-none focus:border-[#2AFEB7]"
-            />
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
-            Address
-          </label>
-          <input
-            type="text"
-            placeholder="e.g. 123 Central Road"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-            className="mt-1.5 w-full rounded-lg border border-[#26313C] bg-[#18212B] px-3.5 py-2 text-sm text-[#F5F7FA] placeholder-[#9AA6B2] outline-none focus:border-[#2AFEB7]"
+          <ValidatedInput
+            label="Branch Code"
+            required
+            maxLength={10}
+            uppercase
+            showCount
+            placeholder="e.g. AGT-01"
+            value={code}
+            error={errors.code}
+            helperText="2-10 chars, uppercase alphanumeric"
+            onChange={(e) => {
+              setCode(e.target.value);
+              validateField('code', e.target.value);
+            }}
+            onBlur={(e) => validateField('code', e.target.value)}
           />
         </div>
 
+        <ValidatedInput
+          label="Address"
+          maxLength={150}
+          placeholder="e.g. 123 Central Road"
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
+        />
+
         <div className="grid gap-4 sm:grid-cols-3">
-          <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
-              City
-            </label>
-            <input
-              type="text"
-              placeholder="e.g. Agartala"
-              value={city}
-              onChange={(e) => setCity(e.target.value)}
-              className="mt-1.5 w-full rounded-lg border border-[#26313C] bg-[#18212B] px-3.5 py-2 text-sm text-[#F5F7FA] placeholder-[#9AA6B2] outline-none focus:border-[#2AFEB7]"
-            />
-          </div>
+          <ValidatedInput
+            label="City"
+            maxLength={50}
+            placeholder="e.g. Agartala"
+            value={city}
+            onChange={(e) => setCity(e.target.value)}
+          />
 
-          <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
-              State
-            </label>
-            <input
-              type="text"
-              placeholder="e.g. Tripura"
-              value={state}
-              onChange={(e) => setState(e.target.value)}
-              className="mt-1.5 w-full rounded-lg border border-[#26313C] bg-[#18212B] px-3.5 py-2 text-sm text-[#F5F7FA] placeholder-[#9AA6B2] outline-none focus:border-[#2AFEB7]"
-            />
-          </div>
+          <ValidatedInput
+            label="State"
+            maxLength={50}
+            placeholder="e.g. Tripura"
+            value={state}
+            onChange={(e) => setState(e.target.value)}
+          />
 
-          <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
-              Postal Code
-            </label>
-            <input
-              type="text"
-              placeholder="e.g. 799001"
-              value={postalCode}
-              onChange={(e) => setPostalCode(e.target.value)}
-              className="mt-1.5 w-full rounded-lg border border-[#26313C] bg-[#18212B] px-3.5 py-2 text-sm text-[#F5F7FA] placeholder-[#9AA6B2] outline-none focus:border-[#2AFEB7]"
-            />
-          </div>
+          <ValidatedInput
+            label="Postal Code"
+            maxLength={10}
+            placeholder="e.g. 799001"
+            value={postalCode}
+            error={errors.postalCode}
+            onChange={(e) => {
+              setPostalCode(e.target.value);
+              validateField('postalCode', e.target.value);
+            }}
+            onBlur={(e) => validateField('postalCode', e.target.value)}
+          />
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
-              Phone
-            </label>
-            <input
-              type="text"
-              placeholder="e.g. +91 9876543210"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              className="mt-1.5 w-full rounded-lg border border-[#26313C] bg-[#18212B] px-3.5 py-2 text-sm text-[#F5F7FA] placeholder-[#9AA6B2] outline-none focus:border-[#2AFEB7]"
-            />
-          </div>
+          <ValidatedInput
+            label="Phone Number"
+            type="tel"
+            maxLength={15}
+            placeholder="e.g. +91 9876543210"
+            value={phone}
+            error={errors.phone}
+            helperText="7 to 15 digits with optional country code"
+            onChange={(e) => {
+              setPhone(e.target.value);
+              validateField('phone', e.target.value);
+            }}
+            onBlur={(e) => validateField('phone', e.target.value)}
+          />
 
-          <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
-              Status
-            </label>
-            <select
-              value={status}
-              onChange={(e) => setStatus(e.target.value as BranchStatus)}
-              className="mt-1.5 w-full rounded-lg border border-[#26313C] bg-[#18212B] px-3.5 py-2 text-sm text-[#F5F7FA] outline-none focus:border-[#2AFEB7]"
-            >
-              <option value="ACTIVE">ACTIVE</option>
-              <option value="INACTIVE">INACTIVE</option>
-              <option value="SUSPENDED">SUSPENDED</option>
-            </select>
-          </div>
+          <ValidatedSelect
+            label="Status"
+            value={status}
+            onChange={(e) => setStatus(e.target.value as BranchStatus)}
+          >
+            <option value="ACTIVE">ACTIVE</option>
+            <option value="INACTIVE">INACTIVE</option>
+          </ValidatedSelect>
         </div>
       </div>
 
@@ -237,7 +277,7 @@ export function BranchForm({
         <button
           type="submit"
           disabled={isLoading}
-          className="rounded-lg bg-[#2AFEB7] px-6 py-2.5 text-sm font-semibold text-[#0B0F14] transition-all hover:bg-[#22E5A4] disabled:opacity-50"
+          className="rounded-lg bg-[#2AFEB7] px-6 py-2.5 text-sm font-semibold text-[#0B0F14] transition-all hover:bg-[#22E5A4] disabled:opacity-50 font-bold"
         >
           {isLoading ? 'Saving...' : isEdit ? 'Update Branch' : 'Create Branch'}
         </button>

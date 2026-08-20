@@ -6,7 +6,8 @@ import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { LoggerModule } from 'nestjs-pino';
 
-import { configuration, envValidationSchema } from './config/index';
+import { configuration } from './config/configuration';
+import { envValidationSchema } from './config/env.validation';
 import { CacheModule } from './common/cache/cache.module';
 import { PrismaModule } from './database/prisma/prisma.module';
 import { HealthModule } from './modules/health/health.module';
@@ -40,6 +41,10 @@ import { AiModule } from './modules/ai/ai.module';
 import { AutomationModule } from './modules/automation/automation.module';
 import { MonitoringModule } from './modules/monitoring/monitoring.module';
 import { SupportModule } from './modules/support/support.module';
+import { DataIntelligenceModule } from './modules/data-intelligence/data-intelligence.module';
+import { AnalyticsModule } from './modules/analytics/analytics.module';
+import { ReportsModule } from './modules/reports/reports.module';
+import { ForecastsModule } from './modules/forecasts/forecasts.module';
 import { CorrelationIdMiddleware } from './common/middleware/correlation-id.middleware';
 import { MetricsMiddleware } from './common/metrics/metrics.middleware';
 import { MetricsService } from './common/metrics/metrics.service';
@@ -64,6 +69,7 @@ import { QueueService } from './common/queue/queue.service';
     CartModule, OrdersModule, PaymentsModule, InventoryModule,
     SubscriptionsModule, TableCallsModule, AuditModule, SearchModule,
     DeliveryModule, AiModule, AutomationModule, SupportModule,
+    DataIntelligenceModule, AnalyticsModule, ReportsModule, ForecastsModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },

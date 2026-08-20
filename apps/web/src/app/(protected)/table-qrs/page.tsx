@@ -31,7 +31,8 @@ export default function TableQrsDashboard() {
       setDetectedIp(window.location.hostname);
       setDetectedBaseUrl(window.location.origin);
     } else {
-      fetch('/api/server-ip')
+      const activePort = window.location.port || '4001';
+      fetch(`/api/server-ip?port=${activePort}`)
         .then((r) => r.json())
         .then((data: { ip: string | null; baseUrl: string | null }) => {
           setDetectedIp(data.ip || window.location.hostname);

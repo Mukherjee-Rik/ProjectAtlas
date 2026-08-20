@@ -5,12 +5,15 @@ import { useRestaurant } from '@/hooks/use-restaurant';
 import { useBranch } from '@/hooks/use-branch';
 import { getTables } from '@/services/tables.service';
 import { getDiningAreas } from '@/services/dining-areas.service';
+import { printThermalReceipt } from '@/lib/receipt-printer';
 import { cancelOrder, createCancellationRequest } from '@/services/orders.service';
 import { apiClient } from '@/services/api-client';
 import type { RestaurantTable } from '@/types/table';
 import type { DiningArea } from '@/types/dining-area';
 import { CANCELLATION_REASONS } from '@/types/order';
 import { formatCurrency } from '@/lib/currency';
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
+import { useToast } from '@/components/ui/toast';
 
 // Synthesize a calming, classical guitar arpeggio pluck sound using Web Audio API
 function playGuitarSound() {
@@ -48,6 +51,7 @@ function playGuitarSound() {
 export default function WaiterDashboard() {
   const { currentRestaurant } = useRestaurant();
   const { currentBranch } = useBranch();
+  const { success: toastSuccess, error: toastError, warning: toastWarning } = useToast();
 
   const [diningAreas, setDiningAreas] = useState<DiningArea[]>([]);
   const [tables, setTables] = useState<RestaurantTable[]>([]);
@@ -57,6 +61,10 @@ export default function WaiterDashboard() {
   const [error, setError] = useState('');
   const [updatingTableId, setUpdatingTableId] = useState<string | null>(null);
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
+
+  // Table clearing modal state
+  const [tableToClear, setTableToClear] = useState<RestaurantTable | null>(null);
+  const [isClearingTable, setIsClearingTable] = useState(false);
 
   // Selected table detail
   const [selectedTable, setSelectedTable] = useState<RestaurantTable | null>(null);
@@ -97,7 +105,7 @@ export default function WaiterDashboard() {
   const handleCancelOrderSubmit = async () => {
     if (!cancellationOrder) return;
     if (cancellationReason === 'OTHER' && !cancellationNote.trim()) {
-      alert('Please provide a note when choosing Other as cancellation reason.');
+      toastWarning('Please provide a note when choosing Other as cancellation reason.');
       return;
     }
 
@@ -107,53 +115,66 @@ export default function WaiterDashboard() {
 
     setIsSubmittingCancel(true);
     try {
-      if (hasPaid) {
-        await createCancellationRequest(
-          cancellationOrder.id,
-          cancellationReason,
-          cancellationNote,
-        );
-        alert(`Cancellation request submitted to Cashier for Order #${cancellationOrder.orderNumber}!`);
-      } else {
-        await cancelOrder(
-          cancellationOrder.id,
-          cancellationReason,
-          cancellationNote,
-        );
+      await createCancellationRequest(
+        cancellationOrder.id,
+        cancellationReason,
+        cancellationNote,
+      );
 
-        // Optimistically update order status in local state
-        setSelectedTable((prev) => {
-          if (!prev) return null;
+      // Optimistically update order with pending cancellation request in local state
+      setSelectedTable((prev) => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          customerSessions: prev.customerSessions?.map((s) => ({
+            ...s,
+            orders: s.orders?.map((o) =>
+              o.id === cancellationOrder.id
+                ? {
+                    ...o,
+                    cancellationRequests: [
+                      {
+                        status: 'PENDING_REVIEW',
+                        reason: cancellationReason,
+                        note: cancellationNote,
+                      },
+                    ],
+                  }
+                : o,
+            ),
+          })),
+        };
+      });
+
+      setTables((prevTables) =>
+        prevTables.map((t) => {
+          if (t.id !== selectedTableIdRef.current) return t;
           return {
-            ...prev,
-            customerSessions: prev.customerSessions?.map((s) => ({
+            ...t,
+            customerSessions: t.customerSessions?.map((s) => ({
               ...s,
               orders: s.orders?.map((o) =>
                 o.id === cancellationOrder.id
-                  ? { ...o, status: 'CANCELLED' as any, cancellationReason }
+                  ? {
+                      ...o,
+                      cancellationRequests: [
+                        {
+                          status: 'PENDING_REVIEW',
+                          reason: cancellationReason,
+                          note: cancellationNote,
+                        },
+                      ],
+                    }
                   : o,
               ),
             })),
           };
-        });
+        }),
+      );
 
-        setTables((prevTables) =>
-          prevTables.map((t) => {
-            if (t.id !== selectedTableIdRef.current) return t;
-            return {
-              ...t,
-              customerSessions: t.customerSessions?.map((s) => ({
-                ...s,
-                orders: s.orders?.map((o) =>
-                  o.id === cancellationOrder.id
-                    ? { ...o, status: 'CANCELLED' as any, cancellationReason }
-                    : o,
-                ),
-              })),
-            };
-          }),
-        );
-      }
+      toastSuccess(
+        `Cancellation request for Order #${cancellationOrder.orderNumber} sent to Owner / Cashier for approval!`,
+      );
 
       setCancellationOrder(null);
       setCancellationReason('CUSTOMER_REQUESTED');
@@ -161,7 +182,7 @@ export default function WaiterDashboard() {
       void loadDataSilently(notifiedOrderIds, notifiedCallIds);
     } catch (err: any) {
       console.error('Cancellation error:', err);
-      alert(err?.message ?? 'Failed to process cancellation.');
+      toastError(err?.message ?? 'Failed to process cancellation.');
     } finally {
       setIsSubmittingCancel(false);
     }
@@ -349,9 +370,9 @@ export default function WaiterDashboard() {
       setActiveMenu(res.data);
     } catch (err) {
       console.error(err);
-      alert('Unable to load menu for order taking.');
+      toastError('Unable to load menu for order taking.');
     }
-  }, [selectedTable]);
+  }, [selectedTable, toastError]);
 
   useEffect(() => {
     if (isOrdering) {
@@ -392,16 +413,24 @@ export default function WaiterDashboard() {
 
       const updated = freshTables.find((t: any) => t.id === table.id);
       if (updated) setSelectedTable(updated);
+      toastSuccess(`Guests seated at Table ${table.name}!`);
     } catch (err: any) {
-      alert(err?.message ?? 'Failed to seat guests.');
+      toastError(err?.message ?? 'Failed to seat guests.');
     } finally {
       setUpdatingTableId(null);
     }
   };
 
-  // Clear table
-  const handleClearTable = async (table: RestaurantTable) => {
-    if (!confirm(`End session and clear Table ${table.name}?`)) return;
+  // Clear table trigger modal
+  const handleClearTable = (table: RestaurantTable) => {
+    setTableToClear(table);
+  };
+
+  // Execute Clear table after confirmation popup
+  const executeClearTable = async () => {
+    if (!tableToClear) return;
+    const table = tableToClear;
+    setIsClearingTable(true);
     setUpdatingTableId(table.id);
 
     // 1. Optimistically clear active session in UI (turns green immediately)
@@ -423,12 +452,15 @@ export default function WaiterDashboard() {
           throw authErr;
         }
       }
+      setTableToClear(null);
+      toastSuccess(`Table ${table.name} session ended & cleared!`);
       void loadDataSilently(notifiedOrderIds, notifiedCallIds);
     } catch (err: any) {
       console.error('Failed to clear table:', err);
-      alert(err?.message ?? 'Failed to end table session.');
+      toastError(err?.message ?? 'Failed to end table session.');
       void loadData(false);
     } finally {
+      setIsClearingTable(false);
       setUpdatingTableId(null);
     }
   };
@@ -478,9 +510,10 @@ export default function WaiterDashboard() {
         const freshTable = freshTables.find((t: any) => t.id === selectedTableIdRef.current);
         if (freshTable) setSelectedTable(freshTable);
       }
+      toastSuccess(`Order status updated to ${label}!`);
     } catch (err: any) {
       console.error(err);
-      alert(err?.message ?? `Failed to update status to ${label.toLowerCase()}.`);
+      toastError(err?.message ?? `Failed to update status to ${label.toLowerCase()}.`);
       void loadDataSilently(notifiedOrderIds, notifiedCallIds);
     } finally {
       setUpdatingOrderId(null);
@@ -494,15 +527,28 @@ export default function WaiterDashboard() {
       const res = await apiClient.get<any>(`/public/tables/${table.publicToken}/orders`);
       const fetchedOrders = res.data ?? [];
       if (fetchedOrders.length === 0) {
-        alert('No orders placed in this session yet.');
+        toastWarning('No orders placed in this session yet.');
         return;
       }
-      setPrintOrders(fetchedOrders);
-      setTimeout(() => {
-        window.print();
-      }, 300);
+      const grandTotal = fetchedOrders.reduce((sum: number, o: any) => sum + Number(o.totalAmount || 0), 0);
+      printThermalReceipt({
+        restaurantName: currentRestaurant?.name || 'CAFE RIZZ',
+        branchName: currentBranch?.name || 'Main Branch',
+        tableName: table.name,
+        dateTime: new Date().toLocaleString(),
+        orders: fetchedOrders.map((o: any) => ({
+          orderNumber: o.orderNumber,
+          totalAmount: Number(o.totalAmount || 0),
+          items: (o.items ?? []).map((it: any) => ({
+            name: it.name,
+            quantity: it.quantity,
+            totalPrice: Number(it.totalPrice || 0),
+          })),
+        })),
+        grandTotal,
+      });
     } catch (err: any) {
-      alert(err?.message ?? 'Failed to prepare bill receipt.');
+      toastError(err?.message ?? 'Failed to prepare bill receipt.');
     } finally {
       setIsPrinting(false);
     }
@@ -545,9 +591,9 @@ export default function WaiterDashboard() {
       setCartItems([]);
       setIsOrdering(false);
       await loadData(false);
-      alert('Order placed successfully for table!');
+      toastSuccess('Order placed successfully for table!');
     } catch (err: any) {
-      alert(err?.message ?? 'Failed to submit order.');
+      toastError(err?.message ?? 'Failed to submit order.');
     } finally {
       setIsLoading(false);
     }
@@ -574,11 +620,14 @@ export default function WaiterDashboard() {
     activeAreaId === 'ALL' ? true : t.diningAreaId === activeAreaId,
   );
 
-  // Calculate quick stats
+  // Calculate quick stats (strict occupancy: only occupied if active unsettled orders exist)
   const totalTables = tables.length;
-  const occupiedCount = tables.filter(
-    (t) => t.customerSessions?.some((s) => s.status === 'ACTIVE'),
-  ).length;
+  const occupiedCount = tables.filter((t) => {
+    const session = t.customerSessions?.find((s) => s.status === 'ACTIVE');
+    if (!session) return false;
+    const orders = session.orders ?? [];
+    return orders.some((o) => !['COMPLETED', 'CANCELLED'].includes(o.status));
+  }).length;
   const availableCount = totalTables - occupiedCount;
   const readyCount = tables.filter((t) =>
     t.customerSessions?.some((s) => s.orders?.some((o) => o.status === 'READY')),
@@ -586,26 +635,26 @@ export default function WaiterDashboard() {
 
   return (
     <div className="space-y-6">
-      {/* Printable Receipt Container */}
-      <div className="hidden print:block print:p-4 text-black bg-white font-mono text-xs w-80 mx-auto">
-        <div className="text-center border-b pb-2 mb-2">
-          <h2 className="text-base font-bold uppercase">{currentRestaurant?.name}</h2>
+      {/* Printable Thermal Receipt (80mm POS Roll) */}
+      <div id="printable-receipt" className="hidden print:block text-black bg-white font-mono text-xs w-[76mm] mx-auto p-1 leading-tight">
+        <div className="text-center border-b border-dashed border-black pb-2 mb-2">
+          <h2 className="text-sm font-black uppercase tracking-wider">{currentRestaurant?.name || 'RESTAURANT'}</h2>
           <p className="text-[10px]">{currentBranch?.name}</p>
-          <p className="mt-1 font-bold">TABLE {selectedTable?.name}</p>
-          <p className="text-[10px] text-gray-600">{new Date().toLocaleString()}</p>
+          <p className="mt-1 font-bold text-xs">TABLE {selectedTable?.name}</p>
+          <p className="text-[9px] text-gray-700">{new Date().toLocaleString()}</p>
         </div>
 
-        <div className="space-y-2 border-b pb-2 mb-2">
+        <div className="space-y-2 border-b border-dashed border-black pb-2 mb-2">
           {printOrders.map((o) => (
             <div key={o.id} className="space-y-1">
-              <div className="flex justify-between font-bold text-[11px]">
-                <span>Order #{o.orderNumber}</span>
+              <div className="flex justify-between font-bold text-[10px] border-b border-dotted pb-0.5">
+                <span>Token #{o.orderNumber}</span>
                 <span>{formatCurrency(o.totalAmount)}</span>
               </div>
               {o.items?.map((item: any) => (
-                <div key={item.id} className="flex justify-between text-[10px] pl-2 text-gray-800">
-                  <span>{item.quantity}x {item.name}</span>
-                  <span>{formatCurrency(item.totalPrice)}</span>
+                <div key={item.id} className="flex justify-between text-[10px]">
+                  <span className="truncate pr-1">{item.quantity}x {item.name}</span>
+                  <span className="font-bold shrink-0">{formatCurrency(item.totalPrice)}</span>
                 </div>
               ))}
             </div>
@@ -615,15 +664,18 @@ export default function WaiterDashboard() {
         {(() => {
           const grandTotal = printOrders.reduce((sum, o) => sum + Number(o.totalAmount || 0), 0);
           return (
-            <div className="pt-2 text-sm font-black flex justify-between">
-              <span>GRAND TOTAL:</span>
-              <span>{formatCurrency(grandTotal)}</span>
+            <div className="space-y-1 border-b border-dashed border-black pb-2 mb-2 text-[11px]">
+              <div className="flex justify-between text-xs font-black pt-1">
+                <span>GRAND TOTAL:</span>
+                <span>{formatCurrency(grandTotal)}</span>
+              </div>
             </div>
           );
         })()}
 
-        <div className="mt-4 text-center text-[9px] text-gray-500">
-          *** Thank you for dining with us ***
+        <div className="text-center text-[9px] text-gray-800 pt-1">
+          <p className="font-bold">*** THANK YOU FOR DINING WITH US ***</p>
+          <p className="text-[8px] text-gray-600 mt-0.5">Please visit again</p>
         </div>
       </div>
 
@@ -709,8 +761,9 @@ export default function WaiterDashboard() {
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-3 xl:grid-cols-4 gap-3">
               {filteredTables.map((table) => {
                 const activeSession = table.customerSessions?.find((s) => s.status === 'ACTIVE');
-                const isOccupied = !!activeSession;
                 const orders = activeSession?.orders ?? [];
+                const activeOrders = orders.filter((o) => !['COMPLETED', 'CANCELLED'].includes(o.status));
+                const isOccupied = !!activeSession && (orders.length === 0 ? false : activeOrders.length > 0);
                 const hasReadyOrders = orders.some((o) => o.status === 'READY');
                 const isSelected = selectedTable?.id === table.id;
 
@@ -733,7 +786,7 @@ export default function WaiterDashboard() {
                     key={table.id}
                     type="button"
                     onClick={() => setSelectedTable(table)}
-                    className={`flex flex-col justify-between rounded-xl border p-3.5 sm:p-4 text-left shadow-md transition-all active:scale-[0.98] ${cardBorder}`}
+                    className={`flex flex-col justify-between rounded-xl border p-3.5 sm:p-4 text-left shadow-md transition-all active:scale-[0.98] cursor-pointer ${cardBorder}`}
                   >
                     <div className="flex items-center justify-between w-full">
                       <span className="text-sm font-extrabold text-[#F5F7FA]">
@@ -750,7 +803,7 @@ export default function WaiterDashboard() {
                     <div className="mt-3 pt-2 border-t border-[#26313C]/40 flex items-center justify-between text-[10px] sm:text-[11px] text-[#9AA6B2] w-full">
                       <span>👥 {table.capacity}p</span>
                       <span className={isOccupied ? 'font-bold text-[#F5F7FA]' : 'text-[#22C55E]'}>
-                        {isOccupied ? `${orders.length} orders` : 'Available'}
+                        {isOccupied ? `${activeOrders.length} active order${activeOrders.length !== 1 ? 's' : ''}` : 'Available'}
                       </span>
                     </div>
                   </button>
@@ -777,7 +830,7 @@ export default function WaiterDashboard() {
                   <button
                     type="button"
                     onClick={() => setSelectedTable(null)}
-                    className="rounded-lg border border-[#26313C] bg-[#18212B] px-2.5 py-1 text-xs text-[#9AA6B2] hover:text-[#F5F7FA]"
+                    className="rounded-lg border border-[#26313C] bg-[#18212B] px-2.5 py-1 text-xs text-[#9AA6B2] hover:text-[#F5F7FA] cursor-pointer"
                   >
                     ✕ Close
                   </button>
@@ -788,33 +841,54 @@ export default function WaiterDashboard() {
                   (() => {
                     const activeSession = selectedTable.customerSessions.find((s) => s.status === 'ACTIVE')!;
                     const allOrders = activeSession.orders ?? [];
+                    const activeOrders = allOrders.filter((o) => !['COMPLETED', 'CANCELLED'].includes(o.status));
 
                     return (
                       <div className="space-y-4">
-                        <div className="rounded-xl bg-[#EF4444]/10 border border-[#EF4444]/20 p-3 text-xs text-[#EF4444] space-y-2.5">
-                          <div className="flex items-center justify-between font-bold">
-                            <span>Occupied Guest Session</span>
-                            <span className="h-2 w-2 rounded-full bg-[#EF4444] animate-pulse" />
+                        {activeOrders.length > 0 ? (
+                          <div className="rounded-xl bg-[#EF4444]/10 border border-[#EF4444]/20 p-3 text-xs text-[#EF4444] space-y-2.5">
+                            <div className="flex items-center justify-between font-bold">
+                              <span>Occupied Guest Session</span>
+                              <span className="h-2 w-2 rounded-full bg-[#EF4444] animate-pulse" />
+                            </div>
+                            <div className="flex gap-2">
+                              <button
+                                type="button"
+                                disabled={isPrinting}
+                                onClick={() => handlePrintBill(selectedTable)}
+                                className="flex-1 rounded-lg bg-[#18212B] border border-[#26313C] py-2 text-xs font-bold text-[#F5F7FA] hover:border-[#2AFEB7] transition-all text-center cursor-pointer"
+                              >
+                                {isPrinting ? 'Printing...' : '🖨️ Print Bill'}
+                              </button>
+                              <button
+                                type="button"
+                                disabled={updatingTableId === selectedTable.id}
+                                onClick={() => handleClearTable(selectedTable)}
+                                className="flex-1 rounded-lg bg-[#EF4444]/20 py-2 text-xs font-bold text-[#EF4444] hover:bg-[#EF4444]/30 transition-all disabled:opacity-50 text-center cursor-pointer"
+                              >
+                                Clear Table
+                              </button>
+                            </div>
                           </div>
-                          <div className="flex gap-2">
-                            <button
-                              type="button"
-                              disabled={isPrinting}
-                              onClick={() => handlePrintBill(selectedTable)}
-                              className="flex-1 rounded-lg bg-[#18212B] border border-[#26313C] py-2 text-xs font-bold text-[#F5F7FA] hover:border-[#2AFEB7] transition-all text-center"
-                            >
-                              {isPrinting ? 'Printing...' : '🖨️ Print Bill'}
-                            </button>
+                        ) : (
+                          <div className="rounded-xl bg-[#22C55E]/10 border border-[#22C55E]/20 p-3 text-xs text-[#22C55E] space-y-2.5">
+                            <div className="flex items-center justify-between font-bold">
+                              <span>Table Available</span>
+                              <span className="h-2 w-2 rounded-full bg-[#22C55E]" />
+                            </div>
+                            <p className="text-[11px] text-[#9AA6B2]">
+                              All orders settled / no active orders. Ready for guests.
+                            </p>
                             <button
                               type="button"
                               disabled={updatingTableId === selectedTable.id}
                               onClick={() => handleClearTable(selectedTable)}
-                              className="flex-1 rounded-lg bg-[#EF4444]/20 py-2 text-xs font-bold text-[#EF4444] hover:bg-[#EF4444]/30 transition-all disabled:opacity-50 text-center"
+                              className="w-full rounded-lg bg-[#18212B] border border-[#26313C] py-2 text-xs font-bold text-[#9AA6B2] hover:text-[#EF4444] hover:border-[#EF4444]/40 transition-all text-center cursor-pointer"
                             >
-                              Clear Table
+                              Clear Session
                             </button>
                           </div>
-                        </div>
+                        )}
 
                         {/* Active Session Orders */}
                         <div className="space-y-2.5">
@@ -913,7 +987,7 @@ export default function WaiterDashboard() {
                                             }}
                                             className="rounded border border-red-500/30 bg-red-500/10 px-2 py-1.5 text-[10px] font-bold text-red-400 hover:bg-red-500/20"
                                           >
-                                            {hasPaid ? 'Req Cancel' : 'Cancel'}
+                                            Request Cancel
                                           </button>
                                         )}
                                         <span className="font-bold text-[#F5F7FA] pl-1">
@@ -1215,18 +1289,28 @@ export default function WaiterDashboard() {
                 type="button"
                 disabled={isSubmittingCancel}
                 onClick={handleCancelOrderSubmit}
-                className="flex-1 rounded-lg bg-red-500 py-2.5 text-xs font-bold text-white hover:bg-red-600 disabled:opacity-50 transition-all"
+                className="flex-1 rounded-lg bg-red-500 py-2.5 text-xs font-bold text-white hover:bg-red-600 disabled:opacity-50 transition-all cursor-pointer"
               >
-                {isSubmittingCancel
-                  ? 'Submitting...'
-                  : cancellationOrder.payments?.some((p: any) => p.status === 'SUCCESS' || p.status === 'PARTIALLY_REFUNDED')
-                  ? 'Submit Request'
-                  : 'Confirm Cancel'}
+                {isSubmittingCancel ? 'Submitting...' : 'Submit Request to Owner'}
               </button>
             </div>
           </div>
         </div>
       )}
+
+      {/* Confirmation Popup Modal for Clearing Table (No Browser Alerts) */}
+      <ConfirmDialog
+        open={!!tableToClear}
+        title={`End Session & Clear Table ${tableToClear?.name}?`}
+        description={`Are you sure you want to end the dining session for Table ${tableToClear?.name}? This will free up the table for new guests and mark all served orders as closed.`}
+        confirmText="Yes, Clear Table"
+        confirmLoadingText="Clearing Table..."
+        variant="primary"
+        icon={<span className="text-xl">🧹</span>}
+        isLoading={isClearingTable}
+        onConfirm={executeClearTable}
+        onCancel={() => setTableToClear(null)}
+      />
     </div>
   );
 }

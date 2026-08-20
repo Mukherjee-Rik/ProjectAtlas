@@ -41,7 +41,9 @@ function getLocalNetworkIp(): string | null {
 
 export async function GET(request: Request) {
   const ip = getLocalNetworkIp();
-  const port = new URL(request.url).searchParams.get('port') ?? '3001';
+  const host = request.headers.get('host') || '';
+  const incomingPort = host.includes(':') ? host.split(':')[1] : new URL(request.url).port;
+  const port = new URL(request.url).searchParams.get('port') ?? (incomingPort || '4001');
   const baseUrl = ip ? `http://${ip}:${port}` : null;
 
   return NextResponse.json({
