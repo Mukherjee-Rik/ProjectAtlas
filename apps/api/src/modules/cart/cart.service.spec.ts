@@ -525,7 +525,10 @@ describe('CartService', () => {
       cartRows([]);
 
       await service.removeItem(TOKEN, 'ci-1');
-      expect(prisma.cartItem.findFirst.mock.calls[0][0].where).toEqual({ id: 'ci-1', cartId: 'cart-1' });
+      expect(prisma.cartItem.findFirst.mock.calls[0][0].where).toEqual({
+        cartId: 'cart-1',
+        OR: [{ id: 'ci-1' }, { menuItemId: 'ci-1' }],
+      });
     });
   });
 

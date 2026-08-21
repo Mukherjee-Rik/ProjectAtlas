@@ -1,16 +1,21 @@
-import { Controller, Get, Query, Headers, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RestaurantAccessGuard } from '../auth/guards/restaurant-access.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { CurrentRestaurant } from '../auth/decorators/current-restaurant.decorator';
 import { SearchService } from './search.service';
+import { RESTAURANT_HEADER } from '../auth/constants/tenant.constants';
+import type { CurrentRestaurant as CurrentRestaurantType } from '../auth/types/current-restaurant.type';
 
 @ApiTags('Search')
+@ApiBearerAuth('access-token')
+@ApiHeader({ name: RESTAURANT_HEADER, required: false })
 @Controller({
   path: 'search',
   version: '1',
 })
-@UseGuards(JwtAuthGuard)
-@ApiBearerAuth('access-token')
+@UseGuards(JwtAuthGuard, RestaurantAccessGuard)
 export class SearchController {
   constructor(private readonly searchService: SearchService) {}
 
@@ -20,8 +25,8 @@ export class SearchController {
     @Query('q') query: string,
     @CurrentUser('id') userId: string,
     @CurrentUser('role') role: string,
-    @Headers('x-restaurant-id') restaurantId?: string,
+    @CurrentRestaurant() restaurant?: CurrentRestaurantType,
   ) {
-    return this.searchService.globalSearch(query, userId, role, restaurantId);
+    return this.searchService.globalSearch(query, userId, role, restaurant?.id);
   }
 }

@@ -20,10 +20,12 @@ import { RestaurantAccessGuard } from '../auth/guards/restaurant-access.guard';
 import { Permissions } from '../auth/decorators/permissions.decorator';
 import { CurrentRestaurant } from '../auth/decorators/current-restaurant.decorator';
 import { CurrentBranch } from '../auth/decorators/current-branch.decorator';
+import { CurrentTenant } from '../auth/decorators/current-tenant.decorator';
 import { PERMISSIONS } from '../auth/permissions/permissions';
 import { RESTAURANT_HEADER, TENANT_HEADER, BRANCH_HEADER } from '../auth/constants/tenant.constants';
 import type { CurrentRestaurant as CurrentRestaurantType } from '../auth/types/current-restaurant.type';
 import type { CurrentBranch as CurrentBranchType } from '../auth/types/current-branch.type';
+import type { CurrentTenant as CurrentTenantType } from '../auth/types/current-tenant.type';
 import { IsString, IsNotEmpty, IsOptional, IsNumber, Min, IsEnum, IsArray, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 import { UnitOfMeasure, StockTransactionType } from '../../generated/prisma/enums';
@@ -337,17 +339,25 @@ export class InventoryController {
   // =========================================================================
   @Get('suppliers')
   @Permissions(PERMISSIONS.MENUS_READ)
-  async getSuppliers(@Headers(TENANT_HEADER) tenantId: string) {
-    return this.inventoryService.getSuppliers(tenantId);
+  async getSuppliers(
+    @CurrentRestaurant() restaurant: CurrentRestaurantType,
+    @CurrentTenant() tenant?: CurrentTenantType,
+  ) {
+    const targetTenantId = tenant?.id || restaurant?.tenantId;
+    if (!targetTenantId) throw new BadRequestException('No active tenant selected');
+    return this.inventoryService.getSuppliers(targetTenantId);
   }
 
   @Post('suppliers')
   @Permissions(PERMISSIONS.MENUS_UPDATE)
   async createSupplier(
-    @Headers(TENANT_HEADER) tenantId: string,
+    @CurrentRestaurant() restaurant: CurrentRestaurantType,
+    @CurrentTenant() tenant: CurrentTenantType | undefined,
     @Body() dto: CreateSupplierDto,
   ) {
-    return this.inventoryService.createSupplier({ tenantId, ...dto });
+    const targetTenantId = tenant?.id || restaurant?.tenantId;
+    if (!targetTenantId) throw new BadRequestException('No active tenant selected');
+    return this.inventoryService.createSupplier({ tenantId: targetTenantId, ...dto });
   }
 
   @Get('locations')
@@ -368,15 +378,16 @@ export class InventoryController {
   @Post('locations')
   @Permissions(PERMISSIONS.MENUS_UPDATE)
   async createLocation(
-    @Headers(TENANT_HEADER) tenantId: string,
     @CurrentRestaurant() restaurant: CurrentRestaurantType,
     @CurrentBranch() branch: CurrentBranchType,
+    @CurrentTenant() tenant: CurrentTenantType | undefined,
     @Body() dto: CreateLocationDto,
   ) {
     const targetBranchId = branch?.id || (await this.inventoryService.getFirstBranchId(restaurant?.id));
     if (!targetBranchId) throw new BadRequestException('No active branch selected');
+    const targetTenantId = tenant?.id || restaurant?.tenantId;
     return this.inventoryService.createLocation({
-      tenantId: tenantId || restaurant?.tenantId,
+      tenantId: targetTenantId || '',
       branchId: targetBranchId,
       ...dto,
     });

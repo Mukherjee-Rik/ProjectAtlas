@@ -86,6 +86,19 @@ export class TenantsService {
     });
   }
 
+  async findByIdForUser(id: string, userId: string, role: string) {
+    const isPlatformOperator = role === 'PLATFORM_ADMIN';
+    if (!isPlatformOperator) {
+      const membership = await this.prisma.tenantMembership.findUnique({
+        where: { userId_tenantId: { userId, tenantId: id } },
+      });
+      if (!membership) {
+        throw new NotFoundException('Tenant not found');
+      }
+    }
+    return this.findById(id);
+  }
+
   async findById(id: string) {
     const tenant = await this.prisma.tenant.findUnique({
       where: {

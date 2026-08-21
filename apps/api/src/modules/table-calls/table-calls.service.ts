@@ -46,6 +46,33 @@ export class TableCallsService {
     return this.calls.filter((c) => c.branchId === branchId && c.status === 'PENDING');
   }
 
+  async resolveCallForUser(id: string, userId: string, role: string) {
+    const call = this.calls.find((c) => c.id === id);
+    if (!call) throw new NotFoundException('Call request not found');
+
+    if (role !== 'PLATFORM_ADMIN') {
+      const rest = await this.publicTablesService['prisma'].restaurant.findUnique({
+        where: { id: call.restaurantId },
+        select: { tenantId: true },
+      });
+      if (rest) {
+        const membership = await this.publicTablesService['prisma'].tenantMembership.findUnique({
+          where: {
+            userId_tenantId: {
+              userId,
+              tenantId: rest.tenantId,
+            },
+          },
+        });
+        if (!membership) {
+          throw new NotFoundException('Call request not found');
+        }
+      }
+    }
+
+    return this.resolveCall(id);
+  }
+
   resolveCall(id: string) {
     const call = this.calls.find((c) => c.id === id);
     if (!call) throw new NotFoundException('Call request not found');

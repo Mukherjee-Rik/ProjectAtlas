@@ -66,19 +66,69 @@ export class BranchAccessGuard implements CanActivate {
       throw new NotFoundException('Branch not found');
     }
 
-    if (request.tenant && branch.restaurant.tenantId !== request.tenant.id) {
-      throw new ForbiddenException(
-        'Target branch does not belong to current active tenant',
-      );
-    }
+    const user = request.user;
+    if (user && user.role !== 'PLATFORM_ADMIN') {
+      if (request.tenant && branch.restaurant.tenantId !== request.tenant.id) {
+        throw new ForbiddenException(
+          'Target branch does not belong to current active tenant',
+        );
+      }
 
-    if (
-      request.restaurant &&
-      branch.restaurantId !== request.restaurant.id
-    ) {
-      throw new ForbiddenException(
-        'Target branch does not belong to current active restaurant',
+      if (
+        request.restaurant &&
+        branch.restaurantId !== request.restaurant.id
+      ) {
+        throw new ForbiddenException(
+          'Target branch does not belong to current active restaurant',
+        );
+      }
+
+      const membership = await this.cache.wrap(
+        CacheKeys.membership(user.id, branch.restaurant.tenantId),
+        CacheTtl.membership,
+        () =>
+          this.prisma.tenantMembership.findUnique({
+            where: {
+              userId_tenantId: {
+                userId: user.id,
+                tenantId: branch.restaurant.tenantId,
+              },
+            },
+            select: {
+              id: true,
+              role: true,
+              tenant: {
+                select: {
+                  id: true,
+                  name: true,
+                  slug: true,
+                  status: true,
+                },
+              },
+            },
+          }),
       );
+
+      if (!membership) {
+        throw new ForbiddenException('You do not have access to this branch');
+      }
+
+      if (!request.tenant && membership.tenant) {
+        request.tenant = {
+          id: membership.tenant.id,
+          name: membership.tenant.name,
+          slug: membership.tenant.slug,
+          status: membership.tenant.status,
+        };
+      }
+
+      if (!request.restaurant) {
+        request.restaurant = {
+          id: branch.restaurant.id,
+          name: branch.name,
+          tenantId: branch.restaurant.tenantId,
+        };
+      }
     }
 
     const currentBranch: CurrentBranch = {

@@ -31,15 +31,19 @@ describe('TenantsService.findAllForUser', () => {
     expect(args.where).toEqual({ memberships: { some: { userId: 'u-1' } } });
   });
 
-  it.each(['PLATFORM_ADMIN', 'ADMIN'])(
-    'lets %s see every tenant',
-    async (role) => {
-      await service.findAllForUser('admin-1', role);
+  it('lets PLATFORM_ADMIN see every tenant', async () => {
+    await service.findAllForUser('admin-1', 'PLATFORM_ADMIN');
 
-      const args = prisma.tenant.findMany.mock.calls[0][0];
-      expect(args.where).toBeUndefined();
-    },
-  );
+    const args = prisma.tenant.findMany.mock.calls[0][0];
+    expect(args.where).toBeUndefined();
+  });
+
+  it('restricts ADMIN to member tenants', async () => {
+    await service.findAllForUser('admin-1', 'ADMIN');
+
+    const args = prisma.tenant.findMany.mock.calls[0][0];
+    expect(args.where).toEqual({ memberships: { some: { userId: 'admin-1' } } });
+  });
 
   it('does not widen access for an unrecognised role', async () => {
     await service.findAllForUser('u-2', 'SOMETHING_NEW');

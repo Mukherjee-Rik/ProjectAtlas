@@ -17,8 +17,8 @@ describe('AppController', () => {
   describe('healthCheck', () => {
     it('should return health status', () => {
       const result = appController.healthCheck();
-      expect(result.status).toBe('Perfect');
-      expect(result.Service).toBe('atlas-api');
+      expect(result.status).toBe('ok');
+      expect(result.service).toBe('atlas-api');
     });
   });
 });

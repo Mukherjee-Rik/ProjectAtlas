@@ -100,6 +100,33 @@ export class SupportService {
     });
   }
 
+  async resolveTicketForUser(ticketId: string, userId: string, role: string, dto: ResolveSupportTicketDto) {
+    const ticket = await this.prisma.supportTicket.findUnique({
+      where: { id: ticketId },
+      include: { restaurant: true },
+    });
+
+    if (!ticket) {
+      throw new NotFoundException(`Support ticket ${ticketId} not found`);
+    }
+
+    if (role !== 'PLATFORM_ADMIN') {
+      const membership = await this.prisma.tenantMembership.findUnique({
+        where: {
+          userId_tenantId: {
+            userId,
+            tenantId: ticket.restaurant.tenantId,
+          },
+        },
+      });
+      if (!membership) {
+        throw new NotFoundException(`Support ticket ${ticketId} not found`);
+      }
+    }
+
+    return this.resolveTicket(ticketId, dto);
+  }
+
   async resolveTicket(ticketId: string, dto: ResolveSupportTicketDto) {
     const ticket = await this.prisma.supportTicket.findUnique({
       where: { id: ticketId },

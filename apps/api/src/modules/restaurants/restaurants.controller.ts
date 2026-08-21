@@ -16,6 +16,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { PermissionsGuard } from '../auth/guards/permissions.guard';
 import { TenantAccessGuard } from '../auth/guards/tenant-access.guard';
 import { Permissions } from '../auth/decorators/permissions.decorator';
+import { PlatformAdminGuard } from '../auth/guards/platform-admin.guard';
 import { CurrentTenant } from '../auth/decorators/current-tenant.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { PERMISSIONS } from '../auth/permissions/permissions';
@@ -54,14 +55,14 @@ export class RestaurantsController {
   }
 
   @Get('admin/all')
-  @Permissions(PERMISSIONS.RESTAURANTS_READ)
+  @UseGuards(PlatformAdminGuard)
   @ApiOperation({ summary: 'Platform Admin: Get all restaurants with operational and financial metrics' })
   async findAllAdmin() {
     return this.restaurantsService.findAllAdminWithMetrics();
   }
 
   @Get('admin/details/:id')
-  @Permissions(PERMISSIONS.RESTAURANTS_READ)
+  @UseGuards(PlatformAdminGuard)
   @ApiOperation({ summary: 'Platform Admin: Get comprehensive deep-dive details for a specific restaurant' })
   async findAdminDetail(
     @Param('id', new ParseUUIDPipe()) id: string,

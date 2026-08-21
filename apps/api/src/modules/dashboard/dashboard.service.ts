@@ -36,13 +36,37 @@ export class DashboardService {
   ) {
     let tenantId: string | undefined;
 
-    // 1. If restaurantId was provided, verify it exists and retrieve its tenantId
+    // 1. If restaurantId was provided, verify it exists, retrieve tenantId, and verify user membership
     if (restaurantId) {
       const rest = await this.prisma.restaurant.findUnique({
         where: { id: restaurantId },
         select: { id: true, tenantId: true },
       });
       if (rest) {
+        if (user?.role !== 'PLATFORM_ADMIN' && user?.id) {
+          const hasMembership = await this.prisma.tenantMembership.findUnique({
+            where: {
+              userId_tenantId: {
+                userId: user.id,
+                tenantId: rest.tenantId,
+              },
+            },
+            select: { id: true },
+          });
+          if (!hasMembership) {
+            return {
+              metrics: {
+                totalOrders: 0,
+                totalSales: 0,
+                activeTables: 0,
+                menuItems: 0,
+                staffCount: 0,
+              },
+              recentOrders: [],
+              restaurantStaff: [],
+            };
+          }
+        }
         restaurantId = rest.id;
         tenantId = rest.tenantId;
       } else {
@@ -208,13 +232,28 @@ export class DashboardService {
     startDate?: string,
     endDate?: string,
   ) {
-    // 1. If restaurantId was provided, verify it exists
+    // 1. If restaurantId was provided, verify it exists and verify user membership
     if (restaurantId) {
       const rest = await this.prisma.restaurant.findUnique({
         where: { id: restaurantId },
-        select: { id: true },
+        select: { id: true, tenantId: true },
       });
-      if (!rest) {
+      if (rest) {
+        if (user?.role !== 'PLATFORM_ADMIN' && user?.id) {
+          const hasMembership = await this.prisma.tenantMembership.findUnique({
+            where: {
+              userId_tenantId: {
+                userId: user.id,
+                tenantId: rest.tenantId,
+              },
+            },
+            select: { id: true },
+          });
+          if (!hasMembership) {
+            restaurantId = undefined;
+          }
+        }
+      } else {
         restaurantId = undefined;
       }
     }

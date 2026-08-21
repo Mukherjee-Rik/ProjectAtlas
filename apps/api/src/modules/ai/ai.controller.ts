@@ -1,56 +1,57 @@
-import { Controller, Post, Get, Body, Req, UseGuards, BadRequestException } from '@nestjs/common';
-import { ApiOperation, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { Controller, Post, Get, Body, UseGuards, BadRequestException } from '@nestjs/common';
+import { ApiOperation, ApiTags, ApiBearerAuth, ApiHeader } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RestaurantAccessGuard } from '../auth/guards/restaurant-access.guard';
 import { SubscriptionGuard } from '../auth/guards/subscription.guard';
 import { RequiresFeature } from '../auth/decorators/requires-feature.decorator';
 import { AiService } from './services/ai.service';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { CurrentRestaurant } from '../auth/decorators/current-restaurant.decorator';
 import { UserRole } from '../../generated/prisma/enums';
-import * as express from 'express';
+import { RESTAURANT_HEADER } from '../auth/constants/tenant.constants';
+import type { CurrentRestaurant as CurrentRestaurantType } from '../auth/types/current-restaurant.type';
 
 @ApiTags('AI Operations')
+@ApiBearerAuth('access-token')
+@ApiHeader({ name: RESTAURANT_HEADER, required: true })
 @Controller({
   path: 'ai',
   version: '1',
 })
-@UseGuards(JwtAuthGuard, SubscriptionGuard)
+@UseGuards(JwtAuthGuard, RestaurantAccessGuard, SubscriptionGuard)
 export class AiController {
   constructor(private readonly aiService: AiService) {}
 
   @Post('query')
   @RequiresFeature('ai_copilot')
-  @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Ask natural-language questions about restaurant operations (Growth & Enterprise only)' })
   async query(
     @CurrentUser('id') userId: string,
     @CurrentUser('role') role: UserRole,
-    @Req() req: express.Request,
+    @CurrentRestaurant() restaurant: CurrentRestaurantType,
     @Body() body: { query: string; history?: { role: 'user' | 'model'; content: string }[] },
   ) {
-    const restaurantId = req.headers['x-restaurant-id'] as string;
-    if (!restaurantId) {
-      throw new BadRequestException('x-restaurant-id header is required');
+    if (!restaurant?.id) {
+      throw new BadRequestException('Restaurant context is required');
     }
 
     if (!body.query) {
       throw new BadRequestException('Query parameter is required');
     }
 
-    return this.aiService.runQuery(userId, role, restaurantId, body.query, body.history || []);
+    return this.aiService.runQuery(userId, role, restaurant.id, body.query, body.history || []);
   }
 
   @Get('insights')
   @RequiresFeature('ai_copilot')
-  @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Get pre-calculated structured dashboard insights (Growth & Enterprise only)' })
   async getInsights(
     @CurrentUser('id') userId: string,
     @CurrentUser('role') role: UserRole,
-    @Req() req: express.Request,
+    @CurrentRestaurant() restaurant: CurrentRestaurantType,
   ) {
-    const restaurantId = req.headers['x-restaurant-id'] as string;
-    if (!restaurantId) {
-      throw new BadRequestException('x-restaurant-id header is required');
+    if (!restaurant?.id) {
+      throw new BadRequestException('Restaurant context is required');
     }
 
     return [

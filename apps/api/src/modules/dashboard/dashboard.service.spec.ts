@@ -44,7 +44,7 @@ describe('DashboardService', () => {
   });
 
   it('should return aggregated overview numbers and recent orders', async () => {
-    const result = await service.getRestaurantOverview('r-1');
+    const result = await service.getRestaurantOverview({ id: 'u-1', role: 'PLATFORM_ADMIN' }, 'r-1');
 
     expect(result).toHaveProperty('metrics');
     expect(result.metrics.totalOrders).toBe(10);
