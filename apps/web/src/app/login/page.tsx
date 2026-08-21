@@ -6,9 +6,9 @@ import Link from 'next/link';
 import { login } from '@/services/auth.service';
 import { useAuth } from '@/hooks/use-auth';
 import { PublicOnlyRoute } from '@/components/auth/public-only-route';
-import { setCurrentTenant } from '@/lib/tenant-storage';
-import { setCurrentRestaurant } from '@/lib/restaurant-storage';
-import { setCurrentBranch } from '@/lib/branch-storage';
+import { clearCurrentTenant, setCurrentTenant } from '@/lib/tenant-storage';
+import { clearCurrentRestaurant, setCurrentRestaurant } from '@/lib/restaurant-storage';
+import { clearCurrentBranch, setCurrentBranch } from '@/lib/branch-storage';
 import { validateEmail, validatePassword } from '@/lib/validation';
 
 export default function LoginPage() {
@@ -69,19 +69,25 @@ function LoginForm() {
         throw new Error('Authentication succeeded but session token is missing. Please try again.');
       }
 
-      // Save user session
+      // 1. Purge all prior workspace keys from local storage
+      clearCurrentTenant();
+      clearCurrentRestaurant();
+      clearCurrentBranch();
+
+      // 2. Save user session
       loginUser(accessToken, user);
 
-      // 1. Platform Admin -> Platform Management / Dashboard
+      // 3. Platform Admin -> Platform Management / Dashboard
       if (user.role === 'PLATFORM_ADMIN') {
         window.location.href = '/platform-admin';
         return;
       }
 
-      // 2. Restaurant Owner / Staff -> Extract active workspace
+      // 4. Restaurant Owner / Staff -> Extract active workspace
       const allRestaurants = (memberships ?? []).flatMap((m: any) =>
         (m?.tenant?.restaurants ?? []).map((r: any) => ({
           tenantId: m?.tenant?.id,
+          tenantName: m?.tenant?.name,
           tenantSlug: m?.tenant?.slug,
           restaurant: r,
           role: m?.role || user.role,
@@ -92,7 +98,7 @@ function LoginForm() {
         const item = allRestaurants[0];
         setCurrentTenant({
           id: item.tenantId,
-          name: item.restaurant.name,
+          name: item.tenantName || item.restaurant.name,
           slug: item.tenantSlug,
           status: 'ACTIVE',
           createdAt: '',
@@ -131,6 +137,19 @@ function LoginForm() {
       } else if (allRestaurants.length > 1) {
         window.location.href = '/select-restaurant';
       } else {
+        if (memberships?.[0]?.tenant) {
+          const t = memberships[0].tenant;
+          setCurrentTenant({
+            id: t.id,
+            name: t.name,
+            slug: t.slug,
+            status: 'ACTIVE',
+            createdAt: '',
+            updatedAt: '',
+          });
+        }
+        clearCurrentRestaurant();
+        clearCurrentBranch();
         const targetPath =
           user.role === 'CASHIER'
             ? '/cashier'
