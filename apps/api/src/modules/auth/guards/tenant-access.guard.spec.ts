@@ -59,7 +59,7 @@ describe('TenantAccessGuard', () => {
     await expect(guard.canActivate(context)).rejects.toThrow(BadRequestException);
   });
 
-  it('should allow ADMIN access to any valid tenant', async () => {
+  it('should allow PLATFORM_ADMIN access to any valid tenant', async () => {
     prismaService.tenant.findUnique.mockResolvedValue({
       id: validTenantId,
       name: 'Tenant A',
@@ -68,7 +68,7 @@ describe('TenantAccessGuard', () => {
     });
 
     const context = createMockExecutionContext(
-      { id: 'u-1', role: 'ADMIN' },
+      { id: 'u-1', role: 'PLATFORM_ADMIN' },
       { 'x-tenant-id': validTenantId },
     );
     const result = await guard.canActivate(context);

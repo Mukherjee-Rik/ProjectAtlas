@@ -61,6 +61,16 @@ export class PublicTablesService {
       throw new NotFoundException('Table structure is incomplete');
     }
 
+    if (
+      table.status !== 'ACTIVE' ||
+      diningArea.status !== 'ACTIVE' ||
+      branch.status !== 'ACTIVE' ||
+      restaurant.status !== 'ACTIVE' ||
+      tenant.status !== 'ACTIVE'
+    ) {
+      throw new NotFoundException('Table QR code is no longer active');
+    }
+
     return {
       table: { id: table.id, name: table.name, code: table.code, capacity: table.capacity },
       diningArea: { name: diningArea.name },

@@ -25,6 +25,7 @@ describe('AiService', () => {
     getSalesContext: jest.fn().mockResolvedValue({ totalSales: 25000, totalOrders: 10, averageOrderValue: 2500, topItem: 'Chicken Biryani', topItemQty: 10, peakHours: '7 PM - 9 PM' }),
     getCustomerContext: jest.fn().mockResolvedValue({ totalCustomers: 8, repeatCustomers: 2 }),
     getOperationsContext: jest.fn().mockResolvedValue({ totalOrders: 10, cancelledOrders: 1, cancellationRate: 10, peakHours: '7 PM - 9 PM' }),
+    getInventoryContext: jest.fn().mockResolvedValue({ lowStockItems: [], totalInventoryValue: 0 }),
   };
 
   const mockProviderService = {

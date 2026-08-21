@@ -1,8 +1,11 @@
-import { Controller, Post, Get, Body, Param, Headers, UseGuards, HttpStatus, HttpCode, Req } from '@nestjs/common';
-import { ApiOperation, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { Controller, Post, Get, Body, Param, Headers, UseGuards, HttpStatus, HttpCode, BadRequestException } from '@nestjs/common';
+import { ApiOperation, ApiTags, ApiBearerAuth, ApiHeader } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { RestaurantAccessGuard } from '../../auth/guards/restaurant-access.guard';
+import { CurrentRestaurant } from '../../auth/decorators/current-restaurant.decorator';
 import { DeliveryService } from '../services/delivery.service';
-import * as express from 'express';
+import { RESTAURANT_HEADER } from '../../auth/constants/tenant.constants';
+import type { CurrentRestaurant as CurrentRestaurantType } from '../../auth/types/current-restaurant.type';
 
 @ApiTags('Delivery Integration')
 @Controller({
@@ -24,19 +27,19 @@ export class DeliveryWebhookController {
   }
 
   @Post('config')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RestaurantAccessGuard)
   @ApiBearerAuth('access-token')
+  @ApiHeader({ name: RESTAURANT_HEADER, required: true })
   @ApiOperation({ summary: 'Save delivery provider integration configuration' })
   async saveConfig(
-    @Req() req: express.Request,
+    @CurrentRestaurant() restaurant: CurrentRestaurantType,
     @Body() body: { provider: string; enabled: boolean; credentials: any },
   ) {
-    const restaurantId = req.headers['x-restaurant-id'] as string;
-    if (!restaurantId) {
-      throw new BadRequestException('x-restaurant-id header is required');
+    if (!restaurant?.id) {
+      throw new BadRequestException('Restaurant context is required');
     }
     return this.deliveryService.saveProviderConfig(
-      restaurantId,
+      restaurant.id,
       body.provider,
       body.enabled,
       body.credentials,
@@ -44,33 +47,30 @@ export class DeliveryWebhookController {
   }
 
   @Get('config')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RestaurantAccessGuard)
   @ApiBearerAuth('access-token')
+  @ApiHeader({ name: RESTAURANT_HEADER, required: true })
   @ApiOperation({ summary: 'Get configured delivery integrations for restaurant' })
-  async getConfig(@Req() req: express.Request) {
-    const restaurantId = req.headers['x-restaurant-id'] as string;
-    if (!restaurantId) {
-      throw new BadRequestException('x-restaurant-id header is required');
+  async getConfig(@CurrentRestaurant() restaurant: CurrentRestaurantType) {
+    if (!restaurant?.id) {
+      throw new BadRequestException('Restaurant context is required');
     }
-    return this.deliveryService.getProviderConfigs(restaurantId);
+    return this.deliveryService.getProviderConfigs(restaurant.id);
   }
 
   @Get('health/:provider')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RestaurantAccessGuard)
   @ApiBearerAuth('access-token')
+  @ApiHeader({ name: RESTAURANT_HEADER, required: true })
   @ApiOperation({ summary: 'Get adapter health and connectivity' })
   async getHealth(
-    @Req() req: express.Request,
+    @CurrentRestaurant() restaurant: CurrentRestaurantType,
     @Param('provider') provider: string,
   ) {
-    const restaurantId = req.headers['x-restaurant-id'] as string;
-    if (!restaurantId) {
-      throw new BadRequestException('x-restaurant-id header is required');
+    if (!restaurant?.id) {
+      throw new BadRequestException('Restaurant context is required');
     }
-    const isHealthy = await this.deliveryService.getProviderHealth(restaurantId, provider);
+    const isHealthy = await this.deliveryService.getProviderHealth(restaurant.id, provider);
     return { provider, status: isHealthy ? 'HEALTHY' : 'UNHEALTHY' };
   }
 }
-
-// Simple request helper exceptions
-import { BadRequestException } from '@nestjs/common';

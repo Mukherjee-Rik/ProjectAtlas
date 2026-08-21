@@ -38,8 +38,11 @@ export class TenantsController {
 
   @Get(':id')
   @Permissions(PERMISSIONS.TENANTS_READ)
-  async findById(@Param('id', new ParseUUIDPipe()) id: string) {
-    return this.tenantsService.findById(id);
+  async findById(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    return this.tenantsService.findByIdForUser(id, user.id, user.role);
   }
 
   @Post()

@@ -1,9 +1,9 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
   Get,
-  Headers,
   Param,
   ParseUUIDPipe,
   Patch,
@@ -20,12 +20,14 @@ import { UsersQueryDto } from './dto/users-query.dto';
 import { UsersService } from './users.service';
 
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { CurrentTenant } from '../auth/decorators/current-tenant.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { PermissionsGuard } from '../auth/guards/permissions.guard';
 import { TenantAccessGuard } from '../auth/guards/tenant-access.guard';
 import { Permissions } from '../auth/decorators/permissions.decorator';
 import { PERMISSIONS } from '../auth/permissions/permissions';
 import type { AuthenticatedUser } from '../auth/types/authenticated-user.type';
+import type { CurrentTenant as CurrentTenantType } from '../auth/types/current-tenant.type';
 
 @ApiTags('Users')
 @Controller({
@@ -41,9 +43,13 @@ export class UsersController {
   @Permissions(PERMISSIONS.USERS_READ)
   async findAll(
     @Query() query: UsersQueryDto,
-    @Headers('x-tenant-id') tenantId?: string,
+    @CurrentUser() user: AuthenticatedUser,
+    @CurrentTenant() tenant?: CurrentTenantType,
   ) {
-    return this.usersService.findAll(query, tenantId);
+    if (user.role !== 'PLATFORM_ADMIN' && !tenant?.id) {
+      throw new BadRequestException('Active tenant context is required');
+    }
+    return this.usersService.findAll(query, tenant?.id);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -69,9 +75,13 @@ export class UsersController {
   @Permissions(PERMISSIONS.USERS_READ)
   async findById(
     @Param('id', new ParseUUIDPipe()) id: string,
-    @Headers('x-tenant-id') tenantId?: string,
+    @CurrentUser() user: AuthenticatedUser,
+    @CurrentTenant() tenant?: CurrentTenantType,
   ) {
-    return this.usersService.findById(id, tenantId);
+    if (user.role !== 'PLATFORM_ADMIN' && !tenant?.id) {
+      throw new BadRequestException('Active tenant context is required');
+    }
+    return this.usersService.findById(id, tenant?.id);
   }
 
   @UseGuards(JwtAuthGuard, PermissionsGuard, TenantAccessGuard)
@@ -80,9 +90,13 @@ export class UsersController {
   @Permissions(PERMISSIONS.USERS_CREATE)
   async create(
     @Body() createUserDto: CreateUserDto,
-    @Headers('x-tenant-id') tenantId?: string,
+    @CurrentUser() user: AuthenticatedUser,
+    @CurrentTenant() tenant?: CurrentTenantType,
   ) {
-    return this.usersService.create(createUserDto, tenantId);
+    if (user.role !== 'PLATFORM_ADMIN' && !tenant?.id) {
+      throw new BadRequestException('Active tenant context is required');
+    }
+    return this.usersService.create(createUserDto, tenant?.id);
   }
 
   @UseGuards(JwtAuthGuard, PermissionsGuard, TenantAccessGuard)
@@ -92,9 +106,13 @@ export class UsersController {
   async update(
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() updateUserDto: UpdateUserDto,
-    @Headers('x-tenant-id') tenantId?: string,
+    @CurrentUser() user: AuthenticatedUser,
+    @CurrentTenant() tenant?: CurrentTenantType,
   ) {
-    return this.usersService.update(id, updateUserDto, tenantId);
+    if (user.role !== 'PLATFORM_ADMIN' && !tenant?.id) {
+      throw new BadRequestException('Active tenant context is required');
+    }
+    return this.usersService.update(id, updateUserDto, tenant?.id);
   }
 
   @UseGuards(JwtAuthGuard, PermissionsGuard, TenantAccessGuard)
@@ -104,8 +122,11 @@ export class UsersController {
   async remove(
     @Param('id', new ParseUUIDPipe()) id: string,
     @CurrentUser() currentUser: AuthenticatedUser,
-    @Headers('x-tenant-id') tenantId?: string,
+    @CurrentTenant() tenant?: CurrentTenantType,
   ) {
-    return this.usersService.remove(id, currentUser.id, tenantId);
+    if (currentUser.role !== 'PLATFORM_ADMIN' && !tenant?.id) {
+      throw new BadRequestException('Active tenant context is required');
+    }
+    return this.usersService.remove(id, currentUser.id, tenant?.id);
   }
 }

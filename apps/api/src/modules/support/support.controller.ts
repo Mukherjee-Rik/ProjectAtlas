@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -7,14 +8,16 @@ import {
   Post,
   Query,
   UseGuards,
-  Headers,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiHeader, ApiTags } from '@nestjs/swagger';
 import { SupportService, CreateSupportTicketDto, ResolveSupportTicketDto } from './support.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RestaurantAccessGuard } from '../auth/guards/restaurant-access.guard';
 import { PlatformAdminGuard } from '../auth/guards/platform-admin.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { CurrentRestaurant } from '../auth/decorators/current-restaurant.decorator';
 import type { AuthenticatedUser } from '../auth/types/authenticated-user.type';
+import type { CurrentRestaurant as CurrentRestaurantType } from '../auth/types/current-restaurant.type';
 import { RESTAURANT_HEADER } from '../auth/constants/tenant.constants';
 
 @ApiTags('Support')
@@ -24,28 +27,33 @@ export class SupportController {
 
   @Post('tickets')
   @ApiBearerAuth('access-token')
-  @UseGuards(JwtAuthGuard)
+  @ApiHeader({ name: RESTAURANT_HEADER, required: true })
+  @UseGuards(JwtAuthGuard, RestaurantAccessGuard)
   async createTicket(
     @CurrentUser() user: AuthenticatedUser,
-    @Headers(RESTAURANT_HEADER) restaurantIdHeader: string,
+    @CurrentRestaurant() restaurant: CurrentRestaurantType,
     @Body() dto: CreateSupportTicketDto,
   ) {
-    const restaurantId = dto.restaurantId || restaurantIdHeader;
+    if (!restaurant?.id) {
+      throw new BadRequestException('Restaurant context is required');
+    }
     return this.supportService.createTicket(user?.id, {
       ...dto,
-      restaurantId,
+      restaurantId: restaurant.id,
     });
   }
 
   @Get('tickets')
   @ApiBearerAuth('access-token')
-  @UseGuards(JwtAuthGuard)
+  @ApiHeader({ name: RESTAURANT_HEADER, required: true })
+  @UseGuards(JwtAuthGuard, RestaurantAccessGuard)
   async getRestaurantTickets(
-    @Headers(RESTAURANT_HEADER) restaurantId: string,
-    @Query('restaurantId') queryRestId?: string,
+    @CurrentRestaurant() restaurant: CurrentRestaurantType,
   ) {
-    const targetRestId = queryRestId || restaurantId;
-    return this.supportService.getRestaurantTickets(targetRestId);
+    if (!restaurant?.id) {
+      throw new BadRequestException('Restaurant context is required');
+    }
+    return this.supportService.getRestaurantTickets(restaurant.id);
   }
 
   @Get('admin/tickets')
@@ -63,8 +71,9 @@ export class SupportController {
   @UseGuards(JwtAuthGuard)
   async resolveTicket(
     @Param('id') ticketId: string,
+    @CurrentUser() user: AuthenticatedUser,
     @Body() dto: ResolveSupportTicketDto,
   ) {
-    return this.supportService.resolveTicket(ticketId, dto);
+    return this.supportService.resolveTicketForUser(ticketId, user.id, user.role, dto);
   }
 }
