@@ -102,6 +102,8 @@ export function TenantProvider({ children }: { children: ReactNode }) {
 
         if (!isValidCurrentTenant && userMemberships.length > 0 && userMemberships[0].tenant) {
           setCurrentTenant(userMemberships[0].tenant);
+        } else if (userMemberships.length === 0) {
+          clearTenant();
         }
       }
     } catch {

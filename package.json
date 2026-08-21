@@ -8,7 +8,7 @@
     "node": "22.x"
   },
   "scripts": {
-    "dev": "pnpm --parallel dev:api dev:web",
+    "dev": "pnpm --parallel --filter api --filter web dev",
     "dev:api": "pnpm --filter api start:dev",
     "dev:web": "pnpm --filter web dev",
     "start": "node apps/api/dist/main.js",

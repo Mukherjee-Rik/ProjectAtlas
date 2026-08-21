@@ -178,12 +178,12 @@ export default function DashboardPage() {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-[#F5F7FA]">
-            {currentRestaurant?.name ?? 'Restaurant Dashboard'}
+            {currentRestaurant?.name ?? currentTenant?.name ?? 'Restaurant Dashboard'}
           </h1>
           <p className="mt-1 text-xs text-[#9AA6B2]">
             Welcome back, <span className="font-semibold text-[#F5F7FA]">{user?.name ?? 'Manager'}</span>! Operating in{' '}
             <span className="font-semibold text-[#2AFEB7]">
-              {currentRestaurant?.name ?? currentTenant?.name ?? 'Monir er Ghorer Khaon'}
+              {currentRestaurant?.name ?? currentTenant?.name ?? 'Workspace'}
             </span>
             {currentBranch && (
               <span>
@@ -305,7 +305,7 @@ export default function DashboardPage() {
                   Restaurant Operational Workspace
                 </p>
                 <p className="text-xs font-bold text-[#F5F7FA]">
-                  {currentRestaurant?.name ?? currentTenant?.name ?? 'Monir er Ghorer Khaon'}
+                  {currentRestaurant?.name ?? currentTenant?.name ?? 'Workspace'}
                   {currentBranch && ` → ${currentBranch.name} (${currentBranch.code})`}
                 </p>
               </div>
@@ -411,7 +411,7 @@ export default function DashboardPage() {
                 <div>
                   <h2 className="text-base font-bold text-[#F5F7FA]">Restaurant Staff</h2>
                   <p className="text-[11px] text-[#9AA6B2]">
-                    Employees working at {currentRestaurant?.name ?? 'Monir er Ghorer Khaon'}.
+                    Employees working at {currentRestaurant?.name ?? 'this restaurant'}.
                   </p>
                 </div>
                 <span className="rounded-full bg-[#18212B] px-2 py-0.5 text-[10px] font-mono text-[#2AFEB7] border border-[#26313C]">

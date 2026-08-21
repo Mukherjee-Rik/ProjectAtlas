@@ -40,9 +40,14 @@ export function RestaurantProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const stored = getCurrentRestaurant();
     if (stored) {
-      setCurrentRestaurantState(stored);
+      if (currentTenant && stored.tenantId !== currentTenant.id) {
+        clearCurrentRestaurant();
+        setCurrentRestaurantState(null);
+      } else {
+        setCurrentRestaurantState(stored);
+      }
     }
-  }, []);
+  }, [currentTenant?.id]);
 
   const clearRestaurant = useCallback(() => {
     setCurrentRestaurantState(null);
@@ -77,10 +82,15 @@ export function RestaurantProvider({ children }: { children: ReactNode }) {
 
       // Use functional update to avoid capturing currentRestaurant as a dep (causes infinite loop)
       setCurrentRestaurantState((prevRestaurant) => {
-        if (loadedRestaurants.length > 0 && !prevRestaurant) {
+        if (loadedRestaurants.length === 0) {
+          clearCurrentRestaurant();
+          return null;
+        }
+
+        if (!prevRestaurant || prevRestaurant.tenantId !== currentTenant.id) {
           saveCurrentRestaurant(loadedRestaurants[0]!);
           return loadedRestaurants[0]!;
-        } else if (prevRestaurant && !loadedRestaurants.some((r) => r.id === prevRestaurant.id)) {
+        } else if (!loadedRestaurants.some((r) => r.id === prevRestaurant.id)) {
           const fallback = loadedRestaurants[0] ?? null;
           if (fallback) saveCurrentRestaurant(fallback);
           else clearCurrentRestaurant();
