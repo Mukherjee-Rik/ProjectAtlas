@@ -61,10 +61,52 @@ export class RestaurantAccessGuard implements CanActivate {
       throw new NotFoundException('Restaurant not found');
     }
 
-    if (request.tenant && restaurant.tenantId !== request.tenant.id) {
-      throw new ForbiddenException(
-        'Target restaurant does not belong to current active tenant',
+    const user = request.user;
+    if (user && user.role !== 'PLATFORM_ADMIN') {
+      if (request.tenant && restaurant.tenantId !== request.tenant.id) {
+        throw new ForbiddenException(
+          'Target restaurant does not belong to current active tenant',
+        );
+      }
+
+      const membership = await this.cache.wrap(
+        CacheKeys.membership(user.id, restaurant.tenantId),
+        CacheTtl.membership,
+        () =>
+          this.prisma.tenantMembership.findUnique({
+            where: {
+              userId_tenantId: {
+                userId: user.id,
+                tenantId: restaurant.tenantId,
+              },
+            },
+            select: {
+              id: true,
+              role: true,
+              tenant: {
+                select: {
+                  id: true,
+                  name: true,
+                  slug: true,
+                  status: true,
+                },
+              },
+            },
+          }),
       );
+
+      if (!membership) {
+        throw new ForbiddenException('You do not have access to this restaurant');
+      }
+
+      if (!request.tenant && membership.tenant) {
+        request.tenant = {
+          id: membership.tenant.id,
+          name: membership.tenant.name,
+          slug: membership.tenant.slug,
+          status: membership.tenant.status,
+        };
+      }
     }
 
     const currentRestaurant: CurrentRestaurant = {

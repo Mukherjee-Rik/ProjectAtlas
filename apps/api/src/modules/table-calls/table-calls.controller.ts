@@ -1,7 +1,13 @@
-import { Controller, Get, Post, Body, Param, Headers, UseGuards, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseGuards, BadRequestException } from '@nestjs/common';
 import { TableCallsService } from './table-calls.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { BranchAccessGuard } from '../auth/guards/branch-access.guard';
+import { CurrentBranch } from '../auth/decorators/current-branch.decorator';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { ApiBearerAuth, ApiHeader, ApiTags } from '@nestjs/swagger';
+import { BRANCH_HEADER } from '../auth/constants/tenant.constants';
+import type { CurrentBranch as CurrentBranchType } from '../auth/types/current-branch.type';
+import type { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 
 @ApiTags('Table Calls')
 @Controller({
@@ -23,19 +29,23 @@ export class TableCallsController {
   }
 
   @ApiBearerAuth('access-token')
-  @UseGuards(JwtAuthGuard)
+  @ApiHeader({ name: BRANCH_HEADER, required: true })
+  @UseGuards(JwtAuthGuard, BranchAccessGuard)
   @Get('table-calls')
-  async getPendingCalls(@Headers('x-branch-id') branchId?: string) {
-    if (!branchId) {
-      throw new BadRequestException('x-branch-id header is required');
+  async getPendingCalls(@CurrentBranch() branch: CurrentBranchType) {
+    if (!branch?.id) {
+      throw new BadRequestException('Active branch context is required');
     }
-    return this.tableCallsService.getPendingCalls(branchId);
+    return this.tableCallsService.getPendingCalls(branch.id);
   }
 
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAuthGuard)
   @Post('table-calls/:id/resolve')
-  async resolveCall(@Param('id') id: string) {
-    return this.tableCallsService.resolveCall(id);
+  async resolveCall(
+    @Param('id') id: string,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    return this.tableCallsService.resolveCallForUser(id, user.id, user.role);
   }
 }

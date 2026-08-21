@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { TenantMembershipsController } from './tenant-memberships.controller';
 import { TenantMembershipsService } from './tenant-memberships.service';
 import { PrismaService } from '../../database/prisma/prisma.service';
+import { TtlCacheService } from '../../common/cache/ttl-cache.service';
 
 describe('TenantMembershipsController', () => {
   let controller: TenantMembershipsController;
@@ -22,6 +23,7 @@ describe('TenantMembershipsController', () => {
       providers: [
         { provide: TenantMembershipsService, useValue: service },
         { provide: PrismaService, useValue: {} },
+        TtlCacheService,
       ],
     }).compile();
 
@@ -35,12 +37,15 @@ describe('TenantMembershipsController', () => {
   });
 
   it('findByUser should delegate to service.findByUser', async () => {
-    await controller.findByUser('u-1');
+    const user: any = { id: 'u-1', role: 'STAFF' };
+    await controller.findByUser('u-1', user);
     expect(service.findByUser).toHaveBeenCalledWith('u-1');
   });
 
   it('findByTenant should delegate to service.findByTenant', async () => {
-    await controller.findByTenant('t-1');
+    const user: any = { id: 'u-1', role: 'STAFF' };
+    const tenant: any = { id: 't-1' };
+    await controller.findByTenant('t-1', user, tenant);
     expect(service.findByTenant).toHaveBeenCalledWith('t-1');
   });
 });

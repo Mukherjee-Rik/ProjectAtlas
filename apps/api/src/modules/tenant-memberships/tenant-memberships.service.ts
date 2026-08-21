@@ -176,6 +176,64 @@ export class TenantMembershipsService {
     });
   }
 
+  async findByIdForUser(id: string, userId: string, role: string, activeTenantId?: string) {
+    const membership = await this.findById(id);
+    if (role !== 'PLATFORM_ADMIN') {
+      if (activeTenantId && membership.tenantId !== activeTenantId) {
+        throw new NotFoundException('Tenant membership not found');
+      }
+      const userHasAccess = await this.prisma.tenantMembership.findUnique({
+        where: { userId_tenantId: { userId, tenantId: membership.tenantId } },
+      });
+      if (!userHasAccess) {
+        throw new NotFoundException('Tenant membership not found');
+      }
+    }
+    return membership;
+  }
+
+  async updateForUser(id: string, updateMembershipDto: UpdateMembershipDto, userId: string, role: string, activeTenantId?: string) {
+    const existing = await this.prisma.tenantMembership.findUnique({
+      where: { id },
+    });
+    if (!existing) {
+      throw new NotFoundException('Tenant membership not found');
+    }
+    if (role !== 'PLATFORM_ADMIN') {
+      if (activeTenantId && existing.tenantId !== activeTenantId) {
+        throw new NotFoundException('Tenant membership not found');
+      }
+      const userHasAccess = await this.prisma.tenantMembership.findUnique({
+        where: { userId_tenantId: { userId, tenantId: existing.tenantId } },
+      });
+      if (!userHasAccess) {
+        throw new NotFoundException('Tenant membership not found');
+      }
+    }
+    return this.update(id, updateMembershipDto);
+  }
+
+  async removeForUser(id: string, userId: string, role: string, activeTenantId?: string) {
+    const existing = await this.prisma.tenantMembership.findUnique({
+      where: { id },
+    });
+    if (!existing) {
+      throw new NotFoundException('Tenant membership not found');
+    }
+    if (role !== 'PLATFORM_ADMIN') {
+      if (activeTenantId && existing.tenantId !== activeTenantId) {
+        throw new NotFoundException('Tenant membership not found');
+      }
+      const userHasAccess = await this.prisma.tenantMembership.findUnique({
+        where: { userId_tenantId: { userId, tenantId: existing.tenantId } },
+      });
+      if (!userHasAccess) {
+        throw new NotFoundException('Tenant membership not found');
+      }
+    }
+    return this.remove(id);
+  }
+
   async update(id: string, updateMembershipDto: UpdateMembershipDto) {
     const existing = await this.prisma.tenantMembership.findUnique({
       where: { id },

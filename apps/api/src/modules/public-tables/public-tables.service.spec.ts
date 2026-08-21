@@ -8,10 +8,12 @@ describe('PublicTablesService', () => {
   let prismaService: any;
 
   beforeEach(async () => {
+    const tableMock = {
+      findUnique: jest.fn(),
+      findFirst: jest.fn(),
+    };
     prismaService = {
-      table: {
-        findUnique: jest.fn(),
-      },
+      table: tableMock,
       customerSession: {
         findFirst: jest.fn(),
         create: jest.fn(),
@@ -34,6 +36,7 @@ describe('PublicTablesService', () => {
   });
 
   it('resolveTableToken should throw NotFoundException if table not found', async () => {
+    prismaService.table.findFirst.mockResolvedValue(null);
     prismaService.table.findUnique.mockResolvedValue(null);
 
     await expect(service.resolveTableToken('invalid-token')).rejects.toThrow(
@@ -42,7 +45,7 @@ describe('PublicTablesService', () => {
   });
 
   it('resolveTableToken should throw NotFoundException if table is INACTIVE', async () => {
-    prismaService.table.findUnique.mockResolvedValue({
+    const tableData = {
       id: 't-1',
       status: 'INACTIVE',
       diningArea: {
@@ -55,7 +58,9 @@ describe('PublicTablesService', () => {
           },
         },
       },
-    });
+    };
+    prismaService.table.findFirst.mockResolvedValue(tableData);
+    prismaService.table.findUnique.mockResolvedValue(tableData);
 
     await expect(service.resolveTableToken('token-inactive')).rejects.toThrow(
       NotFoundException,
@@ -63,7 +68,7 @@ describe('PublicTablesService', () => {
   });
 
   it('resolveTableToken should return safe metadata when active', async () => {
-    prismaService.table.findUnique.mockResolvedValue({
+    const tableData = {
       id: 't-1',
       name: 'Table 4',
       code: 'T04',
@@ -82,7 +87,9 @@ describe('PublicTablesService', () => {
           },
         },
       },
-    });
+    };
+    prismaService.table.findFirst.mockResolvedValue(tableData);
+    prismaService.table.findUnique.mockResolvedValue(tableData);
 
     const result = await service.resolveTableToken('valid-token');
     expect(result).toEqual({
@@ -94,7 +101,7 @@ describe('PublicTablesService', () => {
   });
 
   it('getOrCreateSession should reuse existing active session', async () => {
-    prismaService.table.findUnique.mockResolvedValue({
+    const tableData = {
       id: 't-1',
       name: 'Table 4',
       code: 'T04',
@@ -113,7 +120,9 @@ describe('PublicTablesService', () => {
           },
         },
       },
-    });
+    };
+    prismaService.table.findFirst.mockResolvedValue(tableData);
+    prismaService.table.findUnique.mockResolvedValue(tableData);
 
     prismaService.customerSession.findFirst.mockResolvedValue({
       id: 'cs-1',

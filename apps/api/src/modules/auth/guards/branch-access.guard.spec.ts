@@ -18,6 +18,13 @@ describe('BranchAccessGuard', () => {
       branch: {
         findUnique: jest.fn(),
       },
+      tenantMembership: {
+        findUnique: jest.fn().mockResolvedValue({
+          id: 'mem-1',
+          role: 'OWNER',
+          tenant: { id: tenantId, name: 'Tenant A', slug: 'tenant-a', status: 'ACTIVE' },
+        }),
+      },
     };
 
     const module: TestingModule = await Test.createTestingModule({
