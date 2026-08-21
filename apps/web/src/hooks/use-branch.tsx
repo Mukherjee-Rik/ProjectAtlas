@@ -38,9 +38,14 @@ export function BranchProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const stored = getCurrentBranch();
     if (stored) {
-      setCurrentBranchState(stored);
+      if (currentRestaurant && stored.restaurantId !== currentRestaurant.id) {
+        clearCurrentBranch();
+        setCurrentBranchState(null);
+      } else {
+        setCurrentBranchState(stored);
+      }
     }
-  }, []);
+  }, [currentRestaurant?.id]);
 
   const clearBranch = useCallback(() => {
     setCurrentBranchState(null);
@@ -71,10 +76,15 @@ export function BranchProvider({ children }: { children: ReactNode }) {
 
       // Use functional state update to avoid capturing stale currentBranch
       setCurrentBranchState((prevBranch) => {
-        if (loadedBranches.length > 0 && !prevBranch) {
+        if (loadedBranches.length === 0) {
+          clearCurrentBranch();
+          return null;
+        }
+
+        if (!prevBranch || prevBranch.restaurantId !== currentRestaurant.id) {
           saveCurrentBranch(loadedBranches[0]!);
           return loadedBranches[0]!;
-        } else if (prevBranch && !loadedBranches.some((b) => b.id === prevBranch.id)) {
+        } else if (!loadedBranches.some((b) => b.id === prevBranch.id)) {
           const fallback = loadedBranches[0] ?? null;
           if (fallback) saveCurrentBranch(fallback);
           else clearCurrentBranch();

@@ -1,8 +1,8 @@
 import { config } from '@/lib/config';
 import { getAccessToken, setAccessToken, clearAuthStorage } from '@/lib/auth-storage';
-import { getCurrentTenantId } from '@/lib/tenant-storage';
-import { getCurrentRestaurantId } from '@/lib/restaurant-storage';
-import { getCurrentBranchId } from '@/lib/branch-storage';
+import { getCurrentTenant, getCurrentTenantId } from '@/lib/tenant-storage';
+import { getCurrentRestaurant, getCurrentRestaurantId } from '@/lib/restaurant-storage';
+import { getCurrentBranch, getCurrentBranchId } from '@/lib/branch-storage';
 import { emitUnauthorizedEvent } from '@/lib/auth-events';
 import { ApiError } from './api-error';
 import type { ApiErrorResponse } from '@/types/api';
@@ -24,9 +24,9 @@ async function request<T>(
   options: RequestInit = {},
 ): Promise<T> {
   const token = getAccessToken();
-  const tenantId = getCurrentTenantId();
-  const restaurantId = getCurrentRestaurantId();
-  const branchId = getCurrentBranchId();
+  const tenant = getCurrentTenant();
+  const restaurant = getCurrentRestaurant();
+  const branch = getCurrentBranch();
 
   const headers = new Headers(options.headers);
 
@@ -36,16 +36,22 @@ async function request<T>(
     headers.set('Authorization', `Bearer ${token}`);
   }
 
-  if (tenantId) {
-    headers.set('x-tenant-id', tenantId);
+  if (tenant?.id) {
+    headers.set('x-tenant-id', tenant.id);
   }
 
-  if (restaurantId) {
-    headers.set('x-restaurant-id', restaurantId);
+  // Cross-tenant protection: never send a restaurant header from a different tenant
+  if (restaurant?.id) {
+    if (!tenant?.id || restaurant.tenantId === tenant.id) {
+      headers.set('x-restaurant-id', restaurant.id);
+    }
   }
 
-  if (branchId) {
-    headers.set('x-branch-id', branchId);
+  // Cross-restaurant protection: never send a branch header from a different restaurant
+  if (branch?.id) {
+    if (!restaurant?.id || branch.restaurantId === restaurant.id) {
+      headers.set('x-branch-id', branch.id);
+    }
   }
 
   const fetchOptions: RequestInit = {
@@ -121,9 +127,13 @@ async function request<T>(
           const retryHeaders = new Headers(options.headers);
           retryHeaders.set('Content-Type', 'application/json');
           retryHeaders.set('Authorization', `Bearer ${newToken}`);
-          if (tenantId) retryHeaders.set('x-tenant-id', tenantId);
-          if (restaurantId) retryHeaders.set('x-restaurant-id', restaurantId);
-          if (branchId) retryHeaders.set('x-branch-id', branchId);
+          if (tenant?.id) retryHeaders.set('x-tenant-id', tenant.id);
+          if (restaurant?.id && (!tenant?.id || restaurant.tenantId === tenant.id)) {
+            retryHeaders.set('x-restaurant-id', restaurant.id);
+          }
+          if (branch?.id && (!restaurant?.id || branch.restaurantId === restaurant.id)) {
+            retryHeaders.set('x-branch-id', branch.id);
+          }
 
           fetch(`${config.apiUrl}${endpoint}`, {
             ...options,
