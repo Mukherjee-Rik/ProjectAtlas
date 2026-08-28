@@ -1,802 +1,554 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
+import { motion } from 'framer-motion';
+import { ArrowRight, Minus, Plus } from 'lucide-react';
+import { ScrollProgressBar } from '@/components/landing/ScrollProgressBar';
+import { ScrollReveal, ScrollStagger, staggerItemVariants } from '@/components/landing/ScrollReveal';
+import { AuthenticHeroTerminal } from '@/components/landing/AuthenticHeroTerminal';
+import { BentoModulesGrid } from '@/components/landing/BentoModulesGrid';
+import { ServiceFlow } from '@/components/landing/ServiceFlow';
+import { SplineScene } from '@/components/ui/splite';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
+
+/* ---------------------------------------------------------------------------
+   Page content
+   Kept above the component so the markup below stays readable, and so copy
+   edits don't mean scrolling through JSX.
+--------------------------------------------------------------------------- */
+
+/** Facts about the product, not invented traction numbers. */
+const facts = [
+  { value: '4', label: 'screens, one order' },
+  { value: '0', label: 'apps for guests to install' },
+  { value: '80mm', label: 'receipts, standard rolls' },
+  { value: '14', label: 'days free, no card' },
+];
+
+/**
+ * Reference-toned, not prose. The sections above already narrate the service;
+ * this one is a spec sheet, so each line stays short enough to scan.
+ */
+const capabilities = [
+  {
+    name: 'Receipts',
+    detail: '80mm thermal, tax broken out, order token on the footer. Prints from the browser.',
+  },
+  {
+    name: 'Voids and refunds',
+    detail: 'Waiter requests with a reason, manager approves. Both names stay on the record.',
+  },
+  {
+    name: 'Table state',
+    detail: 'Clears the moment you settle. A guest’s open menu can’t hold a table hostage.',
+  },
+  {
+    name: 'Branches',
+    detail: 'Unlimited, each with its own dining areas, tax rules and staff. One login for all.',
+  },
+  {
+    name: 'Inventory',
+    detail: 'Recipe-level. Ingredients deduct as dishes leave the pass, not at close of night.',
+  },
+  {
+    name: 'Standees',
+    detail: 'Print-ready QR per table, generated under your name rather than ours.',
+  },
+  {
+    name: 'Roles',
+    detail: 'Owner, manager, cashier, waiter, kitchen. Each sees only the screens they need.',
+  },
+];
+
+const devices = [
+  'Android tablet',
+  'iPad',
+  'Kitchen touchscreen',
+  'Laptop',
+  'POS terminal',
+  'A waiter’s own phone',
+];
+
+const plans = [
+  {
+    name: 'Starter',
+    price: '₹0',
+    period: 'for 14 days',
+    blurb: 'One café, one room, one screen in the kitchen.',
+    features: [
+      'Up to 10 tables',
+      'QR ordering at the table',
+      'One kitchen display',
+      'Cashier terminal',
+    ],
+    cta: 'Start free',
+    href: '/signup',
+    featured: false,
+  },
+  {
+    name: 'Growth',
+    price: '₹1,499',
+    period: 'per month',
+    blurb: 'A full room running lunch and dinner service.',
+    features: [
+      'Unlimited tables and standees',
+      'Multi-round tokens on one table',
+      'Unlimited kitchen and waiter devices',
+      'Recipe-level stock deduction',
+      'Split billing and approval on voids',
+    ],
+    cta: 'Start free, then ₹1,499',
+    href: '/signup',
+    featured: true,
+  },
+  {
+    name: 'Enterprise',
+    price: '₹3,999',
+    period: 'per month',
+    blurb: 'Several outlets that need to roll up into one view.',
+    features: [
+      'Unlimited branches',
+      'Stock synced across outlets',
+      'Rush-hour demand forecasting',
+      'Priority support with an SLA',
+    ],
+    cta: 'Talk to us',
+    href: '/contact',
+    featured: false,
+  },
+];
+
+const faqs = [
+  {
+    q: 'Do guests have to download anything?',
+    a: 'No. They point their camera at the standee on the table and the menu opens in whatever browser their phone already has — photos, variants, and a live cooking countdown once the kitchen accepts.',
+  },
+  {
+    q: 'What hardware do we need to buy?',
+    a: 'None, in most cases. Atlas is a website. If a device has a browser it can be a terminal — the tablet behind your counter, a kitchen touchscreen, a laptop, or a waiter’s own phone.',
+  },
+  {
+    q: 'How does the payment QR work?',
+    a: 'You upload your own UPI QR image in Settings. When guests are done, their phone shows the bill total alongside that QR. They can also just pay cash or card at the counter — the cashier screen handles both.',
+  },
+  {
+    q: 'What stops a waiter from quietly cancelling an order?',
+    a: 'Nothing gets cancelled on the spot. The request goes into a review queue on the cashier and owner screens with the waiter’s reason attached, and it stays there until a manager approves it. Refunds work the same way.',
+  },
+  {
+    q: 'Can we run more than one room, or more than one outlet?',
+    a: 'Yes. Dining areas are separate inside a branch, and branches are separate inside your account — each with its own tables, tax rules, and staff. Revenue from all of them rolls up into one dashboard.',
+  },
+];
+
+/* ------------------------------------------------------------------------- */
 
 export default function Home() {
-  const [activeModuleTab, setActiveModuleTab] = useState<'qr' | 'kds' | 'waiter' | 'pos' | 'inventory'>('qr');
-  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  const modules = [
-    {
-      id: 'qr',
-      name: '📱 QR Dine-In & Ordering',
-      badge: 'Zero App Download',
-      title: 'Frictionless QR Dine-In with Live Multi-Token Tracking',
-      description:
-        'Customers simply scan the table QR code to browse appetite-inducing categorized menus, customize dishes with variants and add-ons, place multiple rounds of orders, and pay directly from their seat via UPI.',
-      highlights: [
-        'Real-time multi-token round tracking (#AT-000001, #AT-000002)',
-        'Custom Standee QR code generation for every table and dining zone',
-        'Direct UPI payments at the seat with enlarged scan view',
-        'Waiter assistance calls and water requests at the tap of a button',
-      ],
-      previewStats: {
-        metric1: '+38%',
-        label1: 'Faster Table Ordering',
-        metric2: '0',
-        label2: 'App Downloads Required',
-      },
-    },
-    {
-      id: 'kds',
-      name: '👨‍🍳 Kitchen Display (KDS)',
-      badge: 'Sub-Second Sync',
-      title: 'Real-Time Paperless Kitchen Ticket Flow',
-      description:
-        'Equip your chefs with a lightning-fast, color-coded digital ticket screen that eliminates lost paper dockets, prioritizes tickets by cooking prep time, and alerts staff with pleasant audio chimes.',
-      highlights: [
-        'Audio chime alerts on incoming customer and waiter orders',
-        'Live status progression: Pending ➔ Cooking (Preparing) ➔ Ready',
-        'Item-level variant selections, modifiers, and allergy tags',
-        'Automatic order completion sync with Waiter and Cashier terminals',
-      ],
-      previewStats: {
-        metric1: '< 8 mins',
-        label1: 'Average Preparation Time',
-        metric2: '100%',
-        label2: 'Docket Accuracy',
-      },
-    },
-    {
-      id: 'waiter',
-      name: '🤵 Waiter Handheld Floor',
-      badge: 'Mobile-First',
-      title: 'Floor Management & Instant Table Service',
-      description:
-        'Empower your floor staff with an interactive dining floor map. View table occupancy at a glance, seat guests, take handheld POS orders, serve prepared dishes, and initiate manager-approved cancellations.',
-      highlights: [
-        'Color-coded floor status: Available (Green), Occupied (Red), Ready (Yellow)',
-        'Handheld digital order taking and instant KDS routing',
-        'One-click table clearing with strict ghost-session prevention',
-        'Two-tier manager cancellation requests for revenue protection',
-      ],
-      previewStats: {
-        metric1: '3x',
-        label1: 'Faster Table Turnaround',
-        metric2: '100%',
-        label2: 'Staff Floor Visibility',
-      },
-    },
-    {
-      id: 'pos',
-      name: '💵 Cashier POS & Finance',
-      badge: 'Audit Compliant',
-      title: 'Split Billing, Settlements & Refund Ledger',
-      description:
-        'A comprehensive cashier terminal engineered for high-volume rush hours. Collect cash or UPI payments, execute split payments, review waiter cancellation requests, and maintain an immutable financial ledger.',
-      highlights: [
-        'Split cash and UPI payments for large group tables',
-        'Formal cancellation review workflow (Approve / Reject with notes)',
-        'Full and partial refund ledger with automated audit logs',
-        'Instant GST tax calculation and thermal print receipt generation',
-      ],
-      previewStats: {
-        metric1: '0',
-        label1: 'Reconciliation Discrepancies',
-        metric2: 'Instant',
-        label2: 'Split Bill Calculation',
-      },
-    },
-    {
-      id: 'inventory',
-      name: '📦 Inventory & AI Forecasts',
-      badge: 'Automated Stocking',
-      title: 'Automated Recipe Stock Deduction & Demand AI',
-      description:
-        'Eliminate kitchen food waste and stockouts. Project Atlas automatically deducts raw ingredient stocks as orders are completed, alerts you when supplies run low, and predicts weekly demand with AI.',
-      highlights: [
-        'Automatic ingredient depletion per dish recipe (Meat, Dairy, Veggies)',
-        'Real-time low-stock warnings and raw material waste logs',
-        'Predictive AI demand forecasting for peak weekend rush hours',
-        'Multi-branch supply tracking and unit cost management',
-      ],
-      previewStats: {
-        metric1: '-24%',
-        label1: 'Food Waste Reduction',
-        metric2: 'Auto',
-        label2: 'Ingredient Depletion',
-      },
-    },
-  ];
-
-  const faqs = [
-    {
-      q: 'Do customers need to download an app to order?',
-      a: 'No! Customers simply open their smartphone camera and scan the QR standee on the table. The web menu opens instantly in their browser with high-resolution food images, customization options, and live cooking progress.',
-    },
-    {
-      q: 'What hardware do I need to run Project Atlas?',
-      a: 'Project Atlas is 100% web-native and responsive. You can run it on any device: iPads, Android tablets, kitchen touchscreens, laptops, POS billing terminals, or personal staff smartphones.',
-    },
-    {
-      q: 'How does the table payment and QR settlement work?',
-      a: 'You can upload your restaurant’s custom UPI QR image in Settings. When customers finish their meal, the system displays the combined bill total and payment QR on their phone. Alternatively, they can pay via cash or card at the cashier counter.',
-    },
-    {
-      q: 'How does the cancellation workflow protect against fraud?',
-      a: 'When a waiter requests to cancel any order, it is placed into a "Pending Review" queue on the Cashier / Owner dashboard. The Owner or Manager reviews the reason and notes before approving the cancellation and issuing a refund, ensuring complete financial integrity.',
-    },
-    {
-      q: 'Can I manage multiple branches and dining zones?',
-      a: 'Yes. Atlas includes built-in multi-tenant and multi-branch management. You can configure individual dining areas (e.g. AC Hall, Rooftop, Patio), assign specific tables, track branch-specific revenues, and monitor everything from a centralized executive dashboard.',
-    },
-  ];
-
-  const activeModule = modules.find((m) => m.id === activeModuleTab) || modules[0];
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   return (
-    <div className="min-h-screen bg-[#070A0E] text-[#F5F7FA] font-sans selection:bg-[#2AFEB7] selection:text-[#070A0E] overflow-x-hidden">
-      {/* ── Background Glow Elements ────────────────────────────────────── */}
-      <div className="fixed top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full bg-[#2AFEB7]/10 blur-[140px] pointer-events-none -z-10" />
-      <div className="fixed bottom-[-10%] right-[-10%] w-[50vw] h-[50vw] rounded-full bg-[#A855F7]/10 blur-[140px] pointer-events-none -z-10" />
-      <div className="fixed top-[40%] right-[10%] w-[35vw] h-[35vw] rounded-full bg-[#3B82F6]/5 blur-[120px] pointer-events-none -z-10" />
+    <div className="relative min-h-screen overflow-x-clip bg-background font-sans text-foreground selection:bg-primary/25 selection:text-foreground">
+      {/* Ambient light for the glass nav to refract. Without it the nav has a
+          flat fill behind it and the lens has nothing to bend. */}
+      <div className="ambient" aria-hidden="true" />
+      <ScrollProgressBar />
 
-      {/* ── Navbar ────────────────────────────────────────────────────────── */}
-      <nav className="sticky top-0 z-50 border-b border-[#26313C]/60 bg-[#070A0E]/80 backdrop-blur-md">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3.5 sm:px-6 lg:px-8">
-          <Link href="/" className="flex items-center gap-3">
-            <img src="/logo.png" alt="Atlas Logo" className="h-9 w-auto object-contain" />
-            <span className="text-xl font-black tracking-tight text-white flex items-center gap-1.5">
-              ATLAS
-              <span className="rounded bg-[#2AFEB7]/15 px-1.5 py-0.5 text-[9px] font-extrabold uppercase text-[#2AFEB7] border border-[#2AFEB7]/30">
-                Restaurant OS
-              </span>
+      {/* ═══ Nav ═════════════════════════════════════════════════════════ */}
+      <header className="liquid-glass sticky top-0 z-50 rounded-none border-b border-border/60">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-8 px-6 py-4 lg:px-8">
+          <Link href="/" className="flex shrink-0 items-center gap-2.5">
+            <Image
+              src="/logo.png"
+              alt=""
+              width={28}
+              height={28}
+              priority
+              className="h-7 w-7 object-contain"
+            />
+            <span className="font-display text-[15px] font-bold tracking-[-0.02em] text-foreground">
+              Atlas
             </span>
           </Link>
 
-          {/* Desktop Nav Links */}
-          <div className="hidden md:flex items-center gap-8 text-xs font-bold uppercase tracking-wider text-[#9AA6B2]">
-            <a href="#features" className="transition-colors hover:text-[#2AFEB7]">
-              Features
+          <nav className="hidden items-center gap-9 text-[13px] text-muted-foreground md:flex">
+            <a href="#floor" className="transition-colors hover:text-foreground">
+              Floor view
             </a>
-            <a href="#modules" className="transition-colors hover:text-[#2AFEB7]">
-              Modules
+            <a href="#workflow" className="transition-colors hover:text-foreground">
+              How it works
             </a>
-            <a href="#how-it-works" className="transition-colors hover:text-[#2AFEB7]">
-              How It Works
-            </a>
-            <a href="#pricing" className="transition-colors hover:text-[#2AFEB7]">
+            <a href="#pricing" className="transition-colors hover:text-foreground">
               Pricing
             </a>
-            <a href="#faq" className="transition-colors hover:text-[#2AFEB7]">
-              FAQ
-            </a>
-          </div>
+            <Link href="/docs" className="transition-colors hover:text-foreground">
+              Docs
+            </Link>
+            <Link href="/contact" className="transition-colors hover:text-foreground">
+              Contact Us
+            </Link>
+          </nav>
 
-          {/* Action CTAs */}
-          <div className="hidden sm:flex items-center gap-3">
+          <div className="flex shrink-0 items-center gap-4">
+            <ThemeToggle />
             <Link
               href="/login"
-              className="rounded-xl border border-[#26313C] bg-[#111820] px-4 py-2 text-xs font-bold text-[#F5F7FA] transition-all hover:border-[#2AFEB7]/50 hover:text-[#2AFEB7]"
+              className="text-[13px] text-muted-foreground transition-colors hover:text-foreground"
             >
-              Sign In
+              Sign in
             </Link>
             <Link
               href="/signup"
-              className="rounded-xl bg-[#2AFEB7] px-4 py-2 text-xs font-extrabold text-[#070A0E] shadow-[0_0_20px_rgba(42,254,183,0.3)] transition-all hover:bg-[#22E5A4] hover:shadow-[0_0_25px_rgba(42,254,183,0.5)] active:scale-95"
+              className="rounded-md bg-foreground px-3.5 py-2 text-[13px] font-medium text-background transition-colors hover:bg-foreground/90"
             >
-              Get Started Free
+              Start free
             </Link>
           </div>
+        </div>
+      </header>
 
-          {/* Mobile Menu Toggle */}
-          <button
-            type="button"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="sm:hidden rounded-lg border border-[#26313C] bg-[#111820] p-2 text-[#9AA6B2] hover:text-white"
+      {/* ═══ Hero ════════════════════════════════════════════════════════
+          Text holds seven columns; the dish takes the remaining five. On a
+          phone the dish drops below the copy but stays above the CTAs, so the
+          buttons remain the last thing before the fold. */}
+      <section className="mx-auto max-w-6xl px-6 pb-20 pt-20 sm:pt-28 lg:px-8">
+        <div className="grid items-center gap-x-8 gap-y-10 md:grid-cols-12">
+          <div className="md:col-span-7">
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.4 }}
+              className="flex items-center gap-2.5 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground"
+            >
+              <span className="h-1 w-1 rounded-full bg-primary" />
+              Atlas 2.0 is live
+            </motion.p>
+
+            <motion.h1
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.55, delay: 0.05, ease: [0.22, 0.61, 0.36, 1] }}
+              className="mt-7 font-display text-[2.6rem] font-extrabold leading-[0.98] tracking-[-0.04em] text-foreground sm:text-[3.5rem] lg:text-[4.15rem]"
+            >
+              Nothing gets lost
+              <br />
+              <span className="text-muted-foreground">between the table</span>
+              <br />
+              and the kitchen.
+            </motion.h1>
+
+            <motion.p
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.55, delay: 0.15, ease: [0.22, 0.61, 0.36, 1] }}
+              className="mt-8 max-w-lg text-[15px] leading-[1.75] text-muted-foreground"
+            >
+              Atlas runs the whole floor on one system: the QR menu your guests order
+              from, the screen your kitchen cooks off, the tablet your waiters carry,
+              and the counter where the bill gets settled.
+            </motion.p>
+          </div>
+
+          {/* Spline scene, replacing the procedural plated dish. Decorative,
+              so it is hidden from assistive tech — the headline carries the
+              meaning. aspect-square keeps the canvas box stable at every
+              width so the layout doesn't shift while the scene streams in. */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.9, delay: 0.3 }}
+            className="flex items-center justify-center md:col-span-5"
+            aria-hidden="true"
           >
-            {mobileMenuOpen ? '✕' : '☰'}
-          </button>
+            <SplineScene
+              scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
+              className="aspect-square w-full max-w-[300px] md:max-w-[480px]"
+            />
+          </motion.div>
         </div>
 
-        {/* Mobile Dropdown */}
-        {mobileMenuOpen && (
-          <div className="border-b border-[#26313C] bg-[#0B0F14] px-4 py-4 sm:hidden space-y-3">
-            <div className="flex flex-col space-y-2 text-xs font-bold text-[#9AA6B2]">
-              <a
-                href="#features"
-                onClick={() => setMobileMenuOpen(false)}
-                className="py-1 hover:text-[#2AFEB7]"
-              >
-                Features
-              </a>
-              <a
-                href="#modules"
-                onClick={() => setMobileMenuOpen(false)}
-                className="py-1 hover:text-[#2AFEB7]"
-              >
-                Modules
-              </a>
-              <a
-                href="#how-it-works"
-                onClick={() => setMobileMenuOpen(false)}
-                className="py-1 hover:text-[#2AFEB7]"
-              >
-                How It Works
-              </a>
-              <a
-                href="#pricing"
-                onClick={() => setMobileMenuOpen(false)}
-                className="py-1 hover:text-[#2AFEB7]"
-              >
-                Pricing
-              </a>
-              <a
-                href="#faq"
-                onClick={() => setMobileMenuOpen(false)}
-                className="py-1 hover:text-[#2AFEB7]"
-              >
-                FAQ
-              </a>
-            </div>
-            <div className="pt-2 flex flex-col gap-2">
-              <Link
-                href="/login"
-                className="w-full text-center rounded-xl border border-[#26313C] bg-[#111820] py-2.5 text-xs font-bold text-[#F5F7FA]"
-              >
-                Sign In
-              </Link>
-              <Link
-                href="/signup"
-                className="w-full text-center rounded-xl bg-[#2AFEB7] py-2.5 text-xs font-extrabold text-[#070A0E]"
-              >
-                Get Started Free
-              </Link>
-            </div>
-          </div>
-        )}
-      </nav>
+        <motion.div
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.55, delay: 0.25, ease: [0.22, 0.61, 0.36, 1] }}
+          className="mt-4 flex flex-col items-start gap-x-8 gap-y-5 sm:flex-row sm:items-center md:mt-2"
+        >
+          <Link
+            href="/signup"
+            className="group inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3.5 text-[14px] font-semibold text-background transition-colors hover:bg-primary-hover sm:w-auto"
+          >
+            Start free for 14 days
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+          </Link>
+          <a
+            href="#floor"
+            className="inline-flex items-center gap-2 border-b border-border pb-0.5 text-[14px] text-foreground transition-colors hover:border-border hover:text-foreground"
+          >
+            See the floor view
+          </a>
+        </motion.div>
 
-      {/* ── Hero Section ─────────────────────────────────────────────────── */}
-      <section className="relative pt-16 pb-20 sm:pt-24 sm:pb-32 px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-5xl text-center space-y-8">
-          {/* Release Badge */}
-          <div className="inline-flex items-center gap-2.5 rounded-full border border-[#2AFEB7]/30 bg-[#2AFEB7]/10 px-4 py-1.5 text-xs font-bold text-[#2AFEB7] shadow-sm animate-pulse">
-            <span className="h-2 w-2 rounded-full bg-[#2AFEB7]" />
-            <span>Atlas v2.0 • The Complete Restaurant Operating System</span>
-          </div>
-
-          {/* Hero Headline */}
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-[1.1] text-transparent bg-clip-text bg-gradient-to-b from-white via-[#F5F7FA] to-[#9AA6B2]">
-            Run Your Entire Restaurant <br />
-            <span className="bg-clip-text bg-gradient-to-r from-[#2AFEB7] via-[#22E5A4] to-[#A855F7]">
-              On Pure Autopilot
-            </span>
-          </h1>
-
-          {/* Subtitle */}
-          <p className="mx-auto max-w-2xl text-base sm:text-lg text-[#9AA6B2] leading-relaxed">
-            Dynamic QR Dine-In, Live Kitchen Display (KDS), Waiter Floor Terminals, Real-Time Recipe
-            Inventory, and AI Demand Forecasting — unified into one lightning-fast platform.
-          </p>
-
-          {/* Primary Action Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
-            <Link
-              href="/signup"
-              className="w-full sm:w-auto rounded-xl bg-[#2AFEB7] px-8 py-4 text-sm font-black tracking-wider uppercase text-[#070A0E] shadow-[0_0_30px_rgba(42,254,183,0.35)] transition-all hover:bg-[#22E5A4] hover:shadow-[0_0_40px_rgba(42,254,183,0.55)] hover:scale-105 active:scale-95"
-            >
-              🚀 Launch Restaurant Free
-            </Link>
-
-            <Link
-              href="/login"
-              className="w-full sm:w-auto rounded-xl border border-[#26313C] bg-[#111820]/80 backdrop-blur px-8 py-4 text-sm font-bold text-[#F5F7FA] transition-all hover:border-[#2AFEB7]/40 hover:text-[#2AFEB7] hover:bg-[#18212B]"
-            >
-              Live Demo Portal →
-            </Link>
-          </div>
-
-          {/* Demo Credentials Pill */}
-          <div className="inline-flex flex-wrap items-center justify-center gap-2 rounded-xl border border-[#26313C] bg-[#111820]/60 px-4 py-2 text-[11px] text-[#9AA6B2]">
-            <span>🔑 Instant Demo Account:</span>
-            <span className="font-mono text-[#2AFEB7] font-bold">test@atlas.com</span>
-            <span>/</span>
-            <span className="font-mono text-[#2AFEB7] font-bold">Atlas@12345</span>
-          </div>
-
-          {/* Stat Pillars */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-8 max-w-4xl mx-auto">
-            <div className="rounded-2xl border border-[#26313C] bg-[#111820]/70 p-4 text-center">
-              <p className="text-2xl sm:text-3xl font-black text-[#2AFEB7]">&lt; 15s</p>
-              <p className="mt-1 text-xs text-[#9AA6B2] font-semibold">QR Order to Kitchen</p>
-            </div>
-            <div className="rounded-2xl border border-[#26313C] bg-[#111820]/70 p-4 text-center">
-              <p className="text-2xl sm:text-3xl font-black text-[#A855F7]">+34%</p>
-              <p className="mt-1 text-xs text-[#9AA6B2] font-semibold">Table Turnover Speed</p>
-            </div>
-            <div className="rounded-2xl border border-[#26313C] bg-[#111820]/70 p-4 text-center">
-              <p className="text-2xl sm:text-3xl font-black text-[#38BDF8]">0%</p>
-              <p className="mt-1 text-xs text-[#9AA6B2] font-semibold">Paper Docket Waste</p>
-            </div>
-            <div className="rounded-2xl border border-[#26313C] bg-[#111820]/70 p-4 text-center">
-              <p className="text-2xl sm:text-3xl font-black text-[#22C55E]">100%</p>
-              <p className="mt-1 text-xs text-[#9AA6B2] font-semibold">Cloud Real-Time Sync</p>
-            </div>
-          </div>
-        </div>
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+          className="mt-8 font-mono text-[12px] text-subtle"
+        >
+          Or poke around the live demo —{' '}
+          <span className="text-muted-foreground">test@atlas.com</span>
+          <span className="mx-1.5 text-subtle">/</span>
+          <span className="text-muted-foreground">Atlas@12345</span>
+        </motion.p>
       </section>
 
-      {/* ── Interactive OS Simulation Preview ────────────────────────────── */}
-      <section className="relative px-4 sm:px-6 lg:px-8 pb-24">
-        <div className="mx-auto max-w-6xl rounded-3xl border border-[#26313C] bg-[#111820]/80 p-4 sm:p-8 shadow-2xl backdrop-blur-xl">
-          {/* Mock Window Controls */}
-          <div className="flex items-center justify-between border-b border-[#26313C] pb-4 mb-6">
-            <div className="flex items-center gap-2">
-              <span className="h-3 w-3 rounded-full bg-[#EF4444]" />
-              <span className="h-3 w-3 rounded-full bg-[#EAB308]" />
-              <span className="h-3 w-3 rounded-full bg-[#22C55E]" />
-              <span className="ml-3 text-xs font-mono text-[#9AA6B2] font-bold">
-                atlas-os.restaurant.live • Cafe Rizz (Main Branch)
-              </span>
-            </div>
-            <span className="rounded-full bg-[#2AFEB7]/10 px-3 py-1 text-[10px] font-extrabold uppercase text-[#2AFEB7] border border-[#2AFEB7]/30 flex items-center gap-1.5">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#2AFEB7] animate-ping" />
-              Live Sync
-            </span>
-          </div>
-
-          {/* Mock Dashboard Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-            {/* Live Dining Floor Overview */}
-            <div className="md:col-span-7 space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-xs font-extrabold uppercase tracking-wider text-[#9AA6B2]">
-                  Live Floor Map (Main Dining)
-                </h3>
-                <span className="text-xs text-[#2AFEB7] font-bold">4 Active Tables</span>
+      {/* ═══ Facts strip ═════════════════════════════════════════════════
+          gap-px over a hairline-coloured track gives clean rules between
+          cells at any column count — including the row gap once this wraps
+          to two columns on a phone. */}
+      <section className="border-y border-border">
+        <div className="mx-auto max-w-6xl px-6 lg:px-8">
+          <div className="grid grid-cols-2 gap-px bg-secondary sm:grid-cols-4">
+            {facts.map((fact) => (
+              <div key={fact.label} className="bg-background px-5 py-8 sm:px-7">
+                <p className="font-display text-3xl font-semibold tracking-[-0.03em] text-foreground sm:text-[2.25rem]">
+                  {fact.value}
+                </p>
+                <p className="mt-2 text-[13px] leading-snug text-muted-foreground">{fact.label}</p>
               </div>
-
-              <div className="grid grid-cols-3 gap-3">
-                <div className="rounded-xl border border-[#EF4444]/40 bg-[#EF4444]/5 p-3.5 space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs font-black text-white">Table 1</span>
-                    <span className="h-2 w-2 rounded-full bg-[#EF4444]" />
-                  </div>
-                  <p className="text-[10px] text-[#9AA6B2]">Round 1 (2 Items)</p>
-                  <p className="text-xs font-extrabold text-[#2AFEB7]">₹840.00</p>
-                </div>
-
-                <div className="rounded-xl border border-[#EAB308]/50 bg-[#EAB308]/10 p-3.5 space-y-2 shadow-[0_0_15px_rgba(234,179,8,0.1)]">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs font-black text-white">Table 2</span>
-                    <span className="h-2 w-2 rounded-full bg-[#EAB308] animate-ping" />
-                  </div>
-                  <span className="inline-block rounded bg-[#EAB308]/20 px-1.5 py-0.5 text-[9px] font-bold text-[#EAB308]">
-                    READY 🔔
-                  </span>
-                  <p className="text-xs font-extrabold text-[#2AFEB7]">₹1,240.00</p>
-                </div>
-
-                <div className="rounded-xl border border-[#22C55E]/40 bg-[#22C55E]/5 p-3.5 space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs font-black text-white">Table 3</span>
-                    <span className="h-2 w-2 rounded-full bg-[#22C55E]" />
-                  </div>
-                  <p className="text-[10px] text-[#22C55E] font-bold">Available</p>
-                  <p className="text-xs font-mono text-[#9AA6B2]">👥 4 seats</p>
-                </div>
-
-                <div className="rounded-xl border border-[#EF4444]/40 bg-[#EF4444]/5 p-3.5 space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs font-black text-white">Table 4</span>
-                    <span className="h-2 w-2 rounded-full bg-[#EF4444]" />
-                  </div>
-                  <p className="text-[10px] text-[#9AA6B2]">Round 2 (Multi-Token)</p>
-                  <p className="text-xs font-extrabold text-[#2AFEB7]">₹2,180.00</p>
-                </div>
-
-                <div className="rounded-xl border border-[#22C55E]/40 bg-[#22C55E]/5 p-3.5 space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs font-black text-white">Table 5</span>
-                    <span className="h-2 w-2 rounded-full bg-[#22C55E]" />
-                  </div>
-                  <p className="text-[10px] text-[#22C55E] font-bold">Available</p>
-                  <p className="text-xs font-mono text-[#9AA6B2]">👥 6 seats</p>
-                </div>
-
-                <div className="rounded-xl border border-[#22C55E]/40 bg-[#22C55E]/5 p-3.5 space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs font-black text-white">Table 6</span>
-                    <span className="h-2 w-2 rounded-full bg-[#22C55E]" />
-                  </div>
-                  <p className="text-[10px] text-[#22C55E] font-bold">Available</p>
-                  <p className="text-xs font-mono text-[#9AA6B2]">👥 2 seats</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Live KDS Ticket Feed */}
-            <div className="md:col-span-5 space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-xs font-extrabold uppercase tracking-wider text-[#9AA6B2]">
-                  Live Kitchen Queue (KDS)
-                </h3>
-                <span className="text-xs text-[#EAB308] font-bold">2 In Prep</span>
-              </div>
-
-              <div className="space-y-2.5">
-                <div className="rounded-xl border border-[#A855F7]/30 bg-[#18212B] p-3 space-y-1.5">
-                  <div className="flex justify-between items-center">
-                    <span className="font-mono font-bold text-[#2AFEB7] text-xs">#AT-000012 • Table 2</span>
-                    <span className="rounded bg-[#A855F7]/20 px-2 py-0.5 text-[9px] font-bold text-[#A855F7]">
-                      COOKING 🍳
-                    </span>
-                  </div>
-                  <p className="text-xs text-[#F5F7FA] font-medium">1x Butter Chicken, 2x Garlic Naan</p>
-                  <p className="text-[10px] text-[#9AA6B2]">⏱️ Prep timer: 04:12 mins</p>
-                </div>
-
-                <div className="rounded-xl border border-[#26313C] bg-[#18212B] p-3 space-y-1.5">
-                  <div className="flex justify-between items-center">
-                    <span className="font-mono font-bold text-[#2AFEB7] text-xs">#AT-000013 • Table 4</span>
-                    <span className="rounded bg-sky-500/20 px-2 py-0.5 text-[9px] font-bold text-sky-400">
-                      NEW ORDER
-                    </span>
-                  </div>
-                  <p className="text-xs text-[#F5F7FA] font-medium">2x Cold Coffee, 1x Paneer Tikka</p>
-                  <p className="text-[10px] text-[#9AA6B2]">⏱️ Placed 30s ago</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Core Modules Deep-Dive ───────────────────────────────────────── */}
-      <section id="modules" className="py-20 px-4 sm:px-6 lg:px-8 border-t border-[#26313C]/60 bg-[#0B0F14]/50">
-        <div className="mx-auto max-w-6xl space-y-12">
-          <div className="text-center space-y-3">
-            <span className="text-xs font-black uppercase tracking-widest text-[#2AFEB7]">
-              Comprehensive Platform Architecture
-            </span>
-            <h2 className="text-3xl sm:text-5xl font-black text-white">
-              Engineered For Every Role in Your Restaurant
-            </h2>
-            <p className="mx-auto max-w-2xl text-sm text-[#9AA6B2]">
-              Switch between dedicated, high-speed interfaces built specifically for diners, chefs,
-              waiters, cashiers, and restaurant owners.
-            </p>
-          </div>
-
-          {/* Module Selector Tabs */}
-          <div className="flex gap-2 justify-start sm:justify-center overflow-x-auto no-scrollbar pb-2">
-            {modules.map((m) => (
-              <button
-                key={m.id}
-                type="button"
-                onClick={() => setActiveModuleTab(m.id as any)}
-                className={`rounded-xl px-4 py-2.5 text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
-                  activeModuleTab === m.id
-                    ? 'bg-[#2AFEB7] text-[#070A0E] shadow-[0_0_20px_rgba(42,254,183,0.3)]'
-                    : 'border border-[#26313C] bg-[#111820] text-[#9AA6B2] hover:text-[#F5F7FA] hover:border-[#2AFEB7]/40'
-                }`}
-              >
-                {m.name}
-              </button>
             ))}
           </div>
+        </div>
+      </section>
 
-          {/* Active Module Card */}
-          <div className="rounded-3xl border border-[#26313C] bg-[#111820] p-6 sm:p-10 shadow-2xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            <div className="lg:col-span-7 space-y-6">
-              <div className="inline-flex items-center gap-2 rounded-full border border-[#2AFEB7]/30 bg-[#2AFEB7]/10 px-3 py-1 text-[10px] font-extrabold uppercase text-[#2AFEB7]">
-                {activeModule.badge}
+      {/* ═══ Floor view (product) ════════════════════════════════════════ */}
+      <section id="floor" className="px-6 py-20 sm:py-28 lg:px-8">
+        <div className="mx-auto mb-12 max-w-6xl">
+          <ScrollReveal>
+            <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
+              The floor, right now
+            </p>
+            <h2 className="mt-5 max-w-2xl font-display text-[2rem] font-bold leading-[1.05] tracking-[-0.03em] text-foreground sm:text-[2.75rem]">
+              Every table, every token, on one screen.
+            </h2>
+          </ScrollReveal>
+        </div>
+        {/* Pinned dark: this is a product shot of the app's floor view, and a
+            dark screenshot reads as a screenshot on either page theme. */}
+        <div className="dark">
+          <AuthenticHeroTerminal />
+        </div>
+      </section>
+
+      {/* ═══ Modules ═════════════════════════════════════════════════════ */}
+      <BentoModulesGrid />
+
+      {/* ═══ Service flow ════════════════════════════════════════════════ */}
+      <ServiceFlow />
+
+      {/* ═══ Capabilities ════════════════════════════════════════════════ */}
+      <section className="border-t border-border px-6 py-24 sm:py-32 lg:px-8">
+        <div className="mx-auto max-w-6xl">
+          <ScrollReveal>
+            <div className="grid gap-6 md:grid-cols-12 md:items-end">
+              <div className="md:col-span-7">
+                <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
+                  The unglamorous half
+                </p>
+                <h2 className="mt-5 font-display text-[2rem] font-bold leading-[1.05] tracking-[-0.03em] text-foreground sm:text-[2.75rem]">
+                  The parts nobody demos.
+                </h2>
               </div>
+              <p className="text-[15px] leading-relaxed text-muted-foreground md:col-span-5">
+                Ordering is the easy bit. What decides whether you keep using a system
+                is the printing, the voids, and the day the Wi-Fi drops.
+              </p>
+            </div>
+          </ScrollReveal>
 
-              <h3 className="text-2xl sm:text-3xl font-black text-white leading-snug">
-                {activeModule.title}
-              </h3>
+          {/* A spec list on hairlines, not seven identical boxes. */}
+          <ScrollStagger className="mt-14 border-t border-border">
+            {capabilities.map((cap) => (
+              <motion.div
+                key={cap.name}
+                variants={staggerItemVariants}
+                className="grid items-baseline gap-x-12 gap-y-1.5 border-b border-border py-5 md:grid-cols-12"
+              >
+                <h3 className="font-display text-[15px] font-semibold tracking-[-0.01em] text-foreground md:col-span-3">
+                  {cap.name}
+                </h3>
+                <p className="text-[15px] leading-[1.6] text-muted-foreground md:col-span-9">
+                  {cap.detail}
+                </p>
+              </motion.div>
+            ))}
+          </ScrollStagger>
+        </div>
+      </section>
 
-              <p className="text-sm text-[#9AA6B2] leading-relaxed">{activeModule.description}</p>
+      {/* ═══ Where it runs ═══════════════════════════════════════════════ */}
+      <section className="px-6 py-24 sm:py-28 lg:px-8">
+        <div className="mx-auto max-w-6xl">
+          <ScrollReveal>
+            <div className="grid gap-x-12 gap-y-8 md:grid-cols-12">
+              <div className="md:col-span-6">
+                <h2 className="font-display text-[1.75rem] font-bold leading-[1.1] tracking-[-0.03em] text-foreground sm:text-[2.25rem]">
+                  It runs on whatever is already on your counter.
+                </h2>
+              </div>
+              <div className="md:col-span-6 md:pt-2">
+                <p className="text-[15px] leading-[1.75] text-muted-foreground">
+                  Atlas is a website, not an install. There is no proprietary terminal to
+                  buy or lease, and no dongle that stops working when a cable goes
+                  missing. If a device has a browser, it can be a station.
+                </p>
+                <ul className="mt-8 flex flex-wrap gap-2">
+                  {devices.map((device) => (
+                    <li
+                      key={device}
+                      className="rounded-full border border-border px-3.5 py-1.5 text-[13px] text-muted-foreground"
+                    >
+                      {device}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </ScrollReveal>
+        </div>
+      </section>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                {activeModule.highlights.map((h, i) => (
-                  <div key={i} className="flex items-start gap-2.5 text-xs text-[#F5F7FA]">
-                    <span className="text-[#2AFEB7] font-bold">✓</span>
-                    <span>{h}</span>
+      {/* ═══ Pricing ═════════════════════════════════════════════════════ */}
+      <section id="pricing" className="border-t border-border px-6 py-24 sm:py-32 lg:px-8">
+        <div className="mx-auto max-w-6xl">
+          <ScrollReveal>
+            <div className="grid gap-6 md:grid-cols-12 md:items-end">
+              <div className="md:col-span-7">
+                <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
+                  Pricing
+                </p>
+                <h2 className="mt-5 font-display text-[2rem] font-bold leading-[1.05] tracking-[-0.03em] text-foreground sm:text-[2.75rem]">
+                  Flat monthly. No cut of your sales.
+                </h2>
+              </div>
+              <p className="text-[15px] leading-relaxed text-muted-foreground md:col-span-5">
+                We don’t sit between you and your payment provider, so there is no
+                percentage skimmed off each bill. Every plan starts with 14 free days.
+              </p>
+            </div>
+          </ScrollReveal>
+
+          <div className="mt-16 grid gap-px overflow-hidden rounded-xl border border-border bg-secondary md:grid-cols-3">
+            {plans.map((plan) => (
+              <div
+                key={plan.name}
+                className={`flex flex-col justify-between gap-10 p-8 ${
+                  plan.featured ? 'bg-card' : 'bg-background'
+                }`}
+              >
+                <div>
+                  <div className="flex items-baseline justify-between gap-3">
+                    <h3 className="font-display text-[15px] font-semibold text-foreground">
+                      {plan.name}
+                    </h3>
+                    {plan.featured && (
+                      <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-primary">
+                        Most rooms pick this
+                      </span>
+                    )}
                   </div>
-                ))}
-              </div>
 
-              <div className="pt-4 flex items-center gap-4">
+                  <p className="mt-6 flex items-baseline gap-2">
+                    <span className="font-display text-[2.75rem] font-semibold leading-none tracking-[-0.04em] text-foreground">
+                      {plan.price}
+                    </span>
+                    <span className="text-[13px] text-muted-foreground">{plan.period}</span>
+                  </p>
+
+                  <p className="mt-4 text-[14px] leading-relaxed text-muted-foreground">
+                    {plan.blurb}
+                  </p>
+
+                  <ul className="mt-8 space-y-3 border-t border-border pt-7">
+                    {plan.features.map((feature) => (
+                      <li
+                        key={feature}
+                        className="flex gap-3 text-[14px] leading-snug text-foreground"
+                      >
+                        <span
+                          aria-hidden
+                          className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-primary"
+                        />
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
                 <Link
-                  href="/signup"
-                  className="rounded-xl bg-[#2AFEB7] px-6 py-3 text-xs font-black uppercase tracking-wider text-[#070A0E] hover:bg-[#22E5A4] transition-all"
+                  href={plan.href}
+                  className={`rounded-lg py-3 text-center text-[14px] font-semibold transition-colors ${
+                    plan.featured
+                      ? 'bg-primary text-background hover:bg-primary-hover'
+                      : 'border border-border text-foreground hover:bg-secondary'
+                  }`}
                 >
-                  Try This Feature →
+                  {plan.cta}
                 </Link>
               </div>
-            </div>
-
-            <div className="lg:col-span-5 rounded-2xl border border-[#26313C] bg-[#0B0F14] p-6 space-y-6 text-center">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="rounded-xl border border-[#26313C] bg-[#111820] p-4">
-                  <p className="text-3xl font-black text-[#2AFEB7]">{activeModule.previewStats.metric1}</p>
-                  <p className="text-[11px] text-[#9AA6B2] mt-1 font-semibold">
-                    {activeModule.previewStats.label1}
-                  </p>
-                </div>
-                <div className="rounded-xl border border-[#26313C] bg-[#111820] p-4">
-                  <p className="text-3xl font-black text-[#A855F7]">{activeModule.previewStats.metric2}</p>
-                  <p className="text-[11px] text-[#9AA6B2] mt-1 font-semibold">
-                    {activeModule.previewStats.label2}
-                  </p>
-                </div>
-              </div>
-
-              <div className="rounded-xl border border-[#2AFEB7]/20 bg-[#2AFEB7]/5 p-4 text-xs text-left space-y-2">
-                <p className="font-bold text-[#2AFEB7] flex items-center gap-2">
-                  <span>⚡</span> Instant Cloud Sync
-                </p>
-                <p className="text-[11px] text-[#9AA6B2]">
-                  Changes made in this module propagate across all floor tablets, kitchen displays, and
-                  customer devices in under 100 milliseconds.
-                </p>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* ── How It Works: 4-Step Process ─────────────────────────────────── */}
-      <section id="how-it-works" className="py-20 px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-5xl space-y-12">
-          <div className="text-center space-y-3">
-            <span className="text-xs font-black uppercase tracking-widest text-[#2AFEB7]">
-              End-To-End Dining Cycle
-            </span>
-            <h2 className="text-3xl sm:text-5xl font-black text-white">How Atlas Operates in 4 Steps</h2>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="rounded-2xl border border-[#26313C] bg-[#111820] p-6 space-y-4 relative">
-              <div className="h-10 w-10 rounded-xl bg-[#2AFEB7]/10 border border-[#2AFEB7]/30 flex items-center justify-center font-black text-[#2AFEB7]">
-                1
-              </div>
-              <h3 className="text-base font-extrabold text-white">Scan & Order</h3>
-              <p className="text-xs text-[#9AA6B2] leading-relaxed">
-                Guest scans the table QR, browses rich categorized menus, customizes variants, and receives
-                Token #1.
-              </p>
-            </div>
-
-            <div className="rounded-2xl border border-[#26313C] bg-[#111820] p-6 space-y-4 relative">
-              <div className="h-10 w-10 rounded-xl bg-[#A855F7]/10 border border-[#A855F7]/30 flex items-center justify-center font-black text-[#A855F7]">
-                2
-              </div>
-              <h3 className="text-base font-extrabold text-white">Kitchen Prepares</h3>
-              <p className="text-xs text-[#9AA6B2] leading-relaxed">
-                Kitchen KDS plays a chime alert. Chefs tap Start Cooking ➔ Mark Ready. Customer phone tracks
-                progress.
-              </p>
-            </div>
-
-            <div className="rounded-2xl border border-[#26313C] bg-[#111820] p-6 space-y-4 relative">
-              <div className="h-10 w-10 rounded-xl bg-[#38BDF8]/10 border border-[#38BDF8]/30 flex items-center justify-center font-black text-[#38BDF8]">
-                3
-              </div>
-              <h3 className="text-base font-extrabold text-white">Serve & Multi-Round</h3>
-              <p className="text-xs text-[#9AA6B2] leading-relaxed">
-                Waiters serve food with 1 tap. Diners can add extra items (Token #2) or pay at seat via UPI QR.
-              </p>
-            </div>
-
-            <div className="rounded-2xl border border-[#26313C] bg-[#111820] p-6 space-y-4 relative">
-              <div className="h-10 w-10 rounded-xl bg-[#22C55E]/10 border border-[#22C55E]/30 flex items-center justify-center font-black text-[#22C55E]">
-                4
-              </div>
-              <h3 className="text-base font-extrabold text-white">Clear & Auto-Sync</h3>
-              <p className="text-xs text-[#9AA6B2] leading-relaxed">
-                Cashier/Waiter settles bill. Table clears to Green, ingredients auto-deduct, and revenue logs in
-                ledger.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Feature Highlights Grid ───────────────────────────────────────── */}
-      <section id="features" className="py-20 px-4 sm:px-6 lg:px-8 border-t border-[#26313C]/60 bg-[#0B0F14]/50">
-        <div className="mx-auto max-w-6xl space-y-12">
-          <div className="text-center space-y-3">
-            <span className="text-xs font-black uppercase tracking-widest text-[#2AFEB7]">
-              Enterprise Capabilities
-            </span>
-            <h2 className="text-3xl sm:text-5xl font-black text-white">Built For Uncompromising Reliability</h2>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="rounded-2xl border border-[#26313C] bg-[#111820] p-6 space-y-3 hover:border-[#2AFEB7]/40 transition-all">
-              <div className="text-2xl">📸</div>
-              <h3 className="text-base font-bold text-white">Visual Menu Photo Uploads</h3>
-              <p className="text-xs text-[#9AA6B2] leading-relaxed">
-                Direct drag-and-drop image uploads for dishes, drinks, and custom payment standee QR codes with
-                instant base64 previews.
-              </p>
-            </div>
-
-            <div className="rounded-2xl border border-[#26313C] bg-[#111820] p-6 space-y-3 hover:border-[#2AFEB7]/40 transition-all">
-              <div className="text-2xl">🛡️</div>
-              <h3 className="text-base font-bold text-white">Two-Tier Cancellation Security</h3>
-              <p className="text-xs text-[#9AA6B2] leading-relaxed">
-                Waiter cancellation requests require Owner/Manager review before orders are cancelled or
-                refunded, preventing staff fraud.
-              </p>
-            </div>
-
-            <div className="rounded-2xl border border-[#26313C] bg-[#111820] p-6 space-y-3 hover:border-[#2AFEB7]/40 transition-all">
-              <div className="text-2xl">⚡</div>
-              <h3 className="text-base font-bold text-white">Strict Ghost-Session Prevention</h3>
-              <p className="text-xs text-[#9AA6B2] leading-relaxed">
-                Read-only polling ensures tables strictly remain Available (Green) after clearing, even if
-                the customer phone remains on the last page.
-              </p>
-            </div>
-
-            <div className="rounded-2xl border border-[#26313C] bg-[#111820] p-6 space-y-3 hover:border-[#2AFEB7]/40 transition-all">
-              <div className="text-2xl">🏢</div>
-              <h3 className="text-base font-bold text-white">Multi-Branch Architecture</h3>
-              <p className="text-xs text-[#9AA6B2] leading-relaxed">
-                Manage all your locations, dining rooms, tax rates, and staff permissions under a single unified
-                restaurant umbrella.
-              </p>
-            </div>
-
-            <div className="rounded-2xl border border-[#26313C] bg-[#111820] p-6 space-y-3 hover:border-[#2AFEB7]/40 transition-all">
-              <div className="text-2xl">📊</div>
-              <h3 className="text-base font-bold text-white">Deep Financial Analytics</h3>
-              <p className="text-xs text-[#9AA6B2] leading-relaxed">
-                Hourly sales heatmaps, category profit margins, top-selling items, and custom PDF report
-                generation.
-              </p>
-            </div>
-
-            <div className="rounded-2xl border border-[#26313C] bg-[#111820] p-6 space-y-3 hover:border-[#2AFEB7]/40 transition-all">
-              <div className="text-2xl">🖨️</div>
-              <h3 className="text-base font-bold text-white">Thermal Receipt Printing</h3>
-              <p className="text-xs text-[#9AA6B2] leading-relaxed">
-                One-click print receipt formatting for standard 80mm POS thermal printers with table number,
-                tax breakdown, and GST details.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Pricing Section ──────────────────────────────────────────────── */}
-      <section id="pricing" className="py-20 px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-6xl space-y-12">
-          <div className="text-center space-y-3">
-            <span className="text-xs font-black uppercase tracking-widest text-[#2AFEB7]">
-              Simple & Transparent Pricing
-            </span>
-            <h2 className="text-3xl sm:text-5xl font-black text-white">Start Free. Scale As You Grow.</h2>
-            <p className="mx-auto max-w-2xl text-sm text-[#9AA6B2]">
-              No hidden gateway charges. No locked-in long term contracts.
+      {/* ═══ FAQ ═════════════════════════════════════════════════════════ */}
+      <section id="faq" className="border-t border-border px-6 py-24 sm:py-32 lg:px-8">
+        <div className="mx-auto grid max-w-6xl gap-x-12 gap-y-12 md:grid-cols-12">
+          <div className="md:col-span-4">
+            <h2 className="font-display text-[2rem] font-bold leading-[1.05] tracking-[-0.03em] text-foreground sm:text-[2.5rem]">
+              Questions we
+              <br />
+              actually get.
+            </h2>
+            <p className="mt-6 text-[15px] leading-relaxed text-muted-foreground">
+              Something not here?{' '}
+              <Link
+                href="/contact"
+                className="border-b border-border pb-px text-primary transition-colors hover:border-primary hover:text-primary-hover font-semibold"
+              >
+                Ask us
+              </Link>
+              .
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Tier 1 */}
-            <div className="rounded-3xl border border-[#26313C] bg-[#111820] p-8 space-y-6 flex flex-col justify-between">
-              <div className="space-y-4">
-                <span className="text-xs font-extrabold uppercase text-[#9AA6B2]">Starter / Cafe</span>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-black text-white">₹0</span>
-                  <span className="text-xs text-[#9AA6B2]">/ 14-day trial</span>
-                </div>
-                <p className="text-xs text-[#9AA6B2]">Ideal for single cafes and small dining setups.</p>
-                <ul className="space-y-2.5 text-xs text-[#F5F7FA] pt-2">
-                  <li className="flex items-center gap-2">✓ Up to 10 Tables</li>
-                  <li className="flex items-center gap-2">✓ Digital QR Menu & Dine-In</li>
-                  <li className="flex items-center gap-2">✓ 1 Kitchen KDS Screen</li>
-                  <li className="flex items-center gap-2">✓ Cashier POS & Billing</li>
-                </ul>
-              </div>
-              <Link
-                href="/signup"
-                className="w-full text-center rounded-xl border border-[#26313C] bg-[#18212B] py-3 text-xs font-bold text-[#F5F7FA] hover:border-[#2AFEB7] hover:text-[#2AFEB7] transition-all"
-              >
-                Start Free Trial
-              </Link>
-            </div>
-
-            {/* Tier 2 (Featured) */}
-            <div className="rounded-3xl border-2 border-[#2AFEB7] bg-[#111820] p-8 space-y-6 flex flex-col justify-between shadow-[0_0_30px_rgba(42,254,183,0.15)] relative">
-              <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-[#2AFEB7] px-3 py-0.5 text-[10px] font-black uppercase text-[#070A0E]">
-                Most Popular
-              </span>
-              <div className="space-y-4">
-                <span className="text-xs font-extrabold uppercase text-[#2AFEB7]">Growth Restaurant</span>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-black text-white">₹1,499</span>
-                  <span className="text-xs text-[#9AA6B2]">/ month</span>
-                </div>
-                <p className="text-xs text-[#9AA6B2]">Complete OS for busy, high-volume dining restaurants.</p>
-                <ul className="space-y-2.5 text-xs text-[#F5F7FA] pt-2">
-                  <li className="flex items-center gap-2">✓ Unlimited Tables & QR Standees</li>
-                  <li className="flex items-center gap-2">✓ Multi-Token Live Tracking</li>
-                  <li className="flex items-center gap-2">✓ Unlimited KDS & Waiter Tablets</li>
-                  <li className="flex items-center gap-2">✓ Automated Inventory Stock Deduction</li>
-                  <li className="flex items-center gap-2">✓ Split Billing & Refund Audit Ledger</li>
-                </ul>
-              </div>
-              <Link
-                href="/signup"
-                className="w-full text-center rounded-xl bg-[#2AFEB7] py-3 text-xs font-black uppercase tracking-wider text-[#070A0E] shadow-lg hover:bg-[#22E5A4] transition-all"
-              >
-                Get Growth Plan
-              </Link>
-            </div>
-
-            {/* Tier 3 */}
-            <div className="rounded-3xl border border-[#26313C] bg-[#111820] p-8 space-y-6 flex flex-col justify-between">
-              <div className="space-y-4">
-                <span className="text-xs font-extrabold uppercase text-[#9AA6B2]">Multi-Branch Enterprise</span>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-black text-white">₹3,999</span>
-                  <span className="text-xs text-[#9AA6B2]">/ month</span>
-                </div>
-                <p className="text-xs text-[#9AA6B2]">Designed for multi-city restaurant chains & franchises.</p>
-                <ul className="space-y-2.5 text-xs text-[#F5F7FA] pt-2">
-                  <li className="flex items-center gap-2">✓ Unlimited Branches & Outlets</li>
-                  <li className="flex items-center gap-2">✓ AI Predictive Demand Forecasting</li>
-                  <li className="flex items-center gap-2">✓ Centralized Multi-Branch Inventory</li>
-                  <li className="flex items-center gap-2">✓ Custom Domain & Dedicated SLA Support</li>
-                </ul>
-              </div>
-              <Link
-                href="/signup"
-                className="w-full text-center rounded-xl border border-[#26313C] bg-[#18212B] py-3 text-xs font-bold text-[#F5F7FA] hover:border-[#2AFEB7] hover:text-[#2AFEB7] transition-all"
-              >
-                Contact Sales
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── FAQ Section ──────────────────────────────────────────────────── */}
-      <section id="faq" className="py-20 px-4 sm:px-6 lg:px-8 border-t border-[#26313C]/60 bg-[#0B0F14]/50">
-        <div className="mx-auto max-w-3xl space-y-8">
-          <div className="text-center space-y-3">
-            <span className="text-xs font-black uppercase tracking-widest text-[#2AFEB7]">FAQ</span>
-            <h2 className="text-3xl sm:text-4xl font-black text-white">Frequently Asked Questions</h2>
-          </div>
-
-          <div className="space-y-3">
+          <div className="border-t border-border md:col-span-8">
             {faqs.map((faq, idx) => {
-              const isOpen = openFaqIndex === idx;
+              const isOpen = openFaq === idx;
               return (
-                <div
-                  key={idx}
-                  className="rounded-2xl border border-[#26313C] bg-[#111820] overflow-hidden transition-all"
-                >
+                <div key={faq.q} className="border-b border-border">
                   <button
                     type="button"
-                    onClick={() => setOpenFaqIndex(isOpen ? null : idx)}
-                    className="w-full flex items-center justify-between p-5 text-left text-sm font-bold text-[#F5F7FA] hover:text-[#2AFEB7] transition-colors cursor-pointer"
+                    onClick={() => setOpenFaq(isOpen ? null : idx)}
+                    aria-expanded={isOpen}
+                    className="flex w-full items-start gap-5 py-6 text-left"
                   >
-                    <span>{faq.q}</span>
-                    <span className="text-lg text-[#9AA6B2]">{isOpen ? '−' : '+'}</span>
+                    <span className="mt-0.5 font-mono text-[11px] text-subtle">
+                      {String(idx + 1).padStart(2, '0')}
+                    </span>
+                    <span className="flex-1 font-display text-[16px] font-medium tracking-[-0.01em] text-foreground sm:text-[17px]">
+                      {faq.q}
+                    </span>
+                    {isOpen ? (
+                      <Minus className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                    ) : (
+                      <Plus className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+                    )}
                   </button>
                   {isOpen && (
-                    <div className="px-5 pb-5 text-xs text-[#9AA6B2] leading-relaxed border-t border-[#26313C]/50 pt-3">
+                    <p className="max-w-2xl pb-7 pl-9 text-[15px] leading-[1.75] text-muted-foreground">
                       {faq.a}
-                    </div>
+                    </p>
                   )}
                 </div>
               );
@@ -805,61 +557,130 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── Final High-Conversion CTA Banner ─────────────────────────────── */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-5xl rounded-3xl border border-[#2AFEB7]/40 bg-gradient-to-tr from-[#111820] via-[#18212B] to-[#111820] p-10 sm:p-16 text-center space-y-8 shadow-[0_0_50px_rgba(42,254,183,0.15)]">
-          <div className="space-y-3">
-            <h2 className="text-3xl sm:text-5xl font-black text-white">
-              Ready to Upgrade Your Restaurant Operations?
+      {/* ═══ Closing ═════════════════════════════════════════════════════ */}
+      <section className="border-t border-border px-6 py-28 sm:py-36 lg:px-8">
+        <div className="mx-auto max-w-6xl">
+          <ScrollReveal>
+            <h2 className="max-w-3xl font-display text-[2.25rem] font-extrabold leading-[1.02] tracking-[-0.04em] text-foreground sm:text-[3.25rem]">
+              Put it on one room and see how service goes.
             </h2>
-            <p className="mx-auto max-w-xl text-sm text-[#9AA6B2]">
-              Join hundreds of high-performing dining establishments running with zero downtime, fast table
-              turnover, and automated accounting.
+            <p className="mt-7 max-w-xl text-[15px] leading-[1.75] text-muted-foreground">
+              Fourteen days, no card, no call with a salesperson. Set up your tables in
+              an afternoon and run a real dinner service on it.
             </p>
-          </div>
-
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link
-              href="/signup"
-              className="w-full sm:w-auto rounded-xl bg-[#2AFEB7] px-8 py-4 text-sm font-black uppercase tracking-wider text-[#070A0E] shadow-xl hover:bg-[#22E5A4] transition-all hover:scale-105 active:scale-95"
-            >
-              Get Started Free Today
-            </Link>
-            <Link
-              href="/login"
-              className="w-full sm:w-auto rounded-xl border border-[#26313C] bg-[#111820] px-8 py-4 text-sm font-bold text-[#F5F7FA] hover:text-[#2AFEB7] transition-all"
-            >
-              Sign In to Existing Portal
-            </Link>
-          </div>
+            <div className="mt-10 flex flex-col items-start gap-x-8 gap-y-5 sm:flex-row sm:items-center">
+              <Link
+                href="/signup"
+                className="group inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3.5 text-[14px] font-semibold text-background transition-colors hover:bg-primary-hover sm:w-auto"
+              >
+                Start free for 14 days
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+              </Link>
+              <Link
+                href="/login"
+                className="inline-flex items-center border-b border-border pb-0.5 text-[14px] text-foreground transition-colors hover:border-border hover:text-foreground"
+              >
+                Sign in instead
+              </Link>
+            </div>
+          </ScrollReveal>
         </div>
       </section>
 
-      {/* ── Footer ───────────────────────────────────────────────────────── */}
-      <footer className="border-t border-[#26313C] bg-[#070A0E] py-12 px-4 sm:px-6 lg:px-8 text-xs text-[#9AA6B2]">
-        <div className="mx-auto max-w-7xl flex flex-col sm:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-3">
-            <img src="/logo.png" alt="Atlas Logo" className="h-7 w-auto object-contain" />
-            <span className="font-extrabold text-[#F5F7FA]">Project Atlas Restaurant OS</span>
+      {/* ═══ Footer ══════════════════════════════════════════════════════ */}
+      <footer className="border-t border-border bg-background px-6 py-14 lg:px-8">
+        <div className="mx-auto max-w-6xl">
+          <div className="grid gap-10 md:grid-cols-12">
+            <div className="md:col-span-5">
+              <div className="flex items-center gap-2.5">
+                <Image
+                  src="/logo.png"
+                  alt=""
+                  width={24}
+                  height={24}
+                  className="h-6 w-6 object-contain"
+                />
+                <span className="font-display text-[14px] font-bold tracking-[-0.02em] text-foreground">
+                  Atlas
+                </span>
+              </div>
+              <p className="mt-4 max-w-xs text-[13px] leading-relaxed text-muted-foreground">
+                Floor software for dine-in restaurants. Built for rooms that fill up.
+              </p>
+            </div>
+
+            <div className="md:col-span-3">
+              <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-subtle">
+                Product
+              </p>
+              <ul className="mt-4 space-y-2.5 text-[13px] text-muted-foreground">
+                <li>
+                  <a href="#floor" className="transition-colors hover:text-foreground">
+                    Floor view
+                  </a>
+                </li>
+                <li>
+                  <a href="#workflow" className="transition-colors hover:text-foreground">
+                    How it works
+                  </a>
+                </li>
+                <li>
+                  <a href="#pricing" className="transition-colors hover:text-foreground">
+                    Pricing
+                  </a>
+                </li>
+                <li>
+                  <a href="#faq" className="transition-colors hover:text-foreground">
+                    FAQ
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            <div className="md:col-span-2">
+              <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-subtle">
+                Account
+              </p>
+              <ul className="mt-4 space-y-2.5 text-[13px] text-muted-foreground">
+                <li>
+                  <Link href="/login" className="transition-colors hover:text-foreground">
+                    Sign in
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/signup" className="transition-colors hover:text-foreground">
+                    Create account
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            <div className="md:col-span-2">
+              <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-subtle">
+                Help
+              </p>
+              <ul className="mt-4 space-y-2.5 text-[13px] text-muted-foreground">
+                <li>
+                  <Link href="/docs" className="transition-colors hover:text-foreground">
+                    Documentation
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/support" className="transition-colors hover:text-foreground">
+                    Support Desk
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/contact" className="transition-colors hover:text-foreground font-semibold text-primary">
+                    Contact & Talk to Us
+                  </Link>
+                </li>
+              </ul>
+            </div>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-6 font-semibold">
-            <Link href="/login" className="hover:text-[#2AFEB7] transition-colors">
-              Login
-            </Link>
-            <Link href="/signup" className="hover:text-[#2AFEB7] transition-colors">
-              Register
-            </Link>
-            <Link href="/docs" className="hover:text-[#2AFEB7] transition-colors">
-              Documentation
-            </Link>
-            <Link href="/support" className="hover:text-[#2AFEB7] transition-colors">
-              Support
-            </Link>
-          </div>
-
-          <p className="text-[11px] text-[#9AA6B2]">
-            © {new Date().getFullYear()} Atlas Systems Inc. All rights reserved.
+          <p className="mt-14 border-t border-border pt-7 text-[12px] text-subtle">
+            © {new Date().getFullYear()} Project Atlas
           </p>
         </div>
       </footer>

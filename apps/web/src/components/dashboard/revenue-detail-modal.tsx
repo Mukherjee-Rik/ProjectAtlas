@@ -80,27 +80,27 @@ export function AnalyticsDetailModal({
       />
 
       {/* Modal Dialog */}
-      <div className="relative z-10 w-full max-w-4xl max-h-[90vh] flex flex-col rounded-3xl border border-[#26313C] bg-[#111820] shadow-2xl overflow-hidden text-left animate-in fade-in zoom-in-95 duration-200">
+      <div className="relative z-10 w-full max-w-4xl max-h-[90vh] flex flex-col rounded-3xl border border-border bg-card overflow-hidden text-left animate-in fade-in zoom-in-95 duration-200">
         {/* Header */}
-        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#26313C] bg-[#18212B] px-6 py-5">
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border bg-secondary px-6 py-5">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#2AFEB7]/10 text-xl text-[#2AFEB7] border border-[#2AFEB7]/20">
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10 text-xl text-primary border border-primary/20">
               {currentMode === 'revenue' ? '💳' : currentMode === 'orders' ? '🛒' : '📈'}
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-lg font-bold text-[#F5F7FA]">
+                <h3 className="text-lg font-bold text-foreground">
                   {currentMode === 'revenue'
                     ? 'Total Revenue Breakdown'
                     : currentMode === 'orders'
                     ? 'Completed Orders Analysis'
                     : 'Average Order Value (AOV) Economics'}
                 </h3>
-                <span className="rounded-full bg-[#2AFEB7]/10 px-2.5 py-0.5 text-[10px] font-bold text-[#2AFEB7] border border-[#2AFEB7]/20">
+                <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-bold text-primary border border-primary/20">
                   Last 30 Days
                 </span>
               </div>
-              <p className="text-xs text-[#9AA6B2]">
+              <p className="text-xs text-muted-foreground">
                 {currentMode === 'revenue'
                   ? 'Itemized financial breakdown including base prices, taxes, and discounts'
                   : currentMode === 'orders'
@@ -113,14 +113,14 @@ export function AnalyticsDetailModal({
           <button
             type="button"
             onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-xl border border-[#26313C] bg-[#111820] text-sm text-[#9AA6B2] transition-colors hover:border-[#2AFEB7] hover:text-[#F5F7FA]"
+            className="flex h-8 w-8 items-center justify-center rounded-xl border border-border bg-card text-sm text-muted-foreground transition-colors hover:border-primary hover:text-foreground"
           >
             ✕
           </button>
         </div>
 
         {/* Mode Switcher Tabs */}
-        <div className="flex flex-wrap items-center justify-between border-b border-[#26313C] bg-[#141C25] px-6 pt-3 gap-2">
+        <div className="flex flex-wrap items-center justify-between border-b border-border bg-secondary px-6 pt-3 gap-2">
           {/* Main 3 Metrics Selector */}
           <div className="flex gap-2">
             <button
@@ -128,12 +128,12 @@ export function AnalyticsDetailModal({
               onClick={() => setCurrentMode('revenue')}
               className={`pb-3 px-3 text-xs font-bold transition-all border-b-2 flex items-center gap-1.5 ${
                 currentMode === 'revenue'
-                  ? 'border-[#2AFEB7] text-[#2AFEB7]'
-                  : 'border-transparent text-[#9AA6B2] hover:text-[#F5F7FA]'
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-muted-foreground hover:text-foreground'
               }`}
             >
               <span>💳 Revenue</span>
-              <span className="rounded-md bg-[#2AFEB7]/10 px-1.5 py-0.2 text-[10px]">{formatCurrency(totalGross)}</span>
+              <span className="rounded-md bg-primary/10 px-1.5 py-0.2 text-[10px]">{formatCurrency(totalGross)}</span>
             </button>
 
             <button
@@ -141,12 +141,12 @@ export function AnalyticsDetailModal({
               onClick={() => setCurrentMode('orders')}
               className={`pb-3 px-3 text-xs font-bold transition-all border-b-2 flex items-center gap-1.5 ${
                 currentMode === 'orders'
-                  ? 'border-[#2AFEB7] text-[#2AFEB7]'
-                  : 'border-transparent text-[#9AA6B2] hover:text-[#F5F7FA]'
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-muted-foreground hover:text-foreground'
               }`}
             >
               <span>🛒 Orders</span>
-              <span className="rounded-md bg-[#F5F7FA]/10 px-1.5 py-0.2 text-[10px]">{totalOrders}</span>
+              <span className="rounded-md bg-foreground/10 px-1.5 py-0.2 text-[10px]">{totalOrders}</span>
             </button>
 
             <button
@@ -154,12 +154,12 @@ export function AnalyticsDetailModal({
               onClick={() => setCurrentMode('aov')}
               className={`pb-3 px-3 text-xs font-bold transition-all border-b-2 flex items-center gap-1.5 ${
                 currentMode === 'aov'
-                  ? 'border-[#2AFEB7] text-[#2AFEB7]'
-                  : 'border-transparent text-[#9AA6B2] hover:text-[#F5F7FA]'
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-muted-foreground hover:text-foreground'
               }`}
             >
               <span>📈 AOV</span>
-              <span className="rounded-md bg-[#3B82F6]/10 px-1.5 py-0.2 text-[10px] text-[#3B82F6]">{formatCurrency(aov)}</span>
+              <span className="rounded-md bg-atlas-info/10 px-1.5 py-0.2 text-[10px] text-atlas-info">{formatCurrency(aov)}</span>
             </button>
           </div>
 
@@ -170,8 +170,8 @@ export function AnalyticsDetailModal({
               onClick={() => setActiveTab('overview')}
               className={`rounded-lg px-2.5 py-1 text-[11px] font-semibold transition-colors ${
                 activeTab === 'overview'
-                  ? 'bg-[#18212B] text-[#2AFEB7] border border-[#26313C]'
-                  : 'text-[#9AA6B2] hover:text-[#F5F7FA]'
+                  ? 'bg-secondary text-primary border border-border'
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               Insights & KPIs
@@ -181,8 +181,8 @@ export function AnalyticsDetailModal({
               onClick={() => setActiveTab('ledger')}
               className={`rounded-lg px-2.5 py-1 text-[11px] font-semibold transition-colors ${
                 activeTab === 'ledger'
-                  ? 'bg-[#18212B] text-[#2AFEB7] border border-[#26313C]'
-                  : 'text-[#9AA6B2] hover:text-[#F5F7FA]'
+                  ? 'bg-secondary text-primary border border-border'
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               Orders Ledger ({transactions.length})
@@ -201,22 +201,22 @@ export function AnalyticsDetailModal({
                   placeholder="Search by order number (e.g. AT-000001) or table..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="flex-1 rounded-xl border border-[#26313C] bg-[#18212B] px-4 py-2 text-xs text-[#F5F7FA] placeholder-[#9AA6B2] outline-none focus:border-[#2AFEB7] transition-all"
+                  className="flex-1 rounded-xl border border-border bg-secondary px-4 py-2 text-xs text-foreground placeholder-muted-foreground outline-none focus:border-primary transition-all"
                 />
-                <span className="text-xs text-[#9AA6B2]">
+                <span className="text-xs text-muted-foreground">
                   Showing {filteredTransactions.length} of {transactions.length} orders
                 </span>
               </div>
 
               {/* Transactions Table */}
               {filteredTransactions.length === 0 ? (
-                <div className="rounded-xl border border-[#26313C] bg-[#18212B]/40 p-8 text-center text-xs text-[#9AA6B2]">
+                <div className="rounded-xl border border-border bg-secondary/40 p-8 text-center text-xs text-muted-foreground">
                   No order transactions matched your search filter.
                 </div>
               ) : (
-                <div className="overflow-hidden rounded-2xl border border-[#26313C] bg-[#111820]">
+                <div className="overflow-hidden rounded-2xl border border-border bg-card">
                   <table className="w-full text-left text-xs">
-                    <thead className="border-b border-[#26313C] bg-[#18212B] text-[10px] font-bold uppercase tracking-wider text-[#9AA6B2]">
+                    <thead className="border-b border-border bg-secondary text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                       <tr>
                         <th className="px-4 py-3">Order #</th>
                         <th className="px-4 py-3">Date & Time</th>
@@ -229,13 +229,13 @@ export function AnalyticsDetailModal({
                         <th className="px-4 py-3 text-center">Status</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[#26313C]">
+                    <tbody className="divide-y divide-border">
                       {filteredTransactions.map((t) => (
-                        <tr key={t.id} className="transition-colors hover:bg-[#18212B]/60">
-                          <td className="px-4 py-3 font-mono font-bold text-[#F5F7FA]">
+                        <tr key={t.id} className="transition-colors hover:bg-secondary/60">
+                          <td className="px-4 py-3 font-mono font-bold text-foreground">
                             {t.orderNumber}
                           </td>
-                          <td className="px-4 py-3 text-[#9AA6B2]">
+                          <td className="px-4 py-3 text-muted-foreground">
                             {new Date(t.createdAt).toLocaleDateString('en-US', {
                               month: 'short',
                               day: 'numeric',
@@ -243,24 +243,24 @@ export function AnalyticsDetailModal({
                               minute: '2-digit',
                             })}
                           </td>
-                          <td className="px-4 py-3 text-[#F5F7FA]">{t.tableName}</td>
-                          <td className="px-4 py-3 text-center font-mono text-[#9AA6B2]">
+                          <td className="px-4 py-3 text-foreground">{t.tableName}</td>
+                          <td className="px-4 py-3 text-center font-mono text-muted-foreground">
                             {t.itemCount ?? 1}
                           </td>
                           <td className="px-4 py-3 text-right font-mono text-[#38BDF8]">
                             {formatCurrency(t.subtotal)}
                           </td>
-                          <td className="px-4 py-3 text-right font-mono text-[#F59E0B]">
+                          <td className="px-4 py-3 text-right font-mono text-atlas-warning">
                             {formatCurrency(t.taxAmount)}
                           </td>
                           <td className="px-4 py-3 text-right font-mono text-[#EC4899]">
                             {t.discountAmount > 0 ? `-${formatCurrency(t.discountAmount)}` : '₹0.00'}
                           </td>
-                          <td className="px-4 py-3 text-right font-mono font-bold text-[#2AFEB7]">
+                          <td className="px-4 py-3 text-right font-mono font-bold text-primary">
                             {formatCurrency(t.totalAmount)}
                           </td>
                           <td className="px-4 py-3 text-center">
-                            <span className="rounded-md bg-[#2AFEB7]/10 px-2 py-0.5 text-[9px] font-bold text-[#2AFEB7]">
+                            <span className="rounded-md bg-primary/10 px-2 py-0.5 text-[9px] font-bold text-primary">
                               {t.status}
                             </span>
                           </td>
@@ -278,68 +278,68 @@ export function AnalyticsDetailModal({
             <div className="space-y-6">
               {/* Primary Cards Grid */}
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                <div className="rounded-2xl border border-[#2AFEB7]/30 bg-[#2AFEB7]/5 p-4 shadow-lg">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#2AFEB7]">
+                <div className="rounded-2xl border border-primary/30 bg-primary/5 p-4 shadow-lg">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-primary">
                     Total Price (Gross)
                   </span>
-                  <h4 className="mt-1 text-2xl font-black text-[#F5F7FA]">
+                  <h4 className="mt-1 text-2xl font-black text-foreground">
                     {formatCurrency(totalGross)}
                   </h4>
-                  <p className="mt-1 text-[10px] text-[#9AA6B2]">
+                  <p className="mt-1 text-[10px] text-muted-foreground">
                     Total billed customer revenue
                   </p>
                 </div>
 
-                <div className="rounded-2xl border border-[#26313C] bg-[#18212B]/60 p-4 shadow-lg">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#9AA6B2]">
+                <div className="rounded-2xl border border-border bg-secondary/60 p-4 shadow-lg">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                     Amount (Excl. Tax)
                   </span>
                   <h4 className="mt-1 text-2xl font-black text-[#38BDF8]">
                     {formatCurrency(totalSubtotal)}
                   </h4>
-                  <p className="mt-1 text-[10px] text-[#9AA6B2]">
+                  <p className="mt-1 text-[10px] text-muted-foreground">
                     Base food & beverage pricing
                   </p>
                 </div>
 
-                <div className="rounded-2xl border border-[#26313C] bg-[#18212B]/60 p-4 shadow-lg">
+                <div className="rounded-2xl border border-border bg-secondary/60 p-4 shadow-lg">
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#9AA6B2]">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                       Total Tax Collected
                     </span>
-                    <span className="rounded bg-[#F59E0B]/10 px-1.5 py-0.5 text-[9px] font-bold text-[#F59E0B]">
+                    <span className="rounded bg-atlas-warning/10 px-1.5 py-0.5 text-[9px] font-bold text-atlas-warning">
                       {effectiveRate.toFixed(1)}% GST
                     </span>
                   </div>
-                  <h4 className="mt-1 text-2xl font-black text-[#F59E0B]">
+                  <h4 className="mt-1 text-2xl font-black text-atlas-warning">
                     {formatCurrency(totalTax)}
                   </h4>
-                  <p className="mt-1 text-[10px] text-[#9AA6B2]">
+                  <p className="mt-1 text-[10px] text-muted-foreground">
                     Cumulative GST / VAT component
                   </p>
                 </div>
 
-                <div className="rounded-2xl border border-[#26313C] bg-[#18212B]/60 p-4 shadow-lg">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#9AA6B2]">
+                <div className="rounded-2xl border border-border bg-secondary/60 p-4 shadow-lg">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                     Discounts Given
                   </span>
                   <h4 className="mt-1 text-2xl font-black text-[#EC4899]">
                     {formatCurrency(totalDiscount)}
                   </h4>
-                  <p className="mt-1 text-[10px] text-[#9AA6B2]">
+                  <p className="mt-1 text-[10px] text-muted-foreground">
                     Vouchers and promotional savings
                   </p>
                 </div>
               </div>
 
               {/* Financial Composition Visualizer */}
-              <div className="rounded-2xl border border-[#26313C] bg-[#18212B]/40 p-5 space-y-3">
+              <div className="rounded-2xl border border-border bg-secondary/40 p-5 space-y-3">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold text-[#F5F7FA]">Revenue Composition Breakdown</span>
-                  <span className="text-[11px] text-[#9AA6B2]">100% of Billed Volume</span>
+                  <span className="font-bold text-foreground">Revenue Composition Breakdown</span>
+                  <span className="text-[11px] text-muted-foreground">100% of Billed Volume</span>
                 </div>
 
-                <div className="flex h-4 w-full overflow-hidden rounded-full bg-[#111820]">
+                <div className="flex h-4 w-full overflow-hidden rounded-full bg-card">
                   <div
                     style={{ width: `${totalGross > 0 ? (totalSubtotal / totalGross) * 100 : 100}%` }}
                     className="bg-[#38BDF8] transition-all"
@@ -347,7 +347,7 @@ export function AnalyticsDetailModal({
                   />
                   <div
                     style={{ width: `${totalGross > 0 ? (totalTax / totalGross) * 100 : 0}%` }}
-                    className="bg-[#F59E0B] transition-all"
+                    className="bg-atlas-warning transition-all"
                     title={`Tax Amount: ${formatCurrency(totalTax)}`}
                   />
                   <div
@@ -360,49 +360,49 @@ export function AnalyticsDetailModal({
                 <div className="flex flex-wrap gap-4 pt-1 text-[11px]">
                   <div className="flex items-center gap-1.5">
                     <span className="h-2.5 w-2.5 rounded-full bg-[#38BDF8]" />
-                    <span className="text-[#9AA6B2]">Base Subtotal ({totalGross > 0 ? ((totalSubtotal / totalGross) * 100).toFixed(1) : 0}%)</span>
+                    <span className="text-muted-foreground">Base Subtotal ({totalGross > 0 ? ((totalSubtotal / totalGross) * 100).toFixed(1) : 0}%)</span>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <span className="h-2.5 w-2.5 rounded-full bg-[#F59E0B]" />
-                    <span className="text-[#9AA6B2]">Tax Component ({totalGross > 0 ? ((totalTax / totalGross) * 100).toFixed(1) : 0}%)</span>
+                    <span className="h-2.5 w-2.5 rounded-full bg-atlas-warning" />
+                    <span className="text-muted-foreground">Tax Component ({totalGross > 0 ? ((totalTax / totalGross) * 100).toFixed(1) : 0}%)</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <span className="h-2.5 w-2.5 rounded-full bg-[#EC4899]" />
-                    <span className="text-[#9AA6B2]">Discount Savings ({totalGross > 0 ? ((totalDiscount / totalGross) * 100).toFixed(1) : 0}%)</span>
+                    <span className="text-muted-foreground">Discount Savings ({totalGross > 0 ? ((totalDiscount / totalGross) * 100).toFixed(1) : 0}%)</span>
                   </div>
                 </div>
               </div>
 
               {/* Secondary Metrics & Unit Economics */}
               <div className="grid gap-4 sm:grid-cols-3">
-                <div className="rounded-xl border border-[#26313C] bg-[#111820] p-4">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#9AA6B2]">
+                <div className="rounded-xl border border-border bg-card p-4">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                     Net Dish Revenue
                   </span>
-                  <div className="mt-1 text-lg font-bold text-[#F5F7FA]">
+                  <div className="mt-1 text-lg font-bold text-foreground">
                     {formatCurrency(netRevenue)}
                   </div>
-                  <p className="mt-0.5 text-[10px] text-[#9AA6B2]">Subtotal minus discounts</p>
+                  <p className="mt-0.5 text-[10px] text-muted-foreground">Subtotal minus discounts</p>
                 </div>
 
-                <div className="rounded-xl border border-[#26313C] bg-[#111820] p-4">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#9AA6B2]">
+                <div className="rounded-xl border border-border bg-card p-4">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                     Average Tax Per Order
                   </span>
-                  <div className="mt-1 text-lg font-bold text-[#F5F7FA]">
+                  <div className="mt-1 text-lg font-bold text-foreground">
                     {formatCurrency(avgTax)}
                   </div>
-                  <p className="mt-0.5 text-[10px] text-[#9AA6B2]">Tax contribution per ticket</p>
+                  <p className="mt-0.5 text-[10px] text-muted-foreground">Tax contribution per ticket</p>
                 </div>
 
-                <div className="rounded-xl border border-[#26313C] bg-[#111820] p-4">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#9AA6B2]">
+                <div className="rounded-xl border border-border bg-card p-4">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                     Average Order Value (AOV)
                   </span>
-                  <div className="mt-1 text-lg font-bold text-[#2AFEB7]">
+                  <div className="mt-1 text-lg font-bold text-primary">
                     {formatCurrency(aov)}
                   </div>
-                  <p className="mt-0.5 text-[10px] text-[#9AA6B2]">Total check ticket average</p>
+                  <p className="mt-0.5 text-[10px] text-muted-foreground">Total check ticket average</p>
                 </div>
               </div>
             </div>
@@ -413,47 +413,47 @@ export function AnalyticsDetailModal({
             <div className="space-y-6">
               {/* Primary Cards */}
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                <div className="rounded-2xl border border-[#F5F7FA]/30 bg-[#F5F7FA]/5 p-4 shadow-lg">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#F5F7FA]">
+                <div className="rounded-2xl border border-foreground/30 bg-foreground/5 p-4 shadow-lg">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-foreground">
                     Completed Orders
                   </span>
-                  <h4 className="mt-1 text-2xl font-black text-[#F5F7FA]">{totalOrders}</h4>
-                  <p className="mt-1 text-[10px] text-[#2AFEB7]">100% Fulfillment rate</p>
+                  <h4 className="mt-1 text-2xl font-black text-foreground">{totalOrders}</h4>
+                  <p className="mt-1 text-[10px] text-primary">100% Fulfillment rate</p>
                 </div>
 
-                <div className="rounded-2xl border border-[#26313C] bg-[#18212B]/60 p-4 shadow-lg">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#9AA6B2]">
+                <div className="rounded-2xl border border-border bg-secondary/60 p-4 shadow-lg">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                     Dine-In Tables
                   </span>
                   <h4 className="mt-1 text-2xl font-black text-[#38BDF8]">{dineInCount}</h4>
-                  <p className="mt-1 text-[10px] text-[#9AA6B2]">QR & table service</p>
+                  <p className="mt-1 text-[10px] text-muted-foreground">QR & table service</p>
                 </div>
 
-                <div className="rounded-2xl border border-[#26313C] bg-[#18212B]/60 p-4 shadow-lg">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#9AA6B2]">
+                <div className="rounded-2xl border border-border bg-secondary/60 p-4 shadow-lg">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                     Takeout / Direct
                   </span>
-                  <h4 className="mt-1 text-2xl font-black text-[#F59E0B]">{takeoutCount}</h4>
-                  <p className="mt-1 text-[10px] text-[#9AA6B2]">Counter & takeaway checks</p>
+                  <h4 className="mt-1 text-2xl font-black text-atlas-warning">{takeoutCount}</h4>
+                  <p className="mt-1 text-[10px] text-muted-foreground">Counter & takeaway checks</p>
                 </div>
 
-                <div className="rounded-2xl border border-[#26313C] bg-[#18212B]/60 p-4 shadow-lg">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#9AA6B2]">
+                <div className="rounded-2xl border border-border bg-secondary/60 p-4 shadow-lg">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                     Total Items Served
                   </span>
-                  <h4 className="mt-1 text-2xl font-black text-[#2AFEB7]">{totalItems}</h4>
-                  <p className="mt-1 text-[10px] text-[#9AA6B2]">{avgItems.toFixed(1)} items / check</p>
+                  <h4 className="mt-1 text-2xl font-black text-primary">{totalItems}</h4>
+                  <p className="mt-1 text-[10px] text-muted-foreground">{avgItems.toFixed(1)} items / check</p>
                 </div>
               </div>
 
               {/* Order Channel Composition */}
-              <div className="rounded-2xl border border-[#26313C] bg-[#18212B]/40 p-5 space-y-3">
+              <div className="rounded-2xl border border-border bg-secondary/40 p-5 space-y-3">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold text-[#F5F7FA]">Dining Channel Breakdown</span>
-                  <span className="text-[11px] text-[#9AA6B2]">{totalOrders} total completed</span>
+                  <span className="font-bold text-foreground">Dining Channel Breakdown</span>
+                  <span className="text-[11px] text-muted-foreground">{totalOrders} total completed</span>
                 </div>
 
-                <div className="flex h-4 w-full overflow-hidden rounded-full bg-[#111820]">
+                <div className="flex h-4 w-full overflow-hidden rounded-full bg-card">
                   <div
                     style={{ width: `${totalOrders > 0 ? (dineInCount / totalOrders) * 100 : 100}%` }}
                     className="bg-[#38BDF8] transition-all"
@@ -461,7 +461,7 @@ export function AnalyticsDetailModal({
                   />
                   <div
                     style={{ width: `${totalOrders > 0 ? (takeoutCount / totalOrders) * 100 : 0}%` }}
-                    className="bg-[#F59E0B] transition-all"
+                    className="bg-atlas-warning transition-all"
                     title={`Takeout: ${takeoutCount} orders`}
                   />
                 </div>
@@ -469,13 +469,13 @@ export function AnalyticsDetailModal({
                 <div className="flex flex-wrap gap-4 pt-1 text-[11px]">
                   <div className="flex items-center gap-1.5">
                     <span className="h-2.5 w-2.5 rounded-full bg-[#38BDF8]" />
-                    <span className="text-[#9AA6B2]">
+                    <span className="text-muted-foreground">
                       Dine-in Tables ({dineInCount} orders • {totalOrders > 0 ? ((dineInCount / totalOrders) * 100).toFixed(0) : 100}%)
                     </span>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <span className="h-2.5 w-2.5 rounded-full bg-[#F59E0B]" />
-                    <span className="text-[#9AA6B2]">
+                    <span className="h-2.5 w-2.5 rounded-full bg-atlas-warning" />
+                    <span className="text-muted-foreground">
                       Takeout / Direct ({takeoutCount} orders • {totalOrders > 0 ? ((takeoutCount / totalOrders) * 100).toFixed(0) : 0}%)
                     </span>
                   </div>
@@ -484,20 +484,20 @@ export function AnalyticsDetailModal({
 
               {/* Table Coverage & Activity Summary */}
               {tableSpend.length > 0 && (
-                <div className="rounded-2xl border border-[#26313C] bg-[#111820] p-5 space-y-3">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-[#9AA6B2]">
+                <div className="rounded-2xl border border-border bg-card p-5 space-y-3">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
                     Table Order Volume Distribution
                   </h4>
                   <div className="grid gap-3 sm:grid-cols-3">
                     {tableSpend.map((t) => (
-                      <div key={t.tableName} className="rounded-xl border border-[#26313C] bg-[#18212B]/50 p-3.5">
+                      <div key={t.tableName} className="rounded-xl border border-border bg-secondary/50 p-3.5">
                         <div className="flex items-center justify-between">
-                          <span className="font-bold text-[#F5F7FA] text-xs">{t.tableName}</span>
-                          <span className="rounded bg-[#2AFEB7]/10 px-2 py-0.5 text-[10px] font-bold text-[#2AFEB7]">
+                          <span className="font-bold text-foreground text-xs">{t.tableName}</span>
+                          <span className="rounded bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary">
                             {t.ordersCount} orders
                           </span>
                         </div>
-                        <div className="mt-2 flex items-center justify-between text-[11px] text-[#9AA6B2]">
+                        <div className="mt-2 flex items-center justify-between text-[11px] text-muted-foreground">
                           <span>Revenue: {formatCurrency(t.totalRevenue)}</span>
                           <span>Avg: {formatCurrency(t.averageSpend)}</span>
                         </div>
@@ -514,87 +514,87 @@ export function AnalyticsDetailModal({
             <div className="space-y-6">
               {/* Primary Cards */}
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                <div className="rounded-2xl border border-[#3B82F6]/30 bg-[#3B82F6]/5 p-4 shadow-lg">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#3B82F6]">
+                <div className="rounded-2xl border border-atlas-info/30 bg-atlas-info/5 p-4 shadow-lg">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-atlas-info">
                     Average Order Value (AOV)
                   </span>
-                  <h4 className="mt-1 text-2xl font-black text-[#F5F7FA]">
+                  <h4 className="mt-1 text-2xl font-black text-foreground">
                     {formatCurrency(aov)}
                   </h4>
-                  <p className="mt-1 text-[10px] text-[#9AA6B2]">Total check ticket average</p>
+                  <p className="mt-1 text-[10px] text-muted-foreground">Total check ticket average</p>
                 </div>
 
-                <div className="rounded-2xl border border-[#26313C] bg-[#18212B]/60 p-4 shadow-lg">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#9AA6B2]">
+                <div className="rounded-2xl border border-border bg-secondary/60 p-4 shadow-lg">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                     Base Check (Excl. Tax)
                   </span>
                   <h4 className="mt-1 text-2xl font-black text-[#38BDF8]">
                     {formatCurrency(totalOrders > 0 ? totalSubtotal / totalOrders : 0)}
                   </h4>
-                  <p className="mt-1 text-[10px] text-[#9AA6B2]">Food & beverage subtotal</p>
+                  <p className="mt-1 text-[10px] text-muted-foreground">Food & beverage subtotal</p>
                 </div>
 
-                <div className="rounded-2xl border border-[#26313C] bg-[#18212B]/60 p-4 shadow-lg">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#9AA6B2]">
+                <div className="rounded-2xl border border-border bg-secondary/60 p-4 shadow-lg">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                     Highest Check Ticket
                   </span>
-                  <h4 className="mt-1 text-2xl font-black text-[#2AFEB7]">
+                  <h4 className="mt-1 text-2xl font-black text-primary">
                     {formatCurrency(highestTicket)}
                   </h4>
-                  <p className="mt-1 text-[10px] text-[#9AA6B2]">Peak table check size</p>
+                  <p className="mt-1 text-[10px] text-muted-foreground">Peak table check size</p>
                 </div>
 
-                <div className="rounded-2xl border border-[#26313C] bg-[#18212B]/60 p-4 shadow-lg">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#9AA6B2]">
+                <div className="rounded-2xl border border-border bg-secondary/60 p-4 shadow-lg">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                     Lowest Check Ticket
                   </span>
                   <h4 className="mt-1 text-2xl font-black text-[#EC4899]">
                     {formatCurrency(lowestTicket)}
                   </h4>
-                  <p className="mt-1 text-[10px] text-[#9AA6B2]">Entry / snack ticket</p>
+                  <p className="mt-1 text-[10px] text-muted-foreground">Entry / snack ticket</p>
                 </div>
               </div>
 
               {/* Check Size Distribution */}
-              <div className="rounded-2xl border border-[#26313C] bg-[#18212B]/40 p-5 space-y-3">
+              <div className="rounded-2xl border border-border bg-secondary/40 p-5 space-y-3">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold text-[#F5F7FA]">Check Ticket Size Distribution</span>
-                  <span className="text-[11px] text-[#9AA6B2]">Spread across {totalOrders} total checks</span>
+                  <span className="font-bold text-foreground">Check Ticket Size Distribution</span>
+                  <span className="text-[11px] text-muted-foreground">Spread across {totalOrders} total checks</span>
                 </div>
 
                 <div className="grid gap-3 sm:grid-cols-3">
-                  <div className="rounded-xl border border-[#26313C] bg-[#111820] p-4 text-center">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#9AA6B2]">
+                  <div className="rounded-xl border border-border bg-card p-4 text-center">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                       Small Checks (&lt; ₹500)
                     </span>
                     <div className="mt-1 text-xl font-bold text-[#38BDF8]">
                       {ticketDist.under500} checks
                     </div>
-                    <p className="mt-1 text-[10px] text-[#9AA6B2]">
+                    <p className="mt-1 text-[10px] text-muted-foreground">
                       {totalOrders > 0 ? ((ticketDist.under500 / totalOrders) * 100).toFixed(0) : 0}% of all volume
                     </p>
                   </div>
 
-                  <div className="rounded-xl border border-[#26313C] bg-[#111820] p-4 text-center">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#9AA6B2]">
+                  <div className="rounded-xl border border-border bg-card p-4 text-center">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                       Medium Checks (₹500 - ₹1,000)
                     </span>
-                    <div className="mt-1 text-xl font-bold text-[#2AFEB7]">
+                    <div className="mt-1 text-xl font-bold text-primary">
                       {ticketDist.between500And1000} checks
                     </div>
-                    <p className="mt-1 text-[10px] text-[#9AA6B2]">
+                    <p className="mt-1 text-[10px] text-muted-foreground">
                       {totalOrders > 0 ? ((ticketDist.between500And1000 / totalOrders) * 100).toFixed(0) : 0}% of all volume
                     </p>
                   </div>
 
-                  <div className="rounded-xl border border-[#26313C] bg-[#111820] p-4 text-center">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#9AA6B2]">
+                  <div className="rounded-xl border border-border bg-card p-4 text-center">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                       Large Checks (&gt; ₹1,000)
                     </span>
-                    <div className="mt-1 text-xl font-bold text-[#F59E0B]">
+                    <div className="mt-1 text-xl font-bold text-atlas-warning">
                       {ticketDist.above1000} checks
                     </div>
-                    <p className="mt-1 text-[10px] text-[#9AA6B2]">
+                    <p className="mt-1 text-[10px] text-muted-foreground">
                       {totalOrders > 0 ? ((ticketDist.above1000 / totalOrders) * 100).toFixed(0) : 0}% of all volume
                     </p>
                   </div>
@@ -603,13 +603,13 @@ export function AnalyticsDetailModal({
 
               {/* Table Spend Economics */}
               {tableSpend.length > 0 && (
-                <div className="rounded-2xl border border-[#26313C] bg-[#111820] p-5 space-y-3">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-[#9AA6B2]">
+                <div className="rounded-2xl border border-border bg-card p-5 space-y-3">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
                     Average Spend per Dining Table
                   </h4>
-                  <div className="overflow-hidden rounded-xl border border-[#26313C]">
+                  <div className="overflow-hidden rounded-xl border border-border">
                     <table className="w-full text-left text-xs">
-                      <thead className="border-b border-[#26313C] bg-[#18212B] text-[10px] font-bold uppercase tracking-wider text-[#9AA6B2]">
+                      <thead className="border-b border-border bg-secondary text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                         <tr>
                           <th className="px-4 py-2.5">Table Location</th>
                           <th className="px-4 py-2.5 text-center">Completed Checks</th>
@@ -617,15 +617,15 @@ export function AnalyticsDetailModal({
                           <th className="px-4 py-2.5 text-right">Average Check Spend</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-[#26313C]">
+                      <tbody className="divide-y divide-border">
                         {tableSpend.map((t) => (
-                          <tr key={t.tableName} className="hover:bg-[#18212B]/40 transition-colors">
-                            <td className="px-4 py-2.5 font-bold text-[#F5F7FA]">{t.tableName}</td>
-                            <td className="px-4 py-2.5 text-center text-[#9AA6B2]">{t.ordersCount} checks</td>
+                          <tr key={t.tableName} className="hover:bg-secondary/40 transition-colors">
+                            <td className="px-4 py-2.5 font-bold text-foreground">{t.tableName}</td>
+                            <td className="px-4 py-2.5 text-center text-muted-foreground">{t.ordersCount} checks</td>
                             <td className="px-4 py-2.5 text-right font-mono text-[#38BDF8]">
                               {formatCurrency(t.totalRevenue)}
                             </td>
-                            <td className="px-4 py-2.5 text-right font-mono font-bold text-[#2AFEB7]">
+                            <td className="px-4 py-2.5 text-right font-mono font-bold text-primary">
                               {formatCurrency(t.averageSpend)}
                             </td>
                           </tr>
@@ -640,14 +640,14 @@ export function AnalyticsDetailModal({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between border-t border-[#26313C] bg-[#18212B] px-6 py-4">
-          <div className="text-[11px] text-[#9AA6B2]">
-            Active Timeframe: <strong className="text-[#F5F7FA]">Last 30 Days</strong> • Total Revenue: <strong className="text-[#2AFEB7]">{formatCurrency(totalGross)}</strong>
+        <div className="flex items-center justify-between border-t border-border bg-secondary px-6 py-4">
+          <div className="text-[11px] text-muted-foreground">
+            Active Timeframe: <strong className="text-foreground">Last 30 Days</strong> • Total Revenue: <strong className="text-primary">{formatCurrency(totalGross)}</strong>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-xl bg-[#2AFEB7] px-5 py-2 text-xs font-bold text-[#0B0F14] hover:bg-[#22E5A4] transition-colors"
+            className="rounded-xl bg-primary px-5 py-2 text-xs font-bold text-background hover:bg-primary-hover transition-colors"
           >
             Done
           </button>

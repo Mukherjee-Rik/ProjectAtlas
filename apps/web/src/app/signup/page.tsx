@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { useAuth } from '@/hooks/use-auth';
 import { registerRestaurant } from '@/services/auth.service';
 import { setAccessToken } from '@/lib/auth-storage';
 import { setCurrentTenant } from '@/lib/tenant-storage';
@@ -10,9 +11,12 @@ import { setCurrentRestaurant } from '@/lib/restaurant-storage';
 import { setCurrentBranch } from '@/lib/branch-storage';
 import { ValidatedInput } from '@/components/ui/validated-input';
 import { validateText, validateEmail, validatePhone, validatePassword } from '@/lib/validation';
+import { OAuthButtons } from '@/components/auth/oauth-buttons';
+
 
 export default function SignupPage() {
   const router = useRouter();
+  const { loginUser } = useAuth();
 
   const [restaurantName, setRestaurantName] = useState('');
   const [ownerName, setOwnerName] = useState('');
@@ -134,26 +138,46 @@ export default function SignupPage() {
         password,
       });
 
-      const { accessToken, tenant, restaurant, branch } = response.data;
+      const resData = (response as any)?.data?.data || (response as any)?.data || response;
+      const accessToken = resData?.accessToken;
+      const user = resData?.user || {
+        id: resData?.id || `user_${Date.now()}`,
+        name: ownerName.trim(),
+        email: email.trim().toLowerCase(),
+        phone: phone.trim() || null,
+        role: 'OWNER',
+        status: 'ACTIVE',
+      };
+      const tenant = resData?.tenant;
+      const restaurant = resData?.restaurant;
+      const branch = resData?.branch;
+
+      if (!accessToken) {
+        throw new Error('Registration completed, but no session token was received. Please log in.');
+      }
 
       // Store authentication & context
-      setAccessToken(accessToken);
+      loginUser(accessToken, user);
       if (tenant?.id) setCurrentTenant({ id: tenant.id, name: tenant.name, slug: tenant.slug, status: 'ACTIVE', createdAt: '', updatedAt: '' });
-      if (restaurant?.id) setCurrentRestaurant({ id: restaurant.id, tenantId: tenant.id, name: restaurant.name, slug: restaurant.slug, status: 'ACTIVE', createdAt: '', updatedAt: '' });
-      if (branch?.id) setCurrentBranch({ id: branch.id, restaurantId: restaurant.id, name: branch.name, code: branch.code, status: 'ACTIVE', createdAt: '', updatedAt: '' });
+      if (restaurant?.id) setCurrentRestaurant({ id: restaurant.id, tenantId: tenant?.id || '', name: restaurant.name, slug: restaurant.slug, status: 'ACTIVE', createdAt: '', updatedAt: '' });
+      if (branch?.id) setCurrentBranch({ id: branch.id, restaurantId: restaurant?.id || '', name: branch.name, code: branch.code, status: 'ACTIVE', createdAt: '', updatedAt: '' });
 
       // Redirect to Admin Dashboard
       router.push('/dashboard');
     } catch (err: any) {
-      console.error(err);
-      setError(err?.message ?? 'Failed to register restaurant');
+      console.error('Signup error:', err);
+      const msg =
+        err?.error ??
+        err?.message ??
+        (typeof err === 'string' ? err : 'Failed to register restaurant. Please check your information.');
+      setError(msg);
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#0B0F14] p-4 text-[#F5F7FA]">
+    <main className="flex min-h-screen items-center justify-center bg-background p-4 text-foreground">
       <div className="w-full max-w-md space-y-6">
         {/* Brand Logo & Header */}
         <div className="text-center space-y-3">
@@ -164,16 +188,16 @@ export default function SignupPage() {
               className="h-20 w-auto object-contain drop-shadow-[0_0_12px_rgba(42,254,183,0.2)]"
             />
           </div>
-          <h1 className="text-xl font-bold text-[#F5F7FA] pt-1">Start Your Free Trial</h1>
-          <p className="text-xs text-[#9AA6B2]">
+          <h1 className="text-xl font-bold text-foreground pt-1">Start Your Free Trial</h1>
+          <p className="text-xs text-muted-foreground">
             Create your restaurant account and manage menus, orders, and branches.
           </p>
         </div>
 
         {/* Signup Card */}
-        <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl border border-[#26313C] bg-[#111820] p-6 shadow-2xl" noValidate>
+        <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl border border-border bg-card p-6" noValidate>
           {error && (
-            <div className="rounded-xl border border-[#EF4444]/30 bg-[#EF4444]/10 p-3 text-xs text-[#EF4444] animate-in fade-in">
+            <div className="rounded-xl border border-atlas-error/30 bg-atlas-error/10 p-3 text-xs text-atlas-error animate-in fade-in">
               {error}
             </div>
           )}
@@ -287,28 +311,33 @@ export default function SignupPage() {
                     setErrors(next);
                   }
                 }}
-                className="mt-0.5 rounded border-[#26313C] bg-[#18212B] text-[#2AFEB7] focus:ring-[#2AFEB7]"
+                className="mt-0.5 rounded border-border bg-secondary text-primary focus:ring-primary"
               />
-              <label htmlFor="terms" className="text-xs text-[#9AA6B2] leading-relaxed cursor-pointer">
-                I agree to Atlas's <span className="text-[#2AFEB7] underline">Terms & Conditions</span> and Privacy Policy.
+              <label htmlFor="terms" className="text-xs text-muted-foreground leading-relaxed cursor-pointer">
+                I agree to Atlas's <span className="text-primary underline">Terms & Conditions</span> and Privacy Policy.
               </label>
             </div>
             {errors.terms && (
-              <p className="text-xs text-[#EF4444]">{errors.terms}</p>
+              <p className="text-xs text-atlas-error">{errors.terms}</p>
             )}
           </div>
 
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full rounded-xl bg-[#2AFEB7] py-3.5 text-sm font-bold text-[#0B0F14] shadow-lg transition-all hover:bg-[#22E5A4] active:scale-[0.99] disabled:opacity-50"
+            className="w-full rounded-xl bg-primary py-3.5 text-sm font-bold text-background shadow-lg transition-all hover:bg-primary-hover active:scale-[0.99] disabled:opacity-50"
           >
             {isLoading ? 'Creating Restaurant...' : 'Create Restaurant'}
           </button>
 
-          <p className="text-center text-xs text-[#9AA6B2] pt-2">
+          <OAuthButtons
+            onLoading={(l) => setIsLoading(l)}
+            onError={(err) => setError(err)}
+          />
+
+          <p className="text-center text-xs text-muted-foreground pt-2">
             Already have an account?{' '}
-            <Link href="/login" className="font-semibold text-[#2AFEB7] hover:underline">
+            <Link href="/login" className="font-semibold text-primary hover:underline">
               Sign in
             </Link>
           </p>

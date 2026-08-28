@@ -200,6 +200,11 @@ export type Ingredient = Prisma.IngredientModel
  */
 export type Recipe = Prisma.RecipeModel
 /**
+ * Model BatchProduction
+ * 
+ */
+export type BatchProduction = Prisma.BatchProductionModel
+/**
  * Model RecipeIngredient
  * 
  */

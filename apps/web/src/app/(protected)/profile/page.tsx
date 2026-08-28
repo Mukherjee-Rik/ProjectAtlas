@@ -49,10 +49,10 @@ export default function ProfilePage() {
   return (
     <div className="space-y-8 max-w-4xl">
       <div>
-        <h1 className="text-3xl font-bold text-[#F5F7FA]">
+        <h1 className="font-display text-3xl font-semibold tracking-[-0.02em] text-foreground">
           Profile
         </h1>
-        <p className="mt-2 text-[#9AA6B2]">
+        <p className="mt-2 text-muted-foreground">
           Manage your Atlas account information.
         </p>
       </div>

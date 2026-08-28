@@ -12,7 +12,7 @@ export function AuthStatus() {
 
   if (isLoading) {
     return (
-      <div className="text-sm text-[#9AA6B2]">
+      <div className="text-sm text-muted-foreground">
         Loading...
       </div>
     );
@@ -20,7 +20,7 @@ export function AuthStatus() {
 
   if (!isAuthenticated) {
     return (
-      <div className="text-sm text-[#9AA6B2]">
+      <div className="text-sm text-muted-foreground">
         Not signed in
       </div>
     );
@@ -29,18 +29,18 @@ export function AuthStatus() {
   return (
     <div className="flex items-center gap-4">
       <div>
-        <p className="text-sm font-medium text-[#F5F7FA]">
+        <p className="text-sm font-medium text-foreground">
           {user?.name}
         </p>
 
-        <p className="text-xs text-[#9AA6B2]">
+        <p className="text-xs text-muted-foreground">
           {user?.email}
         </p>
       </div>
 
       <button
         onClick={logout}
-        className="rounded-lg border border-[#26313C] bg-[#18212B] px-3 py-1.5 text-sm text-[#F5F7FA] transition-colors hover:border-[#2AFEB7] hover:text-[#2AFEB7]"
+        className="rounded-lg border border-border bg-secondary px-3 py-1.5 text-sm text-foreground transition-colors hover:border-primary hover:text-primary"
       >
         Logout
       </button>

@@ -68,18 +68,18 @@ export default function CustomerTableEntryPage({
   // ── Loading state ──────────────────────────────────────────────────────────
   if (isLoading) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-[#0B0F14] p-4 text-[#F5F7FA]">
+      <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-background p-4 text-foreground">
         {/* Animated logo */}
         <div className="relative flex h-20 w-20 items-center justify-center">
-          <div className="absolute inset-0 animate-ping rounded-full bg-[#2AFEB7]/20" />
-          <div className="absolute inset-2 animate-pulse rounded-full bg-[#2AFEB7]/30" />
+          <div className="absolute inset-0 animate-ping rounded-full bg-primary/20" />
+          <div className="absolute inset-2 animate-pulse rounded-full bg-primary/30" />
           <span className="relative text-3xl">🍽️</span>
         </div>
         <div className="space-y-2 text-center">
-          <p className="text-sm font-bold text-[#2AFEB7] animate-pulse">
+          <p className="text-sm font-bold text-primary animate-pulse">
             Setting up your table…
           </p>
-          <p className="text-xs text-[#9AA6B2]">Please wait a moment</p>
+          <p className="text-xs text-muted-foreground">Please wait a moment</p>
         </div>
       </div>
     );
@@ -88,22 +88,22 @@ export default function CustomerTableEntryPage({
   // ── Error state ────────────────────────────────────────────────────────────
   if (isInvalid || !session) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#0B0F14] p-4 text-[#F5F7FA]">
-        <div className="w-full max-w-sm rounded-2xl border border-[#EF4444]/30 bg-[#111820] p-8 text-center shadow-2xl space-y-6">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#EF4444]/10 text-3xl text-[#EF4444]">
+      <div className="flex min-h-screen items-center justify-center bg-background p-4 text-foreground">
+        <div className="w-full max-w-sm rounded-2xl border border-atlas-error/30 bg-card p-8 text-center space-y-6">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-atlas-error/10 text-3xl text-atlas-error">
             ⚠️
           </div>
 
           <div className="space-y-2">
-            <h1 className="text-xl font-bold text-[#F5F7FA]">
+            <h1 className="text-xl font-bold text-foreground">
               QR Code Unavailable
             </h1>
-            <p className="text-xs text-[#9AA6B2] leading-relaxed">
+            <p className="text-xs text-muted-foreground leading-relaxed">
               This table QR code is no longer active or may have been regenerated.
             </p>
           </div>
 
-          <div className="rounded-xl border border-[#26313C] bg-[#18212B] p-4 text-xs text-[#9AA6B2]">
+          <div className="rounded-xl border border-border bg-secondary p-4 text-xs text-muted-foreground">
             Please ask restaurant staff for assistance.
           </div>
         </div>
@@ -113,8 +113,8 @@ export default function CustomerTableEntryPage({
 
   // ── Splash / redirect state ────────────────────────────────────────────────
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-[#0B0F14] p-4 text-[#F5F7FA]">
-      <div className="w-full max-w-sm rounded-2xl border border-[#26313C] bg-[#111820] p-8 text-center shadow-2xl space-y-6">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4 text-foreground">
+      <div className="w-full max-w-sm rounded-2xl border border-border bg-card p-8 text-center space-y-6">
 
         {/* Brand logo */}
         <div className="flex justify-center items-center">
@@ -126,45 +126,45 @@ export default function CustomerTableEntryPage({
         </div>
 
         {/* Big welcome icon */}
-        <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-[#2AFEB7]/10 text-4xl shadow-inner">
+        <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 text-4xl shadow-inner">
           🍽️
         </div>
 
         {/* Restaurant & Table */}
         <div className="space-y-1">
-          <h1 className="text-2xl font-black text-[#F5F7FA]">
+          <h1 className="text-2xl font-black text-foreground">
             {session.restaurant.name}
           </h1>
-          <p className="text-xs text-[#9AA6B2]">
+          <p className="text-xs text-muted-foreground">
             {session.branch.name} · {session.diningArea.name}
           </p>
         </div>
 
-        <div className="rounded-xl border border-[#2AFEB7]/30 bg-[#2AFEB7]/10 p-4">
-          <p className="text-xs uppercase font-semibold tracking-wider text-[#9AA6B2]">
+        <div className="rounded-xl border border-primary/30 bg-primary/10 p-4">
+          <p className="text-xs uppercase font-semibold tracking-wider text-muted-foreground">
             Welcome to
           </p>
-          <p className="text-3xl font-extrabold text-[#2AFEB7] mt-1">
+          <p className="text-3xl font-extrabold text-primary mt-1">
             {session.table.name}
           </p>
         </div>
 
         {/* Auto-redirect countdown */}
         <div className="space-y-3">
-          <p className="text-xs text-[#9AA6B2]">
-            Opening menu in <span className="font-bold text-[#2AFEB7]">{countdown}s</span>…
+          <p className="text-xs text-muted-foreground">
+            Opening menu in <span className="font-bold text-primary">{countdown}s</span>…
           </p>
           {/* Progress bar */}
-          <div className="h-1 w-full overflow-hidden rounded-full bg-[#26313C]">
+          <div className="h-1 w-full overflow-hidden rounded-full bg-border">
             <div
-              className="h-full bg-[#2AFEB7] transition-all duration-1000 ease-linear"
+              className="h-full bg-primary transition-all duration-1000 ease-linear"
               style={{ width: countdown === 2 ? '100%' : countdown === 1 ? '50%' : '0%' }}
             />
           </div>
           <button
             type="button"
             onClick={() => router.push(`/t/${token}/menu`)}
-            className="block w-full rounded-xl bg-[#2AFEB7] py-3.5 text-sm font-bold text-[#0B0F14] shadow-lg transition-all hover:bg-[#22E5A4] active:scale-[0.99]"
+            className="block w-full rounded-xl bg-primary py-3.5 text-sm font-bold text-background shadow-lg transition-all hover:bg-primary-hover active:scale-[0.99]"
           >
             View Menu Now →
           </button>

@@ -95,23 +95,27 @@ export default function ReportsHubPage() {
   };
 
   return (
-    <div className="space-y-6 pb-12">
+    <div className="space-y-8 pb-12">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2.5">
-            <FileText className="w-6 h-6 text-primary" />
-            <h1 className="text-2xl font-bold tracking-tight text-foreground">Custom Reports & Report Builder</h1>
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary border border-primary/20">
+              <FileText className="w-5 h-5" />
+            </div>
+            <div>
+              <h1 className="font-display text-3xl font-semibold tracking-[-0.02em] text-foreground">Custom Reports & Report Builder</h1>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Build, save, schedule, export, and automate custom analytics reports.
+              </p>
+            </div>
           </div>
-          <p className="text-xs text-muted-foreground mt-1">
-            Build, save, schedule, export, and automate custom analytics reports
-          </p>
         </div>
 
         <div className="flex items-center gap-2.5">
           <Link
             href="/reports/create"
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold shadow-xs hover:bg-primary/90 transition-all"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-primary text-background text-xs font-bold shadow-md hover:bg-primary-hover transition-all"
           >
             <Plus className="w-4 h-4" />
             Create Custom Report
@@ -123,7 +127,7 @@ export default function ReportsHubPage() {
       <div className="flex items-center gap-2 border-b border-border pb-px text-xs font-semibold">
         <button
           onClick={() => setActiveTab('reports')}
-          className={`px-4 py-2.5 border-b-2 transition-all flex items-center gap-2 ${
+          className={`px-4 py-3 border-b-2 transition-all flex items-center gap-2 ${
             activeTab === 'reports'
               ? 'border-primary text-primary font-bold'
               : 'border-transparent text-muted-foreground hover:text-foreground'
@@ -134,7 +138,7 @@ export default function ReportsHubPage() {
         </button>
         <button
           onClick={() => setActiveTab('templates')}
-          className={`px-4 py-2.5 border-b-2 transition-all flex items-center gap-2 ${
+          className={`px-4 py-3 border-b-2 transition-all flex items-center gap-2 ${
             activeTab === 'templates'
               ? 'border-primary text-primary font-bold'
               : 'border-transparent text-muted-foreground hover:text-foreground'
@@ -151,11 +155,11 @@ export default function ReportsHubPage() {
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {[...Array(3)].map((_, i) => (
-                <div key={i} className="h-44 rounded-xl bg-card/60 animate-pulse border border-border/50" />
+                <div key={i} className="h-44 rounded-xl bg-card animate-pulse border border-border" />
               ))}
             </div>
           ) : reports.length === 0 ? (
-            <div className="p-12 text-center border border-dashed rounded-2xl bg-card/40 space-y-3">
+            <div className="p-12 text-center border border-dashed border-border rounded-2xl bg-card space-y-3">
               <FileText className="w-8 h-8 text-muted-foreground mx-auto" />
               <div className="font-bold text-sm text-foreground">No custom reports created yet</div>
               <p className="text-xs text-muted-foreground max-w-sm mx-auto">
@@ -164,13 +168,13 @@ export default function ReportsHubPage() {
               <div className="pt-2 flex justify-center gap-3">
                 <Link
                   href="/reports/create"
-                  className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold"
+                  className="px-4 py-2.5 rounded-lg bg-primary text-background text-xs font-bold hover:bg-primary-hover transition-all"
                 >
                   Open Report Builder
                 </Link>
                 <button
                   onClick={() => setActiveTab('templates')}
-                  className="px-4 py-2 rounded-xl bg-muted text-foreground text-xs font-semibold"
+                  className="px-4 py-2.5 rounded-lg bg-secondary border border-border text-foreground text-xs font-semibold hover:border-primary transition-all"
                 >
                   Browse Templates
                 </button>
@@ -182,11 +186,11 @@ export default function ReportsHubPage() {
                 <div
                   key={report.id}
                   onClick={() => router.push(`/reports/${report.id}`)}
-                  className="group bg-card hover:bg-muted/20 border border-border hover:border-primary/40 rounded-xl p-5 cursor-pointer transition-all shadow-xs flex flex-col justify-between space-y-4"
+                  className="group bg-card hover:bg-secondary border border-border hover:border-primary/50 rounded-xl p-5 cursor-pointer transition-all shadow-lg flex flex-col justify-between space-y-4"
                 >
                   <div>
                     <div className="flex items-start justify-between">
-                      <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-primary/10 text-primary">
+                      <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-primary/15 text-primary border border-primary/30">
                         {report.dataSource}
                       </span>
                       <span className="text-[10px] text-muted-foreground">v{report.version}</span>
@@ -199,19 +203,19 @@ export default function ReportsHubPage() {
                     </p>
                   </div>
 
-                  <div className="pt-3 border-t border-border/50 flex items-center justify-between text-xs">
+                  <div className="pt-3 border-t border-border/60 flex items-center justify-between text-xs">
                     <div className="flex items-center gap-2">
                       <button
                         onClick={(e) => handleDuplicate(e, report.id)}
                         title="Duplicate report"
-                        className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                        className="p-1.5 rounded-lg bg-background border border-border text-muted-foreground hover:text-foreground hover:border-primary transition-colors"
                       >
                         <Copy className="w-3.5 h-3.5" />
                       </button>
                       <button
                         onClick={(e) => handleDelete(e, report.id)}
                         title="Delete report"
-                        className="p-1.5 rounded-lg hover:bg-rose-500/10 text-muted-foreground hover:text-rose-500 transition-colors"
+                        className="p-1.5 rounded-lg bg-background border border-border text-muted-foreground hover:text-atlas-error hover:border-atlas-error transition-colors"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -234,24 +238,24 @@ export default function ReportsHubPage() {
           {templates.map((tmpl) => (
             <div
               key={tmpl.id}
-              className="bg-card border border-border rounded-xl p-5 shadow-xs flex flex-col justify-between space-y-4 hover:border-primary/40 transition-all"
+              className="bg-card border border-border rounded-xl p-5 shadow-lg flex flex-col justify-between space-y-4 hover:border-primary/50 transition-all"
             >
               <div>
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-muted text-muted-foreground">
+                  <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-secondary border border-border text-muted-foreground">
                     {tmpl.category}
                   </span>
-                  <span className="text-[10px] font-semibold text-primary">{tmpl.configuration.visualization.type}</span>
+                  <span className="text-[10px] font-bold text-primary">{tmpl.configuration.visualization.type}</span>
                 </div>
                 <h3 className="font-bold text-sm text-foreground mt-2">{tmpl.name}</h3>
                 <p className="text-xs text-muted-foreground mt-1">{tmpl.description}</p>
               </div>
 
-              <div className="pt-3 border-t border-border/50">
+              <div className="pt-3 border-t border-border/60">
                 <button
                   onClick={() => handleUseTemplate(tmpl.id)}
                   disabled={cloningId === tmpl.id}
-                  className="w-full py-2 rounded-xl text-xs font-bold bg-muted hover:bg-primary hover:text-primary-foreground text-foreground transition-all flex items-center justify-center gap-1.5"
+                  className="w-full py-2.5 rounded-lg text-xs font-bold bg-secondary border border-border hover:bg-primary hover:text-background text-foreground transition-all flex items-center justify-center gap-1.5"
                 >
                   <Sparkles className="w-3.5 h-3.5" />
                   {cloningId === tmpl.id ? 'Instantiating...' : 'Use This Template'}

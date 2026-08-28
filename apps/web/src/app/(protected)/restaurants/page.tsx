@@ -80,14 +80,14 @@ export default function RestaurantsPage() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#2AFEB7]/30 bg-[#2AFEB7]/10 px-3 py-1 text-xs font-bold text-[#2AFEB7]">
-            <span className="h-2 w-2 rounded-full bg-[#2AFEB7] animate-pulse" />
+          <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
+            <span className="h-2 w-2 rounded-full bg-primary animate-pulse" />
             {isPlatformAdmin ? 'Platform-Wide Directory' : 'Organization Restaurants'}
           </div>
-          <h1 className="mt-3 text-3xl font-black text-[#F5F7FA]">
+          <h1 className="mt-3 text-3xl font-black text-foreground">
             {isPlatformAdmin ? 'All Registered Restaurants' : 'Restaurants'}
           </h1>
-          <p className="mt-1 text-sm text-[#9AA6B2]">
+          <p className="mt-1 text-sm text-muted-foreground">
             {isPlatformAdmin
               ? 'Comprehensive registry of all restaurants onboarded on the Atlas multi-tenant platform. Click on any restaurant to inspect deep-dive telemetry, branches, tables, staff, and sales.'
               : `Manage restaurants and branches under ${currentTenant?.name ?? 'your organization'}.`}
@@ -97,23 +97,23 @@ export default function RestaurantsPage() {
         <button
           type="button"
           onClick={loadRestaurants}
-          className="rounded-xl border border-[#26313C] bg-[#18212B] px-4 py-2.5 text-xs font-semibold text-[#F5F7FA] transition-colors hover:border-[#2AFEB7]"
+          className="rounded-xl border border-border bg-secondary px-4 py-2.5 text-xs font-semibold text-foreground transition-colors hover:border-primary"
         >
           ⟳ Refresh Directory
         </button>
       </div>
 
       {/* Filter & Search Bar */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 rounded-2xl border border-[#26313C] bg-[#111820] p-4 shadow-xl">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 rounded-2xl border border-border bg-card p-4">
         <div className="relative w-full sm:w-80">
           <input
             type="text"
             placeholder="Search by restaurant, slug, or organization..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full rounded-xl border border-[#26313C] bg-[#18212B] pl-9 pr-4 py-2 text-xs text-[#F5F7FA] placeholder-[#9AA6B2] focus:border-[#2AFEB7] focus:outline-none"
+            className="w-full rounded-xl border border-border bg-secondary pl-9 pr-4 py-2 text-xs text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none"
           />
-          <span className="absolute left-3 top-2.5 text-xs text-[#9AA6B2]">🔍</span>
+          <span className="absolute left-3 top-2.5 text-xs text-muted-foreground">🔍</span>
         </div>
 
         <div className="flex items-center gap-2 w-full sm:w-auto">
@@ -121,8 +121,8 @@ export default function RestaurantsPage() {
             onClick={() => setStatusFilter('ALL')}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
               statusFilter === 'ALL'
-                ? 'bg-[#2AFEB7] text-[#070B0E]'
-                : 'bg-[#18212B] text-[#9AA6B2] hover:text-[#F5F7FA]'
+                ? 'bg-primary text-background'
+                : 'bg-secondary text-muted-foreground hover:text-foreground'
             }`}
           >
             All ({isPlatformAdmin ? adminRestaurants.length : tenantRestaurants.length})
@@ -131,8 +131,8 @@ export default function RestaurantsPage() {
             onClick={() => setStatusFilter('ACTIVE')}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
               statusFilter === 'ACTIVE'
-                ? 'bg-[#22C55E] text-white'
-                : 'bg-[#18212B] text-[#9AA6B2] hover:text-[#F5F7FA]'
+                ? 'bg-atlas-success text-foreground'
+                : 'bg-secondary text-muted-foreground hover:text-foreground'
             }`}
           >
             Active
@@ -141,8 +141,8 @@ export default function RestaurantsPage() {
             onClick={() => setStatusFilter('INACTIVE')}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
               statusFilter === 'INACTIVE'
-                ? 'bg-[#EF4444] text-white'
-                : 'bg-[#18212B] text-[#9AA6B2] hover:text-[#F5F7FA]'
+                ? 'bg-atlas-error text-foreground'
+                : 'bg-secondary text-muted-foreground hover:text-foreground'
             }`}
           >
             Inactive
@@ -152,27 +152,27 @@ export default function RestaurantsPage() {
 
       {/* Main Table */}
       {isLoading ? (
-        <div className="rounded-2xl border border-[#26313C] bg-[#111820] p-12 text-center text-[#9AA6B2] shadow-xl">
-          <div className="inline-block h-6 w-6 border-2 border-[#2AFEB7] border-t-transparent rounded-full animate-spin mb-3" />
+        <div className="rounded-2xl border border-border bg-card p-12 text-center text-muted-foreground">
+          <div className="inline-block h-6 w-6 border-2 border-primary border-t-transparent rounded-full animate-spin mb-3" />
           <p className="text-xs font-semibold">Loading restaurant directory...</p>
         </div>
       ) : error ? (
-        <div className="rounded-2xl border border-[#EF4444]/40 bg-[#EF4444]/10 p-6 text-center text-[#EF4444]">
+        <div className="rounded-2xl border border-atlas-error/40 bg-atlas-error/10 p-6 text-center text-atlas-error">
           <p className="font-semibold">{error}</p>
           <button
             type="button"
             onClick={loadRestaurants}
-            className="mt-3 rounded-lg border border-[#EF4444]/40 px-3.5 py-1.5 text-xs text-[#F5F7FA] hover:bg-[#EF4444]/20"
+            className="mt-3 rounded-lg border border-atlas-error/40 px-3.5 py-1.5 text-xs text-foreground hover:bg-atlas-error/20"
           >
             Retry
           </button>
         </div>
       ) : isPlatformAdmin ? (
         /* PLATFORM ADMIN VIEW: Detailed global multi-tenant cards/table */
-        <div className="overflow-hidden rounded-2xl border border-[#26313C] bg-[#111820] shadow-xl">
+        <div className="overflow-hidden rounded-2xl border border-border bg-card">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="border-b border-[#26313C] bg-[#18212B] text-[#9AA6B2] uppercase tracking-wider text-[10px]">
+              <thead className="border-b border-border bg-secondary text-muted-foreground uppercase tracking-wider text-[10px]">
                 <tr>
                   <th className="px-6 py-4">Restaurant</th>
                   <th className="px-6 py-4">Organization / Tenant</th>
@@ -183,43 +183,43 @@ export default function RestaurantsPage() {
                   <th className="px-6 py-4 text-right">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#26313C]/50">
+              <tbody className="divide-y divide-border/50">
                 {filteredAdminRestaurants.map((r) => (
                   <tr
                     key={r.id}
                     onClick={() => setSelectedRestaurantId(r.id)}
-                    className="transition-colors hover:bg-[#18212B] cursor-pointer group"
+                    className="transition-colors hover:bg-secondary cursor-pointer group"
                   >
                     <td className="px-6 py-4">
-                      <div className="font-bold text-[#F5F7FA] group-hover:text-[#2AFEB7] transition-colors flex items-center gap-2">
+                      <div className="font-bold text-foreground group-hover:text-primary transition-colors flex items-center gap-2">
                         <span>🍽️</span>
                         <span>{r.name}</span>
                       </div>
-                      <div className="text-[10px] font-mono text-[#9AA6B2] mt-0.5">slug: {r.slug}</div>
+                      <div className="text-[10px] font-mono text-muted-foreground mt-0.5">slug: {r.slug}</div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="font-semibold text-white">{r.tenantName}</div>
-                      <div className="text-[10px] text-[#9AA6B2] font-mono">{r.tenantId}</div>
+                      <div className="font-semibold text-foreground">{r.tenantName}</div>
+                      <div className="text-[10px] text-muted-foreground font-mono">{r.tenantId}</div>
                     </td>
                     <td className="px-6 py-4">
                       <span className="inline-flex items-center gap-1 rounded-md bg-indigo-500/10 px-2 py-0.5 text-[10px] font-bold text-indigo-400 border border-indigo-500/20">
                         💎 {r.planName}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-white">
+                    <td className="px-6 py-4 text-foreground">
                       <div>{r.branchesCount} Branch(es)</div>
-                      <div className="text-[10px] text-[#9AA6B2]">{r.tablesCount} Tables</div>
+                      <div className="text-[10px] text-muted-foreground">{r.tablesCount} Tables</div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="font-bold text-white font-mono">{formatCurrency(r.totalSales)}</div>
-                      <div className="text-[10px] text-[#22C55E]">{r.completedOrders} orders</div>
+                      <div className="font-bold text-foreground font-mono">{formatCurrency(r.totalSales)}</div>
+                      <div className="text-[10px] text-atlas-success">{r.completedOrders} orders</div>
                     </td>
                     <td className="px-6 py-4">
                       <span
                         className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase border ${
                           r.status === 'ACTIVE'
-                            ? 'bg-[#22C55E]/15 text-[#22C55E] border-[#22C55E]/30'
-                            : 'bg-[#EF4444]/15 text-[#EF4444] border-[#EF4444]/30'
+                            ? 'bg-atlas-success/15 text-atlas-success border-atlas-success/30'
+                            : 'bg-atlas-error/15 text-atlas-error border-atlas-error/30'
                         }`}
                       >
                         <span className="h-1.5 w-1.5 rounded-full bg-current" />
@@ -233,7 +233,7 @@ export default function RestaurantsPage() {
                           e.stopPropagation();
                           setSelectedRestaurantId(r.id);
                         }}
-                        className="rounded-lg border border-[#26313C] bg-[#18212B] px-3 py-1 text-xs font-bold text-[#2AFEB7] hover:border-[#2AFEB7] transition-all"
+                        className="rounded-lg border border-border bg-secondary px-3 py-1 text-xs font-bold text-primary hover:border-primary transition-all"
                       >
                         Inspect Details 🔍
                       </button>
@@ -243,7 +243,7 @@ export default function RestaurantsPage() {
 
                 {filteredAdminRestaurants.length === 0 && (
                   <tr>
-                    <td colSpan={7} className="py-12 text-center text-[#9AA6B2]">
+                    <td colSpan={7} className="py-12 text-center text-muted-foreground">
                       No restaurants match your search query.
                     </td>
                   </tr>
@@ -254,10 +254,10 @@ export default function RestaurantsPage() {
         </div>
       ) : (
         /* TENANT VIEW */
-        <div className="overflow-hidden rounded-2xl border border-[#26313C] bg-[#111820] shadow-xl">
+        <div className="overflow-hidden rounded-2xl border border-border bg-card">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="border-b border-[#26313C] bg-[#18212B] text-[#9AA6B2] uppercase tracking-wider text-[10px]">
+              <thead className="border-b border-border bg-secondary text-muted-foreground uppercase tracking-wider text-[10px]">
                 <tr>
                   <th className="px-6 py-4">Restaurant Name</th>
                   <th className="px-6 py-4">Slug</th>
@@ -265,23 +265,23 @@ export default function RestaurantsPage() {
                   <th className="px-6 py-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#26313C]">
+              <tbody className="divide-y divide-border">
                 {filteredTenantRestaurants.map((r) => (
                   <tr
                     key={r.id}
                     onClick={() => setSelectedRestaurantId(r.id)}
-                    className="transition-colors hover:bg-[#18212B] cursor-pointer group"
+                    className="transition-colors hover:bg-secondary cursor-pointer group"
                   >
-                    <td className="px-6 py-4 font-bold text-[#F5F7FA] group-hover:text-[#2AFEB7] transition-colors">
+                    <td className="px-6 py-4 font-bold text-foreground group-hover:text-primary transition-colors">
                       <div className="flex items-center gap-2">
                         <span>🍽️</span>
                         <span>{r.name}</span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 font-mono text-[#2AFEB7]">{r.slug}</td>
+                    <td className="px-6 py-4 font-mono text-primary">{r.slug}</td>
                     <td className="px-6 py-4">
-                      <span className="inline-flex items-center gap-1.5 rounded-full bg-[#22C55E]/15 px-3 py-1 text-xs font-semibold text-[#22C55E] border border-[#22C55E]/30">
-                        <span className="h-1.5 w-1.5 rounded-full bg-[#22C55E]" />
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-atlas-success/15 px-3 py-1 text-xs font-semibold text-atlas-success border border-atlas-success/30">
+                        <span className="h-1.5 w-1.5 rounded-full bg-atlas-success" />
                         {r.status}
                       </span>
                     </td>
@@ -292,7 +292,7 @@ export default function RestaurantsPage() {
                           e.stopPropagation();
                           setSelectedRestaurantId(r.id);
                         }}
-                        className="rounded-lg border border-[#26313C] bg-[#18212B] px-3 py-1 text-xs font-bold text-[#2AFEB7] hover:border-[#2AFEB7] transition-all"
+                        className="rounded-lg border border-border bg-secondary px-3 py-1 text-xs font-bold text-primary hover:border-primary transition-all"
                       >
                         View Details 🔍
                       </button>
@@ -302,7 +302,7 @@ export default function RestaurantsPage() {
 
                 {filteredTenantRestaurants.length === 0 && (
                   <tr>
-                    <td colSpan={4} className="py-12 text-center text-[#9AA6B2]">
+                    <td colSpan={4} className="py-12 text-center text-muted-foreground">
                       No restaurants registered under this organization.
                     </td>
                   </tr>

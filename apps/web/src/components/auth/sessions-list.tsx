@@ -66,47 +66,47 @@ export function SessionsList() {
   if (isLoading && sessions.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center p-8 space-y-2">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#2AFEB7] border-t-transparent" />
-        <span className="text-xs text-[#9AA6B2]">Scanning active logins...</span>
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+        <span className="text-xs text-muted-foreground">Scanning active logins...</span>
       </div>
     );
   }
 
   return (
-    <div className="rounded-2xl border border-[#26313C] bg-[#111820] p-6 shadow-xl space-y-6 text-left">
+    <div className="rounded-2xl border border-border bg-card p-6 space-y-6 text-left">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h3 className="text-base font-bold text-[#F5F7FA]">Active Login Sessions</h3>
-          <p className="text-xs text-[#9AA6B2]">
+          <h3 className="text-base font-bold text-foreground">Active Login Sessions</h3>
+          <p className="text-xs text-muted-foreground">
             Review all active devices authorized to access your account.
           </p>
         </div>
         <button
           type="button"
           onClick={handleRevokeAll}
-          className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-2 text-xs font-bold text-red-500 hover:bg-red-500 hover:text-white transition-all"
+          className="rounded-xl border border-atlas-error/30 bg-atlas-error/10 px-4 py-2 text-xs font-bold text-atlas-error hover:bg-atlas-error hover:text-foreground transition-all"
         >
           Logout All Devices
         </button>
       </div>
 
       {error && (
-        <div className="rounded-xl border border-red-500/20 bg-red-500/10 p-3 text-xs text-red-500">
+        <div className="rounded-xl border border-atlas-error/20 bg-atlas-error/10 p-3 text-xs text-atlas-error">
           {error}
         </div>
       )}
 
-      <div className="divide-y divide-[#26313C]/50">
+      <div className="divide-y divide-border/50">
         {(Array.isArray(sessions) ? sessions : []).map((sess) => (
           <div key={sess.id} className="flex items-center justify-between py-4 first:pt-0 last:pb-0 gap-4">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
-                <span className="text-sm font-bold text-[#F5F7FA]">{sess.deviceName}</span>
-                <span className="rounded bg-[#18212B] border border-[#26313C] px-2 py-0.5 text-[9px] font-mono text-[#9AA6B2]">
+                <span className="text-sm font-bold text-foreground">{sess.deviceName}</span>
+                <span className="rounded bg-secondary border border-border px-2 py-0.5 text-[9px] font-mono text-muted-foreground">
                   IP: {sess.ipAddress || 'Unknown'}
                 </span>
               </div>
-              <p className="text-[10px] text-[#9AA6B2]">
+              <p className="text-[10px] text-muted-foreground">
                 Logged in: {new Date(sess.createdAt).toLocaleString()} • Last active: {new Date(sess.lastUsedAt).toLocaleString()}
               </p>
             </div>
@@ -115,7 +115,7 @@ export function SessionsList() {
               type="button"
               disabled={actionId !== null}
               onClick={() => void handleRevoke(sess.id)}
-              className="rounded-xl border border-[#26313C] bg-[#18212B] hover:border-red-500 hover:text-red-500 px-3 py-1.5 text-xs font-semibold text-[#9AA6B2] transition-colors disabled:opacity-50"
+              className="rounded-xl border border-border bg-secondary hover:border-atlas-error hover:text-atlas-error px-3 py-1.5 text-xs font-semibold text-muted-foreground transition-colors disabled:opacity-50"
             >
               {actionId === sess.id ? 'Revoking...' : 'Revoke'}
             </button>
@@ -123,7 +123,7 @@ export function SessionsList() {
         ))}
 
         {(!Array.isArray(sessions) || sessions.length === 0) && (
-          <div className="py-8 text-center text-xs text-[#9AA6B2]">
+          <div className="py-8 text-center text-xs text-muted-foreground">
             No active sessions registered.
           </div>
         )}

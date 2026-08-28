@@ -89,11 +89,11 @@ export default function UserDetailsPage() {
     <div className="mx-auto max-w-3xl space-y-8">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-[#F5F7FA]">
+          <h1 className="font-display text-3xl font-semibold tracking-[-0.02em] text-foreground">
             {user.name}
           </h1>
 
-          <p className="mt-2 text-sm text-[#9AA6B2]">
+          <p className="mt-2 text-sm text-muted-foreground">
             User details
           </p>
         </div>
@@ -102,7 +102,7 @@ export default function UserDetailsPage() {
           <button
             type="button"
             onClick={() => router.push(`/users/${user.id}/edit`)}
-            className="rounded-lg bg-[#2AFEB7] px-4 py-2 text-sm font-semibold text-[#0B0F14] transition-all hover:bg-[#22E5A4] active:scale-[0.99]"
+            className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-background transition-all hover:bg-primary-hover active:scale-[0.99]"
           >
             Edit
           </button>
@@ -111,7 +111,7 @@ export default function UserDetailsPage() {
             type="button"
             onClick={openDeleteDialog}
             disabled={isDeleting || isCurrentUser}
-            className="rounded-lg border border-[#EF4444]/40 bg-[#EF4444]/10 px-4 py-2 text-sm font-medium text-[#EF4444] transition-all hover:bg-[#EF4444]/20 disabled:opacity-40"
+            className="rounded-lg border border-atlas-error/40 bg-atlas-error/10 px-4 py-2 text-sm font-medium text-atlas-error transition-all hover:bg-atlas-error/20 disabled:opacity-40"
           >
             Delete
           </button>
@@ -119,7 +119,7 @@ export default function UserDetailsPage() {
           <button
             type="button"
             onClick={() => router.push('/users')}
-            className="rounded-lg border border-[#26313C] bg-[#18212B] px-4 py-2 text-sm font-medium text-[#F5F7FA] transition-colors hover:border-[#2AFEB7]"
+            className="rounded-lg border border-border bg-secondary px-4 py-2 text-sm font-medium text-foreground transition-colors hover:border-primary"
           >
             Back
           </button>
@@ -127,45 +127,45 @@ export default function UserDetailsPage() {
       </div>
 
       {isCurrentUser && (
-        <div className="rounded-lg border border-[#F59E0B]/30 bg-[#F59E0B]/10 p-3 text-xs text-[#F59E0B]">
+        <div className="rounded-lg border border-atlas-warning/30 bg-atlas-warning/10 p-3 text-xs text-atlas-warning">
           You cannot delete your own account.
         </div>
       )}
 
-      <div className="rounded-2xl border border-[#26313C] bg-[#111820] shadow-xl">
+      <div className="rounded-2xl border border-border bg-card">
         <div className="grid gap-6 p-8 md:grid-cols-2">
           <div>
-            <p className="text-xs uppercase tracking-wider text-[#9AA6B2]">
+            <p className="text-xs uppercase tracking-wider text-muted-foreground">
               Name
             </p>
 
-            <p className="mt-1 text-base font-medium text-[#F5F7FA]">
+            <p className="mt-1 text-base font-medium text-foreground">
               {user.name}
             </p>
           </div>
 
           <div>
-            <p className="text-xs uppercase tracking-wider text-[#9AA6B2]">
+            <p className="text-xs uppercase tracking-wider text-muted-foreground">
               Email
             </p>
 
-            <p className="mt-1 text-base font-medium text-[#F5F7FA]">
+            <p className="mt-1 text-base font-medium text-foreground">
               {user.email}
             </p>
           </div>
 
           <div>
-            <p className="text-xs uppercase tracking-wider text-[#9AA6B2]">
+            <p className="text-xs uppercase tracking-wider text-muted-foreground">
               Phone
             </p>
 
-            <p className="mt-1 text-base font-medium text-[#F5F7FA]">
+            <p className="mt-1 text-base font-medium text-foreground">
               {user.phone ?? '—'}
             </p>
           </div>
 
           <div>
-            <p className="text-xs uppercase tracking-wider text-[#9AA6B2]">
+            <p className="text-xs uppercase tracking-wider text-muted-foreground">
               Role
             </p>
 
@@ -175,7 +175,7 @@ export default function UserDetailsPage() {
           </div>
 
           <div>
-            <p className="text-xs uppercase tracking-wider text-[#9AA6B2]">
+            <p className="text-xs uppercase tracking-wider text-muted-foreground">
               Status
             </p>
 
@@ -185,11 +185,11 @@ export default function UserDetailsPage() {
           </div>
 
           <div>
-            <p className="text-xs uppercase tracking-wider text-[#9AA6B2]">
+            <p className="text-xs uppercase tracking-wider text-muted-foreground">
               Created
             </p>
 
-            <p className="mt-1 text-base font-medium text-[#F5F7FA]">
+            <p className="mt-1 text-base font-medium text-foreground">
               {new Date(user.createdAt).toLocaleDateString()}
             </p>
           </div>

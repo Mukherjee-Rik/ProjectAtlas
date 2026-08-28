@@ -14,12 +14,12 @@ export function ComparisonTrendChart({ data, isLoading }: ComparisonTrendChartPr
   const [chartType, setChartType] = useState<'bar' | 'area'>('area');
 
   if (isLoading) {
-    return <div className="h-72 rounded-xl bg-card/60 animate-pulse border border-border/50" />;
+    return <div className="h-72 rounded-xl bg-card animate-pulse border border-border" />;
   }
 
   if (!data || data.length === 0) {
     return (
-      <div className="h-72 flex items-center justify-center text-muted-foreground border border-dashed rounded-xl">
+      <div className="h-72 flex items-center justify-center text-muted-foreground border border-dashed border-border rounded-xl bg-card">
         No time-series points recorded for this period.
       </div>
     );
@@ -55,12 +55,12 @@ export function ComparisonTrendChart({ data, isLoading }: ComparisonTrendChartPr
   const areaD = `${pathD} L ${points[points.length - 1].x} ${svgHeight - paddingY} L ${points[0].x} ${svgHeight - paddingY} Z`;
 
   return (
-    <div className="bg-card border border-border rounded-xl p-6 shadow-xs space-y-4">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-border/60">
+    <div className="bg-card border border-border rounded-xl p-6 space-y-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-border">
         <div>
           <div className="flex items-center gap-2">
             <h3 className="text-base font-bold text-foreground">Performance Trends</h3>
-            <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-semibold">
+            <span className="text-xs px-2.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/25 font-semibold">
               Total: {activeMetric === 'ordersCount' ? `${totalVal} Orders` : `₹${totalVal.toLocaleString('en-IN')}`}
             </span>
           </div>
@@ -71,11 +71,11 @@ export function ComparisonTrendChart({ data, isLoading }: ComparisonTrendChartPr
 
         <div className="flex items-center gap-2 flex-wrap">
           {/* Chart Type Toggle */}
-          <div className="flex items-center p-1 bg-muted/60 rounded-lg text-xs">
+          <div className="flex items-center p-1 bg-background rounded-lg border border-border text-xs">
             <button
               onClick={() => setChartType('area')}
               className={`p-1.5 rounded transition-all ${
-                chartType === 'area' ? 'bg-card text-foreground shadow-xs font-bold' : 'text-muted-foreground hover:text-foreground'
+                chartType === 'area' ? 'bg-primary text-background shadow-xs font-bold' : 'text-muted-foreground hover:text-foreground'
               }`}
               title="Area Curve"
             >
@@ -84,7 +84,7 @@ export function ComparisonTrendChart({ data, isLoading }: ComparisonTrendChartPr
             <button
               onClick={() => setChartType('bar')}
               className={`p-1.5 rounded transition-all ${
-                chartType === 'bar' ? 'bg-card text-foreground shadow-xs font-bold' : 'text-muted-foreground hover:text-foreground'
+                chartType === 'bar' ? 'bg-primary text-background shadow-xs font-bold' : 'text-muted-foreground hover:text-foreground'
               }`}
               title="Bar Chart"
             >
@@ -93,11 +93,11 @@ export function ComparisonTrendChart({ data, isLoading }: ComparisonTrendChartPr
           </div>
 
           {/* Metric Selector */}
-          <div className="flex items-center gap-1 p-1 bg-muted/60 rounded-lg text-xs font-medium">
+          <div className="flex items-center gap-1 p-1 bg-background rounded-lg border border-border text-xs font-medium">
             <button
               onClick={() => setActiveMetric('grossSales')}
               className={`px-3 py-1.5 rounded-md transition-all ${
-                activeMetric === 'grossSales' ? 'bg-card shadow-xs text-foreground font-bold' : 'text-muted-foreground hover:text-foreground'
+                activeMetric === 'grossSales' ? 'bg-secondary text-primary font-bold border border-primary/30' : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               Gross Sales
@@ -105,7 +105,7 @@ export function ComparisonTrendChart({ data, isLoading }: ComparisonTrendChartPr
             <button
               onClick={() => setActiveMetric('netSales')}
               className={`px-3 py-1.5 rounded-md transition-all ${
-                activeMetric === 'netSales' ? 'bg-card shadow-xs text-foreground font-bold' : 'text-muted-foreground hover:text-foreground'
+                activeMetric === 'netSales' ? 'bg-secondary text-primary font-bold border border-primary/30' : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               Net Revenue
@@ -113,7 +113,7 @@ export function ComparisonTrendChart({ data, isLoading }: ComparisonTrendChartPr
             <button
               onClick={() => setActiveMetric('ordersCount')}
               className={`px-3 py-1.5 rounded-md transition-all ${
-                activeMetric === 'ordersCount' ? 'bg-card shadow-xs text-foreground font-bold' : 'text-muted-foreground hover:text-foreground'
+                activeMetric === 'ordersCount' ? 'bg-secondary text-primary font-bold border border-primary/30' : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               Orders Count
@@ -133,8 +133,8 @@ export function ComparisonTrendChart({ data, isLoading }: ComparisonTrendChartPr
             >
               <defs>
                 <linearGradient id="trendGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="var(--primary, #2AFEB7)" stopOpacity="0.45" />
-                  <stop offset="100%" stopColor="var(--primary, #2AFEB7)" stopOpacity="0.0" />
+                  <stop offset="0%" stopColor="#34D399" stopOpacity="0.35" />
+                  <stop offset="100%" stopColor="#34D399" stopOpacity="0.0" />
                 </linearGradient>
               </defs>
 
@@ -144,8 +144,7 @@ export function ComparisonTrendChart({ data, isLoading }: ComparisonTrendChartPr
                 y1={svgHeight - paddingY}
                 x2={svgWidth - paddingX}
                 y2={svgHeight - paddingY}
-                stroke="currentColor"
-                className="text-border"
+                stroke="#1F1F26"
                 strokeWidth="1"
               />
               <line
@@ -153,8 +152,7 @@ export function ComparisonTrendChart({ data, isLoading }: ComparisonTrendChartPr
                 y1={svgHeight / 2}
                 x2={svgWidth - paddingX}
                 y2={svgHeight / 2}
-                stroke="currentColor"
-                className="text-border/40"
+                stroke="#1F1F26"
                 strokeDasharray="4 4"
                 strokeWidth="1"
               />
@@ -166,8 +164,8 @@ export function ComparisonTrendChart({ data, isLoading }: ComparisonTrendChartPr
               <path
                 d={pathD}
                 fill="none"
-                stroke="var(--primary, #2AFEB7)"
-                strokeWidth="3"
+                stroke="#34D399"
+                strokeWidth="2.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />
@@ -178,8 +176,11 @@ export function ComparisonTrendChart({ data, isLoading }: ComparisonTrendChartPr
                   <circle
                     cx={p.x}
                     cy={p.y}
-                    r={p.val > 0 ? 5 : 3}
-                    className="fill-background stroke-primary stroke-2 group-hover:r-7 transition-all"
+                    r={p.val > 0 ? 4 : 2}
+                    fill="#09090B"
+                    stroke="#34D399"
+                    strokeWidth="2"
+                    className="hover:r-6 transition-all"
                   />
                 </g>
               ))}
@@ -208,7 +209,7 @@ export function ComparisonTrendChart({ data, isLoading }: ComparisonTrendChartPr
               return (
                 <div key={idx} className="flex-1 flex flex-col items-center group relative h-full justify-end">
                   {/* Tooltip on Hover */}
-                  <div className="absolute -top-10 opacity-0 group-hover:opacity-100 transition-opacity bg-popover text-popover-foreground text-xs py-1 px-2.5 rounded-lg shadow-lg border border-border pointer-events-none whitespace-nowrap z-20">
+                  <div className="absolute -top-10 opacity-0 group-hover:opacity-100 transition-opacity bg-secondary text-foreground text-xs py-1 px-2.5 rounded-lg border border-border pointer-events-none whitespace-nowrap z-20">
                     <div className="font-bold">{pt.label}</div>
                     <div className="text-primary font-semibold">
                       {activeMetric === 'ordersCount' ? `${val} orders` : `₹${val.toLocaleString('en-IN')}`}
@@ -220,8 +221,8 @@ export function ComparisonTrendChart({ data, isLoading }: ComparisonTrendChartPr
                     style={{ height: `${heightPercent}%` }}
                     className={`w-full max-w-[28px] rounded-t transition-all duration-300 ${
                       val > 0
-                        ? 'bg-primary group-hover:bg-primary/90 shadow-xs'
-                        : 'bg-muted/40'
+                        ? 'bg-primary group-hover:bg-primary-hover shadow-sm'
+                        : 'bg-border/40'
                     }`}
                   />
 

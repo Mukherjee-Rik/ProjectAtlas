@@ -28,7 +28,7 @@ import type { CurrentBranch as CurrentBranchType } from '../auth/types/current-b
 import type { CurrentTenant as CurrentTenantType } from '../auth/types/current-tenant.type';
 import { IsString, IsNotEmpty, IsOptional, IsNumber, Min, IsEnum, IsArray, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
-import { UnitOfMeasure, StockTransactionType } from '../../generated/prisma/enums';
+import { UnitOfMeasure, StockTransactionType, RecipeType } from '../../generated/prisma/enums';
 
 // DTOs
 export class CreateIngredientDto {
@@ -161,6 +161,40 @@ export class RecordAdjustmentDto {
   reason?: string;
 }
 
+export class LogBatchProductionDto {
+  @IsString()
+  @IsNotEmpty()
+  recipeId: string;
+
+  @IsNumber()
+  @Min(0.1)
+  @Type(() => Number)
+  portionsProduced: number;
+
+  @IsString()
+  @IsOptional()
+  notes?: string;
+}
+
+export class LogBatchWastageDto {
+  @IsString()
+  @IsNotEmpty()
+  recipeId: string;
+
+  @IsNumber()
+  @Min(0.1)
+  @Type(() => Number)
+  portionsWasted: number;
+
+  @IsString()
+  @IsNotEmpty()
+  reason: string;
+
+  @IsString()
+  @IsOptional()
+  notes?: string;
+}
+
 export class RecipeIngredientItemDto {
   @IsString()
   @IsNotEmpty()
@@ -176,6 +210,16 @@ export class SaveRecipeDto {
   @IsString()
   @IsNotEmpty()
   menuItemId: string;
+
+  @IsEnum(RecipeType)
+  @IsOptional()
+  recipeType?: RecipeType;
+
+  @IsNumber()
+  @Min(0.1)
+  @IsOptional()
+  @Type(() => Number)
+  batchYieldPortions?: number;
 
   @IsArray()
   @ValidateNested({ each: true })
@@ -230,9 +274,12 @@ export class InventoryController {
   // =========================================================================
   @Get('overview')
   @Permissions(PERMISSIONS.MENUS_READ)
-  async getOverview(@CurrentRestaurant() restaurant: CurrentRestaurantType) {
+  async getOverview(
+    @CurrentRestaurant() restaurant: CurrentRestaurantType,
+    @CurrentBranch() branch?: CurrentBranchType,
+  ) {
     if (!restaurant) throw new BadRequestException('No active restaurant selected');
-    return this.inventoryService.getInventoryOverview(restaurant.id);
+    return this.inventoryService.getInventoryOverview(restaurant.id, branch?.id);
   }
 
   // =========================================================================
@@ -240,9 +287,12 @@ export class InventoryController {
   // =========================================================================
   @Get('ingredients')
   @Permissions(PERMISSIONS.MENUS_READ)
-  async getIngredients(@CurrentRestaurant() restaurant: CurrentRestaurantType) {
+  async getIngredients(
+    @CurrentRestaurant() restaurant: CurrentRestaurantType,
+    @CurrentBranch() branch?: CurrentBranchType,
+  ) {
     if (!restaurant) throw new BadRequestException('No active restaurant selected');
-    return this.inventoryService.getIngredients(restaurant.id);
+    return this.inventoryService.getIngredients(restaurant.id, branch?.id);
   }
 
   @Post('ingredients')
@@ -300,16 +350,21 @@ export class InventoryController {
   @Permissions(PERMISSIONS.MENUS_READ)
   async getMovements(
     @CurrentRestaurant() restaurant: CurrentRestaurantType,
+    @CurrentBranch() branch?: CurrentBranchType,
     @Query('type') type?: StockTransactionType,
     @Query('ingredientId') ingredientId?: string,
     @Query('limit') limit?: number,
   ) {
     if (!restaurant) throw new BadRequestException('No active restaurant selected');
-    return this.inventoryService.getMovements(restaurant.id, {
-      type,
-      ingredientId,
-      limit: limit ? Number(limit) : undefined,
-    });
+    return this.inventoryService.getMovements(
+      restaurant.id,
+      {
+        type,
+        ingredientId,
+        limit: limit ? Number(limit) : undefined,
+      },
+      branch?.id,
+    );
   }
 
   // =========================================================================
@@ -332,6 +387,59 @@ export class InventoryController {
   @Permissions(PERMISSIONS.MENUS_UPDATE)
   async saveRecipe(@Body() dto: SaveRecipeDto) {
     return this.inventoryService.saveRecipe(dto);
+  }
+
+  // =========================================================================
+  // 5. KITCHEN BATCH PREP & PRODUCTION
+  // =========================================================================
+  @Post('batch-production')
+  @Permissions(PERMISSIONS.MENUS_UPDATE)
+  async logBatchProduction(
+    @CurrentRestaurant() restaurant: CurrentRestaurantType,
+    @CurrentBranch() branch: CurrentBranchType,
+    @CurrentTenant() tenant: CurrentTenantType | undefined,
+    @Body() dto: LogBatchProductionDto,
+  ) {
+    if (!restaurant) throw new BadRequestException('No active restaurant selected');
+    const targetBranchId = branch?.id || (await this.inventoryService.getFirstBranchId(restaurant.id));
+    if (!targetBranchId) throw new BadRequestException('No active branch selected');
+    const targetTenantId = tenant?.id || restaurant.tenantId;
+
+    return this.inventoryService.logBatchProduction({
+      tenantId: targetTenantId,
+      branchId: targetBranchId,
+      ...dto,
+    });
+  }
+
+  @Post('batch-wastage')
+  @Permissions(PERMISSIONS.MENUS_UPDATE)
+  async logBatchWastage(
+    @CurrentRestaurant() restaurant: CurrentRestaurantType,
+    @CurrentBranch() branch: CurrentBranchType,
+    @CurrentTenant() tenant: CurrentTenantType | undefined,
+    @Body() dto: LogBatchWastageDto,
+  ) {
+    if (!restaurant) throw new BadRequestException('No active restaurant selected');
+    const targetBranchId = branch?.id || (await this.inventoryService.getFirstBranchId(restaurant.id));
+    if (!targetBranchId) throw new BadRequestException('No active branch selected');
+    const targetTenantId = tenant?.id || restaurant.tenantId;
+
+    return this.inventoryService.logBatchWastage({
+      tenantId: targetTenantId,
+      branchId: targetBranchId,
+      ...dto,
+    });
+  }
+
+  @Get('batch-productions')
+  @Permissions(PERMISSIONS.MENUS_READ)
+  async getBatchProductions(
+    @CurrentRestaurant() restaurant: CurrentRestaurantType,
+    @CurrentBranch() branch?: CurrentBranchType,
+  ) {
+    if (!restaurant) throw new BadRequestException('No active restaurant selected');
+    return this.inventoryService.getBatchProductions(restaurant.id, branch?.id);
   }
 
   // =========================================================================

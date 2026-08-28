@@ -60,20 +60,23 @@ export function ReportScheduleModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-xs">
-      <div className="bg-card border border-border rounded-2xl w-full max-w-lg p-6 shadow-2xl space-y-5">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+      <div className="bg-card border border-border rounded-2xl w-full max-w-lg p-6 space-y-5">
         <div className="flex items-center justify-between pb-3 border-b border-border">
           <div className="flex items-center gap-2">
             <Clock className="w-5 h-5 text-primary" />
             <h3 className="font-bold text-base text-foreground">Schedule Automated Report</h3>
           </div>
-          <button onClick={onClose} className="p-1 rounded-lg hover:bg-muted text-muted-foreground">
+          <button
+            onClick={onClose}
+            className="p-1.5 rounded-lg border border-border bg-secondary text-muted-foreground hover:text-foreground hover:border-primary transition-colors"
+          >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {error && (
-          <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-500 text-xs font-medium">
+          <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-semibold">
             {error}
           </div>
         )}
@@ -86,7 +89,7 @@ export function ReportScheduleModal({
               value={scheduleName}
               onChange={(e) => setScheduleName(e.target.value)}
               required
-              className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground"
+              className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground focus:border-primary focus:outline-none"
             />
           </div>
 
@@ -100,8 +103,8 @@ export function ReportScheduleModal({
                   onClick={() => setFrequency(freq)}
                   className={`py-2 rounded-lg border font-semibold transition-all ${
                     frequency === freq
-                      ? 'border-primary bg-primary/10 text-primary'
-                      : 'border-border bg-card text-muted-foreground'
+                      ? 'border-primary bg-primary/15 text-primary font-bold'
+                      : 'border-border bg-secondary text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   {freq}
@@ -117,7 +120,7 @@ export function ReportScheduleModal({
                 type="time"
                 value={timeOfDay}
                 onChange={(e) => setTimeOfDay(e.target.value)}
-                className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground"
+                className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground focus:border-primary focus:outline-none"
               />
             </div>
 
@@ -127,7 +130,7 @@ export function ReportScheduleModal({
                 <select
                   value={dayOfWeek}
                   onChange={(e) => setDayOfWeek(Number(e.target.value))}
-                  className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground"
+                  className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground focus:border-primary focus:outline-none"
                 >
                   <option value={1}>Monday</option>
                   <option value={2}>Tuesday</option>
@@ -149,7 +152,7 @@ export function ReportScheduleModal({
                   max={31}
                   value={dayOfMonth}
                   onChange={(e) => setDayOfMonth(Number(e.target.value))}
-                  className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground"
+                  className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground focus:border-primary focus:outline-none"
                 />
               </div>
             )}
@@ -164,7 +167,7 @@ export function ReportScheduleModal({
               placeholder="manager@restaurant.com, owner@restaurant.com"
               value={recipients}
               onChange={(e) => setRecipients(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground"
+              className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground focus:border-primary focus:outline-none"
             />
           </div>
 
@@ -172,14 +175,14 @@ export function ReportScheduleModal({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-xl text-xs font-semibold bg-muted text-foreground"
+              className="px-4 py-2 rounded-lg text-xs font-semibold bg-secondary border border-border text-foreground hover:border-primary transition-all"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-4 py-2 rounded-xl text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-all flex items-center gap-1.5"
+              className="px-4 py-2 rounded-lg text-xs font-bold bg-primary text-background hover:bg-primary-hover transition-all flex items-center gap-1.5 shadow-md"
             >
               <Check className="w-4 h-4" />
               {loading ? 'Creating...' : 'Activate Schedule'}

@@ -24,7 +24,7 @@ export function ContextSelectors() {
               setCurrentTenant(membership.tenant);
             }
           }}
-          className="appearance-none rounded-lg border border-[#26313C] bg-[#18212B] py-1 px-2.5 text-xs font-semibold text-[#F5F7FA] hover:border-[#2AFEB7] focus:border-[#2AFEB7] focus:outline-none"
+          className="appearance-none rounded-lg border border-border bg-secondary py-1 px-2.5 text-xs font-semibold text-foreground hover:border-primary focus:border-primary focus:outline-none"
         >
           {memberships.map((m) => {
             const tenant = m.tenant;
@@ -37,13 +37,13 @@ export function ContextSelectors() {
           })}
         </select>
       ) : (
-        <span className="text-xs text-[#9AA6B2]">
+        <span className="text-xs text-muted-foreground">
           {currentTenant?.name ?? 'My Workspace'}
         </span>
       )}
 
       {/* Breadcrumb Separator */}
-      <span className="text-xs text-[#9AA6B2]">/</span>
+      <span className="text-xs text-muted-foreground">/</span>
 
       {/* Restaurant Selector */}
       {restaurants.length > 0 ? (
@@ -54,7 +54,7 @@ export function ContextSelectors() {
             const target = restaurants.find((r) => r.id === selectedId);
             setCurrentRestaurant(target ?? null);
           }}
-          className="appearance-none rounded-lg border border-[#26313C] bg-[#18212B] py-1 px-2.5 text-xs font-semibold text-[#2AFEB7] hover:border-[#2AFEB7] focus:border-[#2AFEB7] focus:outline-none"
+          className="appearance-none rounded-lg border border-border bg-secondary py-1 px-2.5 text-xs font-semibold text-primary hover:border-primary focus:border-primary focus:outline-none"
         >
           {restaurants.map((r) => (
             <option key={r.id} value={r.id}>
@@ -63,11 +63,11 @@ export function ContextSelectors() {
           ))}
         </select>
       ) : (
-        <span className="text-xs text-[#9AA6B2]">No Restaurant</span>
+        <span className="text-xs text-muted-foreground">No Restaurant</span>
       )}
 
       {/* Breadcrumb Separator */}
-      <span className="text-xs text-[#9AA6B2]">/</span>
+      <span className="text-xs text-muted-foreground">/</span>
 
       {/* Branch Selector */}
       {branches.length > 0 ? (
@@ -78,7 +78,7 @@ export function ContextSelectors() {
             const target = branches.find((b) => b.id === selectedId);
             setCurrentBranch(target ?? null);
           }}
-          className="appearance-none rounded-lg border border-[#26313C] bg-[#18212B] py-1 px-2.5 text-xs font-semibold text-[#F5F7FA] hover:border-[#2AFEB7] focus:border-[#2AFEB7] focus:outline-none"
+          className="appearance-none rounded-lg border border-border bg-secondary py-1 px-2.5 text-xs font-semibold text-foreground hover:border-primary focus:border-primary focus:outline-none"
         >
           {branches.map((b) => (
             <option key={b.id} value={b.id}>
@@ -87,7 +87,7 @@ export function ContextSelectors() {
           ))}
         </select>
       ) : (
-        <span className="text-xs text-[#9AA6B2]">No Branch</span>
+        <span className="text-xs text-muted-foreground">No Branch</span>
       )}
     </div>
   );

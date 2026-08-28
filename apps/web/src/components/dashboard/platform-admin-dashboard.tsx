@@ -152,8 +152,8 @@ export function PlatformAdminDashboard() {
   if (isLoading) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center space-y-4">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#2AFEB7] border-t-transparent"></div>
-        <div className="text-sm font-semibold text-[#9AA6B2]">Loading Platform Control Center...</div>
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+        <div className="text-sm font-semibold text-muted-foreground">Loading Platform Control Center...</div>
       </div>
     );
   }
@@ -167,14 +167,14 @@ export function PlatformAdminDashboard() {
     switch (status) {
       case 'COMPLETED':
       case 'SERVED':
-        return 'bg-[#2AFEB7]/10 text-[#2AFEB7] border-[#2AFEB7]/30';
+        return 'bg-primary/10 text-primary border-primary/30';
       case 'PREPARING':
       case 'READY':
-        return 'bg-[#3B82F6]/10 text-[#3B82F6] border-[#3B82F6]/30';
+        return 'bg-atlas-info/10 text-atlas-info border-atlas-info/30';
       case 'CANCELLED':
-        return 'bg-[#EF4444]/10 text-[#EF4444] border-[#EF4444]/30';
+        return 'bg-atlas-error/10 text-atlas-error border-atlas-error/30';
       default:
-        return 'bg-[#F59E0B]/10 text-[#F59E0B] border-[#F59E0B]/30';
+        return 'bg-atlas-warning/10 text-atlas-warning border-atlas-warning/30';
     }
   };
 
@@ -189,15 +189,15 @@ export function PlatformAdminDashboard() {
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#2AFEB7]/30 bg-[#2AFEB7]/10 px-3 py-1 text-xs font-bold text-[#2AFEB7]">
-            <span className="h-2 w-2 rounded-full bg-[#2AFEB7] animate-pulse" />
+          <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
+            <span className="h-2 w-2 rounded-full bg-primary animate-pulse" />
             Atlas Platform Control Center
           </div>
-          <h1 className="mt-3 text-3xl font-black text-[#F5F7FA]">
+          <h1 className="mt-3 text-3xl font-black text-foreground">
             Platform Overview
           </h1>
-          <p className="mt-1 text-xs text-[#9AA6B2]">
-            Logged in as <span className="font-semibold text-[#F5F7FA]">{user?.email ?? 'Platform admin'}</span> (PLATFORM_ADMIN)
+          <p className="mt-1 text-xs text-muted-foreground">
+            Logged in as <span className="font-semibold text-foreground">{user?.email ?? 'Platform admin'}</span> (PLATFORM_ADMIN)
           </p>
         </div>
 
@@ -205,35 +205,35 @@ export function PlatformAdminDashboard() {
           type="button"
           disabled={isRefreshing}
           onClick={() => void loadPlatformData(true)}
-          className="flex items-center gap-2 rounded-xl border border-[#26313C] bg-[#18212B] px-4 py-2.5 text-xs font-semibold text-[#F5F7FA] transition-colors hover:border-[#2AFEB7] disabled:opacity-50"
+          className="flex items-center gap-2 rounded-xl border border-border bg-secondary px-4 py-2.5 text-xs font-semibold text-foreground transition-colors hover:border-primary disabled:opacity-50"
         >
           <span>{isRefreshing ? 'Refreshing...' : '⟳ Refresh Data'}</span>
         </button>
       </div>
 
       {/* Date Pickers Filter Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[#26313C] bg-[#111820] p-4 shadow-xl">
+      <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border bg-card p-4">
         <div className="flex items-center gap-3">
-          <span className="text-xs font-bold text-[#F5F7FA]">📅 Platform Sales & Activity Date Filter</span>
-          <span className="text-[10px] text-[#9AA6B2]">Filter global metrics & telemetry</span>
+          <span className="text-xs font-bold text-foreground">📅 Platform Sales & Activity Date Filter</span>
+          <span className="text-[10px] text-muted-foreground">Filter global metrics & telemetry</span>
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-2">
-            <span className="text-xs text-[#9AA6B2]">From</span>
+            <span className="text-xs text-muted-foreground">From</span>
             <input
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              className="rounded-lg border border-[#26313C] bg-[#18212B] px-3 py-1.5 text-xs text-[#F5F7FA] outline-none focus:border-[#2AFEB7]"
+              className="rounded-lg border border-border bg-secondary px-3 py-1.5 text-xs text-foreground outline-none focus:border-primary"
             />
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-[#9AA6B2]">To</span>
+            <span className="text-xs text-muted-foreground">To</span>
             <input
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              className="rounded-lg border border-[#26313C] bg-[#18212B] px-3 py-1.5 text-xs text-[#F5F7FA] outline-none focus:border-[#2AFEB7]"
+              className="rounded-lg border border-border bg-secondary px-3 py-1.5 text-xs text-foreground outline-none focus:border-primary"
             />
           </div>
           <button
@@ -242,7 +242,7 @@ export function PlatformAdminDashboard() {
               setStartDate(getPastDateStr(30));
               setEndDate(getTodayDateStr());
             }}
-            className="rounded-lg border border-[#26313C] bg-[#18212B] px-3 py-1.5 text-[11px] font-bold text-[#9AA6B2] hover:text-[#F5F7FA] hover:border-[#2AFEB7]"
+            className="rounded-lg border border-border bg-secondary px-3 py-1.5 text-[11px] font-bold text-muted-foreground hover:text-foreground hover:border-primary"
           >
             Reset (30 Days)
           </button>
@@ -250,7 +250,7 @@ export function PlatformAdminDashboard() {
       </div>
 
       {error && (
-        <div className="rounded-xl border border-[#EF4444]/30 bg-[#EF4444]/10 p-4 text-xs text-[#EF4444]">
+        <div className="rounded-xl border border-atlas-error/30 bg-atlas-error/10 p-4 text-xs text-atlas-error">
           {error}
         </div>
       )}
@@ -285,43 +285,43 @@ export function PlatformAdminDashboard() {
       {/* SaaS Plan Distribution & Maintenance Terminal Row */}
       <div className="grid gap-6 lg:grid-cols-3">
         {/* plan distribution analytics */}
-        <div className="lg:col-span-1 rounded-2xl border border-[#26313C] bg-[#111820] p-6 shadow-xl space-y-6 flex flex-col justify-between">
+        <div className="lg:col-span-1 rounded-2xl border border-border bg-card p-6 space-y-6 flex flex-col justify-between">
           <div>
-            <h3 className="text-base font-bold text-[#F5F7FA]">SaaS License Distribution</h3>
-            <p className="text-xs text-[#9AA6B2]">Breakdown of active customer license tiers.</p>
+            <h3 className="text-base font-bold text-foreground">SaaS License Distribution</h3>
+            <p className="text-xs text-muted-foreground">Breakdown of active customer license tiers.</p>
           </div>
 
           <div className="space-y-4">
             {/* Free */}
             <div className="space-y-1">
               <div className="flex justify-between text-xs font-semibold">
-                <span className="text-[#9AA6B2]">Free Tier (15%)</span>
-                <span className="text-[#F5F7FA]">3 Accounts</span>
+                <span className="text-muted-foreground">Free Tier (15%)</span>
+                <span className="text-foreground">3 Accounts</span>
               </div>
-              <div className="h-1.5 w-full rounded-full bg-[#18212B] overflow-hidden">
-                <div style={{ width: '15%' }} className="h-full bg-[#9AA6B2] rounded-full" />
+              <div className="h-1.5 w-full rounded-full bg-secondary overflow-hidden">
+                <div style={{ width: '15%' }} className="h-full bg-muted-foreground rounded-full" />
               </div>
             </div>
 
             {/* Starter */}
             <div className="space-y-1">
               <div className="flex justify-between text-xs font-semibold">
-                <span className="text-[#3B82F6]">Starter Plan (35%)</span>
-                <span className="text-[#F5F7FA]">7 Accounts</span>
+                <span className="text-atlas-info">Starter Plan (35%)</span>
+                <span className="text-foreground">7 Accounts</span>
               </div>
-              <div className="h-1.5 w-full rounded-full bg-[#18212B] overflow-hidden">
-                <div style={{ width: '35%' }} className="h-full bg-[#3B82F6] rounded-full" />
+              <div className="h-1.5 w-full rounded-full bg-secondary overflow-hidden">
+                <div style={{ width: '35%' }} className="h-full bg-atlas-info rounded-full" />
               </div>
             </div>
 
             {/* Growth */}
             <div className="space-y-1">
               <div className="flex justify-between text-xs font-semibold">
-                <span className="text-[#2AFEB7]">Growth Plan (40%)</span>
-                <span className="text-[#F5F7FA]">8 Accounts</span>
+                <span className="text-primary">Growth Plan (40%)</span>
+                <span className="text-foreground">8 Accounts</span>
               </div>
-              <div className="h-1.5 w-full rounded-full bg-[#18212B] overflow-hidden">
-                <div style={{ width: '40%' }} className="h-full bg-[#2AFEB7] rounded-full" />
+              <div className="h-1.5 w-full rounded-full bg-secondary overflow-hidden">
+                <div style={{ width: '40%' }} className="h-full bg-primary rounded-full" />
               </div>
             </div>
 
@@ -329,9 +329,9 @@ export function PlatformAdminDashboard() {
             <div className="space-y-1">
               <div className="flex justify-between text-xs font-semibold">
                 <span className="text-[#A855F7]">Enterprise (10%)</span>
-                <span className="text-[#F5F7FA]">2 Accounts</span>
+                <span className="text-foreground">2 Accounts</span>
               </div>
-              <div className="h-1.5 w-full rounded-full bg-[#18212B] overflow-hidden">
+              <div className="h-1.5 w-full rounded-full bg-secondary overflow-hidden">
                 <div style={{ width: '10%' }} className="h-full bg-purple-500 rounded-full" />
               </div>
             </div>
@@ -339,10 +339,10 @@ export function PlatformAdminDashboard() {
         </div>
 
         {/* DevOps Maintenance Utilities Console */}
-        <div className="lg:col-span-2 rounded-2xl border border-[#26313C] bg-[#111820] p-6 shadow-xl flex flex-col justify-between gap-4">
+        <div className="lg:col-span-2 rounded-2xl border border-border bg-card p-6 flex flex-col justify-between gap-4">
           <div className="space-y-1">
-            <h3 className="text-base font-bold text-[#F5F7FA]">Platform Maintenance Console</h3>
-            <p className="text-xs text-[#9AA6B2]">Execute administrative database and routing routines.</p>
+            <h3 className="text-base font-bold text-foreground">Platform Maintenance Console</h3>
+            <p className="text-xs text-muted-foreground">Execute administrative database and routing routines.</p>
           </div>
 
           <div className="flex gap-3">
@@ -350,7 +350,7 @@ export function PlatformAdminDashboard() {
               type="button"
               disabled={activeMaintenance !== null}
               onClick={() => void runMaintenanceTask('vacuum')}
-              className="flex-1 rounded-xl bg-[#18212B] border border-[#26313C] hover:border-[#2AFEB7] py-2 text-xs font-bold text-[#F5F7FA] transition-all disabled:opacity-50"
+              className="flex-1 rounded-xl bg-secondary border border-border hover:border-primary py-2 text-xs font-bold text-foreground transition-all disabled:opacity-50"
             >
               🧹 Database Vacuum
             </button>
@@ -358,7 +358,7 @@ export function PlatformAdminDashboard() {
               type="button"
               disabled={activeMaintenance !== null}
               onClick={() => void runMaintenanceTask('cache')}
-              className="flex-1 rounded-xl bg-[#18212B] border border-[#26313C] hover:border-[#2AFEB7] py-2 text-xs font-bold text-[#F5F7FA] transition-all disabled:opacity-50"
+              className="flex-1 rounded-xl bg-secondary border border-border hover:border-primary py-2 text-xs font-bold text-foreground transition-all disabled:opacity-50"
             >
               ⚡ Flush Cache
             </button>
@@ -366,16 +366,16 @@ export function PlatformAdminDashboard() {
               type="button"
               disabled={activeMaintenance !== null}
               onClick={() => void runMaintenanceTask('sync')}
-              className="flex-1 rounded-xl bg-[#18212B] border border-[#26313C] hover:border-[#2AFEB7] py-2 text-xs font-bold text-[#F5F7FA] transition-all disabled:opacity-50"
+              className="flex-1 rounded-xl bg-secondary border border-border hover:border-primary py-2 text-xs font-bold text-foreground transition-all disabled:opacity-50"
             >
               🔄 Audit Licenses
             </button>
           </div>
 
           {/* Maintenance Terminal logs */}
-          <div className="rounded-xl border border-[#26313C] bg-[#070B0E] p-4 font-mono text-[10px] text-[#2AFEB7] h-32 overflow-y-auto space-y-1 select-all">
+          <div className="rounded-xl border border-border bg-background p-4 font-mono text-[10px] text-primary h-32 overflow-y-auto space-y-1 select-all">
             {maintenanceConsole.length === 0 ? (
-              <span className="text-[#9AA6B2] italic">// Platform Admin diagnostic terminal. Ready to launch routine.</span>
+              <span className="text-muted-foreground italic">// Platform Admin diagnostic terminal. Ready to launch routine.</span>
             ) : (
               maintenanceConsole.map((logLine, idx) => (
                 <div key={idx}>{logLine}</div>
@@ -393,10 +393,10 @@ export function PlatformAdminDashboard() {
       {/* Middle Grid: Global Stream + System Telemetry */}
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Global Recent Orders Stream */}
-        <div className="lg:col-span-2 space-y-4 rounded-2xl border border-[#26313C] bg-[#111820] p-6 shadow-xl">
+        <div className="lg:col-span-2 space-y-4 rounded-2xl border border-border bg-card p-6">
           <div>
-            <h2 className="text-base font-bold text-[#F5F7FA]">Global Activity Stream</h2>
-            <p className="text-xs text-[#9AA6B2]">
+            <h2 className="text-base font-bold text-foreground">Global Activity Stream</h2>
+            <p className="text-xs text-muted-foreground">
               Real-time checkout orders logged across all tenant databases.
             </p>
           </div>
@@ -404,7 +404,7 @@ export function PlatformAdminDashboard() {
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead>
-                <tr className="border-b border-[#26313C] text-[#9AA6B2] uppercase tracking-wider">
+                <tr className="border-b border-border text-muted-foreground uppercase tracking-wider">
                   <th className="py-2.5 px-3">Order #</th>
                   <th className="py-2.5 px-3">Restaurant</th>
                   <th className="py-2.5 px-3">Branch</th>
@@ -413,19 +413,19 @@ export function PlatformAdminDashboard() {
                   <th className="py-2.5 px-3">Time</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#26313C]/50">
+              <tbody className="divide-y divide-border/50">
                 {telemetry?.recentGlobalOrders.map((ord) => (
-                  <tr key={ord.id} className="hover:bg-[#18212B]/40">
-                    <td className="py-2.5 px-3 font-mono font-bold text-[#F5F7FA]">{ord.orderNumber}</td>
-                    <td className="py-2.5 px-3 text-[#F5F7FA]">{ord.restaurantName}</td>
-                    <td className="py-2.5 px-3 text-[#9AA6B2]">{ord.branchName}</td>
-                    <td className="py-2.5 px-3 font-bold text-[#2AFEB7]">{formatCurrency(ord.totalAmount)}</td>
+                  <tr key={ord.id} className="hover:bg-secondary/40">
+                    <td className="py-2.5 px-3 font-mono font-bold text-foreground">{ord.orderNumber}</td>
+                    <td className="py-2.5 px-3 text-foreground">{ord.restaurantName}</td>
+                    <td className="py-2.5 px-3 text-muted-foreground">{ord.branchName}</td>
+                    <td className="py-2.5 px-3 font-bold text-primary">{formatCurrency(ord.totalAmount)}</td>
                     <td className="py-2.5 px-3">
                       <span className={`rounded-full border px-2 py-0.5 text-[9px] font-bold ${getStatusStyle(ord.status)}`}>
                         {ord.status}
                       </span>
                     </td>
-                    <td className="py-2.5 px-3 text-[#9AA6B2]">
+                    <td className="py-2.5 px-3 text-muted-foreground">
                       {new Date(ord.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </td>
                   </tr>
@@ -433,7 +433,7 @@ export function PlatformAdminDashboard() {
 
                 {telemetry?.recentGlobalOrders.length === 0 && (
                   <tr>
-                    <td colSpan={6} className="py-8 text-center text-[#9AA6B2]">
+                    <td colSpan={6} className="py-8 text-center text-muted-foreground">
                       No global activity recorded yet.
                     </td>
                   </tr>
@@ -444,50 +444,50 @@ export function PlatformAdminDashboard() {
         </div>
 
         {/* Server & System Health Metrics */}
-        <div className="lg:col-span-1 space-y-4 rounded-2xl border border-[#26313C] bg-[#111820] p-6 shadow-xl">
+        <div className="lg:col-span-1 space-y-4 rounded-2xl border border-border bg-card p-6">
           <div>
-            <h2 className="text-base font-bold text-[#F5F7FA]">Node Server Telemetry</h2>
-            <p className="text-xs text-[#9AA6B2]">
+            <h2 className="text-base font-bold text-foreground">Node Server Telemetry</h2>
+            <p className="text-xs text-muted-foreground">
               Real-time resource performance and system metrics.
             </p>
           </div>
 
           <div className="space-y-4">
-            <div className="rounded-xl border border-[#26313C] bg-[#18212B] p-3 space-y-1">
-              <span className="text-[9px] font-bold uppercase tracking-wider text-[#9AA6B2]">API Status</span>
+            <div className="rounded-xl border border-border bg-secondary p-3 space-y-1">
+              <span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">API Status</span>
               <div className="flex items-center justify-between text-xs">
-                <span className="font-bold text-[#F5F7FA]">Uptime Status</span>
-                <span className="rounded-full bg-[#2AFEB7]/15 px-2 py-0.5 text-[10px] font-bold text-[#2AFEB7] border border-[#2AFEB7]/30">
+                <span className="font-bold text-foreground">Uptime Status</span>
+                <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-bold text-primary border border-primary/30">
                   {telemetry?.systemMetrics.systemStatus}
                 </span>
               </div>
             </div>
 
-            <div className="rounded-xl border border-[#26313C] bg-[#18212B] p-3 space-y-1">
-              <span className="text-[9px] font-bold uppercase tracking-wider text-[#9AA6B2]">process memory</span>
+            <div className="rounded-xl border border-border bg-secondary p-3 space-y-1">
+              <span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">process memory</span>
               <div className="flex items-center justify-between text-xs">
-                <span className="font-bold text-[#F5F7FA]">Heap Allocation</span>
-                <span className="font-mono text-[#F5F7FA]">
+                <span className="font-bold text-foreground">Heap Allocation</span>
+                <span className="font-mono text-foreground">
                   {telemetry?.systemMetrics.memoryHeapUsedMB}MB / {telemetry?.systemMetrics.memoryHeapTotalMB}MB
                 </span>
               </div>
             </div>
 
-            <div className="rounded-xl border border-[#26313C] bg-[#18212B] p-3 space-y-1">
-              <span className="text-[9px] font-bold uppercase tracking-wider text-[#9AA6B2]">process health</span>
+            <div className="rounded-xl border border-border bg-secondary p-3 space-y-1">
+              <span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">process health</span>
               <div className="flex items-center justify-between text-xs">
-                <span className="font-bold text-[#F5F7FA]">API Server Uptime</span>
-                <span className="font-semibold text-[#9AA6B2]">
+                <span className="font-bold text-foreground">API Server Uptime</span>
+                <span className="font-semibold text-muted-foreground">
                   {telemetry ? formatUptime(telemetry.systemMetrics.uptimeSeconds) : 'Unknown'}
                 </span>
               </div>
             </div>
 
-            <div className="rounded-xl border border-[#26313C] bg-[#18212B] p-3 space-y-1">
-              <span className="text-[9px] font-bold uppercase tracking-wider text-[#9AA6B2]">HTTP network latency</span>
+            <div className="rounded-xl border border-border bg-secondary p-3 space-y-1">
+              <span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">HTTP network latency</span>
               <div className="flex items-center justify-between text-xs">
-                <span className="font-bold text-[#F5F7FA]">P99 DB latency</span>
-                <span className="font-bold text-[#2AFEB7]">{telemetry?.systemMetrics.apiLatencyMs}ms</span>
+                <span className="font-bold text-foreground">P99 DB latency</span>
+                <span className="font-bold text-primary">{telemetry?.systemMetrics.apiLatencyMs}ms</span>
               </div>
             </div>
           </div>
@@ -495,15 +495,15 @@ export function PlatformAdminDashboard() {
       </div>
 
       {/* Global Directory */}
-      <div className="rounded-2xl border border-[#26313C] bg-[#111820] p-6 shadow-xl space-y-4">
+      <div className="rounded-2xl border border-border bg-card p-6 space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-bold text-[#F5F7FA]">Global Restaurant Directory</h2>
-            <p className="text-xs text-[#9AA6B2]">
+            <h2 className="text-lg font-bold text-foreground">Global Restaurant Directory</h2>
+            <p className="text-xs text-muted-foreground">
               All onboarded restaurants across all tenant accounts.
             </p>
           </div>
-          <span className="rounded-full bg-[#18212B] px-3 py-1 text-xs font-mono text-[#2AFEB7] border border-[#26313C]">
+          <span className="rounded-full bg-secondary px-3 py-1 text-xs font-mono text-primary border border-border">
             {restaurants.length} Total
           </span>
         </div>
@@ -511,7 +511,7 @@ export function PlatformAdminDashboard() {
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead>
-              <tr className="border-b border-[#26313C] text-[#9AA6B2] uppercase tracking-wider">
+              <tr className="border-b border-border text-muted-foreground uppercase tracking-wider">
                 <th className="py-2.5 px-4">Restaurant Name</th>
                 <th className="py-2.5 px-4">Tenant Org</th>
                 <th className="py-2.5 px-4">Slug</th>
@@ -519,18 +519,18 @@ export function PlatformAdminDashboard() {
                 <th className="py-2.5 px-4">Created At</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#26313C]/50">
+            <tbody className="divide-y divide-border/50">
               {restaurants.map((res) => (
-                <tr key={res.id} className="hover:bg-[#18212B]/50 transition-colors">
-                  <td className="py-2.5 px-4 font-bold text-[#F5F7FA]">{res.name}</td>
-                  <td className="py-2.5 px-4 text-[#9AA6B2]">{getTenantName(res.tenantId)}</td>
-                  <td className="py-2.5 px-4 text-[#9AA6B2] font-mono">{res.slug}</td>
+                <tr key={res.id} className="hover:bg-secondary/50 transition-colors">
+                  <td className="py-2.5 px-4 font-bold text-foreground">{res.name}</td>
+                  <td className="py-2.5 px-4 text-muted-foreground">{getTenantName(res.tenantId)}</td>
+                  <td className="py-2.5 px-4 text-muted-foreground font-mono">{res.slug}</td>
                   <td className="py-2.5 px-4">
-                    <span className="rounded-full bg-[#2AFEB7]/15 px-2 py-0.5 text-[9px] font-bold text-[#2AFEB7] border border-[#2AFEB7]/30">
+                    <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[9px] font-bold text-primary border border-primary/30">
                       ACTIVE
                     </span>
                   </td>
-                  <td className="py-2.5 px-4 text-[#9AA6B2]">
+                  <td className="py-2.5 px-4 text-muted-foreground">
                     {new Date(res.createdAt).toLocaleDateString()}
                   </td>
                 </tr>
@@ -541,7 +541,7 @@ export function PlatformAdminDashboard() {
       </div>
 
       {/* Delivery Aggregator Integrations & Automation Engine (Platform Admin Management) */}
-      <div className="pt-6 border-t border-[#26313C] space-y-8">
+      <div className="pt-6 border-t border-border space-y-8">
         <DeliverySettings />
         <AutomationDashboard />
       </div>

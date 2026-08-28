@@ -22,10 +22,10 @@ export default function CreateMenuPage() {
   return (
     <div className="mx-auto max-w-xl space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-[#F5F7FA]">Create Menu</h1>
-        <p className="mt-2 text-sm text-[#9AA6B2]">A menu groups your categories and items for the restaurant.</p>
+        <h1 className="font-display text-3xl font-semibold tracking-[-0.02em] text-foreground">Create Menu</h1>
+        <p className="mt-2 text-sm text-muted-foreground">A menu groups your categories and items for the restaurant.</p>
       </div>
-      <div className="rounded-xl border border-[#26313C] bg-[#111820] p-6 shadow-xl">
+      <div className="rounded-xl border border-border bg-card p-6">
         <MenuForm onSubmit={handleSubmit} onCancel={() => router.push('/menus')} isSubmitting={isSubmitting} />
       </div>
     </div>

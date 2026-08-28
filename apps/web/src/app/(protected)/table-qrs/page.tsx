@@ -128,14 +128,14 @@ export default function TableQrsDashboard() {
 
   if (!currentRestaurant || !currentBranch) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-xl border border-[#26313C] bg-[#111820] p-12 text-center shadow-xl space-y-4">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#18212B] text-2xl">
+      <div className="flex flex-col items-center justify-center rounded-xl border border-border bg-card p-12 text-center space-y-4">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-secondary text-2xl">
           📱
         </div>
-        <h2 className="text-xl font-bold text-[#F5F7FA]">
+        <h2 className="text-xl font-bold text-foreground">
           Select restaurant & branch
         </h2>
-        <p className="text-sm text-[#9AA6B2]">
+        <p className="text-sm text-muted-foreground">
           Please select your restaurant workspace and branch to manage Table QR codes.
         </p>
       </div>
@@ -185,26 +185,26 @@ export default function TableQrsDashboard() {
       `}} />
 
       {/* Header controls */}
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#26313C] pb-4 no-print">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-4 no-print">
         <div>
-          <h1 className="text-3xl font-bold text-[#F5F7FA]">Table QR Codes</h1>
-          <p className="text-xs text-[#9AA6B2]">
+          <h1 className="font-display text-3xl font-semibold tracking-[-0.02em] text-foreground">Table QR Codes</h1>
+          <p className="text-xs text-muted-foreground">
             Grouped by Dining Area inside branch:{' '}
-            <span className="font-semibold text-[#F5F7FA]">{currentBranch.name}</span>
+            <span className="font-semibold text-foreground">{currentBranch.name}</span>
           </p>
           {/* IP auto-detection status badge */}
-          <div className="mt-2 inline-flex items-center gap-2 rounded-lg border border-[#26313C] bg-[#18212B] px-3 py-1.5">
+          <div className="mt-2 inline-flex items-center gap-2 rounded-lg border border-border bg-secondary px-3 py-1.5">
             {detectedIp ? (
               <>
-                <span className="h-2 w-2 rounded-full bg-[#2AFEB7] shadow-[0_0_6px_#2AFEB7]" />
-                <span className="text-[10px] font-mono text-[#2AFEB7]">
+                <span className="h-2 w-2 rounded-full bg-primary shadow-[0_0_6px_#34D399]" />
+                <span className="text-[10px] font-mono text-primary">
                   📶 QR codes point to: <strong>{detectedBaseUrl}</strong>
                 </span>
               </>
             ) : (
               <>
-                <span className="h-2 w-2 rounded-full bg-[#F59E0B] animate-pulse" />
-                <span className="text-[10px] font-mono text-[#F59E0B]">
+                <span className="h-2 w-2 rounded-full bg-atlas-warning animate-pulse" />
+                <span className="text-[10px] font-mono text-atlas-warning">
                   ⚠️ LAN IP not detected — QRs may use localhost
                 </span>
               </>
@@ -216,14 +216,14 @@ export default function TableQrsDashboard() {
             type="button"
             disabled={tables.length === 0}
             onClick={() => window.print()}
-            className="rounded-lg bg-[#2AFEB7] px-4 py-2.5 text-xs font-semibold text-[#0B0F14] hover:bg-[#22E5A4]"
+            className="rounded-lg bg-primary px-4 py-2.5 text-xs font-semibold text-background hover:bg-primary-hover"
           >
             🖨️ Print All QRs
           </button>
           <button
             type="button"
             onClick={() => void loadData()}
-            className="rounded-lg border border-[#26313C] bg-[#18212B] px-4 py-2.5 text-xs text-[#F5F7FA]"
+            className="rounded-lg border border-border bg-secondary px-4 py-2.5 text-xs text-foreground"
           >
             Reload
           </button>
@@ -231,15 +231,15 @@ export default function TableQrsDashboard() {
       </div>
 
       {loading ? (
-        <div className="rounded-xl border border-[#26313C] bg-[#111820] p-12 text-center text-sm text-[#9AA6B2] no-print">
+        <div className="rounded-xl border border-border bg-card p-12 text-center text-sm text-muted-foreground no-print">
           Loading dining area maps and configurations...
         </div>
       ) : error ? (
-        <div className="rounded-xl border border-[#EF4444]/40 bg-[#EF4444]/10 p-6 text-center text-xs text-[#EF4444] no-print">
+        <div className="rounded-xl border border-atlas-error/40 bg-atlas-error/10 p-6 text-center text-xs text-atlas-error no-print">
           {error}
         </div>
       ) : tables.length === 0 ? (
-        <div className="rounded-xl border border-[#26313C] bg-[#111820] p-12 text-center text-sm text-[#9AA6B2] no-print">
+        <div className="rounded-xl border border-border bg-card p-12 text-center text-sm text-muted-foreground no-print">
           No active tables found in this branch. Go to Tables section to configure rooms.
         </div>
       ) : (
@@ -250,7 +250,7 @@ export default function TableQrsDashboard() {
 
             return (
               <div key={area.id} className="space-y-4 page-break-after-avoid">
-                <h2 className="text-lg font-bold text-[#F5F7FA] border-b border-[#26313C] pb-2 print:text-black print:border-black print:mt-6">
+                <h2 className="text-lg font-bold text-foreground border-b border-border pb-2 print:text-black print:border-black print:mt-6">
                   {area.name} ({area.code})
                 </h2>
 
@@ -258,19 +258,19 @@ export default function TableQrsDashboard() {
                   {areaTables.map((table) => (
                     <div
                       key={table.id}
-                      className="flex flex-col items-center justify-between rounded-2xl border border-[#26313C] bg-[#111820] p-6 shadow-lg print-card"
+                      className="flex flex-col items-center justify-between rounded-2xl border border-border bg-card p-6 shadow-lg print-card"
                     >
                       <div className="text-center">
-                        <h3 className="text-base font-black text-[#F5F7FA] print:text-black">
+                        <h3 className="text-base font-black text-foreground print:text-black">
                           Table {table.name}
                         </h3>
-                        <p className="text-[10px] font-mono text-[#9AA6B2] mt-0.5 print:text-black/70">
+                        <p className="text-[10px] font-mono text-muted-foreground mt-0.5 print:text-black/70">
                           Cap: {table.capacity} | Code: {table.code}
                         </p>
                       </div>
 
                       {/* QR Display */}
-                      <div className="my-6 flex h-48 w-48 items-center justify-center rounded-xl bg-white p-4 shadow-inner print:my-4 print-qr-svg">
+                      <div className="my-6 flex h-48 w-48 items-center justify-center rounded-xl bg-foreground p-4 shadow-inner print:my-4 print-qr-svg">
                         {table.qrCodeSvg ? (
                           <div
                             className="w-full h-full text-black flex items-center justify-center"
@@ -290,7 +290,7 @@ export default function TableQrsDashboard() {
                             href={table.qrUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="w-full text-center rounded bg-[#18212B] border border-[#26313C] py-1.5 text-[10px] font-bold text-[#9AA6B2] hover:text-[#2AFEB7] hover:border-[#2AFEB7]"
+                            className="w-full text-center rounded bg-secondary border border-border py-1.5 text-[10px] font-bold text-muted-foreground hover:text-primary hover:border-primary"
                           >
                             🔗 Scan Link
                           </a>
@@ -299,7 +299,7 @@ export default function TableQrsDashboard() {
                           type="button"
                           disabled={!table.qrCodeSvg}
                           onClick={() => handleDownloadQr(table)}
-                          className="w-full rounded bg-[#2AFEB7] py-2 text-[10px] font-bold text-[#0B0F14] hover:bg-[#22E5A4]"
+                          className="w-full rounded bg-primary py-2 text-[10px] font-bold text-background hover:bg-primary-hover"
                         >
                           📥 Download SVG
                         </button>

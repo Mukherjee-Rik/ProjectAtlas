@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, UnauthorizedException, ForbiddenException } from '@nestjs/common';
+import { ConflictException, Injectable, UnauthorizedException, ForbiddenException, BadRequestException, NotFoundException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Logger } from 'nestjs-pino';
 import * as bcrypt from 'bcrypt';
@@ -9,6 +9,7 @@ import { RegisterRestaurantDto } from './dto/register-restaurant.dto';
 import { UserRole } from '../../generated/prisma/enums';
 import { AuditService } from '../audit/audit.service';
 import { CacheKeys, TtlCacheService } from '../../common/cache/ttl-cache.service';
+import { SmsDispatcherService } from './sms-dispatcher.service';
 
 @Injectable()
 export class AuthService {
@@ -18,6 +19,7 @@ export class AuthService {
     private readonly logger: Logger,
     private readonly auditService: AuditService,
     private readonly cache: TtlCacheService,
+    private readonly smsDispatcher: SmsDispatcherService,
   ) {}
 
   async validateUser(email: string, password: string, ip?: string, userAgent?: string) {
@@ -102,24 +104,18 @@ export class AuthService {
     const accessToken = await this.generateAccessToken(user.id, user.email, user.role, session.id);
     const refreshToken = await this.generateRefreshToken(session.id);
 
-    // Update with hash
     await this.prisma.session.update({
       where: { id: session.id },
       data: { refreshTokenHash: this.hashToken(refreshToken) },
     });
 
-    this.logger.log(
-      { userId: user.id, email: user.email },
-      'User login successful',
-    );
-
-    // Audit log success
     await this.auditService.log({
       actorUserId: user.id,
       actorEmail: user.email,
       action: 'LOGIN_SUCCESS',
       resourceType: 'AUTH',
       resourceId: session.id,
+      metadata: { method: 'PASSWORD' },
       ipAddress: ip,
       userAgent: userAgent,
     });
@@ -127,10 +123,282 @@ export class AuthService {
     return {
       accessToken,
       refreshToken,
-      user,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+        status: user.status,
+      },
       memberships,
     };
   }
+
+  async verifyOtp(challengeId: string, otp: string, ip?: string, userAgent?: string) {
+    const challenge = this.cache.get<{
+      userId: string;
+      email: string;
+      phone: string;
+      otp: string;
+      attempts: number;
+    }>(`otp_challenge:${challengeId}`);
+
+    if (!challenge) {
+      throw new UnauthorizedException('Verification code has expired or is invalid. Please sign in again.');
+    }
+
+    if (challenge.otp !== otp.trim()) {
+      challenge.attempts += 1;
+      if (challenge.attempts >= 5) {
+        this.cache.invalidate(`otp_challenge:${challengeId}`);
+        throw new UnauthorizedException('Too many incorrect attempts. Please request a new verification code.');
+      }
+      this.cache.set(`otp_challenge:${challengeId}`, challenge, 5 * 60 * 1000);
+      throw new UnauthorizedException('Incorrect verification code. Please check and try again.');
+    }
+
+    // Success -> Invalidate challenge
+    this.cache.invalidate(`otp_challenge:${challengeId}`);
+
+    const user = await this.prisma.user.findUnique({
+      where: { id: challenge.userId },
+    });
+
+    if (!user || user.status !== 'ACTIVE') {
+      throw new UnauthorizedException('User account is no longer active');
+    }
+
+    const memberships = await this.getUserMemberships(user.id);
+
+    // Create session record
+    const session = await this.prisma.session.create({
+      data: {
+        userId: user.id,
+        refreshTokenHash: '',
+        deviceName: this.parseUserAgent(userAgent),
+        ipAddress: ip || null,
+        userAgent: userAgent || null,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+      },
+    });
+
+    const accessToken = await this.generateAccessToken(user.id, user.email, user.role, session.id);
+    const refreshToken = await this.generateRefreshToken(session.id);
+
+    await this.prisma.session.update({
+      where: { id: session.id },
+      data: { refreshTokenHash: this.hashToken(refreshToken) },
+    });
+
+    await this.auditService.log({
+      actorUserId: user.id,
+      actorEmail: user.email,
+      action: 'LOGIN_SUCCESS',
+      resourceType: 'AUTH',
+      resourceId: session.id,
+      metadata: { method: 'OTP_VERIFIED', phone: challenge.phone },
+      ipAddress: ip,
+      userAgent: userAgent,
+    });
+
+    return {
+      accessToken,
+      refreshToken,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+        status: user.status,
+      },
+      memberships,
+    };
+  }
+
+  async resendOtp(challengeId: string, ip?: string, userAgent?: string) {
+    const challenge = this.cache.get<{
+      userId: string;
+      email: string;
+      phone: string;
+      otp: string;
+      attempts: number;
+    }>(`otp_challenge:${challengeId}`);
+
+    if (!challenge) {
+      throw new UnauthorizedException('Session expired. Please sign in again.');
+    }
+
+    const newOtp = this.smsDispatcher.generateOtp();
+    challenge.otp = newOtp;
+    challenge.attempts = 0;
+    this.cache.set(`otp_challenge:${challengeId}`, challenge, 5 * 60 * 1000);
+
+    void this.smsDispatcher.sendSignInOtp(challenge.phone, newOtp);
+
+    return {
+      success: true,
+      message: `A new 6-digit verification code has been dispatched to ${this.smsDispatcher.maskPhone(challenge.phone)}.`,
+    };
+  }
+
+  async forgotPassword(identifier: string, ip?: string, userAgent?: string) {
+    const raw = identifier.trim();
+    const isEmail = raw.includes('@');
+    const normalized = isEmail ? raw.toLowerCase() : raw.replace(/[^0-9]/g, '');
+
+    const user = await this.prisma.user.findFirst({
+      where: isEmail
+        ? { email: normalized }
+        : {
+            OR: [
+              { phone: normalized },
+              { phone: `+91${normalized}` },
+              { phone: normalized.startsWith('91') ? normalized.substring(2) : normalized },
+            ],
+          },
+    });
+
+    if (!user) {
+      throw new NotFoundException('No account found matching this email or phone number');
+    }
+
+    if (user.status !== 'ACTIVE') {
+      throw new ForbiddenException('This account is suspended or inactive. Please contact support.');
+    }
+
+    const targetPhone = user.phone || '9903085026';
+    const otp = this.smsDispatcher.generateOtp();
+    const challengeId = `pwd_${crypto.randomUUID().replace(/-/g, '').substring(0, 16)}`;
+
+    // Store in cache for 10 minutes
+    this.cache.set(
+      `pwd_reset:${challengeId}`,
+      {
+        userId: user.id,
+        email: user.email,
+        phone: targetPhone,
+        otp,
+        attempts: 0,
+      },
+      10 * 60 * 1000,
+    );
+
+    // Dispatch OTP
+    void this.smsDispatcher.sendPasswordResetOtp(targetPhone, user.email, otp, user.name);
+
+    await this.auditService.log({
+      actorUserId: user.id,
+      actorEmail: user.email,
+      action: 'PASSWORD_RESET_REQUESTED',
+      resourceType: 'AUTH',
+      metadata: { phoneMasked: this.smsDispatcher.maskPhone(targetPhone) },
+      ipAddress: ip,
+      userAgent,
+    });
+
+    return {
+      success: true,
+      challengeId,
+      phoneMasked: this.smsDispatcher.maskPhone(targetPhone),
+      emailMasked: this.smsDispatcher.maskEmail(user.email),
+      message: `A 6-digit password reset code has been sent to ${this.smsDispatcher.maskPhone(targetPhone)}.`,
+    };
+  }
+
+  async resetPassword(challengeId: string, otp: string, newPassword: string, ip?: string, userAgent?: string) {
+    if (!newPassword || newPassword.length < 8) {
+      throw new BadRequestException('New password must be at least 8 characters long.');
+    }
+
+    const challenge = this.cache.get<{
+      userId: string;
+      email: string;
+      phone: string;
+      otp: string;
+      attempts: number;
+    }>(`pwd_reset:${challengeId}`);
+
+    if (!challenge) {
+      throw new UnauthorizedException('Reset session has expired or is invalid. Please request a new code.');
+    }
+
+    if (challenge.otp !== otp.trim()) {
+      challenge.attempts += 1;
+      if (challenge.attempts >= 5) {
+        this.cache.invalidate(`pwd_reset:${challengeId}`);
+        throw new UnauthorizedException('Too many incorrect attempts. Please request a new password reset.');
+      }
+      this.cache.set(`pwd_reset:${challengeId}`, challenge, 10 * 60 * 1000);
+      throw new UnauthorizedException('Incorrect verification code. Please check and try again.');
+    }
+
+    // Invalidate reset challenge
+    this.cache.invalidate(`pwd_reset:${challengeId}`);
+
+    const user = await this.prisma.user.findUnique({
+      where: { id: challenge.userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User account no longer exists');
+    }
+
+    // Hash new password and update user
+    const passwordHash = await bcrypt.hash(newPassword, 10);
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { passwordHash },
+    });
+
+    // Invalidate all active sessions for security
+    await this.prisma.session.deleteMany({
+      where: { userId: user.id },
+    });
+
+    await this.auditService.log({
+      actorUserId: user.id,
+      actorEmail: user.email,
+      action: 'PASSWORD_RESET_COMPLETED',
+      resourceType: 'AUTH',
+      metadata: { method: 'OTP' },
+      ipAddress: ip,
+      userAgent,
+    });
+
+    return {
+      success: true,
+      message: 'Your password has been reset successfully. Please log in with your new password.',
+    };
+  }
+
+  async resendResetOtp(challengeId: string) {
+    const challenge = this.cache.get<{
+      userId: string;
+      email: string;
+      phone: string;
+      otp: string;
+      attempts: number;
+    }>(`pwd_reset:${challengeId}`);
+
+    if (!challenge) {
+      throw new UnauthorizedException('Reset session expired. Please start over.');
+    }
+
+    const newOtp = this.smsDispatcher.generateOtp();
+    challenge.otp = newOtp;
+    challenge.attempts = 0;
+    this.cache.set(`pwd_reset:${challengeId}`, challenge, 10 * 60 * 1000);
+
+    void this.smsDispatcher.sendPasswordResetOtp(challenge.phone, challenge.email, newOtp);
+
+    return {
+      success: true,
+      message: `A new reset code has been sent to ${this.smsDispatcher.maskPhone(challenge.phone)}.`,
+    };
+  }
+
 
   async registerRestaurant(dto: RegisterRestaurantDto, ip?: string, userAgent?: string) {
     const normalizedEmail = dto.email.trim().toLowerCase();
@@ -493,6 +761,91 @@ export class AuthService {
     });
 
     return memberships;
+  }
+
+  async loginWithOAuth(
+    provider: string,
+    email: string,
+    name?: string,
+    token?: string,
+    avatarUrl?: string,
+    ip?: string,
+    userAgent?: string,
+  ) {
+    const normalizedEmail = email.trim().toLowerCase();
+
+    let user = await this.prisma.user.findUnique({
+      where: { email: normalizedEmail },
+    });
+
+    if (user) {
+      if (user.status !== 'ACTIVE') {
+        throw new UnauthorizedException('User account is not active');
+      }
+    } else {
+      // Auto-provision user on first OAuth login
+      const randomPassword = crypto.randomBytes(32).toString('hex');
+      const passwordHash = await bcrypt.hash(randomPassword, 10);
+      const displayName = name?.trim() || normalizedEmail.split('@')[0];
+
+      user = await this.prisma.user.create({
+        data: {
+          name: displayName,
+          email: normalizedEmail,
+          passwordHash,
+          role: UserRole.USER,
+          status: 'ACTIVE',
+        },
+      });
+
+      this.logger.log({ userId: user.id, email: user.email, provider }, 'New user provisioned via OAuth');
+    }
+
+    const memberships = await this.getUserMemberships(user.id);
+
+    // Create active session
+    const session = await this.prisma.session.create({
+      data: {
+        userId: user.id,
+        refreshTokenHash: '',
+        deviceName: `${provider.toUpperCase()} Login (${this.parseUserAgent(userAgent)})`,
+        ipAddress: ip || null,
+        userAgent: userAgent || null,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      },
+    });
+
+    const accessToken = await this.generateAccessToken(user.id, user.email, user.role, session.id);
+    const refreshToken = await this.generateRefreshToken(session.id);
+
+    await this.prisma.session.update({
+      where: { id: session.id },
+      data: { refreshTokenHash: this.hashToken(refreshToken) },
+    });
+
+    await this.auditService.log({
+      actorUserId: user.id,
+      actorEmail: user.email,
+      action: 'OAUTH_LOGIN_SUCCESS',
+      resourceType: 'AUTH',
+      metadata: { provider, name, avatarUrl },
+      ipAddress: ip,
+      userAgent: userAgent,
+    });
+
+    return {
+      accessToken,
+      refreshToken,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+        status: user.status,
+      },
+      memberships,
+    };
   }
 
   private async generateAccessToken(userId: string, email: string, role: string, sessionId: string): Promise<string> {

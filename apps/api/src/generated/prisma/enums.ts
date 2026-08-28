@@ -227,8 +227,18 @@ export const UnitOfMeasure = {
 export type UnitOfMeasure = (typeof UnitOfMeasure)[keyof typeof UnitOfMeasure]
 
 
+export const RecipeType = {
+  COOKED_TO_ORDER: 'COOKED_TO_ORDER',
+  BATCH_PREPARED: 'BATCH_PREPARED'
+} as const
+
+export type RecipeType = (typeof RecipeType)[keyof typeof RecipeType]
+
+
 export const StockTransactionType = {
   RECIPE_DEDUCTION: 'RECIPE_DEDUCTION',
+  BATCH_PRODUCTION: 'BATCH_PRODUCTION',
+  BATCH_WASTAGE: 'BATCH_WASTAGE',
   MANUAL_PURCHASE: 'MANUAL_PURCHASE',
   WASTE_SPOILAGE: 'WASTE_SPOILAGE',
   AUDIT_ADJUSTMENT: 'AUDIT_ADJUSTMENT'

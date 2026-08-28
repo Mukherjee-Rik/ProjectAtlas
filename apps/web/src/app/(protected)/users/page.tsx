@@ -81,8 +81,8 @@ export default function UsersPage() {
       <div className="space-y-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-[#F5F7FA]">Restaurant Team</h1>
-            <p className="mt-2 text-sm text-[#9AA6B2]">Manage employees and staff members.</p>
+            <h1 className="font-display text-3xl font-semibold tracking-[-0.02em] text-foreground">Restaurant Team</h1>
+            <p className="mt-2 text-sm text-muted-foreground">Manage employees and staff members.</p>
           </div>
         </div>
         <UsersTableSkeleton />
@@ -104,15 +104,15 @@ export default function UsersPage() {
       {/* Header & Add Employee Button */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-[#F5F7FA]">
+          <h1 className="font-display text-3xl font-semibold tracking-[-0.02em] text-foreground">
             Restaurant Team & Staff
           </h1>
 
-          <p className="mt-2 text-sm text-[#9AA6B2]">
-            Manage employees working at <span className="font-semibold text-[#2AFEB7]">{currentRestaurant?.name ?? 'your restaurant'}</span> (Managers, Waiters, Kitchen Staff, Cashiers).
+          <p className="mt-2 text-sm text-muted-foreground">
+            Manage employees working at <span className="font-semibold text-primary">{currentRestaurant?.name ?? 'your restaurant'}</span> (Managers, Waiters, Kitchen Staff, Cashiers).
           </p>
 
-          <p className="mt-1 text-xs font-medium text-[#9AA6B2]">
+          <p className="mt-1 text-xs font-medium text-muted-foreground">
             Showing {users.length} of {totalUsers} team members
           </p>
         </div>
@@ -120,14 +120,14 @@ export default function UsersPage() {
         <button
           type="button"
           onClick={() => router.push('/users/create')}
-          className="rounded-xl bg-[#2AFEB7] px-4 py-2.5 text-sm font-bold text-[#0B0F14] transition-all hover:bg-[#22E5A4] active:scale-[0.99]"
+          className="rounded-xl bg-primary px-4 py-2.5 text-sm font-bold text-background transition-all hover:bg-primary-hover active:scale-[0.99]"
         >
           + Add Staff Member
         </button>
       </div>
 
       {/* Toolbar / Filters */}
-      <div className="flex flex-col gap-4 rounded-xl border border-[#26313C] bg-[#111820] p-4 shadow-md md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col gap-4 rounded-xl border border-border bg-card p-4 shadow-md md:flex-row md:items-center md:justify-between">
         <div className="flex flex-1 flex-col gap-3 sm:flex-row sm:items-center">
           <input
             type="search"
@@ -137,7 +137,7 @@ export default function UsersPage() {
               setSearch(event.target.value);
               setCurrentPage(1);
             }}
-            className="w-full rounded-lg border border-[#26313C] bg-[#18212B] px-3.5 py-2 text-sm text-[#F5F7FA] placeholder-[#9AA6B2] transition-colors outline-none focus:border-[#2AFEB7] focus:ring-1 focus:ring-[#2AFEB7] sm:max-w-xs"
+            className="w-full rounded-lg border border-border bg-secondary px-3.5 py-2 text-sm text-foreground placeholder-muted-foreground transition-colors outline-none focus:border-primary focus:ring-1 focus:ring-primary sm:max-w-xs"
           />
 
           <select
@@ -146,7 +146,7 @@ export default function UsersPage() {
               setRoleFilter(event.target.value as 'ALL' | UserRole);
               setCurrentPage(1);
             }}
-            className="rounded-lg border border-[#26313C] bg-[#18212B] px-3 py-2 text-sm text-[#F5F7FA] outline-none focus:border-[#2AFEB7] focus:ring-1 focus:ring-[#2AFEB7]"
+            className="rounded-lg border border-border bg-secondary px-3 py-2 text-sm text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary"
           >
             <option value="ALL">All Roles</option>
             <option value="OWNER">Owner</option>
@@ -163,7 +163,7 @@ export default function UsersPage() {
               setStatusFilter(event.target.value as 'ALL' | UserStatus);
               setCurrentPage(1);
             }}
-            className="rounded-lg border border-[#26313C] bg-[#18212B] px-3 py-2 text-sm text-[#F5F7FA] outline-none focus:border-[#2AFEB7] focus:ring-1 focus:ring-[#2AFEB7]"
+            className="rounded-lg border border-border bg-secondary px-3 py-2 text-sm text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary"
           >
             <option value="ALL">All statuses</option>
             <option value="ACTIVE">Active</option>
@@ -176,7 +176,7 @@ export default function UsersPage() {
           <button
             type="button"
             onClick={handleClearFilters}
-            className="rounded-lg border border-[#26313C] bg-[#18212B] px-3 py-2 text-xs font-medium text-[#F5F7FA] transition-colors hover:border-[#2AFEB7] hover:text-[#2AFEB7]"
+            className="rounded-lg border border-border bg-secondary px-3 py-2 text-xs font-medium text-foreground transition-colors hover:border-primary hover:text-primary"
           >
             Clear filters
           </button>
@@ -184,48 +184,48 @@ export default function UsersPage() {
       </div>
 
       {/* Table Container */}
-      <div className="table-responsive rounded-xl border border-[#26313C] bg-[#111820] shadow-xl">
+      <div className="table-responsive rounded-xl border border-border bg-card">
         <table className="w-full min-w-[700px] text-left">
-          <thead className="border-b border-[#26313C] bg-[#18212B]">
+          <thead className="border-b border-border bg-secondary">
             <tr>
-              <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
+              <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Staff Name
               </th>
 
-              <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
+              <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Email
               </th>
 
-              <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
+              <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Phone
               </th>
 
-              <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
+              <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Role
               </th>
 
-              <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
+              <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Status
               </th>
             </tr>
           </thead>
 
-          <tbody className="divide-y divide-[#26313C]">
+          <tbody className="divide-y divide-border">
             {users.map((user) => (
               <tr
                 key={user.id}
                 onClick={() => router.push(`/users/${user.id}`)}
-                className="cursor-pointer transition-colors hover:bg-[#18212B]"
+                className="cursor-pointer transition-colors hover:bg-secondary"
               >
-                <td className="px-4 py-4 text-sm font-medium text-[#F5F7FA]">
+                <td className="px-4 py-4 text-sm font-medium text-foreground">
                   {user.name}
                 </td>
 
-                <td className="px-4 py-4 text-sm text-[#9AA6B2]">
+                <td className="px-4 py-4 text-sm text-muted-foreground">
                   {user.email}
                 </td>
 
-                <td className="px-4 py-4 text-sm text-[#9AA6B2]">
+                <td className="px-4 py-4 text-sm text-muted-foreground">
                   {user.phone ?? '—'}
                 </td>
 
@@ -244,7 +244,7 @@ export default function UsersPage() {
         {/* Empty State */}
         {users.length === 0 && (
           <div className="p-10 text-center">
-            <p className="text-[#F5F7FA] font-medium">
+            <p className="text-foreground font-medium">
               No staff members found for this restaurant.
             </p>
 
@@ -252,7 +252,7 @@ export default function UsersPage() {
               <button
                 type="button"
                 onClick={handleClearFilters}
-                className="mt-4 rounded-lg border border-[#26313C] bg-[#18212B] px-4 py-2 text-sm text-[#F5F7FA] transition-colors hover:border-[#2AFEB7]"
+                className="mt-4 rounded-lg border border-border bg-secondary px-4 py-2 text-sm text-foreground transition-colors hover:border-primary"
               >
                 Clear filters
               </button>
@@ -262,8 +262,8 @@ export default function UsersPage() {
 
         {/* Pagination Footer */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between border-t border-[#26313C] px-4 py-4 bg-[#18212B]/40">
-            <p className="text-sm text-[#9AA6B2]">
+          <div className="flex items-center justify-between border-t border-border px-4 py-4 bg-secondary/40">
+            <p className="text-sm text-muted-foreground">
               Page {currentPage} of {totalPages}
             </p>
 
@@ -272,7 +272,7 @@ export default function UsersPage() {
                 type="button"
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage((page) => page - 1)}
-                className="rounded-lg border border-[#26313C] bg-[#18212B] px-3 py-1.5 text-sm text-[#F5F7FA] transition-colors hover:border-[#2AFEB7] disabled:opacity-40"
+                className="rounded-lg border border-border bg-secondary px-3 py-1.5 text-sm text-foreground transition-colors hover:border-primary disabled:opacity-40"
               >
                 Previous
               </button>
@@ -281,7 +281,7 @@ export default function UsersPage() {
                 type="button"
                 disabled={currentPage === totalPages}
                 onClick={() => setCurrentPage((page) => page + 1)}
-                className="rounded-lg border border-[#26313C] bg-[#18212B] px-3 py-1.5 text-sm text-[#F5F7FA] transition-colors hover:border-[#2AFEB7] disabled:opacity-40"
+                className="rounded-lg border border-border bg-secondary px-3 py-1.5 text-sm text-foreground transition-colors hover:border-primary disabled:opacity-40"
               >
                 Next
               </button>

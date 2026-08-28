@@ -24,6 +24,8 @@ import { PeakHoursForecast } from '@/components/forecasts/peak-hours-forecast';
 import { MenuDemandForecastTable } from '@/components/forecasts/menu-demand-forecast-table';
 import { ForecastVsActualTable } from '@/components/forecasts/forecast-vs-actual-table';
 import { ModelComparisonCard } from '@/components/forecasts/model-comparison-card';
+import { useRestaurant } from '@/hooks/use-restaurant';
+import { useBranch } from '@/hooks/use-branch';
 import {
   TrendingUp,
   Sparkles,
@@ -40,6 +42,9 @@ import {
 } from 'lucide-react';
 
 export default function ForecastingDashboardPage() {
+  const { currentRestaurant } = useRestaurant();
+  const { currentBranch } = useBranch();
+
   const [branches, setBranches] = useState<Branch[]>([]);
   const [selectedBranch, setSelectedBranch] = useState<string>('');
   const [horizon, setHorizon] = useState<'24H' | '48H' | '7D' | '14D' | '30D' | '90D'>('7D');
@@ -69,23 +74,25 @@ export default function ForecastingDashboardPage() {
     getBranches()
       .then((res) => setBranches(res?.data ?? []))
       .catch((err) => console.error('Failed to load branches:', err));
-  }, []);
+  }, [currentRestaurant?.id]);
 
   const loadForecastData = async () => {
     setLoading(true);
     setError(null);
+    const effectiveBranch = selectedBranch || currentBranch?.id || undefined;
+
     try {
       const [salesRes, expRes, mcRes, heatRes, menuRes, accRes, benchRes] = await Promise.all([
         forecastsService.getSalesForecast({
-          branchId: selectedBranch || undefined,
+          branchId: effectiveBranch,
           horizon,
         }),
-        forecastsService.explainForecast(selectedBranch || undefined),
-        forecastsService.getMealAndChannels(selectedBranch || undefined),
-        forecastsService.getDemandHeatmap(selectedBranch || undefined),
-        forecastsService.getMenuDemand(selectedBranch || undefined),
-        forecastsService.getAccuracy(selectedBranch || undefined),
-        forecastsService.benchmarkModels(selectedBranch || undefined),
+        forecastsService.explainForecast(effectiveBranch),
+        forecastsService.getMealAndChannels(effectiveBranch),
+        forecastsService.getDemandHeatmap(effectiveBranch),
+        forecastsService.getMenuDemand(effectiveBranch),
+        forecastsService.getAccuracy(effectiveBranch),
+        forecastsService.benchmarkModels(effectiveBranch),
       ]);
 
       setSalesForecast(salesRes?.data ?? null);
@@ -106,7 +113,7 @@ export default function ForecastingDashboardPage() {
 
   useEffect(() => {
     loadForecastData();
-  }, [selectedBranch, horizon]);
+  }, [selectedBranch, horizon, currentRestaurant?.id, currentBranch?.id]);
 
   const handleRecalculate = async () => {
     setRecalculating(true);
@@ -138,35 +145,39 @@ export default function ForecastingDashboardPage() {
   };
 
   return (
-    <div className="space-y-6 pb-12">
+    <div className="space-y-8 pb-12">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2.5">
-            <TrendingUp className="w-6 h-6 text-primary" />
-            <h1 className="text-2xl font-bold tracking-tight text-foreground">
-              Sales & Demand Forecasting (V2.5)
-            </h1>
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary border border-primary/20">
+              <TrendingUp className="w-5 h-5" />
+            </div>
+            <div>
+              <h1 className="font-display text-3xl font-semibold tracking-[-0.02em] text-foreground">
+                Sales & Demand Forecasting
+              </h1>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Predict future revenue, orders, meal periods, channels, dish demand, and causal trends.
+              </p>
+            </div>
           </div>
-          <p className="text-xs text-muted-foreground mt-1">
-            Predict future revenue, orders, meal periods, channels, dish demand, and explain causal trends
-          </p>
         </div>
 
         {/* Global Controls */}
         <div className="flex items-center flex-wrap gap-2.5">
           {/* Branch Selector */}
           {branches.length > 0 && (
-            <div className="flex items-center gap-1.5 bg-card border border-border rounded-xl px-3 py-1.5 text-xs font-semibold shadow-xs">
+            <div className="flex items-center gap-1.5 bg-card border border-border rounded-xl px-3 py-2 text-xs font-semibold shadow-sm">
               <Building2 className="w-3.5 h-3.5 text-muted-foreground" />
               <select
                 value={selectedBranch}
                 onChange={(e) => setSelectedBranch(e.target.value)}
-                className="bg-transparent border-none text-foreground outline-hidden cursor-pointer"
+                className="bg-transparent border-none text-foreground focus:outline-none cursor-pointer"
               >
-                <option value="">All Branches</option>
+                <option value="" className="bg-card text-foreground">All Branches</option>
                 {branches.map((b) => (
-                  <option key={b.id} value={b.id}>
+                  <option key={b.id} value={b.id} className="bg-card text-foreground">
                     {b.name}
                   </option>
                 ))}
@@ -175,14 +186,14 @@ export default function ForecastingDashboardPage() {
           )}
 
           {/* Horizon Selector */}
-          <div className="flex items-center bg-card border border-border rounded-xl p-1 text-xs font-semibold shadow-xs">
+          <div className="flex items-center bg-card border border-border rounded-xl p-1 text-xs font-semibold shadow-sm">
             {(['24H', '48H', '7D', '14D', '30D', '90D'] as const).map((h) => (
               <button
                 key={h}
                 onClick={() => setHorizon(h)}
-                className={`px-2.5 py-1 rounded-lg transition-all ${
+                className={`px-3 py-1.5 rounded-lg transition-all ${
                   horizon === h
-                    ? 'bg-primary text-primary-foreground font-bold shadow-xs'
+                    ? 'bg-primary text-background font-bold shadow-sm'
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
@@ -195,7 +206,7 @@ export default function ForecastingDashboardPage() {
           <button
             onClick={handleRecalculate}
             disabled={recalculating}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 text-xs font-bold shadow-xs transition-all"
+            className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg bg-primary text-background hover:bg-primary-hover text-xs font-bold shadow-md transition-all"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${recalculating ? 'animate-spin' : ''}`} />
             {recalculating ? 'Calculating...' : 'Recalculate'}
@@ -204,7 +215,7 @@ export default function ForecastingDashboardPage() {
       </div>
 
       {/* Atlas AI Forecast Assistant Bar */}
-      <div className="bg-card border border-primary/30 rounded-2xl p-5 shadow-xs space-y-3">
+      <div className="bg-card border border-primary/30 rounded-2xl p-5 space-y-3">
         <div className="flex items-center gap-2 text-xs font-bold text-primary">
           <Bot className="w-4 h-4" />
           <span>Ask Atlas AI Forecaster</span>
@@ -216,12 +227,12 @@ export default function ForecastingDashboardPage() {
             value={aiQuestion}
             onChange={(e) => setAiQuestion(e.target.value)}
             placeholder="e.g. How much will I sell tomorrow? Which day will be busiest? How busy at dinner?"
-            className="flex-1 px-4 py-2 rounded-xl border border-border bg-background text-xs text-foreground outline-hidden focus:border-primary"
+            className="flex-1 px-4 py-2.5 rounded-xl border border-border bg-background text-xs text-foreground focus:border-primary focus:outline-none"
           />
           <button
             type="submit"
             disabled={aiLoading}
-            className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/90 transition-all flex items-center gap-1.5"
+            className="px-5 py-2.5 rounded-lg bg-primary text-background text-xs font-bold hover:bg-primary-hover transition-all flex items-center gap-1.5 shadow-md"
           >
             <Send className="w-3.5 h-3.5" />
             {aiLoading ? 'Thinking...' : 'Ask'}
@@ -256,7 +267,7 @@ export default function ForecastingDashboardPage() {
             <button
               key={t.id}
               onClick={() => setActiveTab(t.id as any)}
-              className={`px-4 py-2.5 border-b-2 transition-all flex items-center gap-1.5 whitespace-nowrap ${
+              className={`px-4 py-3 border-b-2 transition-all flex items-center gap-1.5 whitespace-nowrap ${
                 activeTab === t.id
                   ? 'border-primary text-primary font-bold'
                   : 'border-transparent text-muted-foreground hover:text-foreground'
@@ -274,10 +285,10 @@ export default function ForecastingDashboardPage() {
         <div className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="h-32 rounded-xl bg-card/60 animate-pulse border border-border/50" />
+              <div key={i} className="h-32 rounded-xl bg-card animate-pulse border border-border" />
             ))}
           </div>
-          <div className="h-64 rounded-xl bg-card/60 animate-pulse border border-border/50" />
+          <div className="h-64 rounded-xl bg-card animate-pulse border border-border" />
         </div>
       ) : salesForecast ? (
         <div className="space-y-6">
@@ -324,7 +335,7 @@ export default function ForecastingDashboardPage() {
           )}
         </div>
       ) : (
-        <div className="p-12 text-center border border-dashed rounded-2xl bg-card/40 space-y-2">
+        <div className="p-12 text-center border border-dashed border-border rounded-2xl bg-card space-y-2">
           <Sparkles className="w-8 h-8 text-primary mx-auto" />
           <div className="font-bold text-sm text-foreground">No Forecast Generated Yet</div>
           <p className="text-xs text-muted-foreground max-w-sm mx-auto">

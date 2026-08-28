@@ -15,7 +15,7 @@ export function ForecastTrendChart({ projections, horizon }: ForecastTrendChartP
   const maxVal = Math.max(...projections.map((p) => p.upperBoundSales), 1);
 
   return (
-    <div className="bg-card border border-border rounded-xl p-6 shadow-xs space-y-5">
+    <div className="bg-card border border-border rounded-xl p-6 space-y-5">
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-sm font-bold text-foreground">Revenue Projection Curve & Prediction Bands</h3>
@@ -23,7 +23,7 @@ export function ForecastTrendChart({ projections, horizon }: ForecastTrendChartP
             Expected daily sales with 90% confidence intervals (Lower – Upper Bounds)
           </p>
         </div>
-        <span className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-primary/10 text-primary">
+        <span className="text-xs font-bold px-3 py-1 rounded-lg bg-primary/15 text-primary border border-primary/30">
           {horizon} Forecast
         </span>
       </div>
@@ -53,14 +53,14 @@ export function ForecastTrendChart({ projections, horizon }: ForecastTrendChartP
               </div>
 
               {/* Range & Value Progress Meter */}
-              <div className="h-3 w-full bg-muted/40 rounded-full relative overflow-hidden flex items-center">
+              <div className="h-3 w-full bg-secondary rounded-full relative overflow-hidden flex items-center border border-border/50">
                 {/* Confidence band background */}
                 <div
                   style={{
                     left: `${lowerPct}%`,
                     width: `${Math.max(upperPct - lowerPct, 4)}%`,
                   }}
-                  className="absolute h-full bg-primary/20 rounded-full"
+                  className="absolute h-full bg-primary/25 rounded-full"
                 />
                 {/* Expected point pill */}
                 <div
@@ -76,38 +76,38 @@ export function ForecastTrendChart({ projections, horizon }: ForecastTrendChartP
       </div>
 
       {/* Projections Data Table */}
-      <div className="overflow-x-auto pt-4 border-t border-border">
+      <div className="table-responsive pt-4 border-t border-border">
         <table className="w-full text-left text-xs border-collapse">
-          <thead>
-            <tr className="border-b border-border text-muted-foreground uppercase text-[10px]">
-              <th className="py-2.5 px-3 font-semibold">Date & Day</th>
-              <th className="py-2.5 px-3 font-semibold">Expected Sales</th>
-              <th className="py-2.5 px-3 font-semibold">Prediction Range</th>
-              <th className="py-2.5 px-3 font-semibold">Expected Orders</th>
-              <th className="py-2.5 px-3 font-semibold">Projected AOV</th>
-              <th className="py-2.5 px-3 font-semibold">Confidence</th>
+          <thead className="bg-secondary border-b border-border">
+            <tr className="text-muted-foreground uppercase text-[10px] tracking-wider">
+              <th className="py-3 px-3.5 font-semibold">Date & Day</th>
+              <th className="py-3 px-3.5 font-semibold">Expected Sales</th>
+              <th className="py-3 px-3.5 font-semibold">Prediction Range</th>
+              <th className="py-3 px-3.5 font-semibold">Expected Orders</th>
+              <th className="py-3 px-3.5 font-semibold">Projected AOV</th>
+              <th className="py-3 px-3.5 font-semibold">Confidence</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-border/40">
+          <tbody className="divide-y divide-border">
             {projections.map((p) => (
-              <tr key={p.date} className="hover:bg-muted/30 transition-colors">
-                <td className="py-2.5 px-3 font-semibold text-foreground">
+              <tr key={p.date} className="hover:bg-secondary transition-colors">
+                <td className="py-3 px-3.5 font-semibold text-foreground">
                   {p.dayName} <span className="font-normal text-muted-foreground text-[11px]">({p.date})</span>
                 </td>
-                <td className="py-2.5 px-3 font-bold text-foreground">
+                <td className="py-3 px-3.5 font-bold text-primary">
                   ₹{p.predictedSales.toLocaleString('en-IN')}
                 </td>
-                <td className="py-2.5 px-3 text-muted-foreground">
+                <td className="py-3 px-3.5 text-muted-foreground">
                   ₹{p.lowerBoundSales.toLocaleString('en-IN')} – ₹{p.upperBoundSales.toLocaleString('en-IN')}
                 </td>
-                <td className="py-2.5 px-3 font-medium text-foreground">
+                <td className="py-3 px-3.5 font-medium text-foreground">
                   {p.predictedOrders} orders
                 </td>
-                <td className="py-2.5 px-3 font-medium text-foreground">
+                <td className="py-3 px-3.5 font-medium text-foreground">
                   ₹{p.predictedAov.toLocaleString('en-IN')}
                 </td>
-                <td className="py-2.5 px-3">
-                  <span className="font-semibold text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded text-[10px]">
+                <td className="py-3 px-3.5">
+                  <span className="font-bold text-primary bg-primary/15 border border-primary/30 px-2 py-0.5 rounded text-[10px]">
                     {p.confidence}%
                   </span>
                 </td>

@@ -601,14 +601,14 @@ export default function WaiterDashboard() {
 
   if (!currentBranch) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-xl border border-[#26313C] bg-[#111820] p-12 text-center shadow-xl space-y-4">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#18212B] text-2xl">
+      <div className="flex flex-col items-center justify-center rounded-xl border border-border bg-card p-12 text-center space-y-4">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-secondary text-2xl">
           📍
         </div>
-        <h2 className="text-xl font-bold text-[#F5F7FA]">
+        <h2 className="text-xl font-bold text-foreground">
           Select branch for Waiter floor
         </h2>
-        <p className="text-sm text-[#9AA6B2]">
+        <p className="text-sm text-muted-foreground">
           Choose the restaurant branch from the header selector to open the service tables floor.
         </p>
       </div>
@@ -636,7 +636,7 @@ export default function WaiterDashboard() {
   return (
     <div className="space-y-6">
       {/* Printable Thermal Receipt (80mm POS Roll) */}
-      <div id="printable-receipt" className="hidden print:block text-black bg-white font-mono text-xs w-[76mm] mx-auto p-1 leading-tight">
+      <div id="printable-receipt" className="hidden print:block text-black bg-foreground font-mono text-xs w-[76mm] mx-auto p-1 leading-tight">
         <div className="text-center border-b border-dashed border-black pb-2 mb-2">
           <h2 className="text-sm font-black uppercase tracking-wider">{currentRestaurant?.name || 'RESTAURANT'}</h2>
           <p className="text-[10px]">{currentBranch?.name}</p>
@@ -680,31 +680,31 @@ export default function WaiterDashboard() {
       </div>
 
       {/* Screen Control Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#26313C] pb-4 no-print">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4 no-print">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#F5F7FA]">Waiter Service Floor</h1>
-          <p className="text-xs sm:text-sm text-[#9AA6B2] mt-0.5">
-            Active Station: <span className="font-semibold text-[#F5F7FA]">{currentBranch.name}</span>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-foreground">Waiter Service Floor</h1>
+          <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
+            Active Station: <span className="font-semibold text-foreground">{currentBranch.name}</span>
           </p>
         </div>
 
         {/* Quick Floor Stats Bar */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 w-full sm:w-auto">
-          <div className="rounded-xl border border-[#26313C] bg-[#111820] px-3 py-2 text-center">
-            <span className="block text-[10px] font-bold uppercase text-[#9AA6B2]">Total</span>
-            <span className="text-sm font-extrabold text-[#F5F7FA]">{totalTables}</span>
+          <div className="rounded-xl border border-border bg-card px-3 py-2 text-center">
+            <span className="block text-[10px] font-bold uppercase text-muted-foreground">Total</span>
+            <span className="text-sm font-extrabold text-foreground">{totalTables}</span>
           </div>
-          <div className="rounded-xl border border-[#22C55E]/30 bg-[#22C55E]/5 px-3 py-2 text-center">
-            <span className="block text-[10px] font-bold uppercase text-[#22C55E]">Available</span>
-            <span className="text-sm font-extrabold text-[#22C55E]">{availableCount}</span>
+          <div className="rounded-xl border border-atlas-success/30 bg-atlas-success/5 px-3 py-2 text-center">
+            <span className="block text-[10px] font-bold uppercase text-atlas-success">Available</span>
+            <span className="text-sm font-extrabold text-atlas-success">{availableCount}</span>
           </div>
-          <div className="rounded-xl border border-[#EF4444]/30 bg-[#EF4444]/5 px-3 py-2 text-center">
-            <span className="block text-[10px] font-bold uppercase text-[#EF4444]">Occupied</span>
-            <span className="text-sm font-extrabold text-[#EF4444]">{occupiedCount}</span>
+          <div className="rounded-xl border border-atlas-error/30 bg-atlas-error/5 px-3 py-2 text-center">
+            <span className="block text-[10px] font-bold uppercase text-atlas-error">Occupied</span>
+            <span className="text-sm font-extrabold text-atlas-error">{occupiedCount}</span>
           </div>
-          <div className="rounded-xl border border-[#EAB308]/30 bg-[#EAB308]/5 px-3 py-2 text-center">
-            <span className="block text-[10px] font-bold uppercase text-[#EAB308]">Ready</span>
-            <span className="text-sm font-extrabold text-[#EAB308]">{readyCount}</span>
+          <div className="rounded-xl border border-atlas-warning/30 bg-atlas-warning/5 px-3 py-2 text-center">
+            <span className="block text-[10px] font-bold uppercase text-atlas-warning">Ready</span>
+            <span className="text-sm font-extrabold text-atlas-warning">{readyCount}</span>
           </div>
         </div>
       </div>
@@ -717,8 +717,8 @@ export default function WaiterDashboard() {
             onClick={() => setActiveAreaId('ALL')}
             className={`whitespace-nowrap rounded-xl px-4 py-2 text-xs font-bold transition-all shrink-0 ${
               activeAreaId === 'ALL'
-                ? 'bg-[#2AFEB7] text-[#0B0F14] shadow-sm'
-                : 'border border-[#26313C] bg-[#111820] text-[#9AA6B2] hover:text-[#F5F7FA]'
+                ? 'bg-primary text-background shadow-sm'
+                : 'border border-border bg-card text-muted-foreground hover:text-foreground'
             }`}
           >
             All Dining Areas ({tables.length})
@@ -732,8 +732,8 @@ export default function WaiterDashboard() {
                 onClick={() => setActiveAreaId(area.id)}
                 className={`whitespace-nowrap rounded-xl px-4 py-2 text-xs font-bold transition-all shrink-0 ${
                   activeAreaId === area.id
-                    ? 'bg-[#2AFEB7] text-[#0B0F14] shadow-sm'
-                    : 'border border-[#26313C] bg-[#111820] text-[#9AA6B2] hover:text-[#F5F7FA]'
+                    ? 'bg-primary text-background shadow-sm'
+                    : 'border border-border bg-card text-muted-foreground hover:text-foreground'
                 }`}
               >
                 {area.name} ({count})
@@ -748,14 +748,14 @@ export default function WaiterDashboard() {
         {/* Left: Floor Tables Grid */}
         <div className="lg:col-span-2 space-y-4">
           {isLoading && tables.length === 0 ? (
-            <div className="rounded-xl border border-[#26313C] bg-[#111820] p-12 text-center text-[#9AA6B2]">
+            <div className="rounded-xl border border-border bg-card p-12 text-center text-muted-foreground">
               Loading dining floor...
             </div>
           ) : filteredTables.length === 0 ? (
-            <div className="rounded-xl border border-[#26313C] bg-[#111820] p-12 text-center space-y-2">
+            <div className="rounded-xl border border-border bg-card p-12 text-center space-y-2">
               <div className="text-3xl">🍽️</div>
-              <h3 className="text-sm font-bold text-[#F5F7FA]">No tables found</h3>
-              <p className="text-xs text-[#9AA6B2]">Configure tables in the Tables section to populate this area.</p>
+              <h3 className="text-sm font-bold text-foreground">No tables found</h3>
+              <p className="text-xs text-muted-foreground">Configure tables in the Tables section to populate this area.</p>
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-3 xl:grid-cols-4 gap-3">
@@ -768,18 +768,18 @@ export default function WaiterDashboard() {
                 const isSelected = selectedTable?.id === table.id;
 
                 const cardBorder = isSelected
-                  ? 'border-[#2AFEB7] bg-[#2AFEB7]/10 shadow-[0_0_15px_rgba(42,254,183,0.15)] ring-1 ring-[#2AFEB7]'
+                  ? 'border-primary bg-primary/10 shadow-[0_0_15px_rgba(42,254,183,0.15)] ring-1 ring-primary'
                   : hasReadyOrders
-                  ? 'border-[#EAB308]/70 bg-[#EAB308]/5 hover:border-[#EAB308] shadow-[0_0_10px_rgba(234,179,8,0.1)]'
+                  ? 'border-atlas-warning/70 bg-atlas-warning/5 hover:border-atlas-warning shadow-[0_0_10px_rgba(234,179,8,0.1)]'
                   : isOccupied
-                  ? 'border-[#EF4444]/40 bg-[#EF4444]/5 hover:border-[#EF4444]'
-                  : 'border-[#26313C] bg-[#111820] hover:border-[#2AFEB7]/40';
+                  ? 'border-atlas-error/40 bg-atlas-error/5 hover:border-atlas-error'
+                  : 'border-border bg-card hover:border-primary/40';
 
                 const indicatorDot = hasReadyOrders
-                  ? 'bg-[#EAB308] animate-ping'
+                  ? 'bg-atlas-warning animate-ping'
                   : isOccupied
-                  ? 'bg-[#EF4444]'
-                  : 'bg-[#22C55E]';
+                  ? 'bg-atlas-error'
+                  : 'bg-atlas-success';
 
                 return (
                   <button
@@ -789,20 +789,20 @@ export default function WaiterDashboard() {
                     className={`flex flex-col justify-between rounded-xl border p-3.5 sm:p-4 text-left shadow-md transition-all active:scale-[0.98] cursor-pointer ${cardBorder}`}
                   >
                     <div className="flex items-center justify-between w-full">
-                      <span className="text-sm font-extrabold text-[#F5F7FA]">
+                      <span className="text-sm font-extrabold text-foreground">
                         Table {table.name}
                       </span>
                       <div className="flex items-center gap-1.5">
                         {hasReadyOrders && (
-                          <span className="text-[10px] font-bold text-[#EAB308]">READY</span>
+                          <span className="text-[10px] font-bold text-atlas-warning">READY</span>
                         )}
                         <span className={`h-2.5 w-2.5 rounded-full ${indicatorDot}`} />
                       </div>
                     </div>
 
-                    <div className="mt-3 pt-2 border-t border-[#26313C]/40 flex items-center justify-between text-[10px] sm:text-[11px] text-[#9AA6B2] w-full">
+                    <div className="mt-3 pt-2 border-t border-border/40 flex items-center justify-between text-[10px] sm:text-[11px] text-muted-foreground w-full">
                       <span>👥 {table.capacity}p</span>
-                      <span className={isOccupied ? 'font-bold text-[#F5F7FA]' : 'text-[#22C55E]'}>
+                      <span className={isOccupied ? 'font-bold text-foreground' : 'text-atlas-success'}>
                         {isOccupied ? `${activeOrders.length} active order${activeOrders.length !== 1 ? 's' : ''}` : 'Available'}
                       </span>
                     </div>
@@ -815,22 +815,22 @@ export default function WaiterDashboard() {
 
         {/* Right Detail Pane / Drawer (Sticky Desktop, Sheet on Mobile) */}
         <div className="lg:col-span-1">
-          <div className="sticky top-6 rounded-2xl border border-[#26313C] bg-[#111820] p-5 sm:p-6 shadow-xl space-y-5">
+          <div className="sticky top-6 rounded-2xl border border-border bg-card p-5 sm:p-6 space-y-5">
             {selectedTable ? (
               <>
-                <div className="flex items-start justify-between border-b border-[#26313C] pb-3">
+                <div className="flex items-start justify-between border-b border-border pb-3">
                   <div>
-                    <h3 className="text-lg font-extrabold text-[#F5F7FA]">
+                    <h3 className="text-lg font-extrabold text-foreground">
                       Table {selectedTable.name}
                     </h3>
-                    <span className="font-mono text-xs text-[#9AA6B2]">
+                    <span className="font-mono text-xs text-muted-foreground">
                       {selectedTable.code} • {selectedTable.diningArea?.name}
                     </span>
                   </div>
                   <button
                     type="button"
                     onClick={() => setSelectedTable(null)}
-                    className="rounded-lg border border-[#26313C] bg-[#18212B] px-2.5 py-1 text-xs text-[#9AA6B2] hover:text-[#F5F7FA] cursor-pointer"
+                    className="rounded-lg border border-border bg-secondary px-2.5 py-1 text-xs text-muted-foreground hover:text-foreground cursor-pointer"
                   >
                     ✕ Close
                   </button>
@@ -846,17 +846,17 @@ export default function WaiterDashboard() {
                     return (
                       <div className="space-y-4">
                         {activeOrders.length > 0 ? (
-                          <div className="rounded-xl bg-[#EF4444]/10 border border-[#EF4444]/20 p-3 text-xs text-[#EF4444] space-y-2.5">
+                          <div className="rounded-xl bg-atlas-error/10 border border-atlas-error/20 p-3 text-xs text-atlas-error space-y-2.5">
                             <div className="flex items-center justify-between font-bold">
                               <span>Occupied Guest Session</span>
-                              <span className="h-2 w-2 rounded-full bg-[#EF4444] animate-pulse" />
+                              <span className="h-2 w-2 rounded-full bg-atlas-error animate-pulse" />
                             </div>
                             <div className="flex gap-2">
                               <button
                                 type="button"
                                 disabled={isPrinting}
                                 onClick={() => handlePrintBill(selectedTable)}
-                                className="flex-1 rounded-lg bg-[#18212B] border border-[#26313C] py-2 text-xs font-bold text-[#F5F7FA] hover:border-[#2AFEB7] transition-all text-center cursor-pointer"
+                                className="flex-1 rounded-lg bg-secondary border border-border py-2 text-xs font-bold text-foreground hover:border-primary transition-all text-center cursor-pointer"
                               >
                                 {isPrinting ? 'Printing...' : '🖨️ Print Bill'}
                               </button>
@@ -864,26 +864,26 @@ export default function WaiterDashboard() {
                                 type="button"
                                 disabled={updatingTableId === selectedTable.id}
                                 onClick={() => handleClearTable(selectedTable)}
-                                className="flex-1 rounded-lg bg-[#EF4444]/20 py-2 text-xs font-bold text-[#EF4444] hover:bg-[#EF4444]/30 transition-all disabled:opacity-50 text-center cursor-pointer"
+                                className="flex-1 rounded-lg bg-atlas-error/20 py-2 text-xs font-bold text-atlas-error hover:bg-atlas-error/30 transition-all disabled:opacity-50 text-center cursor-pointer"
                               >
                                 Clear Table
                               </button>
                             </div>
                           </div>
                         ) : (
-                          <div className="rounded-xl bg-[#22C55E]/10 border border-[#22C55E]/20 p-3 text-xs text-[#22C55E] space-y-2.5">
+                          <div className="rounded-xl bg-atlas-success/10 border border-atlas-success/20 p-3 text-xs text-atlas-success space-y-2.5">
                             <div className="flex items-center justify-between font-bold">
                               <span>Table Available</span>
-                              <span className="h-2 w-2 rounded-full bg-[#22C55E]" />
+                              <span className="h-2 w-2 rounded-full bg-atlas-success" />
                             </div>
-                            <p className="text-[11px] text-[#9AA6B2]">
+                            <p className="text-[11px] text-muted-foreground">
                               All orders settled / no active orders. Ready for guests.
                             </p>
                             <button
                               type="button"
                               disabled={updatingTableId === selectedTable.id}
                               onClick={() => handleClearTable(selectedTable)}
-                              className="w-full rounded-lg bg-[#18212B] border border-[#26313C] py-2 text-xs font-bold text-[#9AA6B2] hover:text-[#EF4444] hover:border-[#EF4444]/40 transition-all text-center cursor-pointer"
+                              className="w-full rounded-lg bg-secondary border border-border py-2 text-xs font-bold text-muted-foreground hover:text-atlas-error hover:border-atlas-error/40 transition-all text-center cursor-pointer"
                             >
                               Clear Session
                             </button>
@@ -892,12 +892,12 @@ export default function WaiterDashboard() {
 
                         {/* Active Session Orders */}
                         <div className="space-y-2.5">
-                          <h4 className="text-xs font-bold uppercase tracking-wider text-[#9AA6B2]">
+                          <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
                             Session Orders ({allOrders.length})
                           </h4>
 
                           {allOrders.length === 0 ? (
-                            <p className="text-xs text-[#9AA6B2]">No orders placed yet.</p>
+                            <p className="text-xs text-muted-foreground">No orders placed yet.</p>
                           ) : (
                             <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
                               {allOrders.map((o) => {
@@ -917,36 +917,36 @@ export default function WaiterDashboard() {
                                     key={o.id}
                                     className={`rounded-xl p-3 text-xs border transition-all ${
                                       isReady
-                                        ? 'border-[#EAB308]/60 bg-[#EAB308]/10 shadow-[0_0_10px_rgba(234,179,8,0.15)]'
+                                        ? 'border-atlas-warning/60 bg-atlas-warning/10 shadow-[0_0_10px_rgba(234,179,8,0.15)]'
                                         : isCancelled
-                                        ? 'border-red-500/20 bg-red-500/5 opacity-75'
-                                        : 'border-[#26313C] bg-[#18212B]'
+                                        ? 'border-atlas-error/20 bg-atlas-error/5 opacity-75'
+                                        : 'border-border bg-secondary'
                                     }`}
                                   >
                                     <div className="flex items-center justify-between">
                                       <div>
                                         <div className="flex items-center gap-2">
-                                          <span className="font-mono font-extrabold text-[#2AFEB7]">
+                                          <span className="font-mono font-extrabold text-primary">
                                             {o.orderNumber}
                                           </span>
                                           <span
                                             className={`rounded px-1.5 py-0.2 text-[9px] font-bold uppercase ${
                                               isCancelled
-                                                ? 'bg-red-500/20 text-red-400 border border-red-500/30'
+                                                ? 'bg-atlas-error/20 text-atlas-error border border-atlas-error/30'
                                                 : isCompleted
                                                 ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
                                                 : isReady
-                                                ? 'bg-[#EAB308]/25 text-[#EAB308] border border-[#EAB308]/40 animate-pulse'
+                                                ? 'bg-atlas-warning/25 text-atlas-warning border border-atlas-warning/40 animate-pulse'
                                                 : hasPendingReview
-                                                ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                                                : 'bg-[#111820] text-[#9AA6B2]'
+                                                ? 'bg-atlas-warning/20 text-atlas-warning border border-atlas-warning/30'
+                                                : 'bg-card text-muted-foreground'
                                             }`}
                                           >
                                             {hasPendingReview ? 'Review Pending' : o.status}
                                           </span>
                                         </div>
                                         {isCancelled && o.cancellationReason && (
-                                          <p className="mt-1 text-[10px] text-red-400/80">
+                                          <p className="mt-1 text-[10px] text-atlas-error/80">
                                             Reason: {o.cancellationReason}
                                           </p>
                                         )}
@@ -960,8 +960,8 @@ export default function WaiterDashboard() {
                                             onClick={() => handleUpdateOrderStatus(o.id, 'SERVED', 'Served')}
                                             className={`rounded px-2.5 py-1.5 text-[10px] font-bold transition-all active:scale-[0.97] disabled:opacity-50 ${
                                               isReady
-                                                ? 'bg-[#2AFEB7] text-[#0B0F14] hover:bg-[#22E5A4] shadow-[0_0_8px_rgba(42,254,183,0.3)]'
-                                                : 'bg-[#111820] border border-[#26313C] text-[#9AA6B2] hover:border-[#2AFEB7]/40 hover:text-[#2AFEB7]'
+                                                ? 'bg-primary text-background hover:bg-primary-hover shadow-[0_0_8px_rgba(42,254,183,0.3)]'
+                                                : 'bg-card border border-border text-muted-foreground hover:border-primary/40 hover:text-primary'
                                             }`}
                                           >
                                             {isOrderUpdating ? 'Serving...' : isReady ? '🔔 Serve' : 'Serve'}
@@ -972,7 +972,7 @@ export default function WaiterDashboard() {
                                             type="button"
                                             disabled={isOrderUpdating}
                                             onClick={() => handleUpdateOrderStatus(o.id, 'COMPLETED', 'Completed')}
-                                            className="rounded bg-[#A855F7] px-2.5 py-1.5 text-[10px] font-bold text-white hover:bg-[#9333EA] transition-all active:scale-[0.97] disabled:opacity-50"
+                                            className="rounded bg-[#A855F7] px-2.5 py-1.5 text-[10px] font-bold text-foreground hover:bg-[#9333EA] transition-all active:scale-[0.97] disabled:opacity-50"
                                           >
                                             {isOrderUpdating ? 'Completing...' : 'Complete'}
                                           </button>
@@ -985,12 +985,12 @@ export default function WaiterDashboard() {
                                               setCancellationReason('CUSTOMER_REQUESTED');
                                               setCancellationNote('');
                                             }}
-                                            className="rounded border border-red-500/30 bg-red-500/10 px-2 py-1.5 text-[10px] font-bold text-red-400 hover:bg-red-500/20"
+                                            className="rounded border border-atlas-error/30 bg-atlas-error/10 px-2 py-1.5 text-[10px] font-bold text-atlas-error hover:bg-atlas-error/20"
                                           >
                                             Request Cancel
                                           </button>
                                         )}
-                                        <span className="font-bold text-[#F5F7FA] pl-1">
+                                        <span className="font-bold text-foreground pl-1">
                                           {formatCurrency(o.totalAmount)}
                                         </span>
                                       </div>
@@ -1006,7 +1006,7 @@ export default function WaiterDashboard() {
                         <button
                           type="button"
                           onClick={() => setIsOrdering(true)}
-                          className="w-full rounded-xl bg-[#2AFEB7] py-2.5 text-xs font-bold text-[#0B0F14] hover:bg-[#22E5A4] transition-all"
+                          className="w-full rounded-xl bg-primary py-2.5 text-xs font-bold text-background hover:bg-primary-hover transition-all"
                         >
                           + Take New Order
                         </button>
@@ -1015,12 +1015,12 @@ export default function WaiterDashboard() {
                   })()
                 ) : (
                   <div className="space-y-4 text-center py-6">
-                    <p className="text-xs text-[#9AA6B2]">Table is currently unoccupied.</p>
+                    <p className="text-xs text-muted-foreground">Table is currently unoccupied.</p>
                     <button
                       type="button"
                       disabled={updatingTableId === selectedTable.id}
                       onClick={() => handleSeatGuests(selectedTable)}
-                      className="rounded-xl bg-[#2AFEB7] px-6 py-2.5 text-xs font-bold text-[#0B0F14] hover:bg-[#22E5A4] transition-all"
+                      className="rounded-xl bg-primary px-6 py-2.5 text-xs font-bold text-background hover:bg-primary-hover transition-all"
                     >
                       Seat Guests
                     </button>
@@ -1028,7 +1028,7 @@ export default function WaiterDashboard() {
                 )}
               </>
             ) : (
-              <div className="text-center py-12 text-xs text-[#9AA6B2] space-y-2">
+              <div className="text-center py-12 text-xs text-muted-foreground space-y-2">
                 <div className="text-2xl">👈</div>
                 <p>Select any dining table on the floor to view active orders or seat guests.</p>
               </div>
@@ -1040,15 +1040,15 @@ export default function WaiterDashboard() {
       {/* Manual Ordering Modal */}
       {isOrdering && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 no-print">
-          <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl border border-[#26313C] bg-[#111820] p-6 shadow-2xl space-y-6">
-            <div className="flex items-center justify-between border-b border-[#26313C] pb-3">
-              <h2 className="text-base font-bold text-[#F5F7FA]">
+          <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl border border-border bg-card p-6 space-y-6">
+            <div className="flex items-center justify-between border-b border-border pb-3">
+              <h2 className="text-base font-bold text-foreground">
                 Manual Order — Table {selectedTable?.name}
               </h2>
               <button
                 type="button"
                 onClick={() => setIsOrdering(false)}
-                className="text-xs text-[#9AA6B2] hover:text-[#F5F7FA]"
+                className="text-xs text-muted-foreground hover:text-foreground"
               >
                 ✕ Close
               </button>
@@ -1059,7 +1059,7 @@ export default function WaiterDashboard() {
               <div className="space-y-4 max-h-80 overflow-y-auto pr-1">
                 {activeMenu.categories?.map((cat: any) => (
                   <div key={cat.id} className="space-y-2">
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-[#9AA6B2]">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
                       {cat.name}
                     </h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -1073,13 +1073,13 @@ export default function WaiterDashboard() {
                             setChosenAddonIds([]);
                             setQuantity(1);
                           }}
-                          className="flex items-center justify-between rounded-xl border border-[#26313C] bg-[#18212B] p-3 text-left hover:border-[#2AFEB7]/40 transition-colors"
+                          className="flex items-center justify-between rounded-xl border border-border bg-secondary p-3 text-left hover:border-primary/40 transition-colors"
                         >
                           <div>
-                            <span className="block text-xs font-bold text-[#F5F7FA]">{item.name}</span>
-                            <span className="text-[10px] text-[#2AFEB7]">{formatCurrency(item.price)}</span>
+                            <span className="block text-xs font-bold text-foreground">{item.name}</span>
+                            <span className="text-[10px] text-primary">{formatCurrency(item.price)}</span>
                           </div>
-                          <span className="rounded bg-[#2AFEB7]/10 px-2 py-1 text-[10px] font-bold text-[#2AFEB7]">
+                          <span className="rounded bg-primary/10 px-2 py-1 text-[10px] font-bold text-primary">
                             + Select
                           </span>
                         </button>
@@ -1089,33 +1089,33 @@ export default function WaiterDashboard() {
                 ))}
               </div>
             ) : (
-              <div className="py-8 text-center text-xs text-[#9AA6B2]">Loading menu catalog...</div>
+              <div className="py-8 text-center text-xs text-muted-foreground">Loading menu catalog...</div>
             )}
 
             {/* Selected item configurator */}
             {selectedItem && (
-              <div className="rounded-xl border border-[#2AFEB7]/40 bg-[#18212B] p-4 space-y-4">
+              <div className="rounded-xl border border-primary/40 bg-secondary p-4 space-y-4">
                 <div className="flex items-center justify-between">
-                  <h4 className="text-sm font-bold text-[#F5F7FA]">Configure: {selectedItem.name}</h4>
-                  <span className="text-xs font-bold text-[#2AFEB7]">{formatCurrency(selectedItem.price)}</span>
+                  <h4 className="text-sm font-bold text-foreground">Configure: {selectedItem.name}</h4>
+                  <span className="text-xs font-bold text-primary">{formatCurrency(selectedItem.price)}</span>
                 </div>
 
                 {/* Quantity */}
                 <div className="flex items-center gap-3">
-                  <span className="text-xs text-[#9AA6B2]">Quantity:</span>
+                  <span className="text-xs text-muted-foreground">Quantity:</span>
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
                       onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                      className="h-7 w-7 rounded bg-[#111820] border border-[#26313C] text-xs font-bold"
+                      className="h-7 w-7 rounded bg-card border border-border text-xs font-bold"
                     >
                       -
                     </button>
-                    <span className="w-6 text-center text-xs font-bold text-[#F5F7FA]">{quantity}</span>
+                    <span className="w-6 text-center text-xs font-bold text-foreground">{quantity}</span>
                     <button
                       type="button"
                       onClick={() => setQuantity((q) => q + 1)}
-                      className="h-7 w-7 rounded bg-[#111820] border border-[#26313C] text-xs font-bold"
+                      className="h-7 w-7 rounded bg-card border border-border text-xs font-bold"
                     >
                       +
                     </button>
@@ -1125,7 +1125,7 @@ export default function WaiterDashboard() {
                 <button
                   type="button"
                   onClick={handleAddCartItem}
-                  className="w-full rounded-lg bg-[#2AFEB7] py-2 text-xs font-bold text-[#0B0F14] hover:bg-[#22E5A4]"
+                  className="w-full rounded-lg bg-primary py-2 text-xs font-bold text-background hover:bg-primary-hover"
                 >
                   Add to Table Cart
                 </button>
@@ -1134,15 +1134,15 @@ export default function WaiterDashboard() {
 
             {/* Current Cart */}
             {cartItems.length > 0 && (
-              <div className="border-t border-[#26313C] pt-4 space-y-3">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-[#9AA6B2]">
+              <div className="border-t border-border pt-4 space-y-3">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
                   Order Cart ({cartItems.length} items)
                 </h4>
                 <div className="space-y-1.5 max-h-36 overflow-y-auto">
                   {cartItems.map((ci, idx) => (
-                    <div key={idx} className="flex items-center justify-between rounded bg-[#18212B] p-2 text-xs">
+                    <div key={idx} className="flex items-center justify-between rounded bg-secondary p-2 text-xs">
                       <span>{ci.quantity}x {ci.name}</span>
-                      <span className="font-bold text-[#F5F7FA]">{formatCurrency(ci.price * ci.quantity)}</span>
+                      <span className="font-bold text-foreground">{formatCurrency(ci.price * ci.quantity)}</span>
                     </div>
                   ))}
                 </div>
@@ -1150,7 +1150,7 @@ export default function WaiterDashboard() {
                   type="button"
                   disabled={isLoading}
                   onClick={handleSubmitManualOrder}
-                  className="w-full rounded-xl bg-[#2AFEB7] py-3 text-xs font-bold text-[#0B0F14] hover:bg-[#22E5A4] transition-all disabled:opacity-50"
+                  className="w-full rounded-xl bg-primary py-3 text-xs font-bold text-background hover:bg-primary-hover transition-all disabled:opacity-50"
                 >
                   {isLoading ? 'Submitting...' : 'Send Order to Kitchen'}
                 </button>
@@ -1166,14 +1166,14 @@ export default function WaiterDashboard() {
           <div
             key={t.id}
             onClick={() => handleOpenOrderTable(t.tableId, t.id)}
-            className="flex items-center justify-between rounded-xl border border-[#2AFEB7]/50 bg-[#111820]/95 p-3.5 shadow-2xl backdrop-blur-md cursor-pointer hover:bg-[#18212B] transition-all"
+            className="flex items-center justify-between rounded-xl border border-primary/50 bg-card/95 p-3.5 backdrop-blur-md cursor-pointer hover:bg-secondary transition-all"
           >
             <div>
-              <p className="text-xs font-bold text-[#F5F7FA]">
-                Order <span className="font-mono text-[#2AFEB7]">#{t.orderNumber}</span> placed
+              <p className="text-xs font-bold text-foreground">
+                Order <span className="font-mono text-primary">#{t.orderNumber}</span> placed
               </p>
-              <p className="text-[10px] text-[#9AA6B2] mt-0.5">
-                Tap to open details for Table <span className="text-white font-bold">{t.tableName}</span>
+              <p className="text-[10px] text-muted-foreground mt-0.5">
+                Tap to open details for Table <span className="text-foreground font-bold">{t.tableName}</span>
               </p>
             </div>
             <span className="text-xl">🍽️</span>
@@ -1183,18 +1183,18 @@ export default function WaiterDashboard() {
         {callToasts.map((t) => (
           <div
             key={t.id}
-            className="flex items-center justify-between rounded-xl border border-yellow-500/50 bg-[#111820]/95 p-3.5 shadow-2xl backdrop-blur-md"
+            className="flex items-center justify-between rounded-xl border border-atlas-warning/50 bg-card/95 p-3.5 backdrop-blur-md"
           >
             <div>
-              <span className="rounded bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 px-1.5 py-0.5 text-[9px] font-bold">
+              <span className="rounded bg-atlas-warning/20 text-atlas-warning border border-atlas-warning/30 px-1.5 py-0.5 text-[9px] font-bold">
                 {t.type} Assistance
               </span>
-              <p className="text-xs font-bold text-[#F5F7FA] mt-1">Table {t.tableName}</p>
+              <p className="text-xs font-bold text-foreground mt-1">Table {t.tableName}</p>
             </div>
             <button
               type="button"
               onClick={() => void handleResolveCall(t.id)}
-              className="ml-3 rounded-lg bg-[#2AFEB7] px-3 py-1.5 text-xs font-bold text-[#0B0F14] hover:bg-[#22E5A4]"
+              className="ml-3 rounded-lg bg-primary px-3 py-1.5 text-xs font-bold text-background hover:bg-primary-hover"
             >
               Resolve
             </button>
@@ -1205,7 +1205,7 @@ export default function WaiterDashboard() {
       {/* Order Cancellation Modal */}
       {cancellationOrder && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 no-print">
-          <div className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-2xl border border-[#26313C] bg-[#111820] p-6 shadow-2xl space-y-4">
+          <div className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-2xl border border-border bg-card p-6 space-y-4">
             <div>
               {(() => {
                 const hasPaid = cancellationOrder.payments?.some(
@@ -1213,10 +1213,10 @@ export default function WaiterDashboard() {
                 );
                 return (
                   <>
-                    <h3 className="text-base font-bold text-[#F5F7FA]">
+                    <h3 className="text-base font-bold text-foreground">
                       {hasPaid ? 'Request Order Cancellation' : 'Cancel Unpaid Order'}
                     </h3>
-                    <p className="mt-1 text-xs text-[#9AA6B2]">
+                    <p className="mt-1 text-xs text-muted-foreground">
                       {hasPaid
                         ? 'This order has a recorded payment. Submitting this form will send a cancellation & refund request to the Cashier.'
                         : 'This order is unpaid and will be cancelled immediately.'}
@@ -1226,16 +1226,16 @@ export default function WaiterDashboard() {
               })()}
             </div>
 
-            <div className="rounded-xl bg-[#18212B] p-3 text-xs space-y-1.5 border border-[#26313C]">
+            <div className="rounded-xl bg-secondary p-3 text-xs space-y-1.5 border border-border">
               <div className="flex justify-between">
-                <span className="text-[#9AA6B2]">Order Number:</span>
-                <span className="font-mono font-bold text-[#2AFEB7]">
+                <span className="text-muted-foreground">Order Number:</span>
+                <span className="font-mono font-bold text-primary">
                   {cancellationOrder.orderNumber}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-[#9AA6B2]">Order Total:</span>
-                <span className="font-bold text-[#F5F7FA]">
+                <span className="text-muted-foreground">Order Total:</span>
+                <span className="font-bold text-foreground">
                   {formatCurrency(cancellationOrder.totalAmount)}
                 </span>
               </div>
@@ -1243,13 +1243,13 @@ export default function WaiterDashboard() {
 
             <div className="space-y-3">
               <div>
-                <label className="block text-xs font-bold text-[#9AA6B2] uppercase">
+                <label className="block text-xs font-bold text-muted-foreground uppercase">
                   Select Reason
                 </label>
                 <select
                   value={cancellationReason}
                   onChange={(e) => setCancellationReason(e.target.value)}
-                  className="mt-1.5 w-full rounded-lg border border-[#26313C] bg-[#18212B] p-2.5 text-xs text-[#F5F7FA] outline-none focus:border-[#2AFEB7]"
+                  className="mt-1.5 w-full rounded-lg border border-border bg-secondary p-2.5 text-xs text-foreground outline-none focus:border-primary"
                 >
                   {CANCELLATION_REASONS.map((r) => (
                     <option key={r.code} value={r.code}>
@@ -1260,8 +1260,8 @@ export default function WaiterDashboard() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#9AA6B2] uppercase">
-                  Additional Notes {cancellationReason === 'OTHER' && <span className="text-red-400">*</span>}
+                <label className="block text-xs font-bold text-muted-foreground uppercase">
+                  Additional Notes {cancellationReason === 'OTHER' && <span className="text-atlas-error">*</span>}
                 </label>
                 <textarea
                   rows={2}
@@ -1272,7 +1272,7 @@ export default function WaiterDashboard() {
                       ? 'Please specify detailed explanation (required)...'
                       : 'Optional notes for record keeping...'
                   }
-                  className="mt-1.5 w-full rounded-lg border border-[#26313C] bg-[#18212B] p-2 text-xs text-[#F5F7FA] outline-none focus:border-[#2AFEB7]"
+                  className="mt-1.5 w-full rounded-lg border border-border bg-secondary p-2 text-xs text-foreground outline-none focus:border-primary"
                 />
               </div>
             </div>
@@ -1281,7 +1281,7 @@ export default function WaiterDashboard() {
               <button
                 type="button"
                 onClick={() => setCancellationOrder(null)}
-                className="flex-1 rounded-lg bg-[#18212B] border border-[#26313C] py-2.5 text-xs font-bold text-[#F5F7FA]"
+                className="flex-1 rounded-lg bg-secondary border border-border py-2.5 text-xs font-bold text-foreground"
               >
                 Back
               </button>
@@ -1289,7 +1289,7 @@ export default function WaiterDashboard() {
                 type="button"
                 disabled={isSubmittingCancel}
                 onClick={handleCancelOrderSubmit}
-                className="flex-1 rounded-lg bg-red-500 py-2.5 text-xs font-bold text-white hover:bg-red-600 disabled:opacity-50 transition-all cursor-pointer"
+                className="flex-1 rounded-lg bg-atlas-error py-2.5 text-xs font-bold text-foreground hover:bg-red-600 disabled:opacity-50 transition-all cursor-pointer"
               >
                 {isSubmittingCancel ? 'Submitting...' : 'Submit Request to Owner'}
               </button>

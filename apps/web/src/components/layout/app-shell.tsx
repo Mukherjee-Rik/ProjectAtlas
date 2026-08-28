@@ -3,7 +3,7 @@
 import { ReactNode, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, Search, Sparkles, WifiOff, X } from 'lucide-react';
+import { Menu, Search, Sparkles, WifiOff, X, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 
 import { useAuth } from '@/hooks/use-auth';
 import { useRestaurant } from '@/hooks/use-restaurant';
@@ -14,6 +14,7 @@ import { ContextSelectors } from './context-selectors';
 import { SearchOverlay } from '../search/search-overlay';
 import { AIAssistantDrawer } from '../dashboard/ai-assistant-drawer';
 import { NotificationBell } from './notification-bell';
+import { ThemeToggle } from '../ui/theme-toggle';
 
 interface AppShellProps {
   children: ReactNode;
@@ -27,8 +28,29 @@ export function AppShell({ children }: AppShellProps) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isAiOpen, setIsAiOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isOffline, setIsOffline] = useState(false);
   const [canAccessAi, setCanAccessAi] = useState(false);
+
+  // Restore sidebar collapse state from localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('atlas_sidebar_collapsed');
+      if (saved === 'true') {
+        setIsSidebarCollapsed(true);
+      }
+    }
+  }, []);
+
+  const toggleSidebar = () => {
+    setIsSidebarCollapsed((prev) => {
+      const next = !prev;
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('atlas_sidebar_collapsed', String(next));
+      }
+      return next;
+    });
+  };
 
   // Close mobile drawer when route changes
   useEffect(() => {
@@ -91,12 +113,16 @@ export function AppShell({ children }: AppShellProps) {
     };
   }, [user, currentRestaurant]);
 
-  // Keyboard shortcut Ctrl + K, plus Escape to close the mobile drawer.
+  // Keyboard shortcuts: Ctrl + K (Search), Ctrl + B (Toggle Sidebar), Escape (Close Drawer).
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
         setIsSearchOpen((prev) => !prev);
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
+        e.preventDefault();
+        toggleSidebar();
       }
       if (e.key === 'Escape') {
         setIsMobileMenuOpen(false);
@@ -150,7 +176,7 @@ export function AppShell({ children }: AppShellProps) {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#0B0F14] text-[#F5F7FA]">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Lets keyboard users bypass the header and nav on every page. */}
       <a href="#main-content" className="skip-link">
         Skip to main content
@@ -160,7 +186,7 @@ export function AppShell({ children }: AppShellProps) {
       {isOffline && (
         <div
           role="status"
-          className="sticky top-0 z-50 flex items-center justify-center gap-2 bg-[#F59E0B] px-4 py-2 text-xs font-bold text-[#0B0F14] shadow-md"
+          className="sticky top-0 z-50 flex items-center justify-center gap-2 bg-atlas-warning px-4 py-2 text-xs font-bold text-background shadow-md"
         >
           <WifiOff className="h-4 w-4 shrink-0" aria-hidden="true" />
           <span>You are currently working offline. Changes will automatically sync once your internet connection is restored.</span>
@@ -168,7 +194,7 @@ export function AppShell({ children }: AppShellProps) {
       )}
 
       {/* Top Header */}
-      <header className="sticky top-0 z-40 border-b border-[#26313C] bg-[#111820]/90 backdrop-blur-md print:hidden">
+      <header className="liquid-glass sticky top-0 z-40 rounded-none border-b border-border/60 print:hidden">
         <div className="flex h-16 items-center justify-between px-4 md:px-8">
           <div className="flex items-center gap-3 flex-1">
             {/* Mobile Hamburger Button */}
@@ -176,7 +202,7 @@ export function AppShell({ children }: AppShellProps) {
               <button
                 type="button"
                 onClick={() => setIsMobileMenuOpen((prev) => !prev)}
-                className="md:hidden flex items-center justify-center p-2 rounded-lg border border-[#26313C] bg-[#18212B] text-[#F5F7FA] hover:border-[#2AFEB7] transition-colors"
+                className="md:hidden flex items-center justify-center p-2 rounded-lg border border-border bg-secondary text-foreground hover:border-primary transition-colors"
                 aria-label="Toggle navigation menu"
                 aria-expanded={isMobileMenuOpen}
                 aria-controls="mobile-navigation"
@@ -185,6 +211,23 @@ export function AppShell({ children }: AppShellProps) {
                   <X className="h-5 w-5" aria-hidden="true" />
                 ) : (
                   <Menu className="h-5 w-5" aria-hidden="true" />
+                )}
+              </button>
+            )}
+
+            {/* Desktop Sidebar Toggle Button */}
+            {user && (
+              <button
+                type="button"
+                onClick={toggleSidebar}
+                className="hidden md:flex items-center justify-center p-2 rounded-xl border border-border bg-secondary text-foreground hover:border-primary hover:text-primary transition-all shadow-sm"
+                title={isSidebarCollapsed ? 'Expand sidebar (Ctrl + B)' : 'Collapse sidebar (Ctrl + B)'}
+                aria-label="Toggle sidebar width"
+              >
+                {isSidebarCollapsed ? (
+                  <PanelLeftOpen className="h-4 w-4" aria-hidden="true" />
+                ) : (
+                  <PanelLeftClose className="h-4 w-4" aria-hidden="true" />
                 )}
               </button>
             )}
@@ -212,12 +255,12 @@ export function AppShell({ children }: AppShellProps) {
                 <button
                   type="button"
                   onClick={() => setIsSearchOpen(true)}
-                  className="w-full flex items-center justify-between rounded-xl border border-[#26313C] bg-[#18212B] px-3.5 py-1.5 text-xs text-[#9AA6B2] hover:border-[#2AFEB7]/40 transition-colors"
+                  className="w-full flex items-center justify-between rounded-xl border border-border bg-secondary px-3.5 py-1.5 text-xs text-muted-foreground hover:border-primary/40 transition-colors"
                 >
                   <span className="flex items-center gap-2">
                     <Search className="h-3.5 w-3.5" aria-hidden="true" /> Search Atlas...
                   </span>
-                  <span className="rounded bg-[#111820] border border-[#26313C] px-1.5 py-0.5 text-[10px] font-mono">
+                  <span className="rounded bg-card border border-border px-1.5 py-0.5 text-[10px] font-mono">
                     Ctrl K
                   </span>
                 </button>
@@ -232,20 +275,22 @@ export function AppShell({ children }: AppShellProps) {
                 type="button"
                 onClick={() => setIsSearchOpen(true)}
                 aria-label="Search Atlas"
-                className="md:hidden flex items-center justify-center p-1.5 hover:bg-[#18212B] rounded-lg border border-[#26313C]"
+                className="md:hidden flex items-center justify-center p-1.5 hover:bg-secondary rounded-lg border border-border"
               >
                 <Search className="h-5 w-5" aria-hidden="true" />
               </button>
             )}
 
             <div className="text-right hidden sm:block">
-              <p className="text-sm font-medium text-[#F5F7FA]">
+              <p className="text-sm font-medium text-foreground">
                 {user?.name}
               </p>
-              <p className="text-xs text-[#9AA6B2]">
+              <p className="text-xs text-muted-foreground">
                 {user?.email}
               </p>
             </div>
+
+            <ThemeToggle />
 
             {user && <NotificationBell />}
 
@@ -253,7 +298,7 @@ export function AppShell({ children }: AppShellProps) {
               <button
                 type="button"
                 onClick={() => setIsAiOpen(true)}
-                className="rounded-lg border border-[#26313C] bg-[#18212B]/85 hover:border-[#2AFEB7] hover:bg-[#18212B] px-3 py-2 text-sm font-semibold text-[#2AFEB7] transition-all flex items-center gap-1.5 shadow-sm"
+                className="rounded-lg border border-border bg-secondary/85 hover:border-primary hover:bg-secondary px-3 py-2 text-sm font-semibold text-primary transition-all flex items-center gap-1.5 shadow-sm"
               >
                 <Sparkles className="h-4 w-4" aria-hidden="true" />{' '}
                 <span className="hidden sm:inline">Ask AI</span>
@@ -263,7 +308,7 @@ export function AppShell({ children }: AppShellProps) {
             <button
               type="button"
               onClick={logout}
-              className="hidden sm:block rounded-lg border border-[#26313C] bg-[#18212B] px-3 py-2 text-sm text-[#F5F7FA] transition-all hover:border-[#2AFEB7] hover:text-[#2AFEB7]"
+              className="hidden sm:block rounded-lg border border-border bg-secondary px-3 py-2 text-sm text-foreground transition-all hover:border-primary hover:text-primary"
             >
               Logout
             </button>
@@ -275,9 +320,11 @@ export function AppShell({ children }: AppShellProps) {
       <div className="flex min-h-[calc(100vh-4rem)]">
         <aside
           aria-label="Main navigation"
-          className="hidden w-64 shrink-0 border-r border-[#26313C] bg-[#111820] md:block lg:w-72 print:hidden"
+          className={`sticky top-16 hidden h-[calc(100vh-4rem)] shrink-0 overflow-y-auto border-r border-border bg-card sidebar-scroll transition-all duration-200 ease-in-out md:block print:hidden ${
+            isSidebarCollapsed ? 'w-16 lg:w-20' : 'w-64 lg:w-72'
+          }`}
         >
-          <Sidebar />
+          <Sidebar isCollapsed={isSidebarCollapsed} onToggle={toggleSidebar} />
         </aside>
 
         <main id="main-content" className="min-w-0 flex-1 p-4 md:p-6 lg:p-8 print:p-0">
@@ -290,7 +337,7 @@ export function AppShell({ children }: AppShellProps) {
         <div className="fixed inset-0 z-50 md:hidden flex">
           {/* Backdrop */}
           <div
-            className="fixed inset-0 bg-[#0B0F14]/80 backdrop-blur-sm transition-opacity"
+            className="fixed inset-0 bg-background/80 backdrop-blur-sm transition-opacity"
             onClick={() => setIsMobileMenuOpen(false)}
           />
 
@@ -300,38 +347,38 @@ export function AppShell({ children }: AppShellProps) {
             role="dialog"
             aria-modal="true"
             aria-label="Navigation menu"
-            className="relative flex flex-col w-4/5 max-w-xs bg-[#111820] border-r border-[#26313C] h-full z-10 shadow-2xl p-4 space-y-4"
+            className="relative flex flex-col w-4/5 max-w-xs bg-card border-r border-border h-full z-10 p-4 space-y-4"
           >
-            <div className="flex items-center justify-between border-b border-[#26313C] pb-3">
+            <div className="flex items-center justify-between border-b border-border pb-3">
               <div className="flex items-center gap-2">
                 <img src="/logo.png" alt="Atlas Logo" className="h-7 w-auto" />
-                <span className="rounded bg-[#2AFEB7]/15 border border-[#2AFEB7]/30 px-2 py-0.5 text-[10px] font-bold text-[#2AFEB7] uppercase tracking-wider">
+                <span className="rounded bg-primary/15 border border-primary/30 px-2 py-0.5 text-[10px] font-bold text-primary uppercase tracking-wider">
                   {user.role}
                 </span>
               </div>
               <button
                 type="button"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="p-1.5 rounded-lg border border-[#26313C] text-[#9AA6B2] hover:text-[#F5F7FA]"
+                className="p-1.5 rounded-lg border border-border text-muted-foreground hover:text-foreground"
               >
                 ✕
               </button>
             </div>
 
             {/* Context Selectors on Mobile */}
-            <div className="border-b border-[#26313C] pb-3">
+            <div className="border-b border-border pb-3">
               <ContextSelectors />
             </div>
 
             {/* Sidebar Navigation */}
-            <div className="flex-1 overflow-y-auto" onClick={() => setIsMobileMenuOpen(false)}>
+            <div className="flex-1 overflow-y-auto sidebar-scroll" onClick={() => setIsMobileMenuOpen(false)}>
               <Sidebar />
             </div>
 
             {/* Mobile Actions Footer */}
-            <div className="pt-4 border-t border-[#26313C] space-y-3">
-              <div className="text-xs text-[#9AA6B2]">
-                Logged in as <span className="font-semibold text-[#F5F7FA]">{user.name}</span>
+            <div className="pt-4 border-t border-border space-y-3">
+              <div className="text-xs text-muted-foreground">
+                Logged in as <span className="font-semibold text-foreground">{user.name}</span>
               </div>
               <button
                 type="button"
@@ -339,7 +386,7 @@ export function AppShell({ children }: AppShellProps) {
                   setIsMobileMenuOpen(false);
                   logout();
                 }}
-                className="w-full rounded-lg border border-[#26313C] bg-[#18212B] px-3 py-2 text-xs font-semibold text-[#EF4444] hover:bg-[#EF4444]/10 transition-colors"
+                className="w-full rounded-lg border border-border bg-secondary px-3 py-2 text-xs font-semibold text-atlas-error hover:bg-atlas-error/10 transition-colors"
               >
                 Logout
               </button>

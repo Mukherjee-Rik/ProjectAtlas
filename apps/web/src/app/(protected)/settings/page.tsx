@@ -6,10 +6,10 @@ export default function SettingsPage() {
   return (
     <div className="space-y-8 max-w-4xl">
       <div>
-        <h1 className="text-3xl font-bold text-[#F5F7FA]">
+        <h1 className="font-display text-3xl font-semibold tracking-[-0.02em] text-foreground">
           Settings
         </h1>
-        <p className="mt-2 text-[#9AA6B2]">
+        <p className="mt-2 text-muted-foreground">
           Manage your Atlas platform preferences, payments, and security.
         </p>
       </div>
@@ -18,44 +18,44 @@ export default function SettingsPage() {
         {/* Payment & UPI QR Settings */}
         <Link
           href="/settings/payments"
-          className="group block rounded-xl border border-[#2AFEB7]/40 bg-gradient-to-br from-[#18212B] to-[#111820] p-6 shadow-xl transition-all hover:border-[#2AFEB7] hover:shadow-[0_0_20px_rgba(42,254,183,0.15)] sm:col-span-2"
+          className="group block rounded-xl border border-primary/40 bg-gradient-to-br from-secondary to-card p-6 transition-all hover:border-primary sm:col-span-2"
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#2AFEB7]/15 text-xl">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/15 text-xl">
                 💳
               </span>
               <div>
                 <div className="flex items-center gap-2">
-                  <h2 className="text-lg font-black text-[#F5F7FA] group-hover:text-[#2AFEB7] transition-colors">
+                  <h2 className="text-lg font-black text-foreground group-hover:text-primary transition-colors">
                     Payment & UPI QR Settings
                   </h2>
-                  <span className="rounded-full bg-[#2AFEB7]/15 border border-[#2AFEB7]/30 px-2 py-0.5 text-[10px] font-bold text-[#2AFEB7]">
+                  <span className="rounded-full bg-primary/15 border border-primary/30 px-2 py-0.5 text-[10px] font-bold text-primary">
                     Customer Seat Pay
                   </span>
                 </div>
-                <p className="mt-1 text-xs text-[#9AA6B2]">
+                <p className="mt-1 text-xs text-muted-foreground">
                   Set your UPI ID (GPay / PhonePe / Paytm), merchant name, custom QR standee image, and table payment options.
                 </p>
               </div>
             </div>
-            <span className="text-lg font-bold text-[#2AFEB7] group-hover:translate-x-1 transition-transform">→</span>
+            <span className="text-lg font-bold text-primary group-hover:translate-x-1 transition-transform">→</span>
           </div>
         </Link>
 
         {/* Organization */}
         <Link
           href="/settings/organization"
-          className="block rounded-xl border border-[#26313C] bg-[#111820] p-6 shadow-xl transition-all hover:border-[#2AFEB7] hover:bg-[#18212B]"
+          className="block rounded-xl border border-border bg-card p-6 transition-all hover:border-primary hover:bg-secondary"
         >
           <div className="flex items-center justify-between">
-            <h2 className="text-base font-bold text-[#F5F7FA]">
+            <h2 className="text-base font-bold text-foreground">
               🏢 Organization & Tenants
             </h2>
-            <span className="text-[#2AFEB7]">→</span>
+            <span className="text-primary">→</span>
           </div>
 
-          <p className="mt-2 text-xs text-[#9AA6B2]">
+          <p className="mt-2 text-xs text-muted-foreground">
             View active tenant organization, role assignments, and restaurant profile details.
           </p>
         </Link>
@@ -63,16 +63,16 @@ export default function SettingsPage() {
         {/* Security & Sessions */}
         <Link
           href="/settings/security"
-          className="block rounded-xl border border-[#26313C] bg-[#111820] p-6 shadow-xl transition-all hover:border-[#2AFEB7] hover:bg-[#18212B]"
+          className="block rounded-xl border border-border bg-card p-6 transition-all hover:border-primary hover:bg-secondary"
         >
           <div className="flex items-center justify-between">
-            <h2 className="text-base font-bold text-[#F5F7FA]">
+            <h2 className="text-base font-bold text-foreground">
               🔒 Security & Credentials
             </h2>
-            <span className="text-[#2AFEB7]">→</span>
+            <span className="text-primary">→</span>
           </div>
 
-          <p className="mt-2 text-xs text-[#9AA6B2]">
+          <p className="mt-2 text-xs text-muted-foreground">
             Manage password policies, active authentication tokens, and session credentials.
           </p>
         </Link>

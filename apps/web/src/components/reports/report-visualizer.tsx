@@ -14,7 +14,7 @@ export function ReportVisualizer({ data, className = '' }: ReportVisualizerProps
 
   if (!rows || rows.length === 0) {
     return (
-      <div className="p-12 text-center border border-dashed rounded-xl bg-card/40">
+      <div className="p-12 text-center border border-dashed border-border rounded-xl bg-card">
         <p className="text-sm font-semibold text-foreground">No data found</p>
         <p className="text-xs text-muted-foreground mt-1">
           There are no matching operational records for the selected filters and date range.
@@ -44,11 +44,11 @@ export function ReportVisualizer({ data, className = '' }: ReportVisualizerProps
           {columns.filter((c) => c.key !== 'dimensionLabel').map((col) => {
             const sumVal = rows.reduce((s, r) => s + (typeof r[col.key] === 'number' ? r[col.key] : 0), 0);
             return (
-              <div key={col.key} className="bg-card border border-border rounded-xl p-5 shadow-xs">
+              <div key={col.key} className="bg-card border border-border rounded-xl p-5 shadow-lg">
                 <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                   {col.label}
                 </span>
-                <div className="text-2xl font-bold text-foreground mt-2">
+                <div className="font-display text-2xl font-semibold tracking-[-0.02em] text-foreground mt-2">
                   {formatCell(sumVal, col.unit)}
                 </div>
                 <div className="text-[11px] text-muted-foreground mt-1">
@@ -62,7 +62,7 @@ export function ReportVisualizer({ data, className = '' }: ReportVisualizerProps
 
       {/* Bar Chart Renderer */}
       {visType === 'BAR_CHART' && metricKey && (
-        <div className="bg-card border border-border rounded-xl p-6 shadow-xs">
+        <div className="bg-card border border-border rounded-xl p-6">
           <h4 className="text-sm font-bold text-foreground mb-4">{visualization.title || 'Bar Chart Breakdown'}</h4>
           <div className="space-y-3">
             {(() => {
@@ -76,7 +76,7 @@ export function ReportVisualizer({ data, className = '' }: ReportVisualizerProps
                       <span className="font-semibold text-foreground">{row.dimensionLabel}</span>
                       <span className="text-muted-foreground">{formatCell(val, primaryMetricCol?.unit)}</span>
                     </div>
-                    <div className="h-2.5 w-full bg-muted rounded-full overflow-hidden">
+                    <div className="h-2.5 w-full bg-secondary rounded-full overflow-hidden border border-border/40">
                       <div
                         style={{ width: `${widthPct}%` }}
                         className="h-full bg-primary rounded-full transition-all duration-500"
@@ -92,17 +92,17 @@ export function ReportVisualizer({ data, className = '' }: ReportVisualizerProps
 
       {/* Donut / Share Chart Renderer */}
       {visType === 'DONUT_CHART' && metricKey && (
-        <div className="bg-card border border-border rounded-xl p-6 shadow-xs">
+        <div className="bg-card border border-border rounded-xl p-6">
           <h4 className="text-sm font-bold text-foreground mb-4">{visualization.title || 'Distribution Share'}</h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {rows.map((row, idx) => (
-              <div key={idx} className="p-3 rounded-lg border border-border/60 bg-muted/20 flex items-center justify-between text-xs">
+              <div key={idx} className="p-3 rounded-lg border border-border bg-secondary flex items-center justify-between text-xs">
                 <div>
                   <div className="font-bold text-foreground">{row.dimensionLabel}</div>
                   <div className="text-[10px] text-muted-foreground">{primaryMetricCol?.label}</div>
                 </div>
                 <div className="text-right">
-                  <div className="font-bold text-foreground">{formatCell(row[metricKey], primaryMetricCol?.unit)}</div>
+                  <div className="font-bold text-primary">{formatCell(row[metricKey], primaryMetricCol?.unit)}</div>
                   {row.REVENUE_SHARE_PERCENT !== undefined && (
                     <div className="text-primary font-semibold text-[10px]">{row.REVENUE_SHARE_PERCENT}% share</div>
                   )}
@@ -115,8 +115,8 @@ export function ReportVisualizer({ data, className = '' }: ReportVisualizerProps
 
       {/* Standard Table Renderer */}
       {(visType === 'TABLE' || visType === 'LINE_CHART' || visType === 'AREA_CHART' || visType === 'KPI_CARD') && (
-        <div className="bg-card border border-border rounded-xl overflow-hidden shadow-xs">
-          <div className="p-4 border-b border-border bg-muted/10 flex items-center justify-between">
+        <div className="table-responsive rounded-xl border border-border bg-card">
+          <div className="p-4 border-b border-border bg-secondary flex items-center justify-between">
             <h4 className="text-xs font-bold text-foreground uppercase tracking-wider">
               {visualization.title || `${data.reportName} Data Table`}
             </h4>
@@ -125,8 +125,8 @@ export function ReportVisualizer({ data, className = '' }: ReportVisualizerProps
 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs border-collapse">
-              <thead>
-                <tr className="border-b border-border bg-muted/20 text-muted-foreground uppercase text-[10px]">
+              <thead className="bg-secondary border-b border-border">
+                <tr className="text-muted-foreground uppercase text-[10px] tracking-wider">
                   {columns.map((col) => (
                     <th key={col.key} className="py-3 px-4 font-semibold">
                       {col.label}
@@ -134,11 +134,11 @@ export function ReportVisualizer({ data, className = '' }: ReportVisualizerProps
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border/40">
+              <tbody className="divide-y divide-border">
                 {rows.map((row, rIdx) => (
-                  <tr key={rIdx} className="hover:bg-muted/30 transition-colors">
+                  <tr key={rIdx} className="hover:bg-secondary transition-colors">
                     {columns.map((col) => (
-                      <td key={col.key} className="py-3 px-4 font-medium">
+                      <td key={col.key} className="py-3 px-4 font-medium text-foreground">
                         {col.key === 'dimensionLabel' ? (
                           <span className="font-semibold text-foreground">{row.dimensionLabel}</span>
                         ) : (

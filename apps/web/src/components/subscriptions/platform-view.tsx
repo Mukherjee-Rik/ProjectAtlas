@@ -123,24 +123,24 @@ export function PlatformSubscriptionsView() {
   const getStatusBadgeStyle = (status: Subscription['status']) => {
     switch (status) {
       case 'ACTIVE':
-        return 'bg-[#22C55E]/15 text-[#22C55E] border-[#22C55E]/30';
+        return 'bg-atlas-success/15 text-atlas-success border-atlas-success/30';
       case 'TRIALING':
-        return 'bg-[#3B82F6]/15 text-[#3B82F6] border-[#3B82F6]/30';
+        return 'bg-atlas-info/15 text-atlas-info border-atlas-info/30';
       case 'SUSPENDED':
-        return 'bg-[#F59E0B]/15 text-[#F59E0B] border-[#F59E0B]/30';
+        return 'bg-atlas-warning/15 text-atlas-warning border-atlas-warning/30';
       case 'EXPIRED':
       case 'CANCELLED':
-        return 'bg-[#EF4444]/15 text-[#EF4444] border-[#EF4444]/30';
+        return 'bg-atlas-error/15 text-atlas-error border-atlas-error/30';
       default:
-        return 'bg-[#18212B] text-[#9AA6B2] border-[#26313C]';
+        return 'bg-secondary text-muted-foreground border-border';
     }
   };
 
   if (isLoading) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center space-y-4">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#2AFEB7] border-t-transparent"></div>
-        <div className="text-sm font-semibold text-[#9AA6B2]">Loading Platform Subscriptions...</div>
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+        <div className="text-sm font-semibold text-muted-foreground">Loading Platform Subscriptions...</div>
       </div>
     );
   }
@@ -150,14 +150,14 @@ export function PlatformSubscriptionsView() {
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#2AFEB7]/30 bg-[#2AFEB7]/10 px-3 py-1 text-xs font-bold text-[#2AFEB7]">
-            <span className="h-2 w-2 rounded-full bg-[#2AFEB7] animate-pulse" />
+          <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
+            <span className="h-2 w-2 rounded-full bg-primary animate-pulse" />
             Atlas Platform Billing Management
           </div>
-          <h1 className="mt-3 text-3xl font-black text-[#F5F7FA]">
+          <h1 className="mt-3 text-3xl font-black text-foreground">
             SaaS Subscriptions
           </h1>
-          <p className="mt-1 text-xs text-[#9AA6B2]">
+          <p className="mt-1 text-xs text-muted-foreground">
             Monitor and manage active licenses, plans, and service quotas across all store locations.
           </p>
         </div>
@@ -165,44 +165,44 @@ export function PlatformSubscriptionsView() {
         <button
           type="button"
           onClick={() => void loadData()}
-          className="rounded-xl border border-[#26313C] bg-[#18212B] px-4 py-2.5 text-xs font-semibold text-[#F5F7FA] transition-colors hover:border-[#2AFEB7]"
+          className="rounded-xl border border-border bg-secondary px-4 py-2.5 text-xs font-semibold text-foreground transition-colors hover:border-primary"
         >
           ⟳ Refresh Directory
         </button>
       </div>
 
       {error && (
-        <div className="rounded-xl border border-[#EF4444]/30 bg-[#EF4444]/10 p-4 text-xs text-[#EF4444]">
+        <div className="rounded-xl border border-atlas-error/30 bg-atlas-error/10 p-4 text-xs text-atlas-error">
           {error}
         </div>
       )}
 
       {/* Metric Cards Grid */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-        <div className="rounded-2xl border border-[#26313C] bg-[#111820] p-4 shadow-xl">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-[#9AA6B2]">Total Accounts</span>
-          <h3 className="mt-1 text-2xl font-black text-[#F5F7FA]">{total}</h3>
+        <div className="rounded-2xl border border-border bg-card p-4">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Total Accounts</span>
+          <h3 className="mt-1 text-2xl font-black text-foreground">{total}</h3>
         </div>
-        <div className="rounded-2xl border border-[#26313C] bg-[#111820] p-4 shadow-xl">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-[#9AA6B2]">Active Plan</span>
-          <h3 className="mt-1 text-2xl font-black text-[#22C55E]">{active}</h3>
+        <div className="rounded-2xl border border-border bg-card p-4">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Active Plan</span>
+          <h3 className="mt-1 text-2xl font-black text-atlas-success">{active}</h3>
         </div>
-        <div className="rounded-2xl border border-[#26313C] bg-[#111820] p-4 shadow-xl">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-[#9AA6B2]">Trial Period</span>
-          <h3 className="mt-1 text-2xl font-black text-[#3B82F6]">{trialing}</h3>
+        <div className="rounded-2xl border border-border bg-card p-4">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Trial Period</span>
+          <h3 className="mt-1 text-2xl font-black text-atlas-info">{trialing}</h3>
         </div>
-        <div className="rounded-2xl border border-[#26313C] bg-[#111820] p-4 shadow-xl">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-[#9AA6B2]">Expired Trial</span>
-          <h3 className="mt-1 text-2xl font-black text-[#EF4444]">{expired}</h3>
+        <div className="rounded-2xl border border-border bg-card p-4">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Expired Trial</span>
+          <h3 className="mt-1 text-2xl font-black text-atlas-error">{expired}</h3>
         </div>
-        <div className="rounded-2xl border border-[#26313C] bg-[#111820] p-4 shadow-xl">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-[#9AA6B2]">Cancelled</span>
-          <h3 className="mt-1 text-2xl font-black text-[#EF4444]">{cancelled}</h3>
+        <div className="rounded-2xl border border-border bg-card p-4">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Cancelled</span>
+          <h3 className="mt-1 text-2xl font-black text-atlas-error">{cancelled}</h3>
         </div>
       </div>
 
       {/* Directory Datatable */}
-      <div className="rounded-2xl border border-[#26313C] bg-[#111820] p-6 shadow-xl space-y-4">
+      <div className="rounded-2xl border border-border bg-card p-6 space-y-4">
         {/* Search & Filters */}
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="relative w-full max-w-sm">
@@ -211,16 +211,16 @@ export function PlatformSubscriptionsView() {
               placeholder="Search restaurant or plan..."
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
-              className="w-full rounded-xl border border-[#26313C] bg-[#18212B] px-4 py-2.5 text-xs text-[#F5F7FA] outline-none placeholder-[#9AA6B2] focus:border-[#2AFEB7]"
+              className="w-full rounded-xl border border-border bg-secondary px-4 py-2.5 text-xs text-foreground outline-none placeholder-muted-foreground focus:border-primary"
             />
           </div>
 
           <div className="flex items-center gap-3">
-            <span className="text-xs text-[#9AA6B2] font-semibold">Status:</span>
+            <span className="text-xs text-muted-foreground font-semibold">Status:</span>
             <select
               value={statusFilter}
               onChange={e => setStatusFilter(e.target.value)}
-              className="rounded-xl border border-[#26313C] bg-[#18212B] px-3 py-2 text-xs text-[#F5F7FA] outline-none focus:border-[#2AFEB7]"
+              className="rounded-xl border border-border bg-secondary px-3 py-2 text-xs text-foreground outline-none focus:border-primary"
             >
               <option value="ALL">All Statuses</option>
               <option value="ACTIVE">ACTIVE</option>
@@ -236,7 +236,7 @@ export function PlatformSubscriptionsView() {
         <div className="table-responsive">
           <table className="w-full min-w-[750px] text-left text-xs">
             <thead>
-              <tr className="border-b border-[#26313C] text-[#9AA6B2] uppercase tracking-wider">
+              <tr className="border-b border-border text-muted-foreground uppercase tracking-wider">
                 <th className="py-3 px-4">Restaurant</th>
                 <th className="py-3 px-4">Tier / Price</th>
                 <th className="py-3 px-4">Cycle</th>
@@ -245,18 +245,18 @@ export function PlatformSubscriptionsView() {
                 <th className="py-3 px-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#26313C]/50">
+            <tbody className="divide-y divide-border/50">
               {filteredSubs.map(sub => (
-                <tr key={sub.id} className="hover:bg-[#18212B]/40 transition-colors">
+                <tr key={sub.id} className="hover:bg-secondary/40 transition-colors">
                   <td className="py-3 px-4">
-                    <p className="font-bold text-[#F5F7FA]">{sub.restaurant?.name}</p>
-                    <p className="text-[10px] text-[#9AA6B2] font-mono">ID: {sub.restaurantId.substring(0, 8)}...</p>
+                    <p className="font-bold text-foreground">{sub.restaurant?.name}</p>
+                    <p className="text-[10px] text-muted-foreground font-mono">ID: {sub.restaurantId.substring(0, 8)}...</p>
                   </td>
                   <td className="py-3 px-4">
-                    <p className="font-semibold text-[#F5F7FA]">{sub.plan.name}</p>
-                    <p className="text-[10px] text-[#9AA6B2]">{formatCurrency(Number(sub.plan.price))}/mo</p>
+                    <p className="font-semibold text-foreground">{sub.plan.name}</p>
+                    <p className="text-[10px] text-muted-foreground">{formatCurrency(Number(sub.plan.price))}/mo</p>
                   </td>
-                  <td className="py-3 px-4 text-[#9AA6B2] font-mono text-[10px] uppercase">
+                  <td className="py-3 px-4 text-muted-foreground font-mono text-[10px] uppercase">
                     {sub.billingCycle}
                   </td>
                   <td className="py-3 px-4">
@@ -264,7 +264,7 @@ export function PlatformSubscriptionsView() {
                       {sub.status}
                     </span>
                   </td>
-                  <td className="py-3 px-4 text-[#9AA6B2]">
+                  <td className="py-3 px-4 text-muted-foreground">
                     {sub.status === 'TRIALING'
                       ? sub.trialEnd ? new Date(sub.trialEnd).toLocaleDateString() : 'N/A'
                       : new Date(sub.currentPeriodEnd).toLocaleDateString()}
@@ -277,7 +277,7 @@ export function PlatformSubscriptionsView() {
                           setSelectedSub(sub);
                           setActiveModal('extend');
                         }}
-                        className="rounded bg-[#3B82F6]/10 px-2 py-1 text-[10px] font-bold text-[#3B82F6] hover:bg-[#3B82F6]/20 border border-[#3B82F6]/30"
+                        className="rounded bg-atlas-info/10 px-2 py-1 text-[10px] font-bold text-atlas-info hover:bg-atlas-info/20 border border-atlas-info/30"
                       >
                         Extend Trial
                       </button>
@@ -290,7 +290,7 @@ export function PlatformSubscriptionsView() {
                         setSelectedPlanId(sub.planId);
                         setActiveModal('change');
                       }}
-                      className="rounded bg-[#2AFEB7]/10 px-2 py-1 text-[10px] font-bold text-[#2AFEB7] hover:bg-[#2AFEB7]/20 border border-[#2AFEB7]/30"
+                      className="rounded bg-primary/10 px-2 py-1 text-[10px] font-bold text-primary hover:bg-primary/20 border border-primary/30"
                     >
                       Change Plan
                     </button>
@@ -304,7 +304,7 @@ export function PlatformSubscriptionsView() {
                             setPendingStatus('SUSPENDED');
                             setActiveModal('status');
                           }}
-                          className="rounded bg-[#F59E0B]/10 px-2 py-1 text-[10px] font-bold text-[#F59E0B] hover:bg-[#F59E0B]/20 border border-[#F59E0B]/30"
+                          className="rounded bg-atlas-warning/10 px-2 py-1 text-[10px] font-bold text-atlas-warning hover:bg-atlas-warning/20 border border-atlas-warning/30"
                         >
                           Suspend
                         </button>
@@ -315,7 +315,7 @@ export function PlatformSubscriptionsView() {
                             setPendingStatus('CANCELLED');
                             setActiveModal('status');
                           }}
-                          className="rounded bg-[#EF4444]/10 px-2 py-1 text-[10px] font-bold text-[#EF4444] hover:bg-[#EF4444]/20 border border-[#EF4444]/30"
+                          className="rounded bg-atlas-error/10 px-2 py-1 text-[10px] font-bold text-atlas-error hover:bg-atlas-error/20 border border-atlas-error/30"
                         >
                           Cancel
                         </button>
@@ -328,7 +328,7 @@ export function PlatformSubscriptionsView() {
                           setPendingStatus('ACTIVE');
                           setActiveModal('status');
                         }}
-                        className="rounded bg-[#22C55E]/10 px-2 py-1 text-[10px] font-bold text-[#22C55E] hover:bg-[#22C55E]/20 border border-[#22C55E]/30"
+                        className="rounded bg-atlas-success/10 px-2 py-1 text-[10px] font-bold text-atlas-success hover:bg-atlas-success/20 border border-atlas-success/30"
                       >
                         Reactivate
                       </button>
@@ -339,7 +339,7 @@ export function PlatformSubscriptionsView() {
 
               {filteredSubs.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="py-12 text-center text-[#9AA6B2]">
+                  <td colSpan={6} className="py-12 text-center text-muted-foreground">
                     No subscriptions match search filters.
                   </td>
                 </tr>
@@ -352,21 +352,21 @@ export function PlatformSubscriptionsView() {
       {/* MODAL 1: EXTEND TRIAL */}
       {activeModal === 'extend' && selectedSub && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-          <div className="w-full max-w-md rounded-2xl border border-[#26313C] bg-[#111820] p-6 shadow-2xl space-y-4">
-            <h3 className="text-lg font-bold text-[#F5F7FA]">Extend Trial Period</h3>
-            <p className="text-xs text-[#9AA6B2]">
-              Extend trial length for <span className="font-bold text-[#F5F7FA]">{selectedSub.restaurant?.name}</span>. Currently ends on {selectedSub.trialEnd ? new Date(selectedSub.trialEnd).toLocaleDateString() : 'N/A'}.
+          <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 space-y-4">
+            <h3 className="text-lg font-bold text-foreground">Extend Trial Period</h3>
+            <p className="text-xs text-muted-foreground">
+              Extend trial length for <span className="font-bold text-foreground">{selectedSub.restaurant?.name}</span>. Currently ends on {selectedSub.trialEnd ? new Date(selectedSub.trialEnd).toLocaleDateString() : 'N/A'}.
             </p>
 
             <div className="space-y-1">
-              <label className="text-[10px] font-bold uppercase tracking-wider text-[#9AA6B2]">Days to Add</label>
+              <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Days to Add</label>
               <input
                 type="number"
                 min="1"
                 max="90"
                 value={extendDays}
                 onChange={e => setExtendDays(Number(e.target.value))}
-                className="w-full rounded-xl border border-[#26313C] bg-[#18212B] px-4 py-2.5 text-xs text-[#F5F7FA] outline-none focus:border-[#2AFEB7]"
+                className="w-full rounded-xl border border-border bg-secondary px-4 py-2.5 text-xs text-foreground outline-none focus:border-primary"
               />
             </div>
 
@@ -375,7 +375,7 @@ export function PlatformSubscriptionsView() {
                 type="button"
                 onClick={closeModal}
                 disabled={isActionLoading}
-                className="rounded-xl border border-[#26313C] bg-[#18212B] px-4 py-2.5 text-xs font-semibold text-[#F5F7FA] hover:bg-[#26313C]"
+                className="rounded-xl border border-border bg-secondary px-4 py-2.5 text-xs font-semibold text-foreground hover:bg-border"
               >
                 Cancel
               </button>
@@ -383,7 +383,7 @@ export function PlatformSubscriptionsView() {
                 type="button"
                 onClick={() => void handleExtendTrial()}
                 disabled={isActionLoading}
-                className="rounded-xl bg-[#2AFEB7] px-4 py-2.5 text-xs font-bold text-[#0B0F14] hover:bg-[#22E5A4] disabled:opacity-50"
+                className="rounded-xl bg-primary px-4 py-2.5 text-xs font-bold text-background hover:bg-primary-hover disabled:opacity-50"
               >
                 {isActionLoading ? 'Saving...' : 'Extend Trial'}
               </button>
@@ -395,18 +395,18 @@ export function PlatformSubscriptionsView() {
       {/* MODAL 2: CHANGE PLAN */}
       {activeModal === 'change' && selectedSub && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-          <div className="w-full max-w-md rounded-2xl border border-[#26313C] bg-[#111820] p-6 shadow-2xl space-y-4">
-            <h3 className="text-lg font-bold text-[#F5F7FA]">Upgrade / Downgrade Plan</h3>
-            <p className="text-xs text-[#9AA6B2]">
-              Change subscription tier for <span className="font-bold text-[#F5F7FA]">{selectedSub.restaurant?.name}</span>.
+          <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 space-y-4">
+            <h3 className="text-lg font-bold text-foreground">Upgrade / Downgrade Plan</h3>
+            <p className="text-xs text-muted-foreground">
+              Change subscription tier for <span className="font-bold text-foreground">{selectedSub.restaurant?.name}</span>.
             </p>
 
             <div className="space-y-1">
-              <label className="text-[10px] font-bold uppercase tracking-wider text-[#9AA6B2]">Choose New Plan</label>
+              <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Choose New Plan</label>
               <select
                 value={selectedPlanId}
                 onChange={e => setSelectedPlanId(e.target.value)}
-                className="w-full rounded-xl border border-[#26313C] bg-[#18212B] px-4 py-2.5 text-xs text-[#F5F7FA] outline-none focus:border-[#2AFEB7]"
+                className="w-full rounded-xl border border-border bg-secondary px-4 py-2.5 text-xs text-foreground outline-none focus:border-primary"
               >
                 {plans.map(p => (
                   <option key={p.id} value={p.id}>
@@ -421,7 +421,7 @@ export function PlatformSubscriptionsView() {
                 type="button"
                 onClick={closeModal}
                 disabled={isActionLoading}
-                className="rounded-xl border border-[#26313C] bg-[#18212B] px-4 py-2.5 text-xs font-semibold text-[#F5F7FA] hover:bg-[#26313C]"
+                className="rounded-xl border border-border bg-secondary px-4 py-2.5 text-xs font-semibold text-foreground hover:bg-border"
               >
                 Cancel
               </button>
@@ -429,7 +429,7 @@ export function PlatformSubscriptionsView() {
                 type="button"
                 onClick={() => void handleChangePlan()}
                 disabled={isActionLoading}
-                className="rounded-xl bg-[#2AFEB7] px-4 py-2.5 text-xs font-bold text-[#0B0F14] hover:bg-[#22E5A4] disabled:opacity-50"
+                className="rounded-xl bg-primary px-4 py-2.5 text-xs font-bold text-background hover:bg-primary-hover disabled:opacity-50"
               >
                 {isActionLoading ? 'Saving...' : 'Apply Plan Change'}
               </button>
@@ -441,10 +441,10 @@ export function PlatformSubscriptionsView() {
       {/* MODAL 3: CONFIRM STATUS LIFE ACTION */}
       {activeModal === 'status' && selectedSub && pendingStatus && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-          <div className="w-full max-w-md rounded-2xl border border-[#26313C] bg-[#111820] p-6 shadow-2xl space-y-4">
-            <h3 className="text-lg font-bold text-[#F5F7FA]">Confirm Status Action</h3>
-            <p className="text-xs text-[#9AA6B2]">
-              Are you sure you want to mark <span className="font-bold text-[#F5F7FA]">{selectedSub.restaurant?.name}</span> subscription as <span className="font-bold text-[#EF4444]">{pendingStatus}</span>?
+          <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 space-y-4">
+            <h3 className="text-lg font-bold text-foreground">Confirm Status Action</h3>
+            <p className="text-xs text-muted-foreground">
+              Are you sure you want to mark <span className="font-bold text-foreground">{selectedSub.restaurant?.name}</span> subscription as <span className="font-bold text-atlas-error">{pendingStatus}</span>?
             </p>
 
             <div className="flex justify-end gap-3 pt-2">
@@ -452,7 +452,7 @@ export function PlatformSubscriptionsView() {
                 type="button"
                 onClick={closeModal}
                 disabled={isActionLoading}
-                className="rounded-xl border border-[#26313C] bg-[#18212B] px-4 py-2.5 text-xs font-semibold text-[#F5F7FA] hover:bg-[#26313C]"
+                className="rounded-xl border border-border bg-secondary px-4 py-2.5 text-xs font-semibold text-foreground hover:bg-border"
               >
                 Cancel
               </button>
@@ -460,7 +460,7 @@ export function PlatformSubscriptionsView() {
                 type="button"
                 onClick={() => void handleUpdateStatus()}
                 disabled={isActionLoading}
-                className="rounded-xl bg-[#EF4444] px-4 py-2.5 text-xs font-bold text-white hover:bg-red-600 disabled:opacity-50"
+                className="rounded-xl bg-atlas-error px-4 py-2.5 text-xs font-bold text-foreground hover:bg-red-600 disabled:opacity-50"
               >
                 {isActionLoading ? 'Executing...' : 'Confirm Action'}
               </button>

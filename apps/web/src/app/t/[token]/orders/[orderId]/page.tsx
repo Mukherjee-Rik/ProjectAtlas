@@ -10,13 +10,13 @@ import { getPaymentSettings } from '@/lib/payment-settings';
 import { printThermalReceipt } from '@/lib/receipt-printer';
 
 const STATUS_COLOR: Record<string, { bg: string; text: string; border: string }> = {
-  PENDING: { bg: 'bg-[#EAB308]/15', text: 'text-[#EAB308]', border: 'border-[#EAB308]/30' },
-  CONFIRMED: { bg: 'bg-[#3B82F6]/15', text: 'text-[#3B82F6]', border: 'border-[#3B82F6]/30' },
+  PENDING: { bg: 'bg-atlas-warning/15', text: 'text-atlas-warning', border: 'border-atlas-warning/30' },
+  CONFIRMED: { bg: 'bg-atlas-info/15', text: 'text-atlas-info', border: 'border-atlas-info/30' },
   PREPARING: { bg: 'bg-[#A855F7]/15', text: 'text-[#A855F7]', border: 'border-[#A855F7]/30' },
-  READY: { bg: 'bg-[#22C55E]/15', text: 'text-[#22C55E]', border: 'border-[#22C55E]/30' },
-  SERVED: { bg: 'bg-[#2AFEB7]/15', text: 'text-[#2AFEB7]', border: 'border-[#2AFEB7]/30' },
-  COMPLETED: { bg: 'bg-[#9AA6B2]/15', text: 'text-[#9AA6B2]', border: 'border-[#9AA6B2]/30' },
-  CANCELLED: { bg: 'bg-[#EF4444]/15', text: 'text-[#EF4444]', border: 'border-[#EF4444]/30' },
+  READY: { bg: 'bg-atlas-success/15', text: 'text-atlas-success', border: 'border-atlas-success/30' },
+  SERVED: { bg: 'bg-primary/15', text: 'text-primary', border: 'border-primary/30' },
+  COMPLETED: { bg: 'bg-muted-foreground/15', text: 'text-muted-foreground', border: 'border-muted-foreground/30' },
+  CANCELLED: { bg: 'bg-atlas-error/15', text: 'text-atlas-error', border: 'border-atlas-error/30' },
 };
 
 export default function OrderSuccessPage({
@@ -97,10 +97,10 @@ export default function OrderSuccessPage({
 
   if (isLoading) {
     return (
-      <main className="min-h-screen bg-[#0B0F14] p-4 text-[#F5F7FA]">
+      <main className="min-h-screen bg-background p-4 text-foreground">
         <div className="mx-auto w-full max-w-sm space-y-4 animate-pulse">
-          <div className="h-20 rounded-2xl bg-[#111820]" />
-          <div className="h-40 rounded-2xl bg-[#111820]" />
+          <div className="h-20 rounded-2xl bg-card" />
+          <div className="h-40 rounded-2xl bg-card" />
         </div>
       </main>
     );
@@ -108,16 +108,16 @@ export default function OrderSuccessPage({
 
   if (error || !order) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-[#0B0F14] p-4 text-[#F5F7FA]">
-        <div className="w-full max-w-sm space-y-4 rounded-2xl border border-[#EF4444]/30 bg-[#111820] p-8 text-center">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#EF4444]/10 text-2xl text-[#EF4444]">
+      <main className="flex min-h-screen items-center justify-center bg-background p-4 text-foreground">
+        <div className="w-full max-w-sm space-y-4 rounded-2xl border border-atlas-error/30 bg-card p-8 text-center">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-atlas-error/10 text-2xl text-atlas-error">
             ⚠️
           </div>
           <p className="text-sm font-bold">Order Not Found</p>
-          <p className="text-xs text-[#9AA6B2]">{error}</p>
+          <p className="text-xs text-muted-foreground">{error}</p>
           <Link
             href={`/t/${token}/menu`}
-            className="inline-block rounded-xl border border-[#26313C] px-4 py-2 text-xs font-semibold text-[#9AA6B2]"
+            className="inline-block rounded-xl border border-border px-4 py-2 text-xs font-semibold text-muted-foreground"
           >
             Back to Menu
           </Link>
@@ -224,9 +224,9 @@ export default function OrderSuccessPage({
   };
 
   return (
-    <main className="min-h-screen bg-[#0B0F14] pb-8 text-[#F5F7FA]">
+    <main className="min-h-screen bg-background pb-8 text-foreground">
       {/* Printable Thermal Receipt (80mm POS Roll) */}
-      <div id="printable-receipt" className="hidden print:block text-black bg-white font-mono text-xs w-[76mm] mx-auto p-1 leading-tight">
+      <div id="printable-receipt" className="hidden print:block text-black bg-foreground font-mono text-xs w-[76mm] mx-auto p-1 leading-tight">
         <div className="text-center border-b border-dashed border-black pb-2 mb-2">
           <h2 className="text-sm font-black uppercase tracking-wider">{restaurantName}</h2>
           <p className="text-[10px]">{order.branch?.name}</p>
@@ -274,17 +274,17 @@ export default function OrderSuccessPage({
         </div>
       </div>
 
-      <header className="sticky top-0 z-30 border-b border-[#26313C] bg-[#0B0F14]/95 px-4 py-4 backdrop-blur no-print">
+      <header className="sticky top-0 z-30 border-b border-border bg-background/95 px-4 py-4 backdrop-blur no-print">
         <div className="mx-auto flex w-full max-w-sm items-center justify-between gap-3">
           <div>
             <h1 className="text-base font-black">Table Orders Tracker</h1>
-            <p className="text-[11px] text-[#9AA6B2]">
+            <p className="text-[11px] text-muted-foreground">
               {order.branch?.name ?? 'Restaurant'} • {order.table?.name ?? 'Table'}
             </p>
           </div>
           <Link
             href={`/t/${token}/menu`}
-            className="rounded-xl border border-[#26313C] px-3 py-2 text-[11px] font-semibold text-[#2AFEB7] transition-colors hover:border-[#2AFEB7]/40 hover:bg-[#2AFEB7]/10"
+            className="rounded-xl border border-border px-3 py-2 text-[11px] font-semibold text-primary transition-colors hover:border-primary/40 hover:bg-primary/10"
           >
             + Add More Items
           </Link>
@@ -294,13 +294,13 @@ export default function OrderSuccessPage({
       <div className="mx-auto w-full max-w-sm space-y-4 p-4 no-print">
         {/* MULTI-ORDER TOKEN SWITCHER (If customer added more items) */}
         {sessionOrders.length > 1 && (
-          <div className="rounded-2xl border border-[#2AFEB7]/40 bg-gradient-to-b from-[#18212B] to-[#111820] p-3.5 space-y-2.5 shadow-xl animate-fadeIn">
+          <div className="rounded-2xl border border-primary/40 bg-gradient-to-b from-secondary to-card p-3.5 space-y-2.5 animate-fadeIn">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold text-[#F5F7FA] flex items-center gap-1.5">
-                <span className="flex h-2 w-2 rounded-full bg-[#2AFEB7] animate-pulse" />
+              <span className="text-[11px] font-bold text-foreground flex items-center gap-1.5">
+                <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
                 Active Table Orders ({sessionOrders.length})
               </span>
-              <span className="text-[11px] font-black text-[#2AFEB7]">
+              <span className="text-[11px] font-black text-primary">
                 Total: {formatCurrency(sessionGrandTotal)}
               </span>
             </div>
@@ -321,12 +321,12 @@ export default function OrderSuccessPage({
                     onClick={() => setActiveOrderId(o.id)}
                     className={`flex-1 min-w-[135px] rounded-xl border p-2.5 text-left transition-all cursor-pointer ${
                       isSelected
-                        ? 'border-[#2AFEB7] bg-[#2AFEB7]/15 shadow-[0_0_12px_rgba(42,254,183,0.25)] scale-[1.02]'
-                        : 'border-[#26313C] bg-[#0B0F14]/70 hover:border-[#2AFEB7]/40'
+                        ? 'border-primary bg-primary/15 shadow-[0_0_12px_rgba(42,254,183,0.25)] scale-[1.02]'
+                        : 'border-border bg-background/70 hover:border-primary/40'
                     }`}
                   >
                     <div className="flex items-center justify-between">
-                      <span className={`text-[10px] font-extrabold uppercase tracking-wider ${isSelected ? 'text-[#2AFEB7]' : 'text-[#9AA6B2]'}`}>
+                      <span className={`text-[10px] font-extrabold uppercase tracking-wider ${isSelected ? 'text-primary' : 'text-muted-foreground'}`}>
                         {isOld ? 'Old Order (R1)' : isNew ? 'New Order (R2)' : `Round ${idx + 1}`}
                       </span>
                       <span className={`rounded-full px-1.5 py-0.2 text-[9px] font-bold border ${oStyle.bg} ${oStyle.text} ${oStyle.border}`}>
@@ -334,12 +334,12 @@ export default function OrderSuccessPage({
                       </span>
                     </div>
 
-                    <p className="font-mono text-xs font-black text-[#F5F7FA] mt-1 flex items-center gap-1">
+                    <p className="font-mono text-xs font-black text-foreground mt-1 flex items-center gap-1">
                       <span>Token:</span>
-                      <span className="text-[#2AFEB7]">#{o.orderNumber}</span>
+                      <span className="text-primary">#{o.orderNumber}</span>
                     </p>
 
-                    <p className="text-[10px] text-[#9AA6B2] mt-0.5">
+                    <p className="text-[10px] text-muted-foreground mt-0.5">
                       {itemQty} {itemQty === 1 ? 'item' : 'items'} • {formatCurrency(o.totalAmount)}
                     </p>
                   </button>
@@ -350,22 +350,22 @@ export default function OrderSuccessPage({
         )}
 
         {/* Status Header & Live Stepper for Selected Token */}
-        <div className="space-y-6 rounded-2xl border border-[#26313C] bg-[#111820] p-6 shadow-xl relative overflow-hidden">
+        <div className="space-y-6 rounded-2xl border border-border bg-card p-6 relative overflow-hidden">
           {/* Neon side accents */}
-          <div className="absolute top-0 left-0 w-1 h-full bg-[#2AFEB7]/60" />
+          <div className="absolute top-0 left-0 w-1 h-full bg-primary/60" />
           
           <div className="flex justify-between items-start">
             <div>
-              <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#2AFEB7] bg-[#2AFEB7]/10 px-2 py-0.5 rounded-md">
+              <span className="text-[10px] font-extrabold uppercase tracking-widest text-primary bg-primary/10 px-2 py-0.5 rounded-md">
                 {roundLabel}
               </span>
               <div className="flex items-baseline gap-2 mt-1">
-                <span className="text-xs text-[#9AA6B2] font-semibold">Token:</span>
-                <h2 className="text-2xl font-black font-mono text-[#F5F7FA] tracking-tight">
+                <span className="text-xs text-muted-foreground font-semibold">Token:</span>
+                <h2 className="text-2xl font-black font-mono text-foreground tracking-tight">
                   #{order.orderNumber}
                 </h2>
               </div>
-              <p className="text-[11px] text-[#9AA6B2] mt-0.5">
+              <p className="text-[11px] text-muted-foreground mt-0.5">
                 Placed at {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </p>
             </div>
@@ -376,19 +376,19 @@ export default function OrderSuccessPage({
           </div>
 
           {isCancelled ? (
-            <div className="rounded-xl border border-[#EF4444]/30 bg-[#EF4444]/10 p-4 text-center">
+            <div className="rounded-xl border border-atlas-error/30 bg-atlas-error/10 p-4 text-center">
               <span className="text-2xl">⚠️</span>
-              <p className="text-xs font-bold text-[#EF4444] mt-1">Order Cancelled</p>
-              <p className="text-[11px] text-[#9AA6B2] mt-0.5">This transaction has been cancelled.</p>
+              <p className="text-xs font-bold text-atlas-error mt-1">Order Cancelled</p>
+              <p className="text-[11px] text-muted-foreground mt-0.5">This transaction has been cancelled.</p>
             </div>
           ) : (
             <div className="space-y-4">
               {/* Stepper bubbles */}
               <div className="relative flex justify-between items-center px-2">
                 {/* Connecting track line */}
-                <div className="absolute left-6 right-6 top-5 h-0.5 bg-[#26313C] -z-10" />
+                <div className="absolute left-6 right-6 top-5 h-0.5 bg-border -z-10" />
                 <div
-                  className="absolute left-6 top-5 h-0.5 bg-gradient-to-r from-[#2AFEB7] to-[#22E5A4] transition-all duration-1000 -z-10"
+                  className="absolute left-6 top-5 h-0.5 bg-gradient-to-r from-primary to-primary-hover transition-all duration-1000 -z-10"
                   style={{
                     width: `${(currentStep / (steps.length - 1)) * 90}%`,
                   }}
@@ -398,11 +398,11 @@ export default function OrderSuccessPage({
                   const isCompleted = idx < currentStep;
                   const isActive = idx === currentStep;
                   
-                  let bubbleClass = 'border-[#26313C] bg-[#111820] text-[#9AA6B2]';
+                  let bubbleClass = 'border-border bg-card text-muted-foreground';
                   if (isCompleted) {
-                    bubbleClass = 'border-[#2AFEB7] bg-[#2AFEB7]/10 text-[#2AFEB7]';
+                    bubbleClass = 'border-primary bg-primary/10 text-primary';
                   } else if (isActive) {
-                    bubbleClass = 'border-[#2AFEB7] bg-[#2AFEB7] text-[#0B0F14] shadow-[0_0_12px_#2AFEB7] scale-110';
+                    bubbleClass = 'border-primary bg-primary text-background shadow-[0_0_12px_#34D399] scale-110';
                   }
 
                   return (
@@ -419,7 +419,7 @@ export default function OrderSuccessPage({
                       </div>
                       
                       <div className="text-center">
-                        <span className={`text-[10px] font-bold ${isActive ? 'text-[#2AFEB7]' : isCompleted ? 'text-[#F5F7FA]' : 'text-[#9AA6B2]'}`}>
+                        <span className={`text-[10px] font-bold ${isActive ? 'text-primary' : isCompleted ? 'text-foreground' : 'text-muted-foreground'}`}>
                           {step.label}
                         </span>
                       </div>
@@ -429,12 +429,12 @@ export default function OrderSuccessPage({
               </div>
 
               {/* Current Active Status detail text */}
-              <div className="rounded-xl border border-[#26313C] bg-[#0B0F14]/50 p-3.5 text-center transition-all">
-                <p className="text-xs font-bold text-[#2AFEB7] flex items-center justify-center gap-1.5">
+              <div className="rounded-xl border border-border bg-background/50 p-3.5 text-center transition-all">
+                <p className="text-xs font-bold text-primary flex items-center justify-center gap-1.5">
                   {currentStep === 3 ? '🎉 ' : '🍳 '}
                   {steps[currentStep].label}: {steps[currentStep].desc}
                 </p>
-                <p className="text-[11px] leading-relaxed text-[#9AA6B2] mt-1">
+                <p className="text-[11px] leading-relaxed text-muted-foreground mt-1">
                   {getStageTip(currentStep)}
                 </p>
               </div>
@@ -444,27 +444,27 @@ export default function OrderSuccessPage({
 
         {/* MEAL SERVED BANNER (Shown when food is served and customer is dining) */}
         {isFoodServed && (
-          <div className="space-y-3 rounded-2xl border border-[#2AFEB7]/30 bg-gradient-to-b from-[#18212B] to-[#111820] p-4 text-center shadow-lg animate-fadeIn">
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#2AFEB7]/15 text-2xl">
+          <div className="space-y-3 rounded-2xl border border-primary/30 bg-gradient-to-b from-secondary to-card p-4 text-center shadow-lg animate-fadeIn">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/15 text-2xl">
               🍽️
             </div>
             <div>
-              <h3 className="text-sm font-bold text-[#F5F7FA]">Food Served • Enjoy Your Meal!</h3>
-              <p className="text-xs text-[#9AA6B2] mt-1">
+              <h3 className="text-sm font-bold text-foreground">Food Served • Enjoy Your Meal!</h3>
+              <p className="text-xs text-muted-foreground mt-1">
                 Your food has been served hot & fresh. When you are ready to bill, staff will complete the order and your payment QR will appear here.
               </p>
             </div>
             <div className="flex gap-2 pt-1">
               <Link
                 href={`/t/${token}/menu`}
-                className="flex-1 rounded-xl border border-[#26313C] bg-[#0B0F14] py-2 text-center text-xs font-bold text-[#2AFEB7] hover:border-[#2AFEB7]/40 transition-colors"
+                className="flex-1 rounded-xl border border-border bg-background py-2 text-center text-xs font-bold text-primary hover:border-primary/40 transition-colors"
               >
                 + Add More Items
               </Link>
               <button
                 type="button"
                 onClick={() => handleCallStaff('Water')}
-                className="flex-1 rounded-xl border border-[#26313C] bg-[#0B0F14] py-2 text-center text-xs font-bold text-[#F5F7FA] hover:border-[#2AFEB7]/40 transition-colors cursor-pointer"
+                className="flex-1 rounded-xl border border-border bg-background py-2 text-center text-xs font-bold text-foreground hover:border-primary/40 transition-colors cursor-pointer"
               >
                 💧 Request Water
               </button>
@@ -474,22 +474,22 @@ export default function OrderSuccessPage({
 
         {/* POST-MEAL PAYMENT SECTION (Displayed ONLY after waiter marks order COMPLETED) */}
         {isOrderCompleted && (
-          <div className="space-y-4 rounded-2xl border-2 border-[#2AFEB7]/50 bg-gradient-to-b from-[#18212B] to-[#111820] p-5 shadow-2xl relative overflow-hidden animate-fadeIn">
+          <div className="space-y-4 rounded-2xl border-2 border-primary/50 bg-gradient-to-b from-secondary to-card p-5 relative overflow-hidden animate-fadeIn">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#2AFEB7]/20 text-xs">
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/20 text-xs">
                   💳
                 </span>
-                <h3 className="text-sm font-black text-[#F5F7FA]">
+                <h3 className="text-sm font-black text-foreground">
                   Pay From Seat or Cashier
                 </h3>
               </div>
-              <span className="rounded-full border border-[#2AFEB7]/40 bg-[#2AFEB7]/10 px-2.5 py-0.5 text-[10px] font-bold text-[#2AFEB7]">
+              <span className="rounded-full border border-primary/40 bg-primary/10 px-2.5 py-0.5 text-[10px] font-bold text-primary">
                 Order Completed
               </span>
             </div>
 
-            <p className="text-[11px] leading-relaxed text-[#9AA6B2]">
+            <p className="text-[11px] leading-relaxed text-muted-foreground">
               {sessionOrders.length > 1
                 ? `Scan below to pay the combined total for all ${sessionOrders.length} orders at this table, or visit the cashier.`
                 : 'Scan the QR code below to pay directly from your seat via UPI, or visit the cashier counter.'}
@@ -498,31 +498,31 @@ export default function OrderSuccessPage({
             {/* Clickable QR Code Card for Screenshot / Enlargement */}
             <div
               onClick={() => setIsQrModalOpen(true)}
-              className="group cursor-pointer rounded-xl border border-[#26313C] bg-[#0B0F14] p-4 flex flex-col items-center text-center transition-all hover:border-[#2AFEB7] hover:shadow-[0_0_15px_rgba(42,254,183,0.15)] active:scale-[0.99]"
+              className="group cursor-pointer rounded-xl border border-border bg-background p-4 flex flex-col items-center text-center transition-all hover:border-primary active:scale-[0.99]"
             >
-              <div className="relative rounded-xl bg-white p-2.5 shadow-md">
+              <div className="relative rounded-xl bg-foreground p-2.5 shadow-md">
                 <img
                   src={qrCodeImgUrl}
                   alt="Payment QR Code"
                   className="h-36 w-36 object-contain"
                 />
                 <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl backdrop-blur-[2px]">
-                  <span className="rounded-lg bg-[#2AFEB7] px-2 py-1 text-[10px] font-bold text-[#0B0F14] shadow-md">
+                  <span className="rounded-lg bg-primary px-2 py-1 text-[10px] font-bold text-background shadow-md">
                     🔍 Tap to Enlarge
                   </span>
                 </div>
               </div>
 
               <div className="mt-3 space-y-1">
-                <p className="text-sm font-black text-[#2AFEB7]">
+                <p className="text-sm font-black text-primary">
                   {formatCurrency(paymentAmount)}
                 </p>
                 {sessionOrders.length > 1 && (
-                  <p className="text-[10px] font-bold text-[#2AFEB7]/90">
+                  <p className="text-[10px] font-bold text-primary/90">
                     Combined Total ({sessionOrders.length} Orders)
                   </p>
                 )}
-                <p className="text-[10px] font-bold text-[#9AA6B2] flex items-center justify-center gap-1">
+                <p className="text-[10px] font-bold text-muted-foreground flex items-center justify-center gap-1">
                   <span>📸</span> Click QR to enlarge & capture screenshot
                 </p>
               </div>
@@ -532,7 +532,7 @@ export default function OrderSuccessPage({
             <div className="space-y-2 pt-1">
               <a
                 href={upiUri}
-                className="block w-full rounded-xl bg-[#2AFEB7] py-2.5 text-center text-xs font-bold text-[#0B0F14] shadow-md transition-all hover:bg-[#22E5A4] active:scale-95"
+                className="block w-full rounded-xl bg-primary py-2.5 text-center text-xs font-bold text-background shadow-md transition-all hover:bg-primary-hover active:scale-95"
               >
                 Pay via UPI App (GPay / PhonePe / Paytm)
               </a>
@@ -541,14 +541,14 @@ export default function OrderSuccessPage({
                 <button
                   type="button"
                   onClick={() => handleCallStaff('Bill')}
-                  className="flex-1 rounded-xl border border-[#26313C] bg-[#18212B] py-2 text-center text-[11px] font-bold text-[#F5F7FA] transition-colors hover:border-[#2AFEB7]/40"
+                  className="flex-1 rounded-xl border border-border bg-secondary py-2 text-center text-[11px] font-bold text-foreground transition-colors hover:border-primary/40"
                 >
                   💵 Pay at Cashier
                 </button>
                 <button
                   type="button"
                   onClick={() => setIsQrModalOpen(true)}
-                  className="flex-1 rounded-xl border border-[#2AFEB7]/40 bg-[#2AFEB7]/10 py-2 text-center text-[11px] font-bold text-[#2AFEB7] transition-colors hover:bg-[#2AFEB7]/20"
+                  className="flex-1 rounded-xl border border-primary/40 bg-primary/10 py-2 text-center text-[11px] font-bold text-primary transition-colors hover:bg-primary/20"
                 >
                   🔍 View Full QR
                 </button>
@@ -556,7 +556,7 @@ export default function OrderSuccessPage({
             </div>
 
             {paymentConfirmed && (
-              <div className="rounded-xl border border-[#22C55E]/40 bg-[#22C55E]/10 p-3 text-center text-xs font-semibold text-[#22C55E] animate-fadeIn">
+              <div className="rounded-xl border border-atlas-success/40 bg-atlas-success/10 p-3 text-center text-xs font-semibold text-atlas-success animate-fadeIn">
                 ✓ Thank you! Staff has been notified of your payment.
               </div>
             )}
@@ -564,27 +564,27 @@ export default function OrderSuccessPage({
         )}
 
         {/* Ordered Items List for Current Token */}
-        <div className="space-y-3 rounded-2xl border border-[#26313C] bg-[#111820] p-4">
+        <div className="space-y-3 rounded-2xl border border-border bg-card p-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-[#9AA6B2]">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
               Items in Token #{order.orderNumber}
             </h3>
-            <span className="text-[11px] font-semibold text-[#2AFEB7]">
+            <span className="text-[11px] font-semibold text-primary">
               {order.items.reduce((acc, it) => acc + it.quantity, 0)} items
             </span>
           </div>
 
-          <div className="divide-y divide-[#26313C]">
+          <div className="divide-y divide-border">
             {order.items.map((item) => (
               <div key={item.id} className="flex items-start justify-between gap-3 py-3 first:pt-0 last:pb-0">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-[#2AFEB7]">{item.quantity}x</span>
+                    <span className="text-xs font-bold text-primary">{item.quantity}x</span>
                     <h4 className="text-xs font-bold">{item.name}</h4>
                   </div>
 
                   {item.variants && item.variants.length > 0 && (
-                    <p className="pl-5 text-[11px] text-[#9AA6B2]">
+                    <p className="pl-5 text-[11px] text-muted-foreground">
                       {item.variants.map((v) => v.name).join(' • ')}
                     </p>
                   )}
@@ -592,7 +592,7 @@ export default function OrderSuccessPage({
                   {item.addons && item.addons.length > 0 && (
                     <ul className="pl-5 space-y-0.5">
                       {item.addons.map((a) => (
-                        <li key={a.id} className="text-[11px] text-[#9AA6B2]">
+                        <li key={a.id} className="text-[11px] text-muted-foreground">
                           + {a.name}
                         </li>
                       ))}
@@ -600,7 +600,7 @@ export default function OrderSuccessPage({
                   )}
                 </div>
 
-                <span className="text-xs font-bold text-[#F5F7FA]">
+                <span className="text-xs font-bold text-foreground">
                   {formatCurrency(item.totalPrice)}
                 </span>
               </div>
@@ -610,39 +610,39 @@ export default function OrderSuccessPage({
 
         {/* ALL SESSION ORDERS BREAKDOWN ACCORDION (If multiple orders exist) */}
         {sessionOrders.length > 1 && (
-          <div className="rounded-2xl border border-[#26313C] bg-[#111820] p-4 space-y-3">
+          <div className="rounded-2xl border border-border bg-card p-4 space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-[#9AA6B2]">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
                 All Table Rounds Summary
               </h3>
               <button
                 type="button"
                 onClick={() => setShowAllItemsModal(!showAllItemsModal)}
-                className="text-[11px] font-bold text-[#2AFEB7] hover:underline"
+                className="text-[11px] font-bold text-primary hover:underline"
               >
                 {showAllItemsModal ? 'Hide Rounds ▲' : 'Show All Rounds ▼'}
               </button>
             </div>
 
             {showAllItemsModal && (
-              <div className="space-y-3 pt-2 border-t border-[#26313C]">
+              <div className="space-y-3 pt-2 border-t border-border">
                 {sessionOrders.map((sOrder, idx) => (
                   <div
                     key={sOrder.id}
                     className={`rounded-xl border p-3 space-y-2 ${
                       sOrder.id === order.id
-                        ? 'border-[#2AFEB7]/50 bg-[#2AFEB7]/5'
-                        : 'border-[#26313C] bg-[#0B0F14]/50'
+                        ? 'border-primary/50 bg-primary/5'
+                        : 'border-border bg-background/50'
                     }`}
                   >
                     <div className="flex items-center justify-between text-xs font-bold">
-                      <span className="text-[#2AFEB7]">
+                      <span className="text-primary">
                         Round {idx + 1} (Token #{sOrder.orderNumber})
                       </span>
-                      <span className="text-[#F5F7FA]">{formatCurrency(sOrder.totalAmount)}</span>
+                      <span className="text-foreground">{formatCurrency(sOrder.totalAmount)}</span>
                     </div>
 
-                    <div className="text-[11px] text-[#9AA6B2] space-y-1">
+                    <div className="text-[11px] text-muted-foreground space-y-1">
                       {sOrder.items?.map((it) => (
                         <div key={it.id} className="flex justify-between">
                           <span>{it.quantity}x {it.name}</span>
@@ -658,41 +658,41 @@ export default function OrderSuccessPage({
         )}
 
         {/* Bill Breakdown */}
-        <div className="space-y-3 rounded-2xl border border-[#26313C] bg-[#111820] p-4 print-receipt-only print-border-dark">
-          <h3 className="text-xs font-bold uppercase tracking-wider text-[#9AA6B2] print-text-dark">
+        <div className="space-y-3 rounded-2xl border border-border bg-card p-4 print-receipt-only print-border-dark">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground print-text-dark">
             Bill Breakdown (Token #{order.orderNumber})
           </h3>
 
           <div className="space-y-2 text-xs print-text-dark">
-            <div className="flex justify-between text-[#9AA6B2] print-text-dark">
+            <div className="flex justify-between text-muted-foreground print-text-dark">
               <span>Subtotal</span>
-              <span className="font-semibold text-[#F5F7FA] print-text-dark">{formatCurrency(order.subtotal)}</span>
+              <span className="font-semibold text-foreground print-text-dark">{formatCurrency(order.subtotal)}</span>
             </div>
             {Number(order.taxAmount) > 0 && (
               <>
-                <div className="flex justify-between text-[#9AA6B2] print-text-dark pl-2">
+                <div className="flex justify-between text-muted-foreground print-text-dark pl-2">
                   <span>CGST (2.5%)</span>
-                  <span className="font-semibold text-[#F5F7FA] print-text-dark">{formatCurrency(Number(order.taxAmount) / 2)}</span>
+                  <span className="font-semibold text-foreground print-text-dark">{formatCurrency(Number(order.taxAmount) / 2)}</span>
                 </div>
-                <div className="flex justify-between text-[#9AA6B2] print-text-dark pl-2">
+                <div className="flex justify-between text-muted-foreground print-text-dark pl-2">
                   <span>SGST (2.5%)</span>
-                  <span className="font-semibold text-[#F5F7FA] print-text-dark">{formatCurrency(Number(order.taxAmount) / 2)}</span>
+                  <span className="font-semibold text-foreground print-text-dark">{formatCurrency(Number(order.taxAmount) / 2)}</span>
                 </div>
               </>
             )}
             {Number(order.discountAmount) > 0 && (
-              <div className="flex justify-between text-[#22C55E] print-text-dark">
+              <div className="flex justify-between text-atlas-success print-text-dark">
                 <span>Discount</span>
                 <span className="font-semibold">-{formatCurrency(order.discountAmount)}</span>
               </div>
             )}
-            <div className="flex justify-between border-t border-[#26313C] print-border-dark pt-2 text-sm font-bold print-text-dark">
-              <span className="text-[#F5F7FA] print-text-dark">This Token Total</span>
-              <span className="text-[#2AFEB7] print-text-dark">{formatCurrency(order.totalAmount)}</span>
+            <div className="flex justify-between border-t border-border print-border-dark pt-2 text-sm font-bold print-text-dark">
+              <span className="text-foreground print-text-dark">This Token Total</span>
+              <span className="text-primary print-text-dark">{formatCurrency(order.totalAmount)}</span>
             </div>
 
             {sessionOrders.length > 1 && (
-              <div className="flex justify-between border-t border-[#2AFEB7]/30 pt-2 text-sm font-black text-[#2AFEB7]">
+              <div className="flex justify-between border-t border-primary/30 pt-2 text-sm font-black text-primary">
                 <span>All Orders Grand Total</span>
                 <span>{formatCurrency(sessionGrandTotal)}</span>
               </div>
@@ -701,44 +701,44 @@ export default function OrderSuccessPage({
         </div>
 
         {/* Table Assistance Controls */}
-        <div className="rounded-2xl border border-[#26313C] bg-[#111820] p-4 space-y-3 no-print shadow-xl">
-          <h3 className="text-xs font-bold uppercase tracking-wider text-[#9AA6B2]">
+        <div className="rounded-2xl border border-border bg-card p-4 space-y-3 no-print">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
             Table Assistance
           </h3>
           <div className="grid grid-cols-3 gap-2">
             <button
               type="button"
               onClick={() => handleCallStaff('Waiter')}
-              className="flex flex-col items-center justify-center rounded-xl border border-[#26313C] bg-[#18212B] py-3.5 transition-all hover:border-[#2AFEB7] hover:bg-[#2AFEB7]/5 active:scale-95 cursor-pointer"
+              className="flex flex-col items-center justify-center rounded-xl border border-border bg-secondary py-3.5 transition-all hover:border-primary hover:bg-primary/5 active:scale-95 cursor-pointer"
             >
               <span className="text-lg">🙋‍♂️</span>
-              <span className="mt-1 text-[10px] font-bold text-[#F5F7FA]">Call Waiter</span>
+              <span className="mt-1 text-[10px] font-bold text-foreground">Call Waiter</span>
             </button>
             <button
               type="button"
               onClick={() => handleCallStaff('Water')}
-              className="flex flex-col items-center justify-center rounded-xl border border-[#26313C] bg-[#18212B] py-3.5 transition-all hover:border-[#2AFEB7] hover:bg-[#2AFEB7]/5 active:scale-95 cursor-pointer"
+              className="flex flex-col items-center justify-center rounded-xl border border-border bg-secondary py-3.5 transition-all hover:border-primary hover:bg-primary/5 active:scale-95 cursor-pointer"
             >
               <span className="text-lg">💧</span>
-              <span className="mt-1 text-[10px] font-bold text-[#F5F7FA]">Request Water</span>
+              <span className="mt-1 text-[10px] font-bold text-foreground">Request Water</span>
             </button>
             <button
               type="button"
               onClick={() => handleCallStaff('Bill')}
-              className="flex flex-col items-center justify-center rounded-xl border border-[#26313C] bg-[#18212B] py-3.5 transition-all hover:border-[#2AFEB7] hover:bg-[#2AFEB7]/5 active:scale-95 cursor-pointer"
+              className="flex flex-col items-center justify-center rounded-xl border border-border bg-secondary py-3.5 transition-all hover:border-primary hover:bg-primary/5 active:scale-95 cursor-pointer"
             >
               <span className="text-lg">💵</span>
-              <span className="mt-1 text-[10px] font-bold text-[#F5F7FA]">Request Bill</span>
+              <span className="mt-1 text-[10px] font-bold text-foreground">Request Bill</span>
             </button>
           </div>
 
           {activeRequest && (
-            <div className="rounded-xl border border-[#2AFEB7]/30 bg-[#2AFEB7]/10 p-3 text-center animate-pulse">
-              <p className="text-xs font-bold text-[#2AFEB7]">
+            <div className="rounded-xl border border-primary/30 bg-primary/10 p-3 text-center animate-pulse">
+              <p className="text-xs font-bold text-primary">
                 🔔 {activeRequest} Dispatched
               </p>
-              <p className="text-[10px] text-[#9AA6B2] mt-0.5 leading-relaxed">
-                Staff has been notified. A server is attending to table <span className="text-[#F5F7FA] font-bold">{order.table?.name ?? 'your table'}</span> shortly.
+              <p className="text-[10px] text-muted-foreground mt-0.5 leading-relaxed">
+                Staff has been notified. A server is attending to table <span className="text-foreground font-bold">{order.table?.name ?? 'your table'}</span> shortly.
               </p>
             </div>
           )}
@@ -748,7 +748,7 @@ export default function OrderSuccessPage({
         <div className="flex flex-col gap-3 pt-2 no-print">
           <Link
             href={`/t/${token}/menu`}
-            className="w-full rounded-xl bg-[#2AFEB7] py-3.5 text-center text-xs font-black text-[#0B0F14] shadow-[0_0_15px_rgba(42,254,183,0.3)] transition-all hover:bg-[#22E5A4] active:scale-[0.99] flex items-center justify-center gap-2"
+            className="w-full rounded-xl bg-primary py-3.5 text-center text-xs font-black text-background shadow-[0_0_15px_rgba(42,254,183,0.3)] transition-all hover:bg-primary-hover active:scale-[0.99] flex items-center justify-center gap-2"
           >
             <span>🍽️</span> + Add More Food / Order Again
           </Link>
@@ -757,13 +757,13 @@ export default function OrderSuccessPage({
             <button
               type="button"
               onClick={handlePrintCustomerReceipt}
-              className="flex-1 rounded-xl bg-[#18212B] border border-[#26313C] py-3 text-center text-xs font-bold text-[#F5F7FA] transition-all hover:border-[#2AFEB7]/60 active:scale-[0.99] cursor-pointer"
+              className="flex-1 rounded-xl bg-secondary border border-border py-3 text-center text-xs font-bold text-foreground transition-all hover:border-primary/60 active:scale-[0.99] cursor-pointer"
             >
               🖨️ Print Receipt
             </button>
             <Link
               href={`/t/${token}/orders`}
-              className="flex-1 rounded-xl border border-[#26313C] bg-[#18212B] py-3 text-center text-xs font-bold text-[#F5F7FA] transition-colors hover:border-[#2AFEB7]/40 flex items-center justify-center"
+              className="flex-1 rounded-xl border border-border bg-secondary py-3 text-center text-xs font-bold text-foreground transition-colors hover:border-primary/40 flex items-center justify-center"
             >
               All Orders ({sessionOrders.length})
             </Link>
@@ -779,31 +779,31 @@ export default function OrderSuccessPage({
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-sm space-y-4 rounded-2xl border border-[#2AFEB7]/40 bg-[#111820] p-6 text-center shadow-2xl relative"
+            className="w-full max-w-sm space-y-4 rounded-2xl border border-primary/40 bg-card p-6 text-center relative"
           >
             <button
               type="button"
               onClick={() => setIsQrModalOpen(false)}
-              className="absolute right-4 top-4 rounded-full bg-[#18212B] p-1.5 text-xs text-[#9AA6B2] hover:text-white cursor-pointer"
+              className="absolute right-4 top-4 rounded-full bg-secondary p-1.5 text-xs text-muted-foreground hover:text-foreground cursor-pointer"
               aria-label="Close modal"
             >
               ✕
             </button>
 
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-widest text-[#2AFEB7]">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-primary">
                 Scan & Pay from Seat
               </span>
-              <h3 className="text-lg font-black text-[#F5F7FA]">
+              <h3 className="text-lg font-black text-foreground">
                 {restaurantName}
               </h3>
-              <p className="text-xs text-[#9AA6B2]">
+              <p className="text-xs text-muted-foreground">
                 Table: {order.table?.name ?? 'Dine In'} • {sessionOrders.length > 1 ? `${sessionOrders.length} Orders Combined` : `Token: #${order.orderNumber}`}
               </p>
             </div>
 
             {/* High-res White QR Canvas */}
-            <div className="mx-auto rounded-2xl bg-white p-4 shadow-xl inline-block">
+            <div className="mx-auto rounded-2xl bg-foreground p-4 inline-block">
               <img
                 src={qrCodeImgUrl}
                 alt="Enlarged Payment QR"
@@ -812,16 +812,16 @@ export default function OrderSuccessPage({
             </div>
 
             <div className="space-y-1">
-              <span className="text-2xl font-black text-[#2AFEB7]">
+              <span className="text-2xl font-black text-primary">
                 {formatCurrency(paymentAmount)}
               </span>
-              <p className="text-[11px] font-semibold text-[#9AA6B2]">
-                UPI: <span className="font-mono text-[#F5F7FA]">{upiPayee}</span>
+              <p className="text-[11px] font-semibold text-muted-foreground">
+                UPI: <span className="font-mono text-foreground">{upiPayee}</span>
               </p>
             </div>
 
-            <div className="rounded-xl border border-[#26313C] bg-[#0B0F14] p-3 text-[11px] text-[#9AA6B2] leading-relaxed">
-              📸 <strong className="text-white">Tip:</strong> Take a screenshot of this screen to upload into Google Pay / PhonePe scanner, or scan directly with any UPI app!
+            <div className="rounded-xl border border-border bg-background p-3 text-[11px] text-muted-foreground leading-relaxed">
+              📸 <strong className="text-foreground">Tip:</strong> Take a screenshot of this screen to upload into Google Pay / PhonePe scanner, or scan directly with any UPI app!
             </div>
 
             <div className="space-y-2 pt-1">
@@ -831,14 +831,14 @@ export default function OrderSuccessPage({
                   setPaymentConfirmed(true);
                   setIsQrModalOpen(false);
                 }}
-                className="w-full rounded-xl bg-[#2AFEB7] py-3 text-xs font-bold text-[#0B0F14] transition-all hover:bg-[#22E5A4] active:scale-95 shadow-md cursor-pointer"
+                className="w-full rounded-xl bg-primary py-3 text-xs font-bold text-background transition-all hover:bg-primary-hover active:scale-95 shadow-md cursor-pointer"
               >
                 ✓ I Have Completed Payment
               </button>
               <button
                 type="button"
                 onClick={() => setIsQrModalOpen(false)}
-                className="w-full rounded-xl border border-[#26313C] bg-[#18212B] py-2.5 text-xs font-bold text-[#9AA6B2] hover:text-white cursor-pointer"
+                className="w-full rounded-xl border border-border bg-secondary py-2.5 text-xs font-bold text-muted-foreground hover:text-foreground cursor-pointer"
               >
                 Close
               </button>

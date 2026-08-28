@@ -13,12 +13,12 @@ export function MenuPerformanceMatrix({ data, isLoading }: MenuPerformanceMatrix
   const [activeTab, setActiveTab] = useState<'matrix' | 'allItems' | 'categories'>('matrix');
 
   if (isLoading) {
-    return <div className="h-96 rounded-xl bg-card/60 animate-pulse border border-border/50" />;
+    return <div className="h-96 rounded-xl bg-card animate-pulse border border-border" />;
   }
 
   if (!data) return null;
 
-  const { menuMatrix, topSellingItems, categoryPerformance, allItems } = data;
+  const { menuMatrix, categoryPerformance, allItems } = data;
 
   const renderMatrixQuadrant = (
     title: string,
@@ -28,13 +28,13 @@ export function MenuPerformanceMatrix({ data, isLoading }: MenuPerformanceMatrix
     desc: string,
     bgColor: string,
   ) => (
-    <div className={`p-4 rounded-xl border border-border/70 ${bgColor} flex flex-col h-full`}>
+    <div className={`p-4 rounded-xl border border-border ${bgColor} flex flex-col h-full shadow-md`}>
       <div className="flex items-center justify-between mb-1">
         <div className="flex items-center gap-2">
           {icon}
           <h4 className="text-sm font-bold text-foreground">{title}</h4>
         </div>
-        <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-background border border-border">
+        <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-background border border-border text-muted-foreground">
           {items.length} items
         </span>
       </div>
@@ -47,14 +47,14 @@ export function MenuPerformanceMatrix({ data, isLoading }: MenuPerformanceMatrix
           items.map((item) => (
             <div
               key={item.menuItemId}
-              className="bg-card/90 border border-border/50 rounded-lg p-2.5 flex items-center justify-between text-xs"
+              className="bg-background/80 border border-border/70 rounded-lg p-2.5 flex items-center justify-between text-xs hover:border-primary/40 transition-colors"
             >
               <div>
                 <div className="font-semibold text-foreground">{item.name}</div>
                 <div className="text-[10px] text-muted-foreground">{item.categoryName} • ₹{item.price}</div>
               </div>
               <div className="text-right">
-                <div className="font-bold text-foreground">₹{item.totalRevenue.toLocaleString('en-IN')}</div>
+                <div className="font-bold text-primary">₹{item.totalRevenue.toLocaleString('en-IN')}</div>
                 <div className="text-[10px] text-muted-foreground">{item.unitsSold} sold ({item.revenueContributionPercent}%)</div>
               </div>
             </div>
@@ -65,20 +65,20 @@ export function MenuPerformanceMatrix({ data, isLoading }: MenuPerformanceMatrix
   );
 
   return (
-    <div className="bg-card border border-border rounded-xl p-6 shadow-sm space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-border/60">
+    <div className="bg-card border border-border rounded-xl p-6 space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-border">
         <div>
-          <h3 className="text-base font-semibold text-foreground">Menu & Product Intelligence</h3>
+          <h3 className="text-base font-bold text-foreground">Menu & Product Intelligence</h3>
           <p className="text-xs text-muted-foreground mt-0.5">
             2×2 Boston matrix classifications and category velocity
           </p>
         </div>
 
-        <div className="flex items-center gap-1.5 p-1 bg-muted/60 rounded-lg text-xs font-medium self-start sm:self-auto">
+        <div className="flex items-center gap-1.5 p-1 bg-background border border-border rounded-lg text-xs font-medium self-start sm:self-auto">
           <button
             onClick={() => setActiveTab('matrix')}
             className={`px-3 py-1.5 rounded-md transition-all ${
-              activeTab === 'matrix' ? 'bg-background shadow-sm text-foreground font-semibold' : 'text-muted-foreground hover:text-foreground'
+              activeTab === 'matrix' ? 'bg-secondary text-primary font-bold border border-primary/30 shadow-sm' : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             2×2 Profit Matrix
@@ -86,7 +86,7 @@ export function MenuPerformanceMatrix({ data, isLoading }: MenuPerformanceMatrix
           <button
             onClick={() => setActiveTab('categories')}
             className={`px-3 py-1.5 rounded-md transition-all ${
-              activeTab === 'categories' ? 'bg-background shadow-sm text-foreground font-semibold' : 'text-muted-foreground hover:text-foreground'
+              activeTab === 'categories' ? 'bg-secondary text-primary font-bold border border-primary/30 shadow-sm' : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             Categories ({categoryPerformance.length})
@@ -94,7 +94,7 @@ export function MenuPerformanceMatrix({ data, isLoading }: MenuPerformanceMatrix
           <button
             onClick={() => setActiveTab('allItems')}
             className={`px-3 py-1.5 rounded-md transition-all ${
-              activeTab === 'allItems' ? 'bg-background shadow-sm text-foreground font-semibold' : 'text-muted-foreground hover:text-foreground'
+              activeTab === 'allItems' ? 'bg-secondary text-primary font-bold border border-primary/30 shadow-sm' : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             All Items ({allItems.length})
@@ -107,7 +107,7 @@ export function MenuPerformanceMatrix({ data, isLoading }: MenuPerformanceMatrix
           {renderMatrixQuadrant(
             'Stars',
             'HIGH VOLUME • HIGH REVENUE',
-            <Star className="w-4 h-4 text-amber-500 fill-amber-500" />,
+            <Star className="w-4 h-4 text-amber-400 fill-amber-400" />,
             menuMatrix.stars,
             'Top sellers driving highest revenue contribution. Promote prominently.',
             'bg-amber-500/5',
@@ -115,7 +115,7 @@ export function MenuPerformanceMatrix({ data, isLoading }: MenuPerformanceMatrix
           {renderMatrixQuadrant(
             'Plowhorses',
             'HIGH VOLUME • LOW REVENUE',
-            <TrendingUp className="w-4 h-4 text-blue-500" />,
+            <TrendingUp className="w-4 h-4 text-blue-400" />,
             menuMatrix.plowhorses,
             'High ordering velocity with modest price points. Consider margin optimization.',
             'bg-blue-500/5',
@@ -123,7 +123,7 @@ export function MenuPerformanceMatrix({ data, isLoading }: MenuPerformanceMatrix
           {renderMatrixQuadrant(
             'Puzzles',
             'LOW VOLUME • HIGH REVENUE',
-            <HelpCircle className="w-4 h-4 text-purple-500" />,
+            <HelpCircle className="w-4 h-4 text-purple-400" />,
             menuMatrix.puzzles,
             'High-ticket items with lower unit velocity. Feature in combos/specials.',
             'bg-purple-500/5',
@@ -131,7 +131,7 @@ export function MenuPerformanceMatrix({ data, isLoading }: MenuPerformanceMatrix
           {renderMatrixQuadrant(
             'Dogs',
             'LOW VOLUME • LOW REVENUE',
-            <AlertTriangle className="w-4 h-4 text-rose-500" />,
+            <AlertTriangle className="w-4 h-4 text-rose-400" />,
             menuMatrix.dogs,
             'Underperforming items. Candidate for menu refresh or price revision.',
             'bg-rose-500/5',
@@ -144,7 +144,7 @@ export function MenuPerformanceMatrix({ data, isLoading }: MenuPerformanceMatrix
           {categoryPerformance.map((cat) => (
             <div
               key={cat.categoryId}
-              className="flex items-center justify-between p-4 rounded-xl border border-border/60 bg-muted/20 text-xs"
+              className="flex items-center justify-between p-4 rounded-xl border border-border bg-secondary/70 text-xs hover:border-primary/40 transition-colors"
             >
               <div>
                 <div className="font-bold text-sm text-foreground">{cat.name}</div>
@@ -153,8 +153,8 @@ export function MenuPerformanceMatrix({ data, isLoading }: MenuPerformanceMatrix
                 </div>
               </div>
               <div className="text-right">
-                <div className="font-bold text-sm text-foreground">₹{cat.totalRevenue.toLocaleString('en-IN')}</div>
-                <div className="text-primary font-medium text-[11px]">{cat.revenueContributionPercent}% of revenue</div>
+                <div className="font-bold text-sm text-primary">₹{cat.totalRevenue.toLocaleString('en-IN')}</div>
+                <div className="text-muted-foreground font-medium text-[11px]">{cat.revenueContributionPercent}% of revenue</div>
               </div>
             </div>
           ))}
@@ -162,30 +162,30 @@ export function MenuPerformanceMatrix({ data, isLoading }: MenuPerformanceMatrix
       )}
 
       {activeTab === 'allItems' && (
-        <div className="overflow-x-auto">
+        <div className="table-responsive rounded-xl border border-border bg-card">
           <table className="w-full text-left text-xs border-collapse">
-            <thead>
-              <tr className="border-b border-border text-muted-foreground uppercase text-[10px]">
-                <th className="pb-3 font-semibold">Item Name</th>
-                <th className="pb-3 font-semibold">Category</th>
-                <th className="pb-3 font-semibold">Price</th>
-                <th className="pb-3 font-semibold">Units Sold</th>
-                <th className="pb-3 font-semibold">Revenue</th>
-                <th className="pb-3 font-semibold">Share</th>
-                <th className="pb-3 font-semibold">Classification</th>
+            <thead className="bg-secondary border-b border-border">
+              <tr className="text-muted-foreground uppercase text-[10px] tracking-wider">
+                <th className="p-3.5 font-semibold">Item Name</th>
+                <th className="p-3.5 font-semibold">Category</th>
+                <th className="p-3.5 font-semibold">Price</th>
+                <th className="p-3.5 font-semibold">Units Sold</th>
+                <th className="p-3.5 font-semibold">Revenue</th>
+                <th className="p-3.5 font-semibold">Share</th>
+                <th className="p-3.5 font-semibold">Classification</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border/40">
+            <tbody className="divide-y divide-border">
               {allItems.map((item) => (
-                <tr key={item.menuItemId} className="hover:bg-muted/30">
-                  <td className="py-3 font-semibold text-foreground">{item.name}</td>
-                  <td className="py-3 text-muted-foreground">{item.categoryName}</td>
-                  <td className="py-3 font-medium">₹{item.price}</td>
-                  <td className="py-3">{item.unitsSold}</td>
-                  <td className="py-3 font-semibold text-foreground">₹{item.totalRevenue.toLocaleString('en-IN')}</td>
-                  <td className="py-3 text-muted-foreground">{item.revenueContributionPercent}%</td>
-                  <td className="py-3">
-                    <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-muted border border-border">
+                <tr key={item.menuItemId} className="hover:bg-secondary transition-colors">
+                  <td className="p-3.5 font-semibold text-foreground">{item.name}</td>
+                  <td className="p-3.5 text-muted-foreground">{item.categoryName}</td>
+                  <td className="p-3.5 font-medium text-foreground">₹{item.price}</td>
+                  <td className="p-3.5 text-foreground">{item.unitsSold}</td>
+                  <td className="p-3.5 font-semibold text-primary">₹{item.totalRevenue.toLocaleString('en-IN')}</td>
+                  <td className="p-3.5 text-muted-foreground">{item.revenueContributionPercent}%</td>
+                  <td className="p-3.5">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-secondary border border-border text-primary">
                       {item.classification}
                     </span>
                   </td>

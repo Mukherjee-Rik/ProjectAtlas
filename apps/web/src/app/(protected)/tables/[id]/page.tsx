@@ -124,8 +124,8 @@ export default function TableDetailsPage({
   if (isLoading) {
     return (
       <div className="space-y-6 max-w-3xl">
-        <h1 className="text-3xl font-bold text-[#F5F7FA]">Table Details</h1>
-        <div className="rounded-xl border border-[#26313C] bg-[#111820] p-8 text-center text-[#9AA6B2]">
+        <h1 className="font-display text-3xl font-semibold tracking-[-0.02em] text-foreground">Table Details</h1>
+        <div className="rounded-xl border border-border bg-card p-8 text-center text-muted-foreground">
           Loading table information...
         </div>
       </div>
@@ -135,13 +135,13 @@ export default function TableDetailsPage({
   if (error || !table) {
     return (
       <div className="space-y-6 max-w-3xl">
-        <h1 className="text-3xl font-bold text-[#F5F7FA]">Table Details</h1>
-        <div className="rounded-xl border border-[#EF4444]/40 bg-[#EF4444]/10 p-8 text-center text-[#EF4444]">
+        <h1 className="font-display text-3xl font-semibold tracking-[-0.02em] text-foreground">Table Details</h1>
+        <div className="rounded-xl border border-atlas-error/40 bg-atlas-error/10 p-8 text-center text-atlas-error">
           <p>{error || 'Table not found.'}</p>
           <button
             type="button"
             onClick={() => router.push('/tables')}
-            className="mt-4 rounded-lg border border-[#26313C] bg-[#18212B] px-4 py-2 text-sm text-[#F5F7FA]"
+            className="mt-4 rounded-lg border border-border bg-secondary px-4 py-2 text-sm text-foreground"
           >
             Back to Tables
           </button>
@@ -155,10 +155,10 @@ export default function TableDetailsPage({
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-[#F5F7FA]">
+          <h1 className="font-display text-3xl font-semibold tracking-[-0.02em] text-foreground">
             {table.name}
           </h1>
-          <p className="mt-1 text-sm font-mono text-[#2AFEB7]">
+          <p className="mt-1 text-sm font-mono text-primary">
             Code: {table.code}
           </p>
         </div>
@@ -167,7 +167,7 @@ export default function TableDetailsPage({
           <button
             type="button"
             onClick={() => router.push(`/tables/${table.id}/edit`)}
-            className="rounded-lg border border-[#26313C] bg-[#18212B] px-4 py-2 text-sm font-semibold text-[#F5F7FA] hover:border-[#2AFEB7]"
+            className="rounded-lg border border-border bg-secondary px-4 py-2 text-sm font-semibold text-foreground hover:border-primary"
           >
             Edit
           </button>
@@ -175,7 +175,7 @@ export default function TableDetailsPage({
           <button
             type="button"
             onClick={() => setShowDeleteConfirm(true)}
-            className="rounded-lg border border-[#EF4444]/40 bg-[#EF4444]/10 px-4 py-2 text-sm font-semibold text-[#EF4444] hover:bg-[#EF4444]/20"
+            className="rounded-lg border border-atlas-error/40 bg-atlas-error/10 px-4 py-2 text-sm font-semibold text-atlas-error hover:bg-atlas-error/20"
           >
             Delete
           </button>
@@ -185,38 +185,38 @@ export default function TableDetailsPage({
       {/* Grid: Properties + Digital QR Code */}
       <div className="grid gap-6 md:grid-cols-2">
         {/* Table Properties Card */}
-        <div className="overflow-hidden rounded-xl border border-[#26313C] bg-[#111820] shadow-xl">
-          <div className="border-b border-[#26313C] p-6 bg-[#18212B]/40">
-            <h2 className="text-xl font-bold text-[#F5F7FA]">Table Properties</h2>
+        <div className="overflow-hidden rounded-xl border border-border bg-card">
+          <div className="border-b border-border p-6 bg-secondary/40">
+            <h2 className="text-xl font-bold text-foreground">Table Properties</h2>
           </div>
 
           <div className="p-6 space-y-6">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Dining Area
               </p>
-              <p className="mt-1 text-base font-semibold text-[#F5F7FA]">
+              <p className="mt-1 text-base font-semibold text-foreground">
                 {table.diningArea?.name ?? '—'} ({table.diningArea?.code ?? '—'})
               </p>
             </div>
 
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Status
               </p>
               <div className="mt-1">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#22C55E]/15 px-3 py-1 text-xs font-semibold text-[#22C55E] border border-[#22C55E]/30">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[#22C55E]" />
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-atlas-success/15 px-3 py-1 text-xs font-semibold text-atlas-success border border-atlas-success/30">
+                  <span className="h-1.5 w-1.5 rounded-full bg-atlas-success" />
                   {table.status}
                 </span>
               </div>
             </div>
 
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Seating Capacity
               </p>
-              <p className="mt-1 text-lg font-bold text-[#2AFEB7]">
+              <p className="mt-1 text-lg font-bold text-primary">
                 👥 {table.capacity} people
               </p>
             </div>
@@ -224,37 +224,37 @@ export default function TableDetailsPage({
         </div>
 
         {/* Table QR Code Management Card */}
-        <div className="overflow-hidden rounded-xl border border-[#26313C] bg-[#111820] shadow-xl">
-          <div className="border-b border-[#26313C] p-6 bg-[#18212B]/40 flex items-center justify-between">
-            <h2 className="text-xl font-bold text-[#F5F7FA]">Table Digital QR Code</h2>
-            <span className="rounded bg-[#2AFEB7]/10 px-2 py-0.5 text-xs font-mono text-[#2AFEB7]">
+        <div className="overflow-hidden rounded-xl border border-border bg-card">
+          <div className="border-b border-border p-6 bg-secondary/40 flex items-center justify-between">
+            <h2 className="text-xl font-bold text-foreground">Table Digital QR Code</h2>
+            <span className="rounded bg-primary/10 px-2 py-0.5 text-xs font-mono text-primary">
               ACTIVE
             </span>
           </div>
 
           <div className="p-6 flex flex-col items-center justify-center text-center space-y-4">
             {isLoadingQr ? (
-              <div className="h-44 w-44 rounded-lg bg-[#18212B] animate-pulse flex items-center justify-center text-xs text-[#9AA6B2]">
+              <div className="h-44 w-44 rounded-lg bg-secondary animate-pulse flex items-center justify-center text-xs text-muted-foreground">
                 Generating QR...
               </div>
             ) : qrData?.qrCodeSvg ? (
-              <div className="bg-white p-3 rounded-xl shadow-lg border border-[#26313C]">
+              <div className="bg-foreground p-3 rounded-xl shadow-lg border border-border">
                 <div
                   className="h-44 w-44"
                   dangerouslySetInnerHTML={{ __html: qrData.qrCodeSvg }}
                 />
               </div>
             ) : (
-              <div className="h-44 w-44 rounded-lg bg-[#18212B] flex items-center justify-center text-xs text-[#EF4444]">
+              <div className="h-44 w-44 rounded-lg bg-secondary flex items-center justify-center text-xs text-atlas-error">
                 Failed to load QR
               </div>
             )}
 
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Public Access Link
               </p>
-              <p className="mt-1 text-xs font-mono text-[#2AFEB7] break-all">
+              <p className="mt-1 text-xs font-mono text-primary break-all">
                 {qrData?.url ?? 'http://localhost:3001/t/...'}
               </p>
             </div>
@@ -264,7 +264,7 @@ export default function TableDetailsPage({
                 type="button"
                 onClick={handleDownloadQr}
                 disabled={!qrData}
-                className="rounded-lg bg-[#2AFEB7] px-4 py-2 text-xs font-semibold text-[#0B0F14] transition-all hover:bg-[#22E5A4] disabled:opacity-50"
+                className="rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-background transition-all hover:bg-primary-hover disabled:opacity-50"
               >
                 Download QR SVG
               </button>
@@ -273,7 +273,7 @@ export default function TableDetailsPage({
                 type="button"
                 onClick={() => setShowRegenerateConfirm(true)}
                 disabled={!qrData}
-                className="rounded-lg border border-[#26313C] bg-[#18212B] px-4 py-2 text-xs font-semibold text-[#F5F7FA] hover:border-[#2AFEB7] disabled:opacity-50"
+                className="rounded-lg border border-border bg-secondary px-4 py-2 text-xs font-semibold text-foreground hover:border-primary disabled:opacity-50"
               >
                 Regenerate Token
               </button>

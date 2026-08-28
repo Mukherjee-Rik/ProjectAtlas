@@ -89,14 +89,14 @@ export function ImageUpload({
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <label className="block text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
+        <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           {label}
         </label>
 
         <button
           type="button"
           onClick={() => setIsUrlMode(!isUrlMode)}
-          className="text-[11px] text-[#2AFEB7] hover:underline flex items-center gap-1 font-medium"
+          className="text-[11px] text-primary hover:underline flex items-center gap-1 font-medium"
         >
           {isUrlMode ? (
             <>
@@ -118,27 +118,27 @@ export function ImageUpload({
               value={urlInput}
               onChange={(e) => setUrlInput(e.target.value)}
               placeholder="https://example.com/payment-qr.png"
-              className="flex-1 rounded-xl border border-[#26313C] bg-[#0B0F14] px-3.5 py-2.5 text-xs text-[#F5F7FA] placeholder-[#64748B] focus:border-[#2AFEB7] focus:outline-none"
+              className="flex-1 rounded-xl border border-border bg-background px-3.5 py-2.5 text-xs text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none"
             />
             <button
               type="button"
               onClick={() => onChange(urlInput)}
-              className="rounded-xl bg-[#2AFEB7] px-4 py-2 text-xs font-bold text-[#0B0F14] hover:bg-[#22E5A4] flex items-center gap-1"
+              className="rounded-xl bg-primary px-4 py-2 text-xs font-bold text-background hover:bg-primary-hover flex items-center gap-1"
             >
               <Check className="h-3.5 w-3.5" /> Apply
             </button>
           </div>
           {helperText && (
-            <p className="text-[11px] text-[#9AA6B2]">{helperText}</p>
+            <p className="text-[11px] text-muted-foreground">{helperText}</p>
           )}
         </div>
       ) : (
         <div>
           {value ? (
             /* Uploaded Image Preview Box */
-            <div className="relative rounded-2xl border border-[#2AFEB7]/40 bg-[#18212B] p-4 flex items-center justify-between gap-4">
+            <div className="relative rounded-2xl border border-primary/40 bg-secondary p-4 flex items-center justify-between gap-4">
               <div className="flex items-center gap-3">
-                <div className="h-16 w-16 rounded-xl bg-white p-1 flex items-center justify-center overflow-hidden border border-[#26313C] shrink-0 shadow-md">
+                <div className="h-16 w-16 rounded-xl bg-foreground p-1 flex items-center justify-center overflow-hidden border border-border shrink-0 shadow-md">
                   <img
                     src={value}
                     alt="Uploaded QR Preview"
@@ -147,10 +147,10 @@ export function ImageUpload({
                 </div>
 
                 <div className="space-y-0.5 min-w-0">
-                  <p className="text-xs font-bold text-[#F5F7FA] flex items-center gap-1.5">
-                    <span className="text-[#2AFEB7]">✓</span> Custom QR Uploaded
+                  <p className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                    <span className="text-primary">✓</span> Custom QR Uploaded
                   </p>
-                  <p className="text-[11px] text-[#9AA6B2]">
+                  <p className="text-[11px] text-muted-foreground">
                     Image ready & active for customer table payments
                   </p>
                 </div>
@@ -160,14 +160,14 @@ export function ImageUpload({
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="rounded-lg border border-[#26313C] bg-[#111820] px-3 py-1.5 text-xs font-semibold text-[#F5F7FA] hover:border-[#2AFEB7] hover:text-[#2AFEB7] transition-all"
+                  className="rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-semibold text-foreground hover:border-primary hover:text-primary transition-all"
                 >
                   Change
                 </button>
                 <button
                   type="button"
                   onClick={handleRemove}
-                  className="rounded-lg border border-[#EF4444]/30 bg-[#EF4444]/10 p-1.5 text-xs text-[#EF4444] hover:bg-[#EF4444]/20 transition-all"
+                  className="rounded-lg border border-atlas-error/30 bg-atlas-error/10 p-1.5 text-xs text-atlas-error hover:bg-atlas-error/20 transition-all"
                   aria-label="Remove image"
                 >
                   <X className="h-4 w-4" />
@@ -184,19 +184,19 @@ export function ImageUpload({
               className={[
                 'cursor-pointer rounded-2xl border-2 border-dashed p-6 text-center transition-all duration-200 flex flex-col items-center justify-center space-y-2',
                 isDragging
-                  ? 'border-[#2AFEB7] bg-[#2AFEB7]/10 scale-[1.01]'
-                  : 'border-[#26313C] bg-[#0B0F14]/60 hover:border-[#2AFEB7]/60 hover:bg-[#18212B]/40',
+                  ? 'border-primary bg-primary/10 scale-[1.01]'
+                  : 'border-border bg-background/60 hover:border-primary/60 hover:bg-secondary/40',
               ].join(' ')}
             >
-              <div className="rounded-full bg-[#18212B] p-3 text-[#2AFEB7] border border-[#26313C] shadow-inner">
+              <div className="rounded-full bg-secondary p-3 text-primary border border-border shadow-inner">
                 <Upload className="h-5 w-5" />
               </div>
 
               <div className="space-y-1">
-                <p className="text-xs font-bold text-[#F5F7FA]">
+                <p className="text-xs font-bold text-foreground">
                   Click to upload or drag & drop QR Code photo
                 </p>
-                <p className="text-[11px] text-[#9AA6B2]">{helperText}</p>
+                <p className="text-[11px] text-muted-foreground">{helperText}</p>
               </div>
             </div>
           )}
@@ -212,7 +212,7 @@ export function ImageUpload({
       )}
 
       {error && (
-        <p className="text-xs font-semibold text-[#EF4444] animate-fadeIn">
+        <p className="text-xs font-semibold text-atlas-error animate-fadeIn">
           ⚠️ {error}
         </p>
       )}
