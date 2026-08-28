@@ -433,7 +433,7 @@ export class OrdersService {
       select: ORDER_SELECT_FULL,
     });
 
-    // [V2 FEATURE - Automated Inventory Engine Stock Deductions / Returns (Commented out for V1)]
+    // V2 FEATURE - Automated Inventory Engine Stock Deductions / Returns (Commented out for V1)
     /*
     if (
       dto.status === OrderStatus.CONFIRMED ||

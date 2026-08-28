@@ -1,7 +1,11 @@
 export type UnitOfMeasure = 'KG' | 'GRAM' | 'LITER' | 'ML' | 'PIECE' | 'BOX';
 
+export type RecipeType = 'COOKED_TO_ORDER' | 'BATCH_PREPARED';
+
 export type StockTransactionType =
   | 'RECIPE_DEDUCTION'
+  | 'BATCH_PRODUCTION'
+  | 'BATCH_WASTAGE'
   | 'MANUAL_PURCHASE'
   | 'WASTE_SPOILAGE'
   | 'AUDIT_ADJUSTMENT';
@@ -49,9 +53,27 @@ export interface MenuItemRecipe {
   hasRecipe: boolean;
   recipe?: {
     id: string;
+    recipeType: RecipeType;
+    batchYieldPortions: number;
+    preparedStock: number;
     ingredients: RecipeIngredient[];
     totalRecipeCost: number;
   } | null;
+}
+
+export interface BatchProduction {
+  id: string;
+  recipeId: string;
+  menuItemId: string;
+  menuItemName: string;
+  portionsProduced: number;
+  portionsRemaining: number;
+  currentRecipeStock: number;
+  notes?: string;
+  status: 'ACTIVE' | 'DEPLETED' | 'DISCARDED';
+  producedAt: string;
+  expiresAt?: string;
+  createdAt: string;
 }
 
 export interface StockMovement {

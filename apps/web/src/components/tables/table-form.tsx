@@ -121,12 +121,12 @@ export function TableForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-6" noValidate>
       {formError && (
-        <div className="rounded-xl border border-[#EF4444]/40 bg-[#EF4444]/10 p-4 text-sm text-[#EF4444] animate-in fade-in">
+        <div className="rounded-xl border border-atlas-error/40 bg-atlas-error/10 p-4 text-sm text-atlas-error animate-in fade-in">
           {formError}
         </div>
       )}
 
-      <div className="space-y-4 rounded-xl border border-[#26313C] bg-[#111820] p-6 shadow-xl">
+      <div className="space-y-4 rounded-xl border border-border bg-card p-6">
         {/* Dining Area */}
         <ValidatedSelect
           label="Dining Area"
@@ -218,7 +218,7 @@ export function TableForm({
         <button
           type="button"
           onClick={onCancel}
-          className="rounded-lg border border-[#26313C] bg-[#18212B] px-4 py-2.5 text-sm font-semibold text-[#F5F7FA] transition-all hover:bg-[#26313C]"
+          className="rounded-lg border border-border bg-secondary px-4 py-2.5 text-sm font-semibold text-foreground transition-all hover:bg-border"
         >
           Cancel
         </button>
@@ -226,7 +226,7 @@ export function TableForm({
         <button
           type="submit"
           disabled={isLoading}
-          className="rounded-lg bg-[#2AFEB7] px-6 py-2.5 text-sm font-semibold text-[#0B0F14] transition-all hover:bg-[#22E5A4] disabled:opacity-50 shadow-sm font-bold"
+          className="rounded-lg bg-primary px-6 py-2.5 text-sm font-semibold text-background transition-all hover:bg-primary-hover disabled:opacity-50 shadow-sm font-bold"
         >
           {isLoading ? 'Saving...' : isEdit ? 'Update Table' : 'Create Table'}
         </button>

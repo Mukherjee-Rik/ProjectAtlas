@@ -85,7 +85,7 @@ export default function DashboardPage() {
       setIsLoading(false);
       setIsRefreshing(false);
     }
-  }, [user?.role, startDate, endDate]);
+  }, [user?.role, startDate, endDate, currentRestaurant?.id, currentBranch?.id]);
 
   const loadAnalytics = useCallback(async (showLoading = true, start?: string, end?: string) => {
     if (showLoading) setIsLoadingAnalytics(true);
@@ -102,9 +102,9 @@ export default function DashboardPage() {
     } finally {
       setIsLoadingAnalytics(false);
     }
-  }, [startDate, endDate]);
+  }, [startDate, endDate, currentRestaurant?.id, currentBranch?.id]);
 
-  // Load dashboard and analytics when dates or active tab change
+  // Load dashboard and analytics when dates, active tab, restaurant, or branch change
   useEffect(() => {
     void loadDashboard(false, startDate, endDate);
     if (activeTab === 'analytics') {
@@ -112,7 +112,7 @@ export default function DashboardPage() {
     } else {
       setAnalytics(null);
     }
-  }, [startDate, endDate, activeTab]);
+  }, [startDate, endDate, activeTab, currentRestaurant?.id, currentBranch?.id, loadDashboard, loadAnalytics]);
 
   if (user?.role === 'PLATFORM_ADMIN') {
     return <PlatformAdminDashboard />;
@@ -124,17 +124,17 @@ export default function DashboardPage() {
 
   if (error || !dashboard) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-xl border border-[#26313C] bg-[#111820] p-12 text-center shadow-xl">
-        <h2 className="text-xl font-bold text-[#F5F7FA]">
+      <div className="flex flex-col items-center justify-center rounded-xl border border-border bg-card p-12 text-center">
+        <h2 className="text-xl font-bold text-foreground">
           Unable to load restaurant dashboard
         </h2>
-        <p className="mt-2 text-sm text-[#9AA6B2]">
+        <p className="mt-2 text-sm text-muted-foreground">
           We couldn't retrieve your restaurant data.
         </p>
         <button
           type="button"
           onClick={() => void loadDashboard()}
-          className="mt-6 rounded-lg bg-[#2AFEB7] px-4 py-2 text-sm font-semibold text-[#0B0F14] transition-all hover:bg-[#22E5A4] active:scale-[0.99]"
+          className="mt-6 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-background transition-all hover:bg-primary-hover active:scale-[0.99]"
         >
           Try Again
         </button>
@@ -148,17 +148,17 @@ export default function DashboardPage() {
     switch (status) {
       case 'COMPLETED':
       case 'SERVED':
-        return 'bg-[#2AFEB7]/10 text-[#2AFEB7] border-[#2AFEB7]/30';
+        return 'bg-primary/10 text-primary border-primary/30';
       case 'PREPARING':
       case 'READY':
-        return 'bg-[#3B82F6]/10 text-[#3B82F6] border-[#3B82F6]/30';
+        return 'bg-atlas-info/10 text-atlas-info border-atlas-info/30';
       case 'CONFIRMED':
       case 'PENDING':
-        return 'bg-[#F59E0B]/10 text-[#F59E0B] border-[#F59E0B]/30';
+        return 'bg-atlas-warning/10 text-atlas-warning border-atlas-warning/30';
       case 'CANCELLED':
-        return 'bg-[#EF4444]/10 text-[#EF4444] border-[#EF4444]/30';
+        return 'bg-atlas-error/10 text-atlas-error border-atlas-error/30';
       default:
-        return 'bg-[#18212B] text-[#9AA6B2] border-[#26313C]';
+        return 'bg-secondary text-muted-foreground border-border';
     }
   };
 
@@ -177,18 +177,18 @@ export default function DashboardPage() {
       {/* Header & Quick Actions */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-[#F5F7FA]">
+          <h1 className="font-display text-3xl font-semibold tracking-[-0.02em] text-foreground">
             {currentRestaurant?.name ?? currentTenant?.name ?? 'Restaurant Dashboard'}
           </h1>
-          <p className="mt-1 text-xs text-[#9AA6B2]">
-            Welcome back, <span className="font-semibold text-[#F5F7FA]">{user?.name ?? 'Manager'}</span>! Operating in{' '}
-            <span className="font-semibold text-[#2AFEB7]">
+          <p className="mt-1 text-xs text-muted-foreground">
+            Welcome back, <span className="font-semibold text-foreground">{user?.name ?? 'Manager'}</span>! Operating in{' '}
+            <span className="font-semibold text-primary">
               {currentRestaurant?.name ?? currentTenant?.name ?? 'Workspace'}
             </span>
             {currentBranch && (
               <span>
                 {' / '}
-                <span className="font-semibold text-[#F5F7FA]">
+                <span className="font-semibold text-foreground">
                   {currentBranch.name} ({currentBranch.code})
                 </span>
               </span>
@@ -202,7 +202,7 @@ export default function DashboardPage() {
               type="button"
               disabled={isRefreshing}
               onClick={() => void loadDashboard(true)}
-              className="flex items-center gap-2 rounded-xl border border-[#26313C] bg-[#18212B] px-3.5 py-2 text-xs font-medium text-[#F5F7FA] transition-colors hover:border-[#2AFEB7] disabled:opacity-50"
+              className="flex items-center gap-2 rounded-xl border border-border bg-secondary px-3.5 py-2 text-xs font-medium text-foreground transition-colors hover:border-primary disabled:opacity-50"
             >
               <span className={isRefreshing ? 'animate-spin' : ''}>⟳</span>
               <span>{isRefreshing ? 'Refreshing...' : 'Refresh'}</span>
@@ -212,7 +212,7 @@ export default function DashboardPage() {
               type="button"
               disabled={isLoadingAnalytics}
               onClick={() => void loadAnalytics(true)}
-              className="flex items-center gap-2 rounded-xl border border-[#26313C] bg-[#18212B] px-3.5 py-2 text-xs font-medium text-[#F5F7FA] transition-colors hover:border-[#2AFEB7] disabled:opacity-50"
+              className="flex items-center gap-2 rounded-xl border border-border bg-secondary px-3.5 py-2 text-xs font-medium text-foreground transition-colors hover:border-primary disabled:opacity-50"
             >
               <span className={isLoadingAnalytics ? 'animate-spin' : ''}>⟳</span>
               <span>{isLoadingAnalytics ? 'Updating...' : 'Reload'}</span>
@@ -221,7 +221,7 @@ export default function DashboardPage() {
 
           <Link
             href="/menus"
-            className="rounded-xl bg-[#2AFEB7] px-4 py-2 text-xs font-bold text-[#0B0F14] transition-all hover:bg-[#22E5A4] active:scale-[0.99]"
+            className="rounded-xl bg-primary px-4 py-2 text-xs font-bold text-background transition-all hover:bg-primary-hover active:scale-[0.99]"
           >
             + Add Menu Item
           </Link>
@@ -229,28 +229,28 @@ export default function DashboardPage() {
       </div>
 
       {/* Date Pickers Filter Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[#26313C] bg-[#111820] p-4 shadow-xl">
+      <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border bg-card p-4">
         <div className="flex items-center gap-3">
-          <span className="text-xs font-bold text-[#F5F7FA]">📅 Date Range Filter</span>
-          <span className="text-[10px] text-[#9AA6B2]">Filter sales, orders & charts</span>
+          <span className="text-xs font-bold text-foreground">📅 Date Range Filter</span>
+          <span className="text-[10px] text-muted-foreground">Filter sales, orders & charts</span>
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-2">
-            <span className="text-xs text-[#9AA6B2]">From</span>
+            <span className="text-xs text-muted-foreground">From</span>
             <input
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              className="rounded-lg border border-[#26313C] bg-[#18212B] px-3 py-1.5 text-xs text-[#F5F7FA] outline-none focus:border-[#2AFEB7]"
+              className="rounded-lg border border-border bg-secondary px-3 py-1.5 text-xs text-foreground outline-none focus:border-primary"
             />
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-[#9AA6B2]">To</span>
+            <span className="text-xs text-muted-foreground">To</span>
             <input
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              className="rounded-lg border border-[#26313C] bg-[#18212B] px-3 py-1.5 text-xs text-[#F5F7FA] outline-none focus:border-[#2AFEB7]"
+              className="rounded-lg border border-border bg-secondary px-3 py-1.5 text-xs text-foreground outline-none focus:border-primary"
             />
           </div>
           <button
@@ -259,7 +259,7 @@ export default function DashboardPage() {
               setStartDate(getPastDateStr(30));
               setEndDate(getTodayDateStr());
             }}
-            className="rounded-lg border border-[#26313C] bg-[#18212B] px-3 py-1.5 text-[11px] font-bold text-[#9AA6B2] hover:text-[#F5F7FA] hover:border-[#2AFEB7]"
+            className="rounded-lg border border-border bg-secondary px-3 py-1.5 text-[11px] font-bold text-muted-foreground hover:text-foreground hover:border-primary"
           >
             Reset
           </button>
@@ -267,14 +267,14 @@ export default function DashboardPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-[#26313C] gap-6">
+      <div className="flex border-b border-border gap-6">
         <button
           type="button"
           onClick={() => setActiveTab('overview')}
           className={`pb-3 text-sm font-bold transition-all border-b-2 relative ${
             activeTab === 'overview'
-              ? 'border-[#2AFEB7] text-[#2AFEB7]'
-              : 'border-transparent text-[#9AA6B2] hover:text-[#F5F7FA]'
+              ? 'border-primary text-primary'
+              : 'border-transparent text-muted-foreground hover:text-foreground'
           }`}
         >
           Overview
@@ -284,8 +284,8 @@ export default function DashboardPage() {
           onClick={() => setActiveTab('analytics')}
           className={`pb-3 text-sm font-bold transition-all border-b-2 relative ${
             activeTab === 'analytics'
-              ? 'border-[#2AFEB7] text-[#2AFEB7]'
-              : 'border-transparent text-[#9AA6B2] hover:text-[#F5F7FA]'
+              ? 'border-primary text-primary'
+              : 'border-transparent text-muted-foreground hover:text-foreground'
           }`}
         >
           Advanced Analytics
@@ -295,23 +295,23 @@ export default function DashboardPage() {
       {activeTab === 'overview' ? (
         <div className="space-y-6">
           {/* Operational Location Banner */}
-          <div className="rounded-2xl border border-[#26313C] bg-[#111820] p-5 shadow-xl flex flex-wrap items-center justify-between gap-4">
+          <div className="rounded-2xl border border-border bg-card p-5 flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#18212B] text-lg">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-secondary text-lg">
                 🍴
               </div>
               <div>
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-[#9AA6B2]">
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
                   Restaurant Operational Workspace
                 </p>
-                <p className="text-xs font-bold text-[#F5F7FA]">
+                <p className="text-xs font-bold text-foreground">
                   {currentRestaurant?.name ?? currentTenant?.name ?? 'Workspace'}
                   {currentBranch && ` → ${currentBranch.name} (${currentBranch.code})`}
                 </p>
               </div>
             </div>
 
-            <span className="rounded-full bg-[#2AFEB7]/15 px-3 py-0.5 text-[10px] font-semibold text-[#2AFEB7] border border-[#2AFEB7]/30">
+            <span className="rounded-full bg-primary/15 px-3 py-0.5 text-[10px] font-semibold text-primary border border-primary/30">
               Workspace Active
             </span>
           </div>
@@ -349,16 +349,16 @@ export default function DashboardPage() {
             {/* min-w-0: a grid item defaults to min-width:auto and will not
                 shrink below its content, so without this the table below
                 stretched the whole page wider than the phone viewport. */}
-            <div className="min-w-0 lg:col-span-2 space-y-4 rounded-2xl border border-[#26313C] bg-[#111820] p-4 shadow-xl sm:p-6">
+            <div className="min-w-0 lg:col-span-2 space-y-4 rounded-2xl border border-border bg-card p-4 sm:p-6">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="min-w-0">
-                  <h2 className="text-base font-bold text-[#F5F7FA]">Live Recent Orders</h2>
-                  <p className="text-[11px] text-[#9AA6B2]">
+                  <h2 className="text-base font-bold text-foreground">Live Recent Orders</h2>
+                  <p className="text-[11px] text-muted-foreground">
                     Latest customer table orders for {currentRestaurant?.name ?? 'this restaurant'}.
                   </p>
                 </div>
 
-                <Link href="/orders" className="text-xs font-semibold text-[#2AFEB7] hover:underline">
+                <Link href="/orders" className="text-xs font-semibold text-primary hover:underline">
                   View All Orders →
                 </Link>
               </div>
@@ -366,7 +366,7 @@ export default function DashboardPage() {
               <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
                 <table className="w-full text-left text-xs">
                   <thead>
-                    <tr className="border-b border-[#26313C] text-[#9AA6B2] uppercase tracking-wider">
+                    <tr className="border-b border-border text-muted-foreground uppercase tracking-wider">
                       <th className="py-2.5 px-3">Order #</th>
                       <th className="py-2.5 px-3">Table</th>
                       <th className="py-2.5 px-3">Items</th>
@@ -375,19 +375,19 @@ export default function DashboardPage() {
                       <th className="py-2.5 px-3">Time</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#26313C]/50">
+                  <tbody className="divide-y divide-border/50">
                     {recentOrders.map((ord) => (
-                      <tr key={ord.id} className="hover:bg-[#18212B]/50 transition-colors">
-                        <td className="py-2.5 px-3 font-mono font-bold text-[#F5F7FA]">{ord.orderNumber}</td>
-                        <td className="py-2.5 px-3 text-[#9AA6B2]">{ord.tableName}</td>
-                        <td className="py-2.5 px-3 text-[#9AA6B2]">{ord.itemCount} items</td>
-                        <td className="py-2.5 px-3 font-bold text-[#2AFEB7]">{formatCurrency(ord.totalAmount)}</td>
+                      <tr key={ord.id} className="hover:bg-secondary/50 transition-colors">
+                        <td className="py-2.5 px-3 font-mono font-bold text-foreground">{ord.orderNumber}</td>
+                        <td className="py-2.5 px-3 text-muted-foreground">{ord.tableName}</td>
+                        <td className="py-2.5 px-3 text-muted-foreground">{ord.itemCount} items</td>
+                        <td className="py-2.5 px-3 font-bold text-primary">{formatCurrency(ord.totalAmount)}</td>
                         <td className="py-2.5 px-3">
                           <span className={`rounded-full border px-2 py-0.5 text-[9px] font-bold ${getStatusStyle(ord.status)}`}>
                             {ord.status}
                           </span>
                         </td>
-                        <td className="py-2.5 px-3 text-[#9AA6B2]">
+                        <td className="py-2.5 px-3 text-muted-foreground">
                           {new Date(ord.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </td>
                       </tr>
@@ -395,7 +395,7 @@ export default function DashboardPage() {
 
                     {recentOrders.length === 0 && (
                       <tr>
-                        <td colSpan={6} className="py-8 text-center text-[#9AA6B2]">
+                        <td colSpan={6} className="py-8 text-center text-muted-foreground">
                           No customer orders placed for this restaurant yet.
                         </td>
                       </tr>
@@ -406,15 +406,15 @@ export default function DashboardPage() {
             </div>
 
             {/* Restaurant Employees & Staff */}
-            <div className="lg:col-span-1 space-y-4 rounded-2xl border border-[#26313C] bg-[#111820] p-6 shadow-xl">
+            <div className="lg:col-span-1 space-y-4 rounded-2xl border border-border bg-card p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-base font-bold text-[#F5F7FA]">Restaurant Staff</h2>
-                  <p className="text-[11px] text-[#9AA6B2]">
+                  <h2 className="text-base font-bold text-foreground">Restaurant Staff</h2>
+                  <p className="text-[11px] text-muted-foreground">
                     Employees working at {currentRestaurant?.name ?? 'this restaurant'}.
                   </p>
                 </div>
-                <span className="rounded-full bg-[#18212B] px-2 py-0.5 text-[10px] font-mono text-[#2AFEB7] border border-[#26313C]">
+                <span className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-mono text-primary border border-border">
                   {metrics.staffCount} Staff
                 </span>
               </div>
@@ -423,52 +423,52 @@ export default function DashboardPage() {
                 {restaurantStaff.map((staff) => (
                   <div
                     key={staff.id}
-                    className="flex items-center justify-between rounded-xl border border-[#26313C] bg-[#18212B] p-3 transition-colors"
+                    className="flex items-center justify-between rounded-xl border border-border bg-secondary p-3 transition-colors"
                   >
                     <div>
-                      <p className="text-xs font-bold text-[#F5F7FA]">{staff.name}</p>
-                      <p className="text-[10px] text-[#9AA6B2]">{staff.email}</p>
+                      <p className="text-xs font-bold text-foreground">{staff.name}</p>
+                      <p className="text-[10px] text-muted-foreground">{staff.email}</p>
                     </div>
-                    <span className="rounded-full border border-[#2AFEB7]/30 bg-[#2AFEB7]/10 px-2 py-0.5 text-[9px] font-bold text-[#2AFEB7]">
+                    <span className="rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-[9px] font-bold text-primary">
                       {staff.role}
                     </span>
                   </div>
                 ))}
 
                 {restaurantStaff.length === 0 && (
-                  <p className="py-4 text-center text-xs text-[#9AA6B2]">
+                  <p className="py-4 text-center text-xs text-muted-foreground">
                     No staff members assigned yet.
                   </p>
                 )}
               </div>
 
               {/* Quick Actions Footer */}
-              <div className="pt-4 border-t border-[#26313C] space-y-2">
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-[#9AA6B2]">
+              <div className="pt-4 border-t border-border space-y-2">
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
                   Quick Actions
                 </p>
                 <div className="grid grid-cols-2 gap-2">
                   <Link
                     href="/menus"
-                    className="rounded-xl border border-[#26313C] bg-[#18212B] p-2.5 text-center text-[11px] font-semibold text-[#F5F7FA] hover:border-[#2AFEB7] transition-colors"
+                    className="rounded-xl border border-border bg-secondary p-2.5 text-center text-[11px] font-semibold text-foreground hover:border-primary transition-colors"
                   >
                     🍴 Manage Menu
                   </Link>
                   <Link
                     href="/tables"
-                    className="rounded-xl border border-[#26313C] bg-[#18212B] p-2.5 text-center text-[11px] font-semibold text-[#F5F7FA] hover:border-[#2AFEB7] transition-colors"
+                    className="rounded-xl border border-border bg-secondary p-2.5 text-center text-[11px] font-semibold text-foreground hover:border-primary transition-colors"
                   >
                     🪑 View Tables
                   </Link>
                   <Link
                     href="/orders"
-                    className="rounded-xl border border-[#26313C] bg-[#18212B] p-2.5 text-center text-[11px] font-semibold text-[#F5F7FA] hover:border-[#2AFEB7] transition-colors"
+                    className="rounded-xl border border-border bg-secondary p-2.5 text-center text-[11px] font-semibold text-foreground hover:border-primary transition-colors"
                   >
                     🛒 Orders Stream
                   </Link>
                   <Link
                     href="/branches"
-                    className="rounded-xl border border-[#26313C] bg-[#18212B] p-2.5 text-center text-[11px] font-semibold text-[#F5F7FA] hover:border-[#2AFEB7] transition-colors"
+                    className="rounded-xl border border-border bg-secondary p-2.5 text-center text-[11px] font-semibold text-foreground hover:border-primary transition-colors"
                   >
                     📍 Branches
                   </Link>
@@ -480,11 +480,11 @@ export default function DashboardPage() {
       ) : (
         <div className="space-y-6">
           {isLoadingAnalytics ? (
-            <div className="rounded-xl border border-[#26313C] bg-[#111820] p-12 text-center text-sm text-[#9AA6B2] animate-pulse">
+            <div className="rounded-xl border border-border bg-card p-12 text-center text-sm text-muted-foreground animate-pulse">
               Generating restaurant performance analysis...
             </div>
           ) : analyticsError || !analytics ? (
-            <div className="rounded-xl border border-[#EF4444]/40 bg-[#EF4444]/10 p-6 text-center text-xs text-[#EF4444]">
+            <div className="rounded-xl border border-atlas-error/40 bg-atlas-error/10 p-6 text-center text-xs text-atlas-error">
               {analyticsError || 'Failed to load analytics details.'}
             </div>
           ) : (
@@ -494,22 +494,22 @@ export default function DashboardPage() {
                 {/* 1. Total Revenue Card */}
                 <div
                   onClick={() => setModalMode('revenue')}
-                  className="group relative cursor-pointer rounded-2xl border border-[#26313C] bg-[#111820] p-5 shadow-xl transition-all duration-200 hover:border-[#2AFEB7] hover:bg-[#18212B] hover:shadow-[#2AFEB7]/10 hover:shadow-2xl"
+                  className="group relative cursor-pointer rounded-2xl border border-border bg-card p-5 transition-all duration-200 hover:border-primary hover:bg-secondary"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#9AA6B2] group-hover:text-[#2AFEB7] transition-colors">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground group-hover:text-primary transition-colors">
                       Total Revenue (Last 30d)
                     </span>
-                    <span className="rounded-full bg-[#2AFEB7]/10 px-2 py-0.5 text-[9px] font-bold text-[#2AFEB7] border border-[#2AFEB7]/20 group-hover:bg-[#2AFEB7] group-hover:text-[#0B0F14] transition-all">
+                    <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[9px] font-bold text-primary border border-primary/20 group-hover:bg-primary group-hover:text-background transition-all">
                       View Details 🔍
                     </span>
                   </div>
-                  <h3 className="mt-2 text-2xl font-black text-[#2AFEB7]">
+                  <h3 className="mt-2 text-2xl font-black text-primary">
                     {formatCurrency(analytics.metrics.totalRevenue)}
                   </h3>
-                  <p className="mt-1 text-[10px] text-[#9AA6B2] flex items-center justify-between">
+                  <p className="mt-1 text-[10px] text-muted-foreground flex items-center justify-between">
                     <span>Includes base prices + tax</span>
-                    <span className="text-[#2AFEB7] font-semibold underline underline-offset-2">
+                    <span className="text-primary font-semibold underline underline-offset-2">
                       Click for tax & subtotal
                     </span>
                   </p>
@@ -518,22 +518,22 @@ export default function DashboardPage() {
                 {/* 2. Completed Orders Card */}
                 <div
                   onClick={() => setModalMode('orders')}
-                  className="group relative cursor-pointer rounded-2xl border border-[#26313C] bg-[#111820] p-5 shadow-xl transition-all duration-200 hover:border-[#F5F7FA] hover:bg-[#18212B] hover:shadow-white/5 hover:shadow-2xl"
+                  className="group relative cursor-pointer rounded-2xl border border-border bg-card p-5 transition-all duration-200 hover:border-foreground hover:bg-secondary"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#9AA6B2] group-hover:text-[#F5F7FA] transition-colors">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground group-hover:text-foreground transition-colors">
                       Completed Orders (30d)
                     </span>
-                    <span className="rounded-full bg-white/10 px-2 py-0.5 text-[9px] font-bold text-[#F5F7FA] border border-white/20 group-hover:bg-[#F5F7FA] group-hover:text-[#0B0F14] transition-all">
+                    <span className="rounded-full bg-secondary px-2 py-0.5 text-[9px] font-bold text-foreground border border-border group-hover:bg-foreground group-hover:text-background transition-all">
                       View Details 🔍
                     </span>
                   </div>
-                  <h3 className="mt-2 text-2xl font-black text-[#F5F7FA]">
+                  <h3 className="mt-2 text-2xl font-black text-foreground">
                     {analytics.metrics.totalOrders}
                   </h3>
-                  <p className="mt-1 text-[10px] text-[#9AA6B2] flex items-center justify-between">
+                  <p className="mt-1 text-[10px] text-muted-foreground flex items-center justify-between">
                     <span>Successful sales volume</span>
-                    <span className="text-[#F5F7FA] font-semibold underline underline-offset-2">
+                    <span className="text-foreground font-semibold underline underline-offset-2">
                       Click for tables & channels
                     </span>
                   </p>
@@ -542,22 +542,22 @@ export default function DashboardPage() {
                 {/* 3. Average Order Value Card */}
                 <div
                   onClick={() => setModalMode('aov')}
-                  className="group relative cursor-pointer rounded-2xl border border-[#26313C] bg-[#111820] p-5 shadow-xl transition-all duration-200 hover:border-[#3B82F6] hover:bg-[#18212B] hover:shadow-[#3B82F6]/10 hover:shadow-2xl"
+                  className="group relative cursor-pointer rounded-2xl border border-border bg-card p-5 transition-all duration-200 hover:border-atlas-info hover:bg-secondary"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#9AA6B2] group-hover:text-[#3B82F6] transition-colors">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground group-hover:text-atlas-info transition-colors">
                       Average Order Value
                     </span>
-                    <span className="rounded-full bg-[#3B82F6]/10 px-2 py-0.5 text-[9px] font-bold text-[#3B82F6] border border-[#3B82F6]/20 group-hover:bg-[#3B82F6] group-hover:text-[#0B0F14] transition-all">
+                    <span className="rounded-full bg-atlas-info/10 px-2 py-0.5 text-[9px] font-bold text-atlas-info border border-atlas-info/20 group-hover:bg-atlas-info group-hover:text-background transition-all">
                       View Details 🔍
                     </span>
                   </div>
-                  <h3 className="mt-2 text-2xl font-black text-[#3B82F6]">
+                  <h3 className="mt-2 text-2xl font-black text-atlas-info">
                     {formatCurrency(analytics.metrics.averageOrderValue)}
                   </h3>
-                  <p className="mt-1 text-[10px] text-[#9AA6B2] flex items-center justify-between">
+                  <p className="mt-1 text-[10px] text-muted-foreground flex items-center justify-between">
                     <span>AOV per check ticket</span>
-                    <span className="text-[#3B82F6] font-semibold underline underline-offset-2">
+                    <span className="text-atlas-info font-semibold underline underline-offset-2">
                       Click for ticket tiers
                     </span>
                   </p>
@@ -567,18 +567,18 @@ export default function DashboardPage() {
               {/* Charts Section */}
               <div className="grid gap-6 md:grid-cols-2">
                 {/* 1. Sales Trend SVG Area Chart */}
-                <div className="rounded-2xl border border-[#26313C] bg-[#111820] p-5 shadow-xl space-y-4">
+                <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
                   <div>
-                    <h4 className="text-sm font-bold text-[#F5F7FA]">Daily Sales Trend</h4>
-                    <p className="text-[10px] text-[#9AA6B2]">Revenue generated over the last 30 days</p>
+                    <h4 className="text-sm font-bold text-foreground">Daily Sales Trend</h4>
+                    <p className="text-[10px] text-muted-foreground">Revenue generated over the last 30 days</p>
                   </div>
 
                   <div className="relative h-44 w-full">
                     {/* Y Axis Grid Lines */}
                     <div className="absolute inset-0 flex flex-col justify-between pointer-events-none">
-                      <div className="w-full border-b border-[#26313C]/30 text-[9px] text-[#9AA6B2] pb-0.5">₹{maxSales.toFixed(0)}</div>
-                      <div className="w-full border-b border-[#26313C]/30 text-[9px] text-[#9AA6B2] pb-0.5">₹{(maxSales / 2).toFixed(0)}</div>
-                      <div className="w-full text-[9px] text-[#9AA6B2]">₹0</div>
+                      <div className="w-full border-b border-border/30 text-[9px] text-muted-foreground pb-0.5">₹{maxSales.toFixed(0)}</div>
+                      <div className="w-full border-b border-border/30 text-[9px] text-muted-foreground pb-0.5">₹{(maxSales / 2).toFixed(0)}</div>
+                      <div className="w-full text-[9px] text-muted-foreground">₹0</div>
                     </div>
 
                     {/* Bars Grid */}
@@ -591,14 +591,14 @@ export default function DashboardPage() {
                             className="group relative flex-1 flex flex-col items-center justify-end h-full"
                           >
                             {/* Tooltip */}
-                            <div className="absolute bottom-full mb-1 hidden group-hover:block z-20 rounded bg-[#18212B] border border-[#26313C] px-2 py-1 text-[9px] whitespace-nowrap text-[#F5F7FA] font-bold shadow-xl">
+                            <div className="absolute bottom-full mb-1 hidden group-hover:block z-20 rounded bg-secondary border border-border px-2 py-1 text-[9px] whitespace-nowrap text-foreground font-bold">
                               {t.date}: {formatCurrency(t.sales)} ({t.orders} orders)
                             </div>
                             {/* Bar segment */}
                             <div
                               style={{ height: `${Math.max(heightPct, 2)}%` }}
                               className={`w-full rounded-t transition-all ${
-                                heightPct > 0 ? 'bg-[#2AFEB7]/80 hover:bg-[#2AFEB7]' : 'bg-[#26313C]/40'
+                                heightPct > 0 ? 'bg-primary/80 hover:bg-primary' : 'bg-border/40'
                               }`}
                             />
                           </div>
@@ -607,25 +607,25 @@ export default function DashboardPage() {
                     </div>
                   </div>
 
-                  <div className="flex justify-between text-[9px] text-[#9AA6B2] pt-1">
+                  <div className="flex justify-between text-[9px] text-muted-foreground pt-1">
                     <span>30 Days Ago</span>
                     <span>Today</span>
                   </div>
                 </div>
 
                 {/* 2. Peak Hours Histogram */}
-                <div className="rounded-2xl border border-[#26313C] bg-[#111820] p-5 shadow-xl space-y-4">
+                <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
                   <div>
-                    <h4 className="text-sm font-bold text-[#F5F7FA]">Peak Operating Hours</h4>
-                    <p className="text-[10px] text-[#9AA6B2]">Order counts distributed across hours of the day</p>
+                    <h4 className="text-sm font-bold text-foreground">Peak Operating Hours</h4>
+                    <p className="text-[10px] text-muted-foreground">Order counts distributed across hours of the day</p>
                   </div>
 
                   <div className="relative h-44 w-full">
                     {/* Y Axis Grid Lines */}
                     <div className="absolute inset-0 flex flex-col justify-between pointer-events-none">
-                      <div className="w-full border-b border-[#26313C]/30 text-[9px] text-[#9AA6B2] pb-0.5">{maxHourlyCount} Orders</div>
-                      <div className="w-full border-b border-[#26313C]/30 text-[9px] text-[#9AA6B2] pb-0.5">{Math.floor(maxHourlyCount / 2)} Orders</div>
-                      <div className="w-full text-[9px] text-[#9AA6B2]">0</div>
+                      <div className="w-full border-b border-border/30 text-[9px] text-muted-foreground pb-0.5">{maxHourlyCount} Orders</div>
+                      <div className="w-full border-b border-border/30 text-[9px] text-muted-foreground pb-0.5">{Math.floor(maxHourlyCount / 2)} Orders</div>
+                      <div className="w-full text-[9px] text-muted-foreground">0</div>
                     </div>
 
                     {/* Hourly Bars */}
@@ -637,13 +637,13 @@ export default function DashboardPage() {
                             key={t.hour}
                             className="group relative flex-1 flex flex-col items-center justify-end h-full"
                           >
-                            <div className="absolute bottom-full mb-1 hidden group-hover:block z-20 rounded bg-[#18212B] border border-[#26313C] px-2 py-1 text-[9px] whitespace-nowrap text-[#F5F7FA] font-bold shadow-xl">
+                            <div className="absolute bottom-full mb-1 hidden group-hover:block z-20 rounded bg-secondary border border-border px-2 py-1 text-[9px] whitespace-nowrap text-foreground font-bold">
                               {t.hour}:00 - {t.count} orders
                             </div>
                             <div
                               style={{ height: `${Math.max(heightPct, 2)}%` }}
                               className={`w-full rounded-t transition-all ${
-                                heightPct > 0 ? 'bg-[#3B82F6]/80 hover:bg-[#3B82F6]' : 'bg-[#26313C]/40'
+                                heightPct > 0 ? 'bg-atlas-info/80 hover:bg-atlas-info' : 'bg-border/40'
                               }`}
                             />
                           </div>
@@ -652,7 +652,7 @@ export default function DashboardPage() {
                     </div>
                   </div>
 
-                  <div className="flex justify-between text-[9px] text-[#9AA6B2] pt-1">
+                  <div className="flex justify-between text-[9px] text-muted-foreground pt-1">
                     <span>12 AM (0)</span>
                     <span>12 PM (12)</span>
                     <span>11 PM (23)</span>
@@ -663,10 +663,10 @@ export default function DashboardPage() {
               {/* Lower Section: Popular items and Branch comparison */}
               <div className="grid gap-6 md:grid-cols-2">
                 {/* 3. Popular Menu Items */}
-                <div className="rounded-2xl border border-[#26313C] bg-[#111820] p-5 shadow-xl space-y-4">
+                <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
                   <div>
-                    <h4 className="text-sm font-bold text-[#F5F7FA]">Top 5 Selling Items</h4>
-                    <p className="text-[10px] text-[#9AA6B2]">Most ordered menu items by quantity</p>
+                    <h4 className="text-sm font-bold text-foreground">Top 5 Selling Items</h4>
+                    <p className="text-[10px] text-muted-foreground">Most ordered menu items by quantity</p>
                   </div>
 
                   <div className="space-y-4">
@@ -677,17 +677,17 @@ export default function DashboardPage() {
                         <div key={item.name} className="space-y-1">
                           <div className="flex items-center justify-between text-xs">
                             <div className="flex items-center gap-2">
-                              <span className="font-mono text-[#2AFEB7]">#{index + 1}</span>
-                              <span className="font-bold text-[#F5F7FA]">{item.name}</span>
+                              <span className="font-mono text-primary">#{index + 1}</span>
+                              <span className="font-bold text-foreground">{item.name}</span>
                             </div>
-                            <span className="font-semibold text-[#9AA6B2]">
+                            <span className="font-semibold text-muted-foreground">
                               {item.count} items ({formatCurrency(item.revenue)})
                             </span>
                           </div>
-                          <div className="h-1.5 w-full rounded-full bg-[#18212B] overflow-hidden">
+                          <div className="h-1.5 w-full rounded-full bg-secondary overflow-hidden">
                             <div
                               style={{ width: `${widthPct}%` }}
-                              className="h-full bg-gradient-to-r from-[#2AFEB7]/60 to-[#2AFEB7] rounded-full"
+                              className="h-full bg-gradient-to-r from-primary/60 to-primary rounded-full"
                             />
                           </div>
                         </div>
@@ -695,7 +695,7 @@ export default function DashboardPage() {
                     })}
 
                     {analytics.popularItems.length === 0 && (
-                      <p className="py-8 text-center text-xs text-[#9AA6B2]">
+                      <p className="py-8 text-center text-xs text-muted-foreground">
                         No orders recorded to analyze popular dishes yet.
                       </p>
                     )}
@@ -703,28 +703,28 @@ export default function DashboardPage() {
                 </div>
 
                 {/* 4. Branch Performance Matrix */}
-                <div className="rounded-2xl border border-[#26313C] bg-[#111820] p-5 shadow-xl space-y-4">
+                <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
                   <div>
-                    <h4 className="text-sm font-bold text-[#F5F7FA]">Branch Sales Performance</h4>
-                    <p className="text-[10px] text-[#9AA6B2]">Comparison breakdown across locations</p>
+                    <h4 className="text-sm font-bold text-foreground">Branch Sales Performance</h4>
+                    <p className="text-[10px] text-muted-foreground">Comparison breakdown across locations</p>
                   </div>
 
                   <div className="space-y-3">
                     <div className="overflow-x-auto">
                       <table className="w-full text-left text-xs">
                         <thead>
-                          <tr className="border-b border-[#26313C] text-[#9AA6B2] uppercase tracking-wider">
+                          <tr className="border-b border-border text-muted-foreground uppercase tracking-wider">
                             <th className="py-2 px-1">Branch Name</th>
                             <th className="py-2 px-1 text-right">Orders</th>
                             <th className="py-2 px-1 text-right">Revenue</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-[#26313C]/50">
+                        <tbody className="divide-y divide-border/50">
                           {analytics.branchPerformance.map((br) => (
-                            <tr key={br.branchName} className="hover:bg-[#18212B]/40">
-                              <td className="py-2.5 px-1 font-bold text-[#F5F7FA]">{br.branchName}</td>
-                              <td className="py-2.5 px-1 text-right text-[#9AA6B2]">{br.orders} orders</td>
-                              <td className="py-2.5 px-1 text-right font-black text-[#2AFEB7]">
+                            <tr key={br.branchName} className="hover:bg-secondary/40">
+                              <td className="py-2.5 px-1 font-bold text-foreground">{br.branchName}</td>
+                              <td className="py-2.5 px-1 text-right text-muted-foreground">{br.orders} orders</td>
+                              <td className="py-2.5 px-1 text-right font-black text-primary">
                                 {formatCurrency(br.sales)}
                               </td>
                             </tr>
@@ -732,7 +732,7 @@ export default function DashboardPage() {
 
                           {analytics.branchPerformance.length === 0 && (
                             <tr>
-                              <td colSpan={3} className="py-8 text-center text-[#9AA6B2]">
+                              <td colSpan={3} className="py-8 text-center text-muted-foreground">
                                 No branch data recorded.
                               </td>
                             </tr>

@@ -308,7 +308,10 @@ export class UsersService {
   }
 
   async create(createUserDto: CreateUserDto, tenantId?: string) {
-    const { name, email, phone, password, role } = createUserDto;
+    const name = createUserDto.name.trim();
+    const email = createUserDto.email.trim().toLowerCase();
+    const phone = createUserDto.phone?.trim() || null;
+    const { password, role } = createUserDto;
 
     const existingUser = await this.prisma.user.findFirst({
       where: {

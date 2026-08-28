@@ -10,17 +10,17 @@ export function StatCard({
   description,
 }: StatCardProps) {
   return (
-    <div className="rounded-xl border border-[#26313C] bg-[#111820] p-6 shadow-md">
-      <p className="text-sm font-medium text-[#9AA6B2]">
+    <div className="rounded-xl border border-border bg-card p-6 shadow-md">
+      <p className="text-sm font-medium text-muted-foreground">
         {title}
       </p>
 
-      <p className="mt-3 text-3xl font-semibold text-[#F5F7FA]">
+      <p className="mt-3 text-3xl font-semibold text-foreground">
         {typeof value === 'number' ? value.toLocaleString() : value}
       </p>
 
       {description && (
-        <p className="mt-2 text-xs text-[#9AA6B2]">
+        <p className="mt-2 text-xs text-muted-foreground">
           {description}
         </p>
       )}

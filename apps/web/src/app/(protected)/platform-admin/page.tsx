@@ -111,7 +111,7 @@ export default function PlatformAdminPage() {
   if (isLoading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="text-sm font-semibold text-[#9AA6B2]">Loading Platform Control Center...</div>
+        <div className="text-sm font-semibold text-muted-foreground">Loading Platform Control Center...</div>
       </div>
     );
   }
@@ -121,37 +121,37 @@ export default function PlatformAdminPage() {
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#2AFEB7]/30 bg-[#2AFEB7]/10 px-3 py-1 text-xs font-bold text-[#2AFEB7]">
-            <span className="h-2 w-2 rounded-full bg-[#2AFEB7] animate-pulse" />
+          <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
+            <span className="h-2 w-2 rounded-full bg-primary animate-pulse" />
             Atlas Platform Control Center
           </div>
-          <h1 className="mt-3 text-3xl font-black text-[#F5F7FA]">
+          <h1 className="mt-3 text-3xl font-black text-foreground">
             Platform Overview
           </h1>
-          <p className="mt-1 text-sm text-[#9AA6B2]">
-            Logged in as <span className="font-semibold text-[#F5F7FA]">{user?.email ?? 'Platform admin'}</span> (PLATFORM_ADMIN)
+          <p className="mt-1 text-sm text-muted-foreground">
+            Logged in as <span className="font-semibold text-foreground">{user?.email ?? 'Platform admin'}</span> (PLATFORM_ADMIN)
           </p>
         </div>
 
         <button
           type="button"
           onClick={() => void loadPlatformData()}
-          className="rounded-xl border border-[#26313C] bg-[#18212B] px-4 py-2.5 text-xs font-semibold text-[#F5F7FA] transition-colors hover:border-[#2AFEB7]"
+          className="rounded-xl border border-border bg-secondary px-4 py-2.5 text-xs font-semibold text-foreground transition-colors hover:border-primary"
         >
           ⟳ Refresh Platform Data
         </button>
       </div>
 
       {/* Tab Switcher */}
-      <div className="flex gap-2 border-b border-[#26313C] pb-px">
+      <div className="flex gap-2 border-b border-border pb-px">
         <button
           type="button"
           onClick={() => setActiveTab('overview')}
           className={[
             'px-4 py-2 text-xs font-bold transition-all border-b-2',
             activeTab === 'overview'
-              ? 'border-[#2AFEB7] text-[#2AFEB7]'
-              : 'border-transparent text-[#9AA6B2] hover:text-[#F5F7FA]',
+              ? 'border-primary text-primary'
+              : 'border-transparent text-muted-foreground hover:text-foreground',
           ].join(' ')}
         >
           📊 System Overview
@@ -162,8 +162,8 @@ export default function PlatformAdminPage() {
           className={[
             'px-4 py-2 text-xs font-bold transition-all border-b-2',
             activeTab === 'monitoring'
-              ? 'border-[#2AFEB7] text-[#2AFEB7]'
-              : 'border-transparent text-[#9AA6B2] hover:text-[#F5F7FA]',
+              ? 'border-primary text-primary'
+              : 'border-transparent text-muted-foreground hover:text-foreground',
           ].join(' ')}
         >
           📡 Infrastructure & Telemetry
@@ -174,8 +174,8 @@ export default function PlatformAdminPage() {
           className={[
             'px-4 py-2 text-xs font-bold transition-all border-b-2',
             activeTab === 'audit'
-              ? 'border-[#2AFEB7] text-[#2AFEB7]'
-              : 'border-transparent text-[#9AA6B2] hover:text-[#F5F7FA]',
+              ? 'border-primary text-primary'
+              : 'border-transparent text-muted-foreground hover:text-foreground',
           ].join(' ')}
         >
           🔐 Security Audit Logs
@@ -186,8 +186,8 @@ export default function PlatformAdminPage() {
           className={[
             'px-4 py-2 text-xs font-bold transition-all border-b-2',
             activeTab === 'support'
-              ? 'border-[#2AFEB7] text-[#2AFEB7]'
-              : 'border-transparent text-[#9AA6B2] hover:text-[#F5F7FA]',
+              ? 'border-primary text-primary'
+              : 'border-transparent text-muted-foreground hover:text-foreground',
           ].join(' ')}
         >
           🆘 Support & Incident Desk
@@ -232,29 +232,29 @@ export default function PlatformAdminPage() {
       {/* Real-time System Telemetry & Maintenance Utilities */}
       <div className="grid gap-6 lg:grid-cols-3">
         {/* API & System Diagnostics Telemetry */}
-        <div className="lg:col-span-1 rounded-2xl border border-[#26313C] bg-[#111820] p-6 shadow-xl space-y-6">
+        <div className="lg:col-span-1 rounded-2xl border border-border bg-card p-6 space-y-6">
           <div>
-            <h3 className="text-base font-bold text-[#F5F7FA]">API & Server Telemetry</h3>
-            <p className="text-xs text-[#9AA6B2]">Real-time operational statistics of the cloud backend.</p>
+            <h3 className="text-base font-bold text-foreground">API & Server Telemetry</h3>
+            <p className="text-xs text-muted-foreground">Real-time operational statistics of the cloud backend.</p>
           </div>
 
           <div className="space-y-4 text-xs">
-            <div className="flex justify-between items-center border-b border-[#26313C]/50 pb-2">
-              <span className="text-[#9AA6B2]">Platform Status:</span>
-              <span className="flex items-center gap-1.5 font-bold text-[#22C55E]">
-                <span className="h-2.5 w-2.5 rounded-full bg-[#22C55E] animate-pulse" />
+            <div className="flex justify-between items-center border-b border-border/50 pb-2">
+              <span className="text-muted-foreground">Platform Status:</span>
+              <span className="flex items-center gap-1.5 font-bold text-atlas-success">
+                <span className="h-2.5 w-2.5 rounded-full bg-atlas-success animate-pulse" />
                 {platformOverview?.systemMetrics?.systemStatus || 'HEALTHY'}
               </span>
             </div>
             
-            <div className="flex justify-between items-center border-b border-[#26313C]/50 pb-2">
-              <span className="text-[#9AA6B2]">Core API Latency:</span>
-              <span className="font-mono font-bold text-[#2AFEB7]">{platformOverview?.systemMetrics?.apiLatencyMs || 12}ms</span>
+            <div className="flex justify-between items-center border-b border-border/50 pb-2">
+              <span className="text-muted-foreground">Core API Latency:</span>
+              <span className="font-mono font-bold text-primary">{platformOverview?.systemMetrics?.apiLatencyMs || 12}ms</span>
             </div>
 
-            <div className="flex justify-between items-center border-b border-[#26313C]/50 pb-2">
-              <span className="text-[#9AA6B2]">System Uptime:</span>
-              <span className="font-mono font-bold text-[#F5F7FA]">
+            <div className="flex justify-between items-center border-b border-border/50 pb-2">
+              <span className="text-muted-foreground">System Uptime:</span>
+              <span className="font-mono font-bold text-foreground">
                 {platformOverview?.systemMetrics?.uptimeSeconds !== undefined ? (
                   `${Math.floor(platformOverview.systemMetrics.uptimeSeconds / 86400)}d ${Math.floor((platformOverview.systemMetrics.uptimeSeconds % 86400) / 3600)}h ${Math.floor((platformOverview.systemMetrics.uptimeSeconds % 3600) / 60)}m`
                 ) : (
@@ -266,12 +266,12 @@ export default function PlatformAdminPage() {
             {/* Memory Usage Meter */}
             <div className="space-y-2 pt-2">
               <div className="flex justify-between">
-                <span className="text-[#9AA6B2]">API Server Memory:</span>
-                <span className="font-mono font-bold text-[#F5F7FA]">
+                <span className="text-muted-foreground">API Server Memory:</span>
+                <span className="font-mono font-bold text-foreground">
                   {platformOverview?.systemMetrics?.memoryHeapUsedMB || 0}MB / {platformOverview?.systemMetrics?.memoryHeapTotalMB || 512}MB
                 </span>
               </div>
-              <div className="h-2 w-full rounded-full bg-[#18212B] overflow-hidden">
+              <div className="h-2 w-full rounded-full bg-secondary overflow-hidden">
                 <div
                   style={{
                     width: `${
@@ -280,7 +280,7 @@ export default function PlatformAdminPage() {
                         : 20
                     }%`
                   }}
-                  className="h-full bg-gradient-to-r from-[#2AFEB7]/60 to-[#2AFEB7] rounded-full animate-pulse"
+                  className="h-full bg-gradient-to-r from-primary/60 to-primary rounded-full animate-pulse"
                 />
               </div>
             </div>
@@ -288,10 +288,10 @@ export default function PlatformAdminPage() {
         </div>
 
         {/* Maintenance Utilities Console */}
-        <div className="lg:col-span-2 rounded-2xl border border-[#26313C] bg-[#111820] p-6 shadow-xl flex flex-col justify-between gap-4">
+        <div className="lg:col-span-2 rounded-2xl border border-border bg-card p-6 flex flex-col justify-between gap-4">
           <div className="space-y-1">
-            <h3 className="text-base font-bold text-[#F5F7FA]">Platform Maintenance Console</h3>
-            <p className="text-xs text-[#9AA6B2]">Execute administrative database and routing routines.</p>
+            <h3 className="text-base font-bold text-foreground">Platform Maintenance Console</h3>
+            <p className="text-xs text-muted-foreground">Execute administrative database and routing routines.</p>
           </div>
 
           <div className="flex gap-3">
@@ -299,7 +299,7 @@ export default function PlatformAdminPage() {
               type="button"
               disabled={activeMaintenance !== null}
               onClick={() => void runMaintenanceTask('vacuum')}
-              className="flex-1 rounded-xl bg-[#18212B] border border-[#26313C] hover:border-[#2AFEB7] py-2 text-xs font-bold text-[#F5F7FA] transition-all disabled:opacity-50"
+              className="flex-1 rounded-xl bg-secondary border border-border hover:border-primary py-2 text-xs font-bold text-foreground transition-all disabled:opacity-50"
             >
               🧹 Database Vacuum
             </button>
@@ -307,7 +307,7 @@ export default function PlatformAdminPage() {
               type="button"
               disabled={activeMaintenance !== null}
               onClick={() => void runMaintenanceTask('cache')}
-              className="flex-1 rounded-xl bg-[#18212B] border border-[#26313C] hover:border-[#2AFEB7] py-2 text-xs font-bold text-[#F5F7FA] transition-all disabled:opacity-50"
+              className="flex-1 rounded-xl bg-secondary border border-border hover:border-primary py-2 text-xs font-bold text-foreground transition-all disabled:opacity-50"
             >
               ⚡ Flush Cache
             </button>
@@ -315,16 +315,16 @@ export default function PlatformAdminPage() {
               type="button"
               disabled={activeMaintenance !== null}
               onClick={() => void runMaintenanceTask('sync')}
-              className="flex-1 rounded-xl bg-[#18212B] border border-[#26313C] hover:border-[#2AFEB7] py-2 text-xs font-bold text-[#F5F7FA] transition-all disabled:opacity-50"
+              className="flex-1 rounded-xl bg-secondary border border-border hover:border-primary py-2 text-xs font-bold text-foreground transition-all disabled:opacity-50"
             >
               🔄 Audit Licenses
             </button>
           </div>
 
           {/* Maintenance Terminal logs */}
-          <div className="rounded-xl border border-[#26313C] bg-[#070B0E] p-4 font-mono text-[10px] text-[#2AFEB7] h-32 overflow-y-auto space-y-1 select-all">
+          <div className="rounded-xl border border-border bg-background p-4 font-mono text-[10px] text-primary h-32 overflow-y-auto space-y-1 select-all">
             {maintenanceConsole.length === 0 ? (
-              <span className="text-[#9AA6B2] italic">// Platform Admin diagnostic terminal. Ready to launch routine.</span>
+              <span className="text-muted-foreground italic">// Platform Admin diagnostic terminal. Ready to launch routine.</span>
             ) : (
               maintenanceConsole.map((logLine, idx) => (
                 <div key={idx}>{logLine}</div>
@@ -342,15 +342,15 @@ export default function PlatformAdminPage() {
       {/* Global Activity Feed & Directory */}
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Global Restaurant Directory Table */}
-        <div className="lg:col-span-2 rounded-2xl border border-[#26313C] bg-[#111820] p-6 shadow-xl space-y-4">
+        <div className="lg:col-span-2 rounded-2xl border border-border bg-card p-6 space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-base font-bold text-[#F5F7FA]">Global Restaurant Directory</h2>
-              <p className="text-xs text-[#9AA6B2]">
+              <h2 className="text-base font-bold text-foreground">Global Restaurant Directory</h2>
+              <p className="text-xs text-muted-foreground">
                 All onboarded restaurants across all tenant accounts.
               </p>
             </div>
-            <span className="rounded-full bg-[#18212B] px-3 py-1 text-[10px] font-mono text-[#2AFEB7] border border-[#26313C]">
+            <span className="rounded-full bg-secondary px-3 py-1 text-[10px] font-mono text-primary border border-border">
               {restaurants.length} Total
             </span>
           </div>
@@ -358,7 +358,7 @@ export default function PlatformAdminPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead>
-                <tr className="border-b border-[#26313C] text-[#9AA6B2] uppercase tracking-wider text-[10px]">
+                <tr className="border-b border-border text-muted-foreground uppercase tracking-wider text-[10px]">
                   <th className="py-2.5 px-4">Restaurant Name</th>
                   <th className="py-2.5 px-4">Slug / Namespace</th>
                   <th className="py-2.5 px-4">Status</th>
@@ -366,26 +366,26 @@ export default function PlatformAdminPage() {
                   <th className="py-2.5 px-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#26313C]/50">
+              <tbody className="divide-y divide-border/50">
                 {(Array.isArray(restaurants) ? restaurants : []).map((res) => (
                   <tr
                     key={res.id}
                     onClick={() => setSelectedRestaurantId(res.id)}
-                    className="hover:bg-[#18212B] transition-colors cursor-pointer group"
+                    className="hover:bg-secondary transition-colors cursor-pointer group"
                   >
-                    <td className="py-3 px-4 font-bold text-[#F5F7FA] group-hover:text-[#2AFEB7] transition-colors">
+                    <td className="py-3 px-4 font-bold text-foreground group-hover:text-primary transition-colors">
                       <div className="flex items-center gap-2">
                         <span>🍽️</span>
                         <span>{res.name}</span>
                       </div>
                     </td>
-                    <td className="py-3 px-4 font-mono text-[#9AA6B2]">{res.slug}</td>
+                    <td className="py-3 px-4 font-mono text-muted-foreground">{res.slug}</td>
                     <td className="py-3 px-4">
-                      <span className="rounded-full bg-[#2AFEB7]/10 px-2.5 py-0.5 text-[9px] font-bold text-[#2AFEB7] border border-[#2AFEB7]/30 uppercase">
+                      <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[9px] font-bold text-primary border border-primary/30 uppercase">
                         {res.status}
                       </span>
                     </td>
-                    <td className="py-3 px-4 text-[#9AA6B2]">
+                    <td className="py-3 px-4 text-muted-foreground">
                       {new Date(res.createdAt).toLocaleDateString()}
                     </td>
                     <td className="py-3 px-4 text-right">
@@ -395,7 +395,7 @@ export default function PlatformAdminPage() {
                           e.stopPropagation();
                           setSelectedRestaurantId(res.id);
                         }}
-                        className="rounded-lg border border-[#26313C] bg-[#18212B] px-2.5 py-1 text-[10px] font-bold text-[#2AFEB7] hover:border-[#2AFEB7] transition-colors"
+                        className="rounded-lg border border-border bg-secondary px-2.5 py-1 text-[10px] font-bold text-primary hover:border-primary transition-colors"
                       >
                         View Details 🔍
                       </button>
@@ -405,7 +405,7 @@ export default function PlatformAdminPage() {
 
                 {(!Array.isArray(restaurants) || restaurants.length === 0) && (
                   <tr>
-                    <td colSpan={5} className="py-8 text-center text-[#9AA6B2]">
+                    <td colSpan={5} className="py-8 text-center text-muted-foreground">
                       No restaurants registered on the platform yet.
                     </td>
                   </tr>
@@ -416,10 +416,10 @@ export default function PlatformAdminPage() {
         </div>
 
         {/* Global Live Activity Feed */}
-        <div className="lg:col-span-1 rounded-2xl border border-[#26313C] bg-[#111820] p-6 shadow-xl space-y-4">
+        <div className="lg:col-span-1 rounded-2xl border border-border bg-card p-6 space-y-4">
           <div>
-            <h2 className="text-base font-bold text-[#F5F7FA]">Global Activity Stream</h2>
-            <p className="text-xs text-[#9AA6B2]">Real-time orders placed across all outlets.</p>
+            <h2 className="text-base font-bold text-foreground">Global Activity Stream</h2>
+            <p className="text-xs text-muted-foreground">Real-time orders placed across all outlets.</p>
           </div>
 
           <div className="space-y-3 max-h-[350px] overflow-y-auto pr-1">
@@ -428,40 +428,40 @@ export default function PlatformAdminPage() {
                 const getStatusStyle = (st: string) => {
                   switch (st) {
                     case 'COMPLETED':
-                      return 'bg-green-500';
+                      return 'bg-atlas-success';
                     case 'PREPARING':
-                      return 'bg-blue-500';
+                      return 'bg-atlas-info';
                     case 'PENDING':
-                      return 'bg-amber-500';
+                      return 'bg-atlas-warning';
                     default:
-                      return 'bg-red-500';
+                      return 'bg-atlas-error';
                   }
                 };
 
                 return (
-                  <div key={ord.id} className="rounded-xl border border-[#26313C] bg-[#18212B] p-3 text-[11px] space-y-2">
+                  <div key={ord.id} className="rounded-xl border border-border bg-secondary p-3 text-[11px] space-y-2">
                     <div className="flex justify-between items-center">
-                      <span className="font-mono font-bold text-[#2AFEB7]">{ord.orderNumber}</span>
-                      <span className="text-[10px] text-[#9AA6B2]">{new Date(ord.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                      <span className="font-mono font-bold text-primary">{ord.orderNumber}</span>
+                      <span className="text-[10px] text-muted-foreground">{new Date(ord.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                     </div>
 
                     <div className="space-y-0.5 text-left">
-                      <p className="font-semibold text-[#F5F7FA]">{ord.restaurantName}</p>
-                      <p className="text-[10px] text-[#9AA6B2]">Branch: {ord.branchName}</p>
+                      <p className="font-semibold text-foreground">{ord.restaurantName}</p>
+                      <p className="text-[10px] text-muted-foreground">Branch: {ord.branchName}</p>
                     </div>
 
-                    <div className="flex justify-between items-center border-t border-[#26313C]/50 pt-2 text-[10px]">
-                      <span className="font-black text-white">{formatCurrency(ord.totalAmount)}</span>
+                    <div className="flex justify-between items-center border-t border-border/50 pt-2 text-[10px]">
+                      <span className="font-black text-foreground">{formatCurrency(ord.totalAmount)}</span>
                       <div className="flex items-center gap-1.5">
                         <span className={`h-1.5 w-1.5 rounded-full ${getStatusStyle(ord.status)}`} />
-                        <span className="text-[9px] font-bold text-[#9AA6B2] uppercase">{ord.status}</span>
+                        <span className="text-[9px] font-bold text-muted-foreground uppercase">{ord.status}</span>
                       </div>
                     </div>
                   </div>
                 );
               })
             ) : (
-              <p className="text-center text-[#9AA6B2] text-xs py-12 italic">No recent order stream detected.</p>
+              <p className="text-center text-muted-foreground text-xs py-12 italic">No recent order stream detected.</p>
             )}
           </div>
         </div>

@@ -115,16 +115,16 @@ export default function DocsPage() {
   );
 
   return (
-    <div className="min-h-screen bg-[#0B0F14] text-[#F5F7FA] py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-background text-foreground py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto space-y-8">
         {/* Top Banner */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-[#26313C] pb-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-border pb-6">
           <div className="space-y-1">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#2AFEB7]/10 border border-[#2AFEB7]/30 text-[#2AFEB7] text-xs font-semibold uppercase tracking-wider">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/30 text-primary text-xs font-semibold uppercase tracking-wider">
               📖 Project Atlas v1 Documentation
             </div>
-            <h1 className="text-3xl font-black text-white">Knowledge Base & User Manual</h1>
-            <p className="text-[#9AA6B2] text-sm">
+            <h1 className="text-3xl font-black text-foreground">Knowledge Base & User Manual</h1>
+            <p className="text-muted-foreground text-sm">
               Comprehensive operational playbooks for Restaurant Owners, Floor Staff, and Platform Operators.
             </p>
           </div>
@@ -133,7 +133,7 @@ export default function DocsPage() {
             <Link href="/dashboard">
               <button
                 type="button"
-                className="px-4 py-2.5 rounded-xl border border-[#26313C] bg-[#18212B] text-xs font-semibold text-[#9AA6B2] hover:text-white"
+                className="px-4 py-2.5 rounded-xl border border-border bg-secondary text-xs font-semibold text-muted-foreground hover:text-foreground"
               >
                 Back to Dashboard
               </button>
@@ -141,7 +141,7 @@ export default function DocsPage() {
             <Link href="/support">
               <button
                 type="button"
-                className="px-4 py-2.5 rounded-xl bg-[#2AFEB7] text-[#0B0F14] text-xs font-black hover:bg-[#20df9f]"
+                className="px-4 py-2.5 rounded-xl bg-primary text-background text-xs font-black hover:bg-primary"
               >
                 🆘 Support Desk
               </button>
@@ -161,20 +161,20 @@ export default function DocsPage() {
                 onClick={() => setActiveSection(sec.id)}
                 className={`p-5 rounded-2xl border text-left transition-all ${
                   isSelected
-                    ? 'bg-[#2AFEB7]/10 border-[#2AFEB7] shadow-xl shadow-[#2AFEB7]/10'
-                    : 'bg-[#121922] border-[#26313C] hover:border-[#384654]'
+                    ? 'bg-primary/10 border-primary shadow-primary/10'
+                    : 'bg-card border-border hover:border-input'
                 }`}
               >
                 <div className="flex items-center justify-between mb-3">
-                  <div className="p-2.5 rounded-xl bg-[#0B0F14] border border-[#26313C] text-xl">
+                  <div className="p-2.5 rounded-xl bg-background border border-border text-xl">
                     {sec.icon}
                   </div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-[#18212B] text-[#2AFEB7]">
+                  <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-secondary text-primary">
                     {sec.badge}
                   </span>
                 </div>
-                <h3 className="text-sm font-bold text-white">{sec.title}</h3>
-                <p className="text-xs text-[#9AA6B2] mt-1">
+                <h3 className="text-sm font-bold text-foreground">{sec.title}</h3>
+                <p className="text-xs text-muted-foreground mt-1">
                   {sec.id === 'owner' && 'Setup, Menu, QRs, AI & Analytics'}
                   {sec.id === 'staff' && 'Kitchen KDS, Waiter & POS Settlement'}
                   {sec.id === 'admin' && 'Multi-Tenancy, Runbooks & Recovery'}
@@ -191,25 +191,25 @@ export default function DocsPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search guides, operations, and technical workflows..."
-            className="w-full px-4 py-3 rounded-2xl bg-[#121922] border border-[#26313C] text-sm text-white placeholder-[#9AA6B2] focus:outline-none focus:border-[#2AFEB7]"
+            className="w-full px-4 py-3 rounded-2xl bg-card border border-border text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary"
           />
         </div>
 
         {/* Articles List */}
         <div className="space-y-4">
           {filteredArticles.length === 0 ? (
-            <div className="bg-[#121922] border border-[#26313C] rounded-2xl text-center py-12 px-4 space-y-2">
+            <div className="bg-card border border-border rounded-2xl text-center py-12 px-4 space-y-2">
               <div className="text-3xl mb-1">📄</div>
-              <p className="text-xs text-[#9AA6B2]">No articles matching your search.</p>
+              <p className="text-xs text-muted-foreground">No articles matching your search.</p>
             </div>
           ) : (
             filteredArticles.map((art, idx) => (
-              <div key={idx} className="bg-[#121922] border border-[#26313C] rounded-2xl p-6 shadow-lg space-y-3">
+              <div key={idx} className="bg-card border border-border rounded-2xl p-6 shadow-lg space-y-3">
                 <div>
-                  <h3 className="text-base font-bold text-white">{art.title}</h3>
-                  <p className="text-xs text-[#9AA6B2] mt-0.5">{art.desc}</p>
+                  <h3 className="text-base font-bold text-foreground">{art.title}</h3>
+                  <p className="text-xs text-muted-foreground mt-0.5">{art.desc}</p>
                 </div>
-                <pre className="p-4 rounded-xl bg-[#0B0F14] border border-[#26313C] text-xs font-mono text-[#F5F7FA] whitespace-pre-wrap leading-relaxed">
+                <pre className="p-4 rounded-xl bg-background border border-border text-xs font-mono text-foreground whitespace-pre-wrap leading-relaxed">
                   {art.content}
                 </pre>
               </div>

@@ -65,8 +65,8 @@ export default function EditBranchPage({
   if (isLoading) {
     return (
       <div className="space-y-6 max-w-3xl">
-        <h1 className="text-3xl font-bold text-[#F5F7FA]">Edit Branch</h1>
-        <div className="rounded-xl border border-[#26313C] bg-[#111820] p-8 text-center text-[#9AA6B2]">
+        <h1 className="font-display text-3xl font-semibold tracking-[-0.02em] text-foreground">Edit Branch</h1>
+        <div className="rounded-xl border border-border bg-card p-8 text-center text-muted-foreground">
           Loading branch information...
         </div>
       </div>
@@ -76,13 +76,13 @@ export default function EditBranchPage({
   if (error || !branch) {
     return (
       <div className="space-y-6 max-w-3xl">
-        <h1 className="text-3xl font-bold text-[#F5F7FA]">Edit Branch</h1>
-        <div className="rounded-xl border border-[#EF4444]/40 bg-[#EF4444]/10 p-8 text-center text-[#EF4444]">
+        <h1 className="font-display text-3xl font-semibold tracking-[-0.02em] text-foreground">Edit Branch</h1>
+        <div className="rounded-xl border border-atlas-error/40 bg-atlas-error/10 p-8 text-center text-atlas-error">
           <p>{error || 'Branch not found.'}</p>
           <button
             type="button"
             onClick={() => router.push('/branches')}
-            className="mt-4 rounded-lg border border-[#26313C] bg-[#18212B] px-4 py-2 text-sm text-[#F5F7FA]"
+            className="mt-4 rounded-lg border border-border bg-secondary px-4 py-2 text-sm text-foreground"
           >
             Back to Branches
           </button>
@@ -94,14 +94,14 @@ export default function EditBranchPage({
   return (
     <div className="space-y-6 max-w-3xl">
       <div>
-        <h1 className="text-3xl font-bold text-[#F5F7FA]">Edit Branch</h1>
-        <p className="mt-2 text-[#9AA6B2]">
-          Updating <span className="font-semibold text-[#F5F7FA]">{branch.name}</span> ({branch.code}).
+        <h1 className="font-display text-3xl font-semibold tracking-[-0.02em] text-foreground">Edit Branch</h1>
+        <p className="mt-2 text-muted-foreground">
+          Updating <span className="font-semibold text-foreground">{branch.name}</span> ({branch.code}).
         </p>
       </div>
 
       {error && (
-        <div className="rounded-lg border border-[#EF4444]/40 bg-[#EF4444]/10 p-4 text-sm text-[#EF4444]">
+        <div className="rounded-lg border border-atlas-error/40 bg-atlas-error/10 p-4 text-sm text-atlas-error">
           {error}
         </div>
       )}

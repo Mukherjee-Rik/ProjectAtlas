@@ -38,16 +38,16 @@ export default function EditMenuPage({ params }: { params: Promise<{ id: string 
   };
 
   if (isLoading) {
-    return <div className="rounded-xl border border-[#26313C] bg-[#111820] p-8 text-center text-[#9AA6B2]">Loading...</div>;
+    return <div className="rounded-xl border border-border bg-card p-8 text-center text-muted-foreground">Loading...</div>;
   }
 
   return (
     <div className="mx-auto max-w-xl space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-[#F5F7FA]">Edit Menu</h1>
-        <p className="mt-2 text-sm text-[#9AA6B2]">Update details for <span className="font-semibold text-[#F5F7FA]">{menu?.name}</span>.</p>
+        <h1 className="font-display text-3xl font-semibold tracking-[-0.02em] text-foreground">Edit Menu</h1>
+        <p className="mt-2 text-sm text-muted-foreground">Update details for <span className="font-semibold text-foreground">{menu?.name}</span>.</p>
       </div>
-      <div className="rounded-xl border border-[#26313C] bg-[#111820] p-6 shadow-xl">
+      <div className="rounded-xl border border-border bg-card p-6">
         {menu && (
           <MenuForm
             initialValues={menu}

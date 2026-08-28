@@ -115,14 +115,14 @@ export function MenuItemSheet({
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 backdrop-blur-sm">
-      <div className="max-h-[88vh] w-full max-w-sm overflow-y-auto rounded-t-2xl border border-[#26313C] bg-[#111820] text-[#F5F7FA] shadow-2xl">
-        <div className="sticky top-0 flex items-start justify-between gap-3 border-b border-[#26313C] bg-[#111820] p-4">
+      <div className="max-h-[88vh] w-full max-w-sm overflow-y-auto rounded-t-2xl border border-border bg-card text-foreground">
+        <div className="sticky top-0 flex items-start justify-between gap-3 border-b border-border bg-card p-4">
           <div className="space-y-1">
             <h2 className="text-base font-bold leading-tight">
               {item?.name ?? (loadError ? 'Unavailable' : 'Loading…')}
             </h2>
             {item?.category?.name && (
-              <p className="text-[10px] uppercase tracking-wider text-[#9AA6B2]">
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
                 {item.category.name}
               </p>
             )}
@@ -131,7 +131,7 @@ export function MenuItemSheet({
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="rounded-lg border border-[#26313C] px-2 py-1 text-xs text-[#9AA6B2] transition-colors hover:text-[#F5F7FA]"
+            className="rounded-lg border border-border px-2 py-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
           >
             ✕
           </button>
@@ -140,14 +140,14 @@ export function MenuItemSheet({
         <div className="space-y-5 p-4">
           {isLoading && (
             <div className="space-y-3 animate-pulse">
-              <div className="h-3 w-2/3 rounded bg-[#18212B]" />
-              <div className="h-3 w-1/2 rounded bg-[#18212B]" />
-              <div className="h-20 rounded-xl bg-[#18212B]" />
+              <div className="h-3 w-2/3 rounded bg-secondary" />
+              <div className="h-3 w-1/2 rounded bg-secondary" />
+              <div className="h-20 rounded-xl bg-secondary" />
             </div>
           )}
 
           {loadError && (
-            <div className="rounded-xl border border-[#EF4444]/30 bg-[#EF4444]/10 p-3 text-xs text-[#EF4444]">
+            <div className="rounded-xl border border-atlas-error/30 bg-atlas-error/10 p-3 text-xs text-atlas-error">
               {loadError}
             </div>
           )}
@@ -156,18 +156,18 @@ export function MenuItemSheet({
             <>
               <div className="space-y-2">
                 {item.description && (
-                  <p className="text-xs leading-relaxed text-[#9AA6B2]">{item.description}</p>
+                  <p className="text-xs leading-relaxed text-muted-foreground">{item.description}</p>
                 )}
                 <div className="flex items-center gap-2">
                   <span
                     className="h-2.5 w-2.5 rounded-full"
-                    style={{ backgroundColor: DIETARY_COLOR[item.dietaryType] ?? '#9AA6B2' }}
+                    style={{ backgroundColor: DIETARY_COLOR[item.dietaryType] ?? '#A1A1AA' }}
                   />
-                  <span className="text-sm font-bold text-[#2AFEB7]">
+                  <span className="text-sm font-bold text-primary">
                     {formatCurrency(item.price)}
                   </span>
                   {item.preparationTimeMinutes ? (
-                    <span className="text-[10px] text-[#9AA6B2]">
+                    <span className="text-[10px] text-muted-foreground">
                       • {item.preparationTimeMinutes} min
                     </span>
                   ) : null}
@@ -177,10 +177,10 @@ export function MenuItemSheet({
               {(item.variantGroups ?? []).map((group) => (
                 <div key={group.id} className="space-y-2">
                   <div className="flex items-baseline justify-between">
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-[#F5F7FA]">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-foreground">
                       {group.name}
                     </h3>
-                    <span className="text-[10px] text-[#9AA6B2]">
+                    <span className="text-[10px] text-muted-foreground">
                       {group.required ? 'Required • pick 1' : 'Optional • pick 1'}
                     </span>
                   </div>
@@ -197,8 +197,8 @@ export function MenuItemSheet({
                           }
                           className={`flex w-full items-center justify-between rounded-xl border px-3 py-2.5 text-left text-xs transition-colors ${
                             selected
-                              ? 'border-[#2AFEB7] bg-[#2AFEB7]/10 text-[#2AFEB7]'
-                              : 'border-[#26313C] bg-[#18212B] text-[#F5F7FA] hover:border-[#2AFEB7]/40'
+                              ? 'border-primary bg-primary/10 text-primary'
+                              : 'border-border bg-secondary text-foreground hover:border-primary/40'
                           }`}
                         >
                           <span className="font-semibold">{variant.name}</span>
@@ -218,10 +218,10 @@ export function MenuItemSheet({
                 return (
                   <div key={group.id} className="space-y-2">
                     <div className="flex items-baseline justify-between">
-                      <h3 className="text-xs font-bold uppercase tracking-wider text-[#F5F7FA]">
+                      <h3 className="text-xs font-bold uppercase tracking-wider text-foreground">
                         {group.name}
                       </h3>
-                      <span className="text-[10px] text-[#9AA6B2]">
+                      <span className="text-[10px] text-muted-foreground">
                         {group.required ? 'Required' : 'Optional'} • max {group.maxSelect}
                         {group.minSelect > 0 ? ` • min ${group.minSelect}` : ''}
                       </span>
@@ -239,8 +239,8 @@ export function MenuItemSheet({
                             onClick={() => toggleAddon(group.maxSelect, groupAddonIds, addon.id)}
                             className={`flex w-full items-center justify-between rounded-xl border px-3 py-2.5 text-left text-xs transition-colors ${
                               selected
-                                ? 'border-[#2AFEB7] bg-[#2AFEB7]/10 text-[#2AFEB7]'
-                                : 'border-[#26313C] bg-[#18212B] text-[#F5F7FA] hover:border-[#2AFEB7]/40'
+                                ? 'border-primary bg-primary/10 text-primary'
+                                : 'border-border bg-secondary text-foreground hover:border-primary/40'
                             } ${disabled ? 'cursor-not-allowed opacity-40' : ''}`}
                           >
                             <span className="font-semibold">
@@ -256,8 +256,8 @@ export function MenuItemSheet({
                 );
               })}
 
-              <div className="flex items-center justify-between rounded-xl border border-[#26313C] bg-[#18212B] p-3">
-                <span className="text-xs font-bold uppercase tracking-wider text-[#9AA6B2]">
+              <div className="flex items-center justify-between rounded-xl border border-border bg-secondary p-3">
+                <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
                   Quantity
                 </span>
                 <div className="flex items-center gap-3">
@@ -266,7 +266,7 @@ export function MenuItemSheet({
                     aria-label="Decrease quantity"
                     disabled={quantity <= 1}
                     onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                    className="h-8 w-8 rounded-lg border border-[#26313C] text-sm font-bold text-[#F5F7FA] transition-colors hover:border-[#2AFEB7]/40 disabled:opacity-30"
+                    className="h-8 w-8 rounded-lg border border-border text-sm font-bold text-foreground transition-colors hover:border-primary/40 disabled:opacity-30"
                   >
                     −
                   </button>
@@ -276,7 +276,7 @@ export function MenuItemSheet({
                     aria-label="Increase quantity"
                     disabled={quantity >= MAX_QUANTITY}
                     onClick={() => setQuantity((q) => Math.min(MAX_QUANTITY, q + 1))}
-                    className="h-8 w-8 rounded-lg border border-[#26313C] text-sm font-bold text-[#F5F7FA] transition-colors hover:border-[#2AFEB7]/40 disabled:opacity-30"
+                    className="h-8 w-8 rounded-lg border border-border text-sm font-bold text-foreground transition-colors hover:border-primary/40 disabled:opacity-30"
                   >
                     +
                   </button>
@@ -284,7 +284,7 @@ export function MenuItemSheet({
               </div>
 
               {error && (
-                <div className="rounded-xl border border-[#EF4444]/30 bg-[#EF4444]/10 p-3 text-xs text-[#EF4444]">
+                <div className="rounded-xl border border-atlas-error/30 bg-atlas-error/10 p-3 text-xs text-atlas-error">
                   {error}
                 </div>
               )}
@@ -293,7 +293,7 @@ export function MenuItemSheet({
                 type="button"
                 disabled={isMutating || missingRequired}
                 onClick={() => void handleAdd()}
-                className="w-full rounded-xl bg-[#2AFEB7] py-3.5 text-sm font-bold text-[#0B0F14] shadow-lg transition-all hover:bg-[#22E5A4] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40"
+                className="w-full rounded-xl bg-primary py-3.5 text-sm font-bold text-background shadow-lg transition-all hover:bg-primary-hover active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40"
               >
                 {isMutating
                   ? 'Adding…'
@@ -302,7 +302,7 @@ export function MenuItemSheet({
                     : `Add to Cart • ${formatCurrency(unitPreview * quantity)}`}
               </button>
 
-              <p className="text-center text-[10px] text-[#9AA6B2]/70">
+              <p className="text-center text-[10px] text-muted-foreground/70">
                 Final pricing is confirmed by the restaurant.
               </p>
             </>

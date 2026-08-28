@@ -96,9 +96,9 @@ export default function AdminOrdersPage() {
       primary: true,
       render: (order) => (
         <div>
-          <div className="font-mono text-sm font-bold text-[#2AFEB7]">{order.orderNumber}</div>
+          <div className="font-mono text-sm font-bold text-primary">{order.orderNumber}</div>
           {order.source && order.source !== 'DIRECT' && (
-            <span className="mt-1.5 inline-block rounded border border-[#26313C] bg-[#18212B] px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[#9AA6B2]">
+            <span className="mt-1.5 inline-block rounded border border-border bg-secondary px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-muted-foreground">
               {order.source === 'PROVIDER_A'
                 ? 'Provider A'
                 : order.source === 'PROVIDER_B'
@@ -114,8 +114,8 @@ export default function AdminOrdersPage() {
       header: 'Table / Branch',
       render: (order) => (
         <div>
-          <div className="text-sm text-[#F5F7FA]">{order.table?.name ?? 'Takeaway / Session'}</div>
-          <div className="text-[11px] text-[#9AA6B2]">{order.branch?.name}</div>
+          <div className="text-sm text-foreground">{order.table?.name ?? 'Takeaway / Session'}</div>
+          <div className="text-[11px] text-muted-foreground">{order.branch?.name}</div>
         </div>
       ),
     },
@@ -123,14 +123,14 @@ export default function AdminOrdersPage() {
       key: 'items',
       header: 'Items',
       hideOnMobile: true,
-      cellClassName: 'max-w-xs truncate text-[#9AA6B2]',
+      cellClassName: 'max-w-xs truncate text-muted-foreground',
       render: (order) => order.items.map((i) => `${i.quantity}x ${i.name}`).join(', '),
     },
     {
       key: 'total',
       header: 'Total',
       render: (order) => (
-        <span className="text-sm font-bold text-[#F5F7FA]">
+        <span className="text-sm font-bold text-foreground">
           {formatCurrency(order.totalAmount)}
         </span>
       ),
@@ -194,11 +194,11 @@ export default function AdminOrdersPage() {
         description={
           <>
             Manage restaurant orders for{' '}
-            <span className="font-semibold text-[#F5F7FA]">{currentRestaurant.name}</span>
+            <span className="font-semibold text-foreground">{currentRestaurant.name}</span>
             {currentBranch && (
               <>
                 {' • '}Branch:{' '}
-                <span className="font-semibold text-[#F5F7FA]">{currentBranch.name}</span>
+                <span className="font-semibold text-foreground">{currentBranch.name}</span>
               </>
             )}
           </>
@@ -209,7 +209,7 @@ export default function AdminOrdersPage() {
       <div
         role="tablist"
         aria-label="Filter orders by status"
-        className="no-scrollbar flex touch-pan-x flex-nowrap gap-2 overflow-x-auto border-b border-[#26313C] pb-2"
+        className="no-scrollbar flex touch-pan-x flex-nowrap gap-2 overflow-x-auto border-b border-border pb-2"
       >
         {STATUSES.map((tab) => {
           const active = statusFilter === tab.value;
@@ -222,8 +222,8 @@ export default function AdminOrdersPage() {
               onClick={() => setStatusFilter(tab.value)}
               className={`shrink-0 whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
                 active
-                  ? 'bg-[#2AFEB7] text-[#0B0F14]'
-                  : 'border border-[#26313C] bg-[#111820] text-[#9AA6B2] hover:border-[#2AFEB7]/40 hover:text-[#F5F7FA]'
+                  ? 'bg-primary text-background'
+                  : 'border border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground'
               }`}
             >
               {tab.label}
@@ -249,7 +249,7 @@ export default function AdminOrdersPage() {
           renderExpanded={(order) =>
             expandedId === order.id ? (
               <div className="space-y-2">
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                   Items
                 </h3>
                 <ul className="space-y-1.5">
@@ -258,10 +258,10 @@ export default function AdminOrdersPage() {
                       key={item.id}
                       className="flex items-center justify-between gap-4 text-sm"
                     >
-                      <span className="text-[#F5F7FA]">
+                      <span className="text-foreground">
                         {item.quantity}× {item.name}
                       </span>
-                      <span className="font-mono text-[#9AA6B2]">
+                      <span className="font-mono text-muted-foreground">
                         {formatCurrency(item.totalPrice)}
                       </span>
                     </li>

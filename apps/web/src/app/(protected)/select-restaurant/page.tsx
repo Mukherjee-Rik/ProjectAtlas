@@ -67,7 +67,7 @@ export default function SelectRestaurantPage() {
   if (isLoading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="text-sm font-semibold text-[#9AA6B2]">Loading your restaurants...</div>
+        <div className="text-sm font-semibold text-muted-foreground">Loading your restaurants...</div>
       </div>
     );
   }
@@ -85,31 +85,31 @@ export default function SelectRestaurantPage() {
   return (
     <div className="mx-auto max-w-4xl space-y-8 py-4">
       <div>
-        <h1 className="text-3xl font-bold text-[#F5F7FA]">Choose Restaurant</h1>
-        <p className="mt-2 text-sm text-[#9AA6B2]">
+        <h1 className="font-display text-3xl font-semibold tracking-[-0.02em] text-foreground">Choose Restaurant</h1>
+        <p className="mt-2 text-sm text-muted-foreground">
           Select the restaurant workspace you want to manage.
         </p>
       </div>
 
       {error && (
-        <div className="rounded-xl border border-[#EF4444]/30 bg-[#EF4444]/10 p-4 text-xs text-[#EF4444]">
+        <div className="rounded-xl border border-atlas-error/30 bg-atlas-error/10 p-4 text-xs text-atlas-error">
           {error}
         </div>
       )}
 
       {allRestaurants.length === 0 && !error && (
-        <div className="flex flex-col items-center justify-center rounded-xl border border-[#26313C] bg-[#111820] p-12 text-center space-y-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#18212B] text-2xl">
+        <div className="flex flex-col items-center justify-center rounded-xl border border-border bg-card p-12 text-center space-y-4">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-secondary text-2xl">
             🍽️
           </div>
-          <h2 className="text-lg font-bold text-[#F5F7FA]">No Restaurants Found</h2>
-          <p className="text-xs text-[#9AA6B2]">
+          <h2 className="text-lg font-bold text-foreground">No Restaurants Found</h2>
+          <p className="text-xs text-muted-foreground">
             You do not have active memberships in any restaurant yet.
           </p>
           <button
             type="button"
             onClick={() => router.push('/signup')}
-            className="rounded-xl bg-[#2AFEB7] px-4 py-2.5 text-xs font-bold text-[#0B0F14]"
+            className="rounded-xl bg-primary px-4 py-2.5 text-xs font-bold text-background"
           >
             + Create a Restaurant
           </button>
@@ -120,26 +120,26 @@ export default function SelectRestaurantPage() {
         {allRestaurants.map(({ tenantId, tenantName, tenantSlug, restaurant, role }) => (
           <div
             key={restaurant.id}
-            className="group flex flex-col justify-between rounded-2xl border border-[#26313C] bg-[#111820] p-6 shadow-xl transition-all hover:border-[#2AFEB7]/50 hover:shadow-2xl"
+            className="group flex flex-col justify-between rounded-2xl border border-border bg-card p-6 transition-all hover:border-primary/50"
           >
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#18212B] text-xl">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-secondary text-xl">
                   🍴
                 </div>
-                <span className="rounded-full border border-[#2AFEB7]/30 bg-[#2AFEB7]/10 px-2.5 py-0.5 text-[10px] font-bold text-[#2AFEB7]">
+                <span className="rounded-full border border-primary/30 bg-primary/10 px-2.5 py-0.5 text-[10px] font-bold text-primary">
                   {role}
                 </span>
               </div>
 
               <div>
-                <h3 className="text-lg font-bold text-[#F5F7FA] group-hover:text-[#2AFEB7]">
+                <h3 className="text-lg font-bold text-foreground group-hover:text-primary">
                   {restaurant.name}
                 </h3>
-                <p className="text-xs text-[#9AA6B2]">{tenantName}</p>
+                <p className="text-xs text-muted-foreground">{tenantName}</p>
               </div>
 
-              <div className="text-xs text-[#9AA6B2] pt-1">
+              <div className="text-xs text-muted-foreground pt-1">
                 📍 {restaurant.branches?.length ?? 0}{' '}
                 {restaurant.branches?.length === 1 ? 'branch' : 'branches'}
               </div>
@@ -151,7 +151,7 @@ export default function SelectRestaurantPage() {
                 onClick={() =>
                   selectRestaurant(tenantId, tenantSlug, restaurant, restaurant.branches?.[0])
                 }
-                className="w-full rounded-xl bg-[#2AFEB7] py-2.5 text-xs font-bold text-[#0B0F14] transition-all hover:bg-[#22E5A4]"
+                className="w-full rounded-xl bg-primary py-2.5 text-xs font-bold text-background transition-all hover:bg-primary-hover"
               >
                 Open Workspace →
               </button>

@@ -122,23 +122,23 @@ export default function EditProfilePage() {
   return (
     <div className="space-y-8 max-w-2xl">
       <div>
-        <h1 className="text-3xl font-bold text-[#F5F7FA]">
+        <h1 className="font-display text-3xl font-semibold tracking-[-0.02em] text-foreground">
           Edit Profile
         </h1>
-        <p className="mt-2 text-[#9AA6B2]">
+        <p className="mt-2 text-muted-foreground">
           Update your personal account details.
         </p>
       </div>
 
       {error && (
-        <div className="rounded-xl border border-[#EF4444]/30 bg-[#EF4444]/10 p-4 text-sm text-[#EF4444] animate-in fade-in">
+        <div className="rounded-xl border border-atlas-error/30 bg-atlas-error/10 p-4 text-sm text-atlas-error animate-in fade-in">
           {error}
         </div>
       )}
 
       <form
         onSubmit={handleSubmit}
-        className="rounded-xl border border-[#26313C] bg-[#111820] p-6 shadow-xl space-y-6"
+        className="rounded-xl border border-border bg-card p-6 space-y-6"
         noValidate
       >
         <ValidatedInput
@@ -172,24 +172,24 @@ export default function EditProfilePage() {
         />
 
         {/* Read-only security fields */}
-        <div className="pt-2 border-t border-[#26313C] space-y-4">
+        <div className="pt-2 border-t border-border space-y-4">
           <div>
-            <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
+            <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Email Address
             </label>
             <input
               disabled
               value={userProfile?.email ?? ''}
-              className="w-full rounded-lg border border-[#26313C]/50 bg-[#18212B]/50 px-4 py-2.5 text-[#9AA6B2] cursor-not-allowed"
+              className="w-full rounded-lg border border-border/50 bg-secondary/50 px-4 py-2.5 text-muted-foreground cursor-not-allowed"
             />
-            <p className="mt-1 text-xs text-[#9AA6B2]/70">
+            <p className="mt-1 text-xs text-muted-foreground/70">
               Email address cannot be changed directly for security reasons.
             </p>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <span className="mb-2 block text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
+              <span className="mb-2 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Account Role
               </span>
               {userProfile && (
@@ -198,7 +198,7 @@ export default function EditProfilePage() {
             </div>
 
             <div>
-              <span className="mb-2 block text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
+              <span className="mb-2 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Account Status
               </span>
               {userProfile && (
@@ -208,12 +208,12 @@ export default function EditProfilePage() {
           </div>
         </div>
 
-        <div className="flex justify-end gap-3 pt-4 border-t border-[#26313C]">
+        <div className="flex justify-end gap-3 pt-4 border-t border-border">
           <button
             type="button"
             onClick={() => router.push('/profile')}
             disabled={isSubmitting}
-            className="rounded-lg border border-[#26313C] bg-[#18212B] px-4 py-2 text-sm font-semibold text-[#F5F7FA] transition-colors hover:border-[#2AFEB7] disabled:opacity-50"
+            className="rounded-lg border border-border bg-secondary px-4 py-2 text-sm font-semibold text-foreground transition-colors hover:border-primary disabled:opacity-50"
           >
             Cancel
           </button>
@@ -221,7 +221,7 @@ export default function EditProfilePage() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="rounded-lg bg-[#2AFEB7] px-6 py-2.5 text-sm font-bold text-[#0B0F14] transition-all hover:bg-[#22E5A4] active:scale-[0.99] disabled:opacity-50 shadow"
+            className="rounded-lg bg-primary px-6 py-2.5 text-sm font-bold text-background transition-all hover:bg-primary-hover active:scale-[0.99] disabled:opacity-50 shadow"
           >
             {isSubmitting ? 'Saving changes...' : 'Save Profile'}
           </button>

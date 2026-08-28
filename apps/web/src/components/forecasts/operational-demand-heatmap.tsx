@@ -17,19 +17,19 @@ export function OperationalDemandHeatmap({ matrix }: OperationalDemandHeatmapPro
   const getCellColor = (intensity: DemandHeatmapCell['intensity']) => {
     switch (intensity) {
       case 'PEAK':
-        return 'bg-purple-600/90 text-white font-bold border-purple-500';
+        return 'bg-purple-600/90 text-foreground font-bold border-purple-500 shadow-sm';
       case 'HIGH':
-        return 'bg-rose-500/80 text-white font-bold border-rose-400';
+        return 'bg-rose-500/80 text-foreground font-bold border-rose-400 shadow-sm';
       case 'MODERATE':
         return 'bg-amber-500/70 text-black font-semibold border-amber-400';
       case 'LOW':
       default:
-        return 'bg-emerald-500/20 text-foreground border-border/40';
+        return 'bg-secondary text-muted-foreground border-border';
     }
   };
 
   return (
-    <div className="bg-card border border-border rounded-xl p-6 shadow-xs space-y-5">
+    <div className="bg-card border border-border rounded-xl p-6 space-y-5">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h3 className="text-sm font-bold text-foreground">7×24 Operational Demand Intensity Heatmap</h3>
@@ -41,7 +41,7 @@ export function OperationalDemandHeatmap({ matrix }: OperationalDemandHeatmapPro
         {/* Legend */}
         <div className="flex items-center gap-3 text-[11px] font-semibold text-muted-foreground">
           <div className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded bg-emerald-500/30 border border-emerald-500/40" />
+            <span className="w-3 h-3 rounded bg-secondary border border-border" />
             <span>Low (&lt;10)</span>
           </div>
           <div className="flex items-center gap-1.5">
@@ -60,23 +60,23 @@ export function OperationalDemandHeatmap({ matrix }: OperationalDemandHeatmapPro
       </div>
 
       {/* Heatmap Grid */}
-      <div className="overflow-x-auto">
+      <div className="table-responsive">
         <table className="w-full text-center border-collapse text-xs">
-          <thead>
+          <thead className="bg-secondary border-b border-border">
             <tr>
-              <th className="py-2 px-3 text-left font-semibold text-muted-foreground text-[11px] w-28">
+              <th className="py-2.5 px-3 text-left font-semibold text-muted-foreground text-[11px] w-28">
                 Day of Week
               </th>
               {hoursToShow.map((h) => (
-                <th key={h} className="py-2 px-1 text-[10px] font-semibold text-muted-foreground">
+                <th key={h} className="py-2.5 px-1 text-[10px] font-semibold text-muted-foreground">
                   {h % 12 === 0 ? 12 : h % 12}{h >= 12 ? 'p' : 'a'}
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-border/30">
+          <tbody className="divide-y divide-border">
             {matrix.map((row, dIdx) => (
-              <tr key={dIdx} className="hover:bg-muted/20 transition-colors">
+              <tr key={dIdx} className="hover:bg-secondary/50 transition-colors">
                 <td className="py-2.5 px-3 text-left font-bold text-foreground text-xs whitespace-nowrap">
                   {row[0]?.dayName}
                 </td>

@@ -53,10 +53,10 @@ export default function MenusPage() {
 
   if (!currentRestaurant) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-xl border border-[#26313C] bg-[#111820] p-12 text-center shadow-xl space-y-4">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#18212B] text-2xl">🍽️</div>
-        <h2 className="text-xl font-bold text-[#F5F7FA]">Select a restaurant to continue</h2>
-        <p className="text-sm text-[#9AA6B2]">Choose the restaurant you are operating in from the header selector.</p>
+      <div className="flex flex-col items-center justify-center rounded-xl border border-border bg-card p-12 text-center space-y-4">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-secondary text-2xl">🍽️</div>
+        <h2 className="text-xl font-bold text-foreground">Select a restaurant to continue</h2>
+        <p className="text-sm text-muted-foreground">Choose the restaurant you are operating in from the header selector.</p>
       </div>
     );
   }
@@ -65,59 +65,59 @@ export default function MenusPage() {
     <div className="space-y-8">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-[#F5F7FA]">Menus</h1>
-          <p className="mt-2 text-sm text-[#9AA6B2]">
-            Manage menus for <span className="font-semibold text-[#F5F7FA]">{currentRestaurant.name}</span>.
+          <h1 className="font-display text-3xl font-semibold tracking-[-0.02em] text-foreground">Menus</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Manage menus for <span className="font-semibold text-foreground">{currentRestaurant.name}</span>.
           </p>
         </div>
         <button
           type="button"
           onClick={() => router.push('/menus/create')}
-          className="rounded-lg bg-[#2AFEB7] px-4 py-2.5 text-sm font-semibold text-[#0B0F14] transition-all hover:bg-[#22E5A4] active:scale-[0.99]"
+          className="rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-background transition-all hover:bg-primary-hover active:scale-[0.99]"
         >
           + Create Menu
         </button>
       </div>
 
       {isLoading ? (
-        <div className="rounded-xl border border-[#26313C] bg-[#111820] p-8 text-center text-[#9AA6B2]">Loading menus...</div>
+        <div className="rounded-xl border border-border bg-card p-8 text-center text-muted-foreground">Loading menus...</div>
       ) : error ? (
-        <div className="rounded-xl border border-[#EF4444]/40 bg-[#EF4444]/10 p-6 text-center text-[#EF4444]"><p>{error}</p></div>
+        <div className="rounded-xl border border-atlas-error/40 bg-atlas-error/10 p-6 text-center text-atlas-error"><p>{error}</p></div>
       ) : menus.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-xl border border-[#26313C] bg-[#111820] p-16 text-center space-y-4">
-          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#18212B] text-3xl">📋</div>
-          <h2 className="text-lg font-bold text-[#F5F7FA]">No menus yet</h2>
-          <p className="text-sm text-[#9AA6B2]">Create your first menu to start adding categories and items.</p>
+        <div className="flex flex-col items-center justify-center rounded-xl border border-border bg-card p-16 text-center space-y-4">
+          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-secondary text-3xl">📋</div>
+          <h2 className="text-lg font-bold text-foreground">No menus yet</h2>
+          <p className="text-sm text-muted-foreground">Create your first menu to start adding categories and items.</p>
           <button
             type="button"
             onClick={() => router.push('/menus/create')}
-            className="rounded-lg bg-[#2AFEB7] px-4 py-2.5 text-sm font-semibold text-[#0B0F14] hover:bg-[#22E5A4]"
+            className="rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-background hover:bg-primary-hover"
           >
             Create your first menu
           </button>
         </div>
       ) : (
-        <div className="table-responsive rounded-xl border border-[#26313C] bg-[#111820] shadow-xl">
+        <div className="table-responsive rounded-xl border border-border bg-card">
           <table className="w-full min-w-[600px] text-left">
-            <thead className="border-b border-[#26313C] bg-[#18212B]">
+            <thead className="border-b border-border bg-secondary">
               <tr>
                 {['Menu Name', 'Code', 'Status', 'Actions'].map((h) => (
-                  <th key={h} className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">{h}</th>
+                  <th key={h} className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">{h}</th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#26313C]">
+            <tbody className="divide-y divide-border">
               {menus.map((menu) => (
                 <tr
                   key={menu.id}
                   onClick={() => router.push(`/menus/${menu.id}`)}
-                  className="cursor-pointer transition-colors hover:bg-[#18212B]"
+                  className="cursor-pointer transition-colors hover:bg-secondary"
                 >
-                  <td className="px-6 py-4 text-sm font-semibold text-[#F5F7FA]">{menu.name}</td>
-                  <td className="px-6 py-4 font-mono text-sm text-[#2AFEB7]">{menu.code}</td>
+                  <td className="px-6 py-4 text-sm font-semibold text-foreground">{menu.name}</td>
+                  <td className="px-6 py-4 font-mono text-sm text-primary">{menu.code}</td>
                   <td className="px-6 py-4">
-                    <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold border ${menu.status === 'ACTIVE' ? 'bg-[#22C55E]/15 text-[#22C55E] border-[#22C55E]/30' : 'bg-[#9AA6B2]/15 text-[#9AA6B2] border-[#9AA6B2]/30'}`}>
-                      <span className={`h-1.5 w-1.5 rounded-full ${menu.status === 'ACTIVE' ? 'bg-[#22C55E]' : 'bg-[#9AA6B2]'}`} />
+                    <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold border ${menu.status === 'ACTIVE' ? 'bg-atlas-success/15 text-atlas-success border-atlas-success/30' : 'bg-muted-foreground/15 text-muted-foreground border-muted-foreground/30'}`}>
+                      <span className={`h-1.5 w-1.5 rounded-full ${menu.status === 'ACTIVE' ? 'bg-atlas-success' : 'bg-muted-foreground'}`} />
                       {menu.status}
                     </span>
                   </td>
@@ -126,14 +126,14 @@ export default function MenusPage() {
                       <button
                         type="button"
                         onClick={() => router.push(`/menus/${menu.id}/edit`)}
-                        className="rounded-lg border border-[#26313C] bg-[#18212B] px-2.5 py-1 text-xs text-[#F5F7FA] hover:border-[#2AFEB7]"
+                        className="rounded-lg border border-border bg-secondary px-2.5 py-1 text-xs text-foreground hover:border-primary"
                       >
                         Edit
                       </button>
                       <button
                         type="button"
                         onClick={() => setDeletingMenu(menu)}
-                        className="rounded-lg border border-[#EF4444]/40 bg-[#EF4444]/10 px-2.5 py-1 text-xs text-[#EF4444] hover:bg-[#EF4444]/20"
+                        className="rounded-lg border border-atlas-error/40 bg-atlas-error/10 px-2.5 py-1 text-xs text-atlas-error hover:bg-atlas-error/20"
                       >
                         Delete
                       </button>

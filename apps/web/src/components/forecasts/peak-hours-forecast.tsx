@@ -16,9 +16,9 @@ export function PeakHoursForecast({ hourlyPoints }: PeakHoursForecastProps) {
   const maxOrders = Math.max(...activeHours.map((h) => h.predictedOrders), 1);
 
   return (
-    <div className="bg-card border border-border rounded-xl p-6 shadow-xs space-y-5">
+    <div className="bg-card border border-border rounded-xl p-6 space-y-5">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
           <Clock className="w-5 h-5 text-primary" />
           <div>
             <h3 className="text-sm font-bold text-foreground">Tomorrow's Peak Hours & Workload Forecast</h3>
@@ -38,12 +38,12 @@ export function PeakHoursForecast({ hourlyPoints }: PeakHoursForecastProps) {
               key={h.hour}
               className={`p-3 rounded-xl border flex flex-col justify-between space-y-2 transition-all ${
                 h.isPeak
-                  ? 'border-primary/50 bg-primary/10 shadow-xs'
-                  : 'border-border bg-muted/20'
+                  ? 'border-primary/50 bg-primary/10 shadow-sm'
+                  : 'border-border bg-secondary'
               }`}
             >
               <div className="flex items-center justify-between text-[11px]">
-                <span className="font-semibold text-foreground">{h.timeLabel}</span>
+                <span className="font-bold text-foreground">{h.timeLabel}</span>
                 {h.isPeak && <Flame className="w-3.5 h-3.5 text-primary animate-pulse" />}
               </div>
 
@@ -52,10 +52,10 @@ export function PeakHoursForecast({ hourlyPoints }: PeakHoursForecastProps) {
                 <div className="text-[10px] text-muted-foreground">orders expected</div>
               </div>
 
-              <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
+              <div className="h-1.5 w-full bg-background rounded-full overflow-hidden border border-border/40">
                 <div
                   style={{ width: `${heightPct}%` }}
-                  className={`h-full rounded-full ${h.isPeak ? 'bg-primary' : 'bg-muted-foreground/60'}`}
+                  className={`h-full rounded-full ${h.isPeak ? 'bg-primary' : 'bg-muted-foreground/40'}`}
                 />
               </div>
             </div>

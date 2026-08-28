@@ -43,30 +43,30 @@ export default function CheckoutPage({
 
   if (isLoading) {
     return (
-      <main className="min-h-screen bg-[#0B0F14] p-4 text-[#F5F7FA]">
+      <main className="min-h-screen bg-background p-4 text-foreground">
         <div className="mx-auto w-full max-w-sm space-y-4 animate-pulse">
-          <div className="h-6 w-36 rounded bg-[#18212B]" />
-          <div className="h-40 rounded-2xl bg-[#111820]" />
-          <div className="h-28 rounded-2xl bg-[#111820]" />
+          <div className="h-6 w-36 rounded bg-secondary" />
+          <div className="h-40 rounded-2xl bg-card" />
+          <div className="h-28 rounded-2xl bg-card" />
         </div>
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen bg-[#0B0F14] pb-8 text-[#F5F7FA]">
-      <header className="sticky top-0 z-30 border-b border-[#26313C] bg-[#0B0F14]/95 px-4 py-4 backdrop-blur">
+    <main className="min-h-screen bg-background pb-8 text-foreground">
+      <header className="sticky top-0 z-30 border-b border-border bg-background/95 px-4 py-4 backdrop-blur">
         <div className="mx-auto flex w-full max-w-sm items-center justify-between gap-3">
           <div>
             <h1 className="text-lg font-black">Review Order</h1>
-            <p className="text-[11px] text-[#9AA6B2]">
+            <p className="text-[11px] text-muted-foreground">
               {itemCount} {itemCount === 1 ? 'item' : 'items'} • {totalQuantity}{' '}
               {totalQuantity === 1 ? 'unit' : 'units'}
             </p>
           </div>
           <Link
             href={`/t/${token}/cart`}
-            className="rounded-xl border border-[#26313C] px-3 py-2 text-[11px] font-semibold text-[#9AA6B2] transition-colors hover:border-[#2AFEB7]/40 hover:text-[#2AFEB7]"
+            className="rounded-xl border border-border px-3 py-2 text-[11px] font-semibold text-muted-foreground transition-colors hover:border-primary/40 hover:text-primary"
           >
             ← Back to Cart
           </Link>
@@ -75,23 +75,23 @@ export default function CheckoutPage({
 
       <div className="mx-auto w-full max-w-sm space-y-4 p-4">
         {error && (
-          <div className="rounded-xl border border-[#EF4444]/30 bg-[#EF4444]/10 p-3 text-xs text-[#EF4444]">
+          <div className="rounded-xl border border-atlas-error/30 bg-atlas-error/10 p-3 text-xs text-atlas-error">
             {error}
           </div>
         )}
 
         {(!cart || cart.items.length === 0) && (
-          <div className="space-y-4 rounded-2xl border border-[#26313C] bg-[#111820] p-8 text-center">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#18212B] text-2xl">
+          <div className="space-y-4 rounded-2xl border border-border bg-card p-8 text-center">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-secondary text-2xl">
               🛒
             </div>
             <p className="text-sm font-bold">Your cart is empty</p>
-            <p className="text-xs text-[#9AA6B2]">
+            <p className="text-xs text-muted-foreground">
               Add items from the menu before checking out.
             </p>
             <Link
               href={`/t/${token}/menu`}
-              className="inline-block rounded-xl bg-[#2AFEB7] px-4 py-2.5 text-xs font-bold text-[#0B0F14]"
+              className="inline-block rounded-xl bg-primary px-4 py-2.5 text-xs font-bold text-background"
             >
               Browse the menu
             </Link>
@@ -101,22 +101,22 @@ export default function CheckoutPage({
         {cart && cart.items.length > 0 && (
           <>
             {/* Order Items Summary */}
-            <div className="space-y-3 rounded-2xl border border-[#26313C] bg-[#111820] p-4">
-              <h2 className="text-xs font-bold uppercase tracking-wider text-[#9AA6B2]">
+            <div className="space-y-3 rounded-2xl border border-border bg-card p-4">
+              <h2 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
                 Order Items
               </h2>
 
-              <div className="divide-y divide-[#26313C]">
+              <div className="divide-y divide-border">
                 {cart.items.map((item) => (
                   <div key={item.id} className="flex items-start justify-between gap-3 py-3 first:pt-0 last:pb-0">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-[#2AFEB7]">{item.quantity}x</span>
+                        <span className="text-xs font-bold text-primary">{item.quantity}x</span>
                         <h3 className="text-xs font-bold">{item.name}</h3>
                       </div>
 
                       {item.variants.length > 0 && (
-                        <p className="pl-5 text-[11px] text-[#9AA6B2]">
+                        <p className="pl-5 text-[11px] text-muted-foreground">
                           {item.variants.map((v) => v.name).join(' • ')}
                         </p>
                       )}
@@ -124,7 +124,7 @@ export default function CheckoutPage({
                       {item.addons.length > 0 && (
                         <ul className="pl-5 space-y-0.5">
                           {item.addons.map((a) => (
-                            <li key={a.id} className="text-[11px] text-[#9AA6B2]">
+                            <li key={a.id} className="text-[11px] text-muted-foreground">
                               + {a.name}
                             </li>
                           ))}
@@ -132,7 +132,7 @@ export default function CheckoutPage({
                       )}
                     </div>
 
-                    <span className="text-xs font-bold text-[#F5F7FA]">
+                    <span className="text-xs font-bold text-foreground">
                       {formatCurrency(item.totalPrice)}
                     </span>
                   </div>
@@ -141,23 +141,23 @@ export default function CheckoutPage({
             </div>
 
             {/* Bill Summary */}
-            <div className="space-y-3 rounded-2xl border border-[#26313C] bg-[#111820] p-4">
-              <h2 className="text-xs font-bold uppercase tracking-wider text-[#9AA6B2]">
+            <div className="space-y-3 rounded-2xl border border-border bg-card p-4">
+              <h2 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
                 Payment Summary
               </h2>
 
               <div className="space-y-2 text-xs">
-                <div className="flex justify-between text-[#9AA6B2]">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Subtotal</span>
-                  <span className="font-semibold text-[#F5F7FA]">{formatCurrency(subtotal)}</span>
+                  <span className="font-semibold text-foreground">{formatCurrency(subtotal)}</span>
                 </div>
-                <div className="flex justify-between text-[#9AA6B2]">
+                <div className="flex justify-between text-muted-foreground">
                   <span>Estimated Taxes & Charges</span>
-                  <span className="font-semibold text-[#F5F7FA]">Calculated at order</span>
+                  <span className="font-semibold text-foreground">Calculated at order</span>
                 </div>
-                <div className="flex justify-between border-t border-[#26313C] pt-2 text-sm font-bold">
-                  <span className="text-[#F5F7FA]">Subtotal Amount</span>
-                  <span className="text-[#2AFEB7]">{formatCurrency(subtotal)}</span>
+                <div className="flex justify-between border-t border-border pt-2 text-sm font-bold">
+                  <span className="text-foreground">Subtotal Amount</span>
+                  <span className="text-primary">{formatCurrency(subtotal)}</span>
                 </div>
               </div>
 
@@ -166,13 +166,13 @@ export default function CheckoutPage({
                   type="button"
                   disabled={isSubmitting}
                   onClick={() => void handlePlaceOrder()}
-                  className="w-full rounded-xl bg-[#2AFEB7] py-3.5 text-sm font-bold text-[#0B0F14] shadow-lg transition-all hover:bg-[#22E5A4] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
+                  className="w-full rounded-xl bg-primary py-3.5 text-sm font-bold text-background shadow-lg transition-all hover:bg-primary-hover active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {isSubmitting ? 'Creating your order...' : 'PLACE ORDER'}
                 </button>
               </div>
 
-              <p className="text-center text-[10px] text-[#9AA6B2]/70">
+              <p className="text-center text-[10px] text-muted-foreground/70">
                 By placing this order, your request will be sent directly to the kitchen.
               </p>
             </div>

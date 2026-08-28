@@ -138,13 +138,13 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center bg-[#070B0E]/80 backdrop-blur-sm p-4 pt-[15vh]">
+    <div className="fixed inset-0 z-50 flex items-start justify-center bg-background/80 backdrop-blur-sm p-4 pt-[15vh]">
       {/* Backdrop closer click target */}
       <div className="fixed inset-0 -z-10" onClick={onClose} />
 
-      <div className="w-full max-w-2xl overflow-hidden rounded-2xl border border-[#26313C] bg-[#111820] shadow-2xl flex flex-col">
+      <div className="w-full max-w-2xl overflow-hidden rounded-2xl border border-border bg-card flex flex-col">
         {/* Search Input Box */}
-        <div className="flex items-center gap-3 border-b border-[#26313C] px-4 py-3 bg-[#18212B]">
+        <div className="flex items-center gap-3 border-b border-border px-4 py-3 bg-secondary">
           <span className="text-lg">🔎</span>
           <input
             ref={inputRef}
@@ -152,15 +152,15 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
             placeholder="Search menus, orders, tables, staff, pages..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="flex-1 bg-transparent text-sm text-[#F5F7FA] outline-none placeholder-[#64748B]"
+            className="flex-1 bg-transparent text-sm text-foreground outline-none placeholder-muted-foreground"
           />
           {isLoading && (
-            <div className="h-4 w-4 animate-spin rounded-full border-2 border-[#2AFEB7] border-t-transparent" />
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
           )}
           <button
             type="button"
             onClick={onClose}
-            className="rounded bg-[#111820] border border-[#26313C] px-2 py-1 text-[10px] text-[#9AA6B2] hover:border-[#EF4444] hover:text-[#EF4444]"
+            className="rounded bg-card border border-border px-2 py-1 text-[10px] text-muted-foreground hover:border-atlas-error hover:text-atlas-error"
           >
             ESC
           </button>
@@ -170,7 +170,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
         <div className="max-h-[60vh] overflow-y-auto p-4 space-y-4">
           {flatItems.length > 0 ? (
             <div className="space-y-1">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-[#64748B] mb-2 px-2">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2 px-2">
                 Matching Results ({flatItems.length})
               </p>
               {flatItems.map((item, idx) => {
@@ -185,17 +185,17 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                     className={[
                       'flex items-center justify-between rounded-xl px-4 py-2.5 cursor-pointer transition-all border text-left',
                       isCurrent
-                        ? 'bg-[#2AFEB7]/10 border-[#2AFEB7]/30 text-[#2AFEB7] shadow-[0_0_8px_rgba(42,254,183,0.05)]'
-                        : 'bg-transparent border-transparent hover:bg-[#18212B]/40 text-[#F5F7FA]',
+                        ? 'bg-primary/10 border-primary/30 text-primary shadow-[0_0_8px_rgba(42,254,183,0.05)]'
+                        : 'bg-transparent border-transparent hover:bg-secondary/40 text-foreground',
                     ].join(' ')}
                   >
                     <div className="flex flex-col">
                       <span className="text-xs font-semibold">{item.label}</span>
                       {item.detail && (
-                        <span className="text-[10px] text-[#9AA6B2] mt-0.5">{item.detail}</span>
+                        <span className="text-[10px] text-muted-foreground mt-0.5">{item.detail}</span>
                       )}
                     </div>
-                    <span className="rounded-full bg-[#18212B] border border-[#26313C] px-2 py-0.5 text-[9px] font-bold uppercase text-[#9AA6B2]">
+                    <span className="rounded-full bg-secondary border border-border px-2 py-0.5 text-[9px] font-bold uppercase text-muted-foreground">
                       {item.type}
                     </span>
                   </div>
@@ -203,11 +203,11 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
               })}
             </div>
           ) : query.trim().length >= 2 ? (
-            <div className="py-8 text-center text-xs text-[#9AA6B2]">
+            <div className="py-8 text-center text-xs text-muted-foreground">
               No matching pages or database records found for "{query}".
             </div>
           ) : (
-            <div className="py-8 text-center text-xs text-[#9AA6B2]">
+            <div className="py-8 text-center text-xs text-muted-foreground">
               Type at least 2 characters to search across the platform.
             </div>
           )}

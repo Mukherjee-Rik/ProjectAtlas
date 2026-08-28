@@ -8,9 +8,9 @@ export function UserStatusBadge({
   status,
 }: UserStatusBadgeProps) {
   const classes: Record<UserStatus, string> = {
-    ACTIVE: 'bg-[#2AFEB7]/15 text-[#2AFEB7] border border-[#2AFEB7]/30',
-    INACTIVE: 'bg-[#26313C]/50 text-[#9AA6B2] border border-[#26313C]',
-    SUSPENDED: 'bg-[#EF4444]/15 text-[#EF4444] border border-[#EF4444]/30',
+    ACTIVE: 'bg-primary/15 text-primary border border-primary/30',
+    INACTIVE: 'bg-border/50 text-muted-foreground border border-border',
+    SUSPENDED: 'bg-atlas-error/15 text-atlas-error border border-atlas-error/30',
   };
 
   return (

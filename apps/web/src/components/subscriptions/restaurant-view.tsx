@@ -81,21 +81,21 @@ export function RestaurantSubscriptionView() {
   if (isLoading) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center space-y-4">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#2AFEB7] border-t-transparent"></div>
-        <div className="text-sm font-semibold text-[#9AA6B2]">Loading Subscription details...</div>
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+        <div className="text-sm font-semibold text-muted-foreground">Loading Subscription details...</div>
       </div>
     );
   }
 
   if (error || !usageStats) {
     return (
-      <div className="rounded-2xl border border-[#EF4444]/30 bg-[#EF4444]/10 p-6 text-center space-y-3">
-        <p className="text-sm text-[#EF4444] font-bold">Unable to retrieve subscription information</p>
-        <p className="text-xs text-[#9AA6B2]">{error || 'Please check your active restaurant credentials'}</p>
+      <div className="rounded-2xl border border-atlas-error/30 bg-atlas-error/10 p-6 text-center space-y-3">
+        <p className="text-sm text-atlas-error font-bold">Unable to retrieve subscription information</p>
+        <p className="text-xs text-muted-foreground">{error || 'Please check your active restaurant credentials'}</p>
         <button
           type="button"
           onClick={() => void loadUsage()}
-          className="rounded-xl bg-[#18212B] border border-[#26313C] px-4 py-2 text-xs font-semibold text-[#F5F7FA] hover:border-[#2AFEB7] transition-colors"
+          className="rounded-xl bg-secondary border border-border px-4 py-2 text-xs font-semibold text-foreground hover:border-primary transition-colors"
         >
           Try Again
         </button>
@@ -108,13 +108,13 @@ export function RestaurantSubscriptionView() {
   const getStatusBadgeStyle = (subStatus: string) => {
     switch (subStatus) {
       case 'ACTIVE':
-        return 'bg-[#22C55E]/15 text-[#22C55E] border-[#22C55E]/30';
+        return 'bg-atlas-success/15 text-atlas-success border-atlas-success/30';
       case 'TRIALING':
-        return 'bg-[#3B82F6]/15 text-[#3B82F6] border-[#3B82F6]/30';
+        return 'bg-atlas-info/15 text-atlas-info border-atlas-info/30';
       case 'SUSPENDED':
-        return 'bg-[#F59E0B]/15 text-[#F59E0B] border-[#F59E0B]/30';
+        return 'bg-atlas-warning/15 text-atlas-warning border-atlas-warning/30';
       default:
-        return 'bg-[#EF4444]/15 text-[#EF4444] border-[#EF4444]/30';
+        return 'bg-atlas-error/15 text-atlas-error border-atlas-error/30';
     }
   };
 
@@ -128,25 +128,25 @@ export function RestaurantSubscriptionView() {
     <div className="space-y-6">
       {/* Title */}
       <div>
-        <h1 className="text-3xl font-black text-[#F5F7FA]">My Subscription</h1>
-        <p className="mt-1 text-xs text-[#9AA6B2]">
+        <h1 className="text-3xl font-black text-foreground">My Subscription</h1>
+        <p className="mt-1 text-xs text-muted-foreground">
           Manage store licensing plan, active features, and current operational quotas.
         </p>
       </div>
 
       {/* Trial Alert Banner */}
       {status === 'TRIALING' && nextBillingDate && (
-        <div className="rounded-2xl border border-[#3B82F6]/30 bg-[#3B82F6]/10 p-5 flex flex-wrap items-center justify-between gap-4">
+        <div className="rounded-2xl border border-atlas-info/30 bg-atlas-info/10 p-5 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <span className="text-2xl">⏳</span>
             <div>
-              <p className="text-xs font-bold text-[#F5F7FA]">Restaurant is operating in Trial Mode</p>
-              <p className="text-[11px] text-[#9AA6B2]">
-                Your trial will automatically expire on <span className="font-semibold text-white">{new Date(nextBillingDate).toLocaleDateString()}</span>.
+              <p className="text-xs font-bold text-foreground">Restaurant is operating in Trial Mode</p>
+              <p className="text-[11px] text-muted-foreground">
+                Your trial will automatically expire on <span className="font-semibold text-foreground">{new Date(nextBillingDate).toLocaleDateString()}</span>.
               </p>
             </div>
           </div>
-          <span className="rounded-full bg-[#3B82F6]/25 border border-[#3B82F6]/40 px-3 py-1 text-[10px] font-bold text-[#F5F7FA]">
+          <span className="rounded-full bg-atlas-info/25 border border-atlas-info/40 px-3 py-1 text-[10px] font-bold text-foreground">
             {Math.max(0, Math.ceil((new Date(nextBillingDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)))} days left
           </span>
         </div>
@@ -154,11 +154,11 @@ export function RestaurantSubscriptionView() {
 
       {/* Expired / Suspended Warning */}
       {!['ACTIVE', 'TRIALING'].includes(status) && (
-        <div className="rounded-2xl border border-[#EF4444]/30 bg-[#EF4444]/10 p-5 flex items-center gap-3">
+        <div className="rounded-2xl border border-atlas-error/30 bg-atlas-error/10 p-5 flex items-center gap-3">
           <span className="text-2xl">⚠️</span>
           <div>
-            <p className="text-xs font-bold text-white">Subscription suspended or expired ({status})</p>
-            <p className="text-[11px] text-[#9AA6B2]">
+            <p className="text-xs font-bold text-foreground">Subscription suspended or expired ({status})</p>
+            <p className="text-[11px] text-muted-foreground">
               Some features or administrative updates may be locked. Please contact support or platform administration to reactivate your plan.
             </p>
           </div>
@@ -168,52 +168,52 @@ export function RestaurantSubscriptionView() {
       {/* Grid: Subscription Info Card + Usage Meters Card */}
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Info Card */}
-        <div className="lg:col-span-1 rounded-2xl border border-[#26313C] bg-[#111820] p-6 shadow-xl space-y-6">
+        <div className="lg:col-span-1 rounded-2xl border border-border bg-card p-6 space-y-6">
           <div>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[#9AA6B2]">Current Plan Tier</span>
+            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Current Plan Tier</span>
             <div className="mt-2 flex items-baseline gap-2">
-              <h2 className="text-3xl font-black text-[#2AFEB7]">{planName}</h2>
+              <h2 className="text-3xl font-black text-primary">{planName}</h2>
               <span className={`rounded-full border px-2 py-0.5 text-[9px] font-bold ${getStatusBadgeStyle(status)}`}>
                 {status}
               </span>
             </div>
           </div>
 
-          <div className="border-t border-[#26313C]/60 pt-4 space-y-3 text-xs">
+          <div className="border-t border-border/60 pt-4 space-y-3 text-xs">
             <div className="flex justify-between">
-              <span className="text-[#9AA6B2]">Billing Cycle</span>
-              <span className="font-semibold text-[#F5F7FA] uppercase">{billingCycle}</span>
+              <span className="text-muted-foreground">Billing Cycle</span>
+              <span className="font-semibold text-foreground uppercase">{billingCycle}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-[#9AA6B2]">Renewal/Expiry Date</span>
-              <span className="font-semibold text-[#F5F7FA]">
+              <span className="text-muted-foreground">Renewal/Expiry Date</span>
+              <span className="font-semibold text-foreground">
                 {nextBillingDate ? new Date(nextBillingDate).toLocaleDateString() : 'N/A'}
               </span>
             </div>
           </div>
 
-          <div className="border-t border-[#26313C]/60 pt-4 space-y-2">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-[#9AA6B2]">Included Features</p>
-            <ul className="space-y-1.5 text-xs text-[#F5F7FA]">
+          <div className="border-t border-border/60 pt-4 space-y-2">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Included Features</p>
+            <ul className="space-y-1.5 text-xs text-foreground">
               <li className="flex items-center gap-2">
-                <span className="text-[#2AFEB7]">✓</span> QR Menu Ordering
+                <span className="text-primary">✓</span> QR Menu Ordering
               </li>
               <li className="flex items-center gap-2">
-                <span className="text-[#2AFEB7]">✓</span> Table & Area Setup
+                <span className="text-primary">✓</span> Table & Area Setup
               </li>
               {['Starter', 'Professional', 'Enterprise'].includes(planName) && (
                 <li className="flex items-center gap-2">
-                  <span className="text-[#2AFEB7]">✓</span> Order Dispatch & Kitchen Screen
+                  <span className="text-primary">✓</span> Order Dispatch & Kitchen Screen
                 </li>
               )}
               {['Professional', 'Enterprise'].includes(planName) && (
                 <li className="flex items-center gap-2">
-                  <span className="text-[#2AFEB7]">✓</span> Advanced Revenue Analytics
+                  <span className="text-primary">✓</span> Advanced Revenue Analytics
                 </li>
               )}
               {planName === 'Enterprise' && (
                 <li className="flex items-center gap-2">
-                  <span className="text-[#2AFEB7]">✓</span> Multi-Branch Corporate Control
+                  <span className="text-primary">✓</span> Multi-Branch Corporate Control
                 </li>
               )}
             </ul>
@@ -221,25 +221,25 @@ export function RestaurantSubscriptionView() {
         </div>
 
         {/* Resource Usage Meters Card */}
-        <div className="lg:col-span-2 rounded-2xl border border-[#26313C] bg-[#111820] p-6 shadow-xl space-y-6">
+        <div className="lg:col-span-2 rounded-2xl border border-border bg-card p-6 space-y-6">
           <div>
-            <h3 className="text-base font-bold text-[#F5F7FA]">Plan Resource Quotas</h3>
-            <p className="text-xs text-[#9AA6B2]">Usage breakdown compared to maximum plan limitations.</p>
+            <h3 className="text-base font-bold text-foreground">Plan Resource Quotas</h3>
+            <p className="text-xs text-muted-foreground">Usage breakdown compared to maximum plan limitations.</p>
           </div>
 
           <div className="space-y-5">
             {/* Table Quota */}
             <div className="space-y-2">
               <div className="flex justify-between text-xs">
-                <span className="font-bold text-[#F5F7FA]">Tables Configured</span>
-                <span className="text-[#9AA6B2]">
-                  <span className="font-bold text-[#F5F7FA]">{usage.tables.current}</span> / {usage.tables.limit} max
+                <span className="font-bold text-foreground">Tables Configured</span>
+                <span className="text-muted-foreground">
+                  <span className="font-bold text-foreground">{usage.tables.current}</span> / {usage.tables.limit} max
                 </span>
               </div>
-              <div className="h-2 w-full rounded-full bg-[#18212B] overflow-hidden">
+              <div className="h-2 w-full rounded-full bg-secondary overflow-hidden">
                 <div
                   style={{ width: `${getMeterPercent(usage.tables.current, usage.tables.limit)}%` }}
-                  className="h-full bg-gradient-to-r from-[#2AFEB7]/60 to-[#2AFEB7] rounded-full"
+                  className="h-full bg-gradient-to-r from-primary/60 to-primary rounded-full"
                 />
               </div>
             </div>
@@ -247,15 +247,15 @@ export function RestaurantSubscriptionView() {
             {/* Staff Quota */}
             <div className="space-y-2">
               <div className="flex justify-between text-xs">
-                <span className="font-bold text-[#F5F7FA]">Staff Members</span>
-                <span className="text-[#9AA6B2]">
-                  <span className="font-bold text-[#F5F7FA]">{usage.staff.current}</span> / {usage.staff.limit} max
+                <span className="font-bold text-foreground">Staff Members</span>
+                <span className="text-muted-foreground">
+                  <span className="font-bold text-foreground">{usage.staff.current}</span> / {usage.staff.limit} max
                 </span>
               </div>
-              <div className="h-2 w-full rounded-full bg-[#18212B] overflow-hidden">
+              <div className="h-2 w-full rounded-full bg-secondary overflow-hidden">
                 <div
                   style={{ width: `${getMeterPercent(usage.staff.current, usage.staff.limit)}%` }}
-                  className="h-full bg-gradient-to-r from-[#3B82F6]/60 to-[#3B82F6] rounded-full"
+                  className="h-full bg-gradient-to-r from-atlas-info/60 to-atlas-info rounded-full"
                 />
               </div>
             </div>
@@ -263,15 +263,15 @@ export function RestaurantSubscriptionView() {
             {/* Branch Quota */}
             <div className="space-y-2">
               <div className="flex justify-between text-xs">
-                <span className="font-bold text-[#F5F7FA]">Active Branches</span>
-                <span className="text-[#9AA6B2]">
-                  <span className="font-bold text-[#F5F7FA]">{usage.branches.current}</span> / {usage.branches.limit} max
+                <span className="font-bold text-foreground">Active Branches</span>
+                <span className="text-muted-foreground">
+                  <span className="font-bold text-foreground">{usage.branches.current}</span> / {usage.branches.limit} max
                 </span>
               </div>
-              <div className="h-2 w-full rounded-full bg-[#18212B] overflow-hidden">
+              <div className="h-2 w-full rounded-full bg-secondary overflow-hidden">
                 <div
                   style={{ width: `${getMeterPercent(usage.branches.current, usage.branches.limit)}%` }}
-                  className="h-full bg-gradient-to-r from-[#F59E0B]/60 to-[#F59E0B] rounded-full"
+                  className="h-full bg-gradient-to-r from-atlas-warning/60 to-atlas-warning rounded-full"
                 />
               </div>
             </div>
@@ -279,12 +279,12 @@ export function RestaurantSubscriptionView() {
             {/* Menu Quota */}
             <div className="space-y-2">
               <div className="flex justify-between text-xs">
-                <span className="font-bold text-[#F5F7FA]">Catalogs / Menus</span>
-                <span className="text-[#9AA6B2]">
-                  <span className="font-bold text-[#F5F7FA]">{usage.menus.current}</span> / {usage.menus.limit} max
+                <span className="font-bold text-foreground">Catalogs / Menus</span>
+                <span className="text-muted-foreground">
+                  <span className="font-bold text-foreground">{usage.menus.current}</span> / {usage.menus.limit} max
                 </span>
               </div>
-              <div className="h-2 w-full rounded-full bg-[#18212B] overflow-hidden">
+              <div className="h-2 w-full rounded-full bg-secondary overflow-hidden">
                 <div
                   style={{ width: `${getMeterPercent(usage.menus.current, usage.menus.limit)}%` }}
                   className="h-full bg-gradient-to-r from-purple-500/60 to-purple-500 rounded-full"
@@ -298,8 +298,8 @@ export function RestaurantSubscriptionView() {
       {/* Available Subscription Plans Upgrade Section */}
       <div className="space-y-4 pt-4">
         <div>
-          <h2 className="text-xl font-black text-[#F5F7FA]">Available Subscription Plans</h2>
-          <p className="text-xs text-[#9AA6B2]">Upgrade or scale your licensing tier to access higher quotas and additional features.</p>
+          <h2 className="text-xl font-black text-foreground">Available Subscription Plans</h2>
+          <p className="text-xs text-muted-foreground">Upgrade or scale your licensing tier to access higher quotas and additional features.</p>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
@@ -309,46 +309,46 @@ export function RestaurantSubscriptionView() {
               <div
                 key={pl.id}
                 onClick={() => setSelectedPlanDetails(pl)}
-                className={`cursor-pointer rounded-2xl border p-5 flex flex-col justify-between space-y-4 shadow-xl transition-all hover:scale-[1.01] ${
+                className={`cursor-pointer rounded-2xl border p-5 flex flex-col justify-between space-y-4 transition-all hover:scale-[1.01] ${
                   isCurrent
-                    ? 'border-[#2AFEB7] bg-[#111820] ring-1 ring-[#2AFEB7]/30'
-                    : 'border-[#26313C] bg-[#111820] hover:border-[#2AFEB7]/45'
+                    ? 'border-primary bg-card ring-1 ring-primary/30'
+                    : 'border-border bg-card hover:border-primary/45'
                 }`}
               >
                 <div className="space-y-2">
                   <div className="flex justify-between items-center">
-                    <h4 className="text-sm font-bold text-[#F5F7FA] uppercase tracking-wider">{pl.name}</h4>
+                    <h4 className="text-sm font-bold text-foreground uppercase tracking-wider">{pl.name}</h4>
                     {isCurrent && (
-                      <span className="rounded-full bg-[#2AFEB7]/15 px-2 py-0.5 text-[9px] font-bold text-[#2AFEB7] border border-[#2AFEB7]/30">
+                      <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[9px] font-bold text-primary border border-primary/30">
                         Active Plan
                       </span>
                     )}
                   </div>
-                  <p className="text-xs text-[#9AA6B2] line-clamp-2">{pl.description || `Atlas scaling plan for restaurants.`}</p>
+                  <p className="text-xs text-muted-foreground line-clamp-2">{pl.description || `Atlas scaling plan for restaurants.`}</p>
                   
                   <div className="pt-2 flex items-baseline gap-1">
-                    <span className="text-2xl font-black text-[#2AFEB7]">{formatCurrency(pl.price)}</span>
-                    <span className="text-[10px] text-[#9AA6B2] uppercase">/ {pl.billingCycle}</span>
+                    <span className="text-2xl font-black text-primary">{formatCurrency(pl.price)}</span>
+                    <span className="text-[10px] text-muted-foreground uppercase">/ {pl.billingCycle}</span>
                   </div>
                 </div>
 
                 {/* Plan Resource Limits */}
-                <div className="border-t border-[#26313C] pt-3 text-[11px] text-[#9AA6B2] space-y-1.5">
+                <div className="border-t border-border pt-3 text-[11px] text-muted-foreground space-y-1.5">
                   <div className="flex justify-between">
                     <span>Tables Quota:</span>
-                    <span className="font-semibold text-white">{formatLimit((pl.limits as any)?.maxTables)}</span>
+                    <span className="font-semibold text-foreground">{formatLimit((pl.limits as any)?.maxTables)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Staff Limit:</span>
-                    <span className="font-semibold text-white">{formatLimit((pl.limits as any)?.maxStaff)}</span>
+                    <span className="font-semibold text-foreground">{formatLimit((pl.limits as any)?.maxStaff)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Branches Limit:</span>
-                    <span className="font-semibold text-white">{formatLimit((pl.limits as any)?.maxBranches)}</span>
+                    <span className="font-semibold text-foreground">{formatLimit((pl.limits as any)?.maxBranches)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Menus Limit:</span>
-                    <span className="font-semibold text-white">{formatLimit((pl.limits as any)?.maxMenus)}</span>
+                    <span className="font-semibold text-foreground">{formatLimit((pl.limits as any)?.maxMenus)}</span>
                   </div>
                 </div>
 
@@ -358,7 +358,7 @@ export function RestaurantSubscriptionView() {
                     <button
                       type="button"
                       disabled
-                      className="w-full rounded-xl bg-[#2AFEB7]/10 border border-[#2AFEB7]/30 py-2.5 text-xs font-bold text-[#2AFEB7] cursor-not-allowed"
+                      className="w-full rounded-xl bg-primary/10 border border-primary/30 py-2.5 text-xs font-bold text-primary cursor-not-allowed"
                     >
                       ✓ Active Plan
                     </button>
@@ -370,7 +370,7 @@ export function RestaurantSubscriptionView() {
                         e.stopPropagation();
                         handleUpgradePlan(pl.id, pl.name);
                       }}
-                      className="w-full rounded-xl bg-[#2AFEB7] py-2.5 text-xs font-bold text-[#0B0F14] transition-all hover:bg-[#22E5A4] active:scale-[0.99] disabled:opacity-50"
+                      className="w-full rounded-xl bg-primary py-2.5 text-xs font-bold text-background transition-all hover:bg-primary-hover active:scale-[0.99] disabled:opacity-50"
                     >
                       {isUpgradingId === pl.id ? 'Upgrading...' : `Select ${pl.name}`}
                     </button>
@@ -385,50 +385,50 @@ export function RestaurantSubscriptionView() {
       {/* Receipt Modal */}
       {receipt && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-md p-4 animate-fadeIn">
-          <div className="w-full max-w-md rounded-3xl border border-[#26313C] bg-[#111820]/90 p-8 shadow-2xl space-y-6 text-center backdrop-saturate-150">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#2AFEB7]/10 text-2xl text-[#2AFEB7] border border-[#2AFEB7]/30">
+          <div className="w-full max-w-md rounded-3xl border border-border bg-card/90 p-8 space-y-6 text-center backdrop-saturate-150">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-2xl text-primary border border-primary/30">
               🎉
             </div>
             
             <div className="space-y-1">
-              <h3 className="text-xl font-black text-[#F5F7FA]">Subscription Upgraded!</h3>
-              <p className="text-xs text-[#9AA6B2]">Your payment has been settled successfully.</p>
+              <h3 className="text-xl font-black text-foreground">Subscription Upgraded!</h3>
+              <p className="text-xs text-muted-foreground">Your payment has been settled successfully.</p>
             </div>
 
             {/* Receipt details */}
-            <div className="rounded-2xl border border-[#26313C] bg-[#18212B] p-5 text-left text-xs space-y-3 font-medium">
-              <div className="flex justify-between items-center border-b border-[#26313C]/50 pb-2">
-                <span className="text-[#9AA6B2]">Plan Tier:</span>
-                <span className="font-bold text-[#2AFEB7] uppercase tracking-wider">{receipt.planName}</span>
+            <div className="rounded-2xl border border-border bg-secondary p-5 text-left text-xs space-y-3 font-medium">
+              <div className="flex justify-between items-center border-b border-border/50 pb-2">
+                <span className="text-muted-foreground">Plan Tier:</span>
+                <span className="font-bold text-primary uppercase tracking-wider">{receipt.planName}</span>
               </div>
-              <div className="flex justify-between items-center border-b border-[#26313C]/50 pb-2">
-                <span className="text-[#9AA6B2]">Amount Paid:</span>
-                <span className="font-bold text-[#F5F7FA]">{formatCurrency(receipt.amountPaid)}</span>
+              <div className="flex justify-between items-center border-b border-border/50 pb-2">
+                <span className="text-muted-foreground">Amount Paid:</span>
+                <span className="font-bold text-foreground">{formatCurrency(receipt.amountPaid)}</span>
               </div>
-              <div className="flex justify-between items-center border-b border-[#26313C]/50 pb-2">
-                <span className="text-[#9AA6B2]">Transaction ID:</span>
-                <span className="font-mono text-[#F5F7FA] text-[10px] select-all">{receipt.transactionReference}</span>
+              <div className="flex justify-between items-center border-b border-border/50 pb-2">
+                <span className="text-muted-foreground">Transaction ID:</span>
+                <span className="font-mono text-foreground text-[10px] select-all">{receipt.transactionReference}</span>
               </div>
-              <div className="flex justify-between items-center border-b border-[#26313C]/50 pb-2">
-                <span className="text-[#9AA6B2]">Payment Status:</span>
-                <span className="rounded bg-[#2AFEB7]/10 px-1.5 py-0.5 text-[9px] font-bold text-[#2AFEB7] border border-[#2AFEB7]/30 uppercase">
+              <div className="flex justify-between items-center border-b border-border/50 pb-2">
+                <span className="text-muted-foreground">Payment Status:</span>
+                <span className="rounded bg-primary/10 px-1.5 py-0.5 text-[9px] font-bold text-primary border border-primary/30 uppercase">
                   {receipt.status}
                 </span>
               </div>
               <div className="flex justify-between items-center pt-1">
-                <span className="text-[#9AA6B2]">Date & Time:</span>
-                <span className="text-[#9AA6B2]">{new Date(receipt.paidAt).toLocaleString()}</span>
+                <span className="text-muted-foreground">Date & Time:</span>
+                <span className="text-muted-foreground">{new Date(receipt.paidAt).toLocaleString()}</span>
               </div>
             </div>
 
-            <p className="text-[11px] text-[#9AA6B2] italic">
+            <p className="text-[11px] text-muted-foreground italic">
               "{receipt.message}"
             </p>
 
             <button
               type="button"
               onClick={() => setReceipt(null)}
-              className="w-full rounded-xl bg-[#2AFEB7] py-3 text-xs font-bold text-[#0B0F14] transition-all hover:bg-[#22E5A4] active:scale-[0.99] shadow-lg shadow-[#2AFEB7]/10"
+              className="w-full rounded-xl bg-primary py-3 text-xs font-bold text-background transition-all hover:bg-primary-hover active:scale-[0.99] shadow-lg shadow-primary/10"
             >
               Great, thank you!
             </button>
@@ -439,61 +439,61 @@ export function RestaurantSubscriptionView() {
       {/* Plan Details Modal */}
       {selectedPlanDetails && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-md p-4 animate-fadeIn">
-          <div className="w-full max-w-lg rounded-3xl border border-[#26313C] bg-[#111820]/95 p-8 shadow-2xl space-y-6 backdrop-saturate-150 relative">
+          <div className="w-full max-w-lg rounded-3xl border border-border bg-card/95 p-8 space-y-6 backdrop-saturate-150 relative">
             {/* Close Button */}
             <button
               type="button"
               onClick={() => setSelectedPlanDetails(null)}
-              className="absolute top-5 right-5 text-[#9AA6B2] hover:text-white text-sm font-bold transition-colors"
+              className="absolute top-5 right-5 text-muted-foreground hover:text-foreground text-sm font-bold transition-colors"
             >
               ✕
             </button>
 
             <div className="space-y-1">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[#2AFEB7]">Plan Details</span>
-              <h3 className="text-2xl font-black text-[#F5F7FA] uppercase tracking-wide">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-primary">Plan Details</span>
+              <h3 className="text-2xl font-black text-foreground uppercase tracking-wide">
                 {selectedPlanDetails.name} Plan
               </h3>
-              <p className="text-xs text-[#9AA6B2]">
+              <p className="text-xs text-muted-foreground">
                 {selectedPlanDetails.description || 'Explore the operational capacities and features of this tier.'}
               </p>
             </div>
 
             {/* Price and Cycle */}
-            <div className="flex items-baseline gap-2 border-y border-[#26313C]/60 py-4">
-              <span className="text-3xl font-black text-[#2AFEB7]">
+            <div className="flex items-baseline gap-2 border-y border-border/60 py-4">
+              <span className="text-3xl font-black text-primary">
                 {formatCurrency(selectedPlanDetails.price)}
               </span>
-              <span className="text-xs text-[#9AA6B2] uppercase font-bold">
+              <span className="text-xs text-muted-foreground uppercase font-bold">
                 / {selectedPlanDetails.billingCycle}
               </span>
             </div>
 
             {/* Quotas & Limits */}
             <div className="space-y-3">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-[#9AA6B2]">Resource Quotas</h4>
+              <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Resource Quotas</h4>
               <div className="grid grid-cols-2 gap-3">
-                <div className="rounded-xl border border-[#26313C] bg-[#18212B] p-3 text-left">
-                  <p className="text-[10px] text-[#9AA6B2]">Tables Configured</p>
-                  <p className="text-sm font-bold text-[#F5F7FA] mt-1">
+                <div className="rounded-xl border border-border bg-secondary p-3 text-left">
+                  <p className="text-[10px] text-muted-foreground">Tables Configured</p>
+                  <p className="text-sm font-bold text-foreground mt-1">
                     {formatLimit((selectedPlanDetails.limits as any)?.maxTables)}
                   </p>
                 </div>
-                <div className="rounded-xl border border-[#26313C] bg-[#18212B] p-3 text-left">
-                  <p className="text-[10px] text-[#9AA6B2]">Staff Members</p>
-                  <p className="text-sm font-bold text-[#F5F7FA] mt-1">
+                <div className="rounded-xl border border-border bg-secondary p-3 text-left">
+                  <p className="text-[10px] text-muted-foreground">Staff Members</p>
+                  <p className="text-sm font-bold text-foreground mt-1">
                     {formatLimit((selectedPlanDetails.limits as any)?.maxStaff)}
                   </p>
                 </div>
-                <div className="rounded-xl border border-[#26313C] bg-[#18212B] p-3 text-left">
-                  <p className="text-[10px] text-[#9AA6B2]">Active Branches</p>
-                  <p className="text-sm font-bold text-[#F5F7FA] mt-1">
+                <div className="rounded-xl border border-border bg-secondary p-3 text-left">
+                  <p className="text-[10px] text-muted-foreground">Active Branches</p>
+                  <p className="text-sm font-bold text-foreground mt-1">
                     {formatLimit((selectedPlanDetails.limits as any)?.maxBranches)}
                   </p>
                 </div>
-                <div className="rounded-xl border border-[#26313C] bg-[#18212B] p-3 text-left">
-                  <p className="text-[10px] text-[#9AA6B2]">Menus & Catalogs</p>
-                  <p className="text-sm font-bold text-[#F5F7FA] mt-1">
+                <div className="rounded-xl border border-border bg-secondary p-3 text-left">
+                  <p className="text-[10px] text-muted-foreground">Menus & Catalogs</p>
+                  <p className="text-sm font-bold text-foreground mt-1">
                     {formatLimit((selectedPlanDetails.limits as any)?.maxMenus)}
                   </p>
                 </div>
@@ -503,11 +503,11 @@ export function RestaurantSubscriptionView() {
             {/* Included Features */}
             {selectedPlanDetails.features && selectedPlanDetails.features.length > 0 && (
               <div className="space-y-2">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-[#9AA6B2]">Included Features</h4>
-                <ul className="grid grid-cols-2 gap-2 text-xs text-[#F5F7FA] text-left">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Included Features</h4>
+                <ul className="grid grid-cols-2 gap-2 text-xs text-foreground text-left">
                   {selectedPlanDetails.features.map((feature, idx) => (
                     <li key={idx} className="flex items-center gap-2">
-                      <span className="text-[#2AFEB7] text-sm">✓</span> 
+                      <span className="text-primary text-sm">✓</span> 
                       <span className="capitalize">{feature.replace(/-/g, ' ')}</span>
                     </li>
                   ))}
@@ -520,7 +520,7 @@ export function RestaurantSubscriptionView() {
               <button
                 type="button"
                 onClick={() => setSelectedPlanDetails(null)}
-                className="flex-1 rounded-xl border border-[#26313C] bg-[#18212B] py-3 text-xs font-semibold text-[#F5F7FA] hover:bg-[#26313C]"
+                className="flex-1 rounded-xl border border-border bg-secondary py-3 text-xs font-semibold text-foreground hover:bg-border"
               >
                 Close
               </button>
@@ -528,7 +528,7 @@ export function RestaurantSubscriptionView() {
                 <button
                   type="button"
                   disabled
-                  className="flex-1 rounded-xl bg-[#2AFEB7]/10 border border-[#2AFEB7]/30 py-3 text-xs font-bold text-[#2AFEB7] cursor-not-allowed text-center"
+                  className="flex-1 rounded-xl bg-primary/10 border border-primary/30 py-3 text-xs font-bold text-primary cursor-not-allowed text-center"
                 >
                   ✓ Current Plan
                 </button>
@@ -542,7 +542,7 @@ export function RestaurantSubscriptionView() {
                     setSelectedPlanDetails(null);
                     void handleUpgradePlan(planId, name);
                   }}
-                  className="flex-1 rounded-xl bg-[#2AFEB7] py-3 text-xs font-bold text-[#0B0F14] transition-all hover:bg-[#22E5A4] active:scale-[0.99] disabled:opacity-50"
+                  className="flex-1 rounded-xl bg-primary py-3 text-xs font-bold text-background transition-all hover:bg-primary-hover active:scale-[0.99] disabled:opacity-50"
                 >
                   {isUpgradingId === selectedPlanDetails.id ? 'Upgrading...' : `Select & Upgrade`}
                 </button>

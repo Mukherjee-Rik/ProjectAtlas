@@ -19,19 +19,19 @@ export default function CustomerCartPage({
     useCart();
 
   return (
-    <main className="min-h-screen bg-[#0B0F14] pb-8 text-[#F5F7FA]">
-      <header className="sticky top-0 z-30 border-b border-[#26313C] bg-[#0B0F14]/95 px-4 py-4 backdrop-blur">
+    <main className="min-h-screen bg-background pb-8 text-foreground">
+      <header className="sticky top-0 z-30 border-b border-border bg-background/95 px-4 py-4 backdrop-blur">
         <div className="mx-auto flex w-full max-w-sm items-center justify-between gap-3">
           <div>
             <h1 className="text-lg font-black">Your Cart</h1>
-            <p className="text-[11px] text-[#9AA6B2]">
+            <p className="text-[11px] text-muted-foreground">
               {itemCount} {itemCount === 1 ? 'item' : 'items'} • {totalQuantity}{' '}
               {totalQuantity === 1 ? 'unit' : 'units'}
             </p>
           </div>
           <Link
             href={`/t/${token}/menu`}
-            className="rounded-xl border border-[#26313C] px-3 py-2 text-[11px] font-semibold text-[#9AA6B2] transition-colors hover:border-[#2AFEB7]/40 hover:text-[#2AFEB7]"
+            className="rounded-xl border border-border px-3 py-2 text-[11px] font-semibold text-muted-foreground transition-colors hover:border-primary/40 hover:text-primary"
           >
             + Add more
           </Link>
@@ -42,29 +42,29 @@ export default function CustomerCartPage({
         {isLoading && (
           <div className="space-y-3 animate-pulse">
             {[0, 1].map((key) => (
-              <div key={key} className="h-28 rounded-2xl bg-[#111820]" />
+              <div key={key} className="h-28 rounded-2xl bg-card" />
             ))}
           </div>
         )}
 
         {error && (
-          <div className="rounded-xl border border-[#EF4444]/30 bg-[#EF4444]/10 p-3 text-xs text-[#EF4444]">
+          <div className="rounded-xl border border-atlas-error/30 bg-atlas-error/10 p-3 text-xs text-atlas-error">
             {error}
           </div>
         )}
 
         {!isLoading && cart && cart.items.length === 0 && (
-          <div className="space-y-4 rounded-2xl border border-[#26313C] bg-[#111820] p-8 text-center">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#18212B] text-2xl">
+          <div className="space-y-4 rounded-2xl border border-border bg-card p-8 text-center">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-secondary text-2xl">
               🛒
             </div>
             <p className="text-sm font-bold">Your cart is empty</p>
-            <p className="text-xs text-[#9AA6B2]">
+            <p className="text-xs text-muted-foreground">
               Add something from the menu and it will show up here.
             </p>
             <Link
               href={`/t/${token}/menu`}
-              className="inline-block rounded-xl bg-[#2AFEB7] px-4 py-2.5 text-xs font-bold text-[#0B0F14]"
+              className="inline-block rounded-xl bg-primary px-4 py-2.5 text-xs font-bold text-background"
             >
               Browse the menu
             </Link>
@@ -75,14 +75,14 @@ export default function CustomerCartPage({
           cart?.items.map((item) => (
             <article
               key={item.id}
-              className="space-y-3 rounded-2xl border border-[#26313C] bg-[#111820] p-4"
+              className="space-y-3 rounded-2xl border border-border bg-card p-4"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="space-y-1.5">
                   <h2 className="text-sm font-bold leading-tight">{item.name}</h2>
 
                   {item.variants.length > 0 && (
-                    <p className="text-[11px] font-semibold text-[#9AA6B2]">
+                    <p className="text-[11px] font-semibold text-muted-foreground">
                       {item.variants.map((variant) => variant.name).join(' • ')}
                     </p>
                   )}
@@ -90,7 +90,7 @@ export default function CustomerCartPage({
                   {item.addons.length > 0 && (
                     <ul className="space-y-0.5">
                       {item.addons.map((addon) => (
-                        <li key={addon.id} className="text-[11px] text-[#9AA6B2]">
+                        <li key={addon.id} className="text-[11px] text-muted-foreground">
                           + {addon.name}
                           {addon.price > 0 ? ` (${formatCurrency(addon.price)})` : ''}
                         </li>
@@ -98,9 +98,9 @@ export default function CustomerCartPage({
                     </ul>
                   )}
 
-                  <p className="pt-1 text-sm font-bold text-[#2AFEB7]">
+                  <p className="pt-1 text-sm font-bold text-primary">
                     {formatCurrency(item.unitPrice)}
-                    <span className="pl-1 text-[10px] font-normal text-[#9AA6B2]">each</span>
+                    <span className="pl-1 text-[10px] font-normal text-muted-foreground">each</span>
                   </p>
                 </div>
 
@@ -108,20 +108,20 @@ export default function CustomerCartPage({
                   type="button"
                   onClick={() => void removeItem(item.id)}
                   aria-label={`Remove ${item.name}`}
-                  className="rounded-lg border border-[#26313C] px-2.5 py-1 text-[11px] text-[#9AA6B2] transition-all hover:border-[#EF4444]/40 hover:text-[#EF4444] active:scale-95 cursor-pointer"
+                  className="rounded-lg border border-border px-2.5 py-1 text-[11px] text-muted-foreground transition-all hover:border-atlas-error/40 hover:text-atlas-error active:scale-95 cursor-pointer"
                 >
                   Remove
                 </button>
               </div>
 
-              <div className="flex items-center justify-between border-t border-[#26313C] pt-3">
+              <div className="flex items-center justify-between border-t border-border pt-3">
                 <div className="flex items-center gap-3">
                   <button
                     type="button"
                     aria-label={`Decrease ${item.name} quantity`}
                     disabled={item.quantity <= 1}
                     onClick={() => void updateQuantity(item.id, item.quantity - 1)}
-                    className="h-8 w-8 rounded-lg border border-[#26313C] text-sm font-bold transition-all hover:border-[#2AFEB7]/40 active:scale-75 disabled:opacity-30 cursor-pointer"
+                    className="h-8 w-8 rounded-lg border border-border text-sm font-bold transition-all hover:border-primary/40 active:scale-75 disabled:opacity-30 cursor-pointer"
                   >
                     −
                   </button>
@@ -131,7 +131,7 @@ export default function CustomerCartPage({
                     aria-label={`Increase ${item.name} quantity`}
                     disabled={item.quantity >= MAX_QUANTITY}
                     onClick={() => void updateQuantity(item.id, item.quantity + 1)}
-                    className="h-8 w-8 rounded-lg border border-[#26313C] text-sm font-bold transition-all hover:border-[#2AFEB7]/40 active:scale-75 disabled:opacity-30 cursor-pointer"
+                    className="h-8 w-8 rounded-lg border border-border text-sm font-bold transition-all hover:border-primary/40 active:scale-75 disabled:opacity-30 cursor-pointer"
                   >
                     +
                   </button>
@@ -143,24 +143,24 @@ export default function CustomerCartPage({
           ))}
 
         {!isLoading && cart && cart.items.length > 0 && (
-          <div className="space-y-4 rounded-2xl border border-[#26313C] bg-[#111820] p-4">
+          <div className="space-y-4 rounded-2xl border border-border bg-card p-4">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#9AA6B2]">
+              <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
                 Subtotal
               </span>
-              <span className="text-xl font-black text-[#2AFEB7]">
+              <span className="text-xl font-black text-primary">
                 {formatCurrency(subtotal)}
               </span>
             </div>
 
-            <p className="text-[10px] leading-relaxed text-[#9AA6B2]/70">
+            <p className="text-[10px] leading-relaxed text-muted-foreground/70">
               Taxes and charges are applied when your order is placed.
             </p>
 
             <button
               type="button"
               onClick={() => router.push(`/t/${token}/checkout`)}
-              className="w-full rounded-xl bg-[#2AFEB7] py-3.5 text-sm font-bold text-[#0B0F14] shadow-lg transition-all hover:bg-[#22E5A4] active:scale-[0.99]"
+              className="w-full rounded-xl bg-primary py-3.5 text-sm font-bold text-background shadow-lg transition-all hover:bg-primary-hover active:scale-[0.99]"
             >
               Continue to Checkout →
             </button>

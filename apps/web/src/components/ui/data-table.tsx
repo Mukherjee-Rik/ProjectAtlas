@@ -65,7 +65,7 @@ export function DataTable<T>({
           return (
             <li
               key={rowKey(row)}
-              className="rounded-xl border border-[#26313C] bg-[#111820] shadow-lg"
+              className="rounded-xl border border-border bg-card shadow-lg"
             >
               <div
                 // Deliberately not role="button": these cards contain their
@@ -73,7 +73,7 @@ export function DataTable<T>({
                 // ARIA. Pointer users can click the card; keyboard and screen
                 // reader users get the explicit toggle rendered below.
                 {...(onRowClick ? { onClick: () => onRowClick(row) } : {})}
-                className={`flex flex-col gap-3 p-4 ${onRowClick ? 'cursor-pointer transition-colors hover:bg-[#18212B]' : ''}`}
+                className={`flex flex-col gap-3 p-4 ${onRowClick ? 'cursor-pointer transition-colors hover:bg-secondary' : ''}`}
               >
                 {primaryColumn && (
                   <div className="flex items-start justify-between gap-3">
@@ -87,7 +87,7 @@ export function DataTable<T>({
                           onRowClick(row);
                         }}
                         aria-expanded={Boolean(renderExpanded?.(row))}
-                        className="shrink-0 rounded-lg border border-[#26313C] px-2 py-1 text-xs text-[#9AA6B2] transition-colors hover:border-[#2AFEB7] hover:text-[#2AFEB7]"
+                        className="shrink-0 rounded-lg border border-border px-2 py-1 text-xs text-muted-foreground transition-colors hover:border-primary hover:text-primary"
                       >
                         Details
                       </button>
@@ -108,10 +108,10 @@ export function DataTable<T>({
                           key={column.key}
                           className="flex items-start justify-between gap-4"
                         >
-                          <dt className="shrink-0 text-xs font-medium uppercase tracking-wider text-[#9AA6B2]">
+                          <dt className="shrink-0 text-xs font-medium uppercase tracking-wider text-muted-foreground">
                             {column.header}
                           </dt>
-                          <dd className="min-w-0 text-right text-sm text-[#F5F7FA]">
+                          <dd className="min-w-0 text-right text-sm text-foreground">
                             {column.render(row)}
                           </dd>
                         </div>
@@ -121,7 +121,7 @@ export function DataTable<T>({
               </div>
 
               {expanded && (
-                <div className="border-t border-[#26313C] p-4">{expanded}</div>
+                <div className="border-t border-border p-4">{expanded}</div>
               )}
             </li>
           );
@@ -129,17 +129,17 @@ export function DataTable<T>({
       </ul>
 
       {/* ---------------- Desktop: real table ---------------- */}
-      <div className="hidden overflow-x-auto rounded-xl border border-[#26313C] bg-[#111820] shadow-xl md:block">
+      <div className="hidden overflow-x-auto rounded-xl border border-border bg-card md:block">
         <table className="w-full text-left">
           {caption && <caption className="sr-only">{caption}</caption>}
 
-          <thead className="border-b border-[#26313C] bg-[#18212B]">
+          <thead className="border-b border-border bg-secondary">
             <tr>
               {columns.map((column) => (
                 <th
                   key={column.key}
                   scope="col"
-                  className={`px-4 py-4 text-xs font-semibold uppercase tracking-wider text-[#9AA6B2] lg:px-6 ${column.headerClassName ?? ''}`}
+                  className={`px-4 py-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground lg:px-6 ${column.headerClassName ?? ''}`}
                 >
                   {column.header}
                 </th>
@@ -147,7 +147,7 @@ export function DataTable<T>({
             </tr>
           </thead>
 
-          <tbody className="divide-y divide-[#26313C]">
+          <tbody className="divide-y divide-border">
             {rows.map((row) => {
               const expanded = renderExpanded?.(row);
 
@@ -158,7 +158,7 @@ export function DataTable<T>({
                     // buttons, so it must not itself be a focusable control.
                     {...(onRowClick ? { onClick: () => onRowClick(row) } : {})}
                     className={
-                      onRowClick ? 'cursor-pointer transition-colors hover:bg-[#18212B]' : ''
+                      onRowClick ? 'cursor-pointer transition-colors hover:bg-secondary' : ''
                     }
                   >
                     {columns.map((column) => (
@@ -172,7 +172,7 @@ export function DataTable<T>({
                   </tr>
 
                   {expanded && (
-                    <tr className="bg-[#0F161D]">
+                    <tr className="bg-secondary">
                       <td colSpan={columns.length} className="px-4 py-4 lg:px-6">
                         {expanded}
                       </td>

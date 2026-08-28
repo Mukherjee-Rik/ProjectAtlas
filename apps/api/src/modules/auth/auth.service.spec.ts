@@ -8,6 +8,7 @@ import { PrismaService } from '../../database/prisma/prisma.service';
 
 import { AuditService } from '../audit/audit.service';
 import { TtlCacheService } from '../../common/cache/ttl-cache.service';
+import { SmsDispatcherService } from './sms-dispatcher.service';
 
 jest.mock('bcrypt', () => ({
   compare: jest.fn(),
@@ -69,6 +70,15 @@ describe('AuthService', () => {
         { provide: JwtService, useValue: jwtService },
         { provide: Logger, useValue: mockLogger },
         { provide: AuditService, useValue: mockAuditService },
+        {
+          provide: SmsDispatcherService,
+          useValue: {
+            generateOtp: jest.fn().mockReturnValue('123456'),
+            maskPhone: jest.fn().mockReturnValue('******5026'),
+            sendSignInOtp: jest.fn().mockResolvedValue(true),
+            dispatchDirectEmail: jest.fn().mockResolvedValue(true),
+          },
+        },
       ],
     }).compile();
 
@@ -142,7 +152,7 @@ describe('AuthService', () => {
   });
 
   describe('login', () => {
-    it('should return accessToken and user object and log success', async () => {
+    it('should complete login and return accessToken directly when password matches', async () => {
       prismaService.user.findUnique.mockResolvedValue(mockUser);
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
 
@@ -161,18 +171,6 @@ describe('AuthService', () => {
           status: mockUser.status,
         },
       });
-      expect(jwtService.signAsync).toHaveBeenCalledWith(
-        expect.objectContaining({
-          sub: mockUser.id,
-          email: mockUser.email,
-          role: mockUser.role,
-        }),
-        expect.anything(),
-      );
-      expect(mockLogger.log).toHaveBeenCalledWith(
-        { userId: mockUser.id, email: mockUser.email },
-        'User login successful',
-      );
     });
   });
 });

@@ -11,12 +11,12 @@ interface BranchBenchmarkingViewProps {
 
 export function BranchBenchmarkingView({ data, isLoading }: BranchBenchmarkingViewProps) {
   if (isLoading) {
-    return <div className="h-72 rounded-xl bg-card/60 animate-pulse border border-border/50" />;
+    return <div className="h-72 rounded-xl bg-card animate-pulse border border-border" />;
   }
 
   if (!data || data.branches.length === 0) {
     return (
-      <div className="p-8 text-center text-muted-foreground border border-dashed rounded-xl">
+      <div className="p-8 text-center text-muted-foreground border border-dashed border-border rounded-xl bg-card">
         No multi-branch comparisons available.
       </div>
     );
@@ -25,17 +25,17 @@ export function BranchBenchmarkingView({ data, isLoading }: BranchBenchmarkingVi
   const { branches, totalNetworkRevenue } = data;
 
   return (
-    <div className="bg-card border border-border rounded-xl p-6 shadow-sm space-y-6">
-      <div className="flex items-center justify-between pb-4 border-b border-border/60">
+    <div className="bg-card border border-border rounded-xl p-6 space-y-6">
+      <div className="flex items-center justify-between pb-4 border-b border-border">
         <div>
-          <h3 className="text-base font-semibold text-foreground">Multi-Branch Benchmarking</h3>
+          <h3 className="text-base font-bold text-foreground">Multi-Branch Benchmarking</h3>
           <p className="text-xs text-muted-foreground mt-0.5">
             Comparative performance across {branches.length} branches
           </p>
         </div>
         <div className="text-right">
           <span className="text-xs text-muted-foreground">Network Revenue</span>
-          <div className="text-base font-bold text-foreground">₹{totalNetworkRevenue.toLocaleString('en-IN')}</div>
+          <div className="text-base font-bold text-primary">₹{totalNetworkRevenue.toLocaleString('en-IN')}</div>
         </div>
       </div>
 
@@ -43,7 +43,7 @@ export function BranchBenchmarkingView({ data, isLoading }: BranchBenchmarkingVi
         {branches.map((branch, idx) => (
           <div
             key={branch.branchId}
-            className="border border-border rounded-xl p-5 bg-card hover:bg-muted/20 transition-all flex flex-col justify-between space-y-4"
+            className="border border-border rounded-xl p-5 bg-secondary hover:border-primary/50 transition-all flex flex-col justify-between space-y-4 shadow-md"
           >
             <div>
               <div className="flex items-center justify-between">
@@ -51,14 +51,14 @@ export function BranchBenchmarkingView({ data, isLoading }: BranchBenchmarkingVi
                   <Building2 className="w-4 h-4 text-primary" />
                   <h4 className="font-bold text-sm text-foreground">{branch.name}</h4>
                 </div>
-                <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-muted text-muted-foreground uppercase">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-background border border-border text-primary uppercase">
                   #{idx + 1}
                 </span>
               </div>
               <div className="text-xs text-muted-foreground mt-0.5">{branch.city} • Code: {branch.code}</div>
             </div>
 
-            <div className="space-y-2 pt-2 border-t border-border/50 text-xs">
+            <div className="space-y-2 pt-2 border-t border-border/60 text-xs">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Gross Revenue:</span>
                 <span className="font-bold text-foreground">₹{branch.grossRevenue.toLocaleString('en-IN')}</span>
@@ -77,7 +77,7 @@ export function BranchBenchmarkingView({ data, isLoading }: BranchBenchmarkingVi
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Cancellation Rate:</span>
-                <span className={`font-medium ${branch.cancellationRate > 5 ? 'text-rose-500' : 'text-foreground'}`}>
+                <span className={`font-medium ${branch.cancellationRate > 5 ? 'text-[#EF4444]' : 'text-foreground'}`}>
                   {branch.cancellationRate}%
                 </span>
               </div>

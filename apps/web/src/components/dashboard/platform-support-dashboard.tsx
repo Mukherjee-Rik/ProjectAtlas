@@ -98,8 +98,8 @@ export function PlatformSupportDashboard() {
               onClick={() => setFilterStatus(st)}
               className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
                 filterStatus === st
-                  ? 'bg-[#2AFEB7] text-[#0B0F14] border-[#2AFEB7]'
-                  : 'bg-[#18212B] border-[#26313C] text-[#9AA6B2] hover:text-white'
+                  ? 'bg-primary text-background border-primary'
+                  : 'bg-secondary border-border text-muted-foreground hover:text-foreground'
               }`}
             >
               {st}
@@ -112,12 +112,12 @@ export function PlatformSupportDashboard() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by ticket or restaurant..."
-            className="w-full sm:w-64 px-3 py-1.5 rounded-xl bg-[#0B0F14] border border-[#26313C] text-white text-xs focus:outline-none focus:border-[#2AFEB7]"
+            className="w-full sm:w-64 px-3 py-1.5 rounded-xl bg-background border border-border text-foreground text-xs focus:outline-none focus:border-primary"
           />
           <button
             type="button"
             onClick={fetchAdminTickets}
-            className="px-3 py-1.5 rounded-xl bg-[#18212B] border border-[#26313C] text-xs font-semibold text-[#9AA6B2] hover:text-white"
+            className="px-3 py-1.5 rounded-xl bg-secondary border border-border text-xs font-semibold text-muted-foreground hover:text-foreground"
           >
             ⟳
           </button>
@@ -126,31 +126,31 @@ export function PlatformSupportDashboard() {
 
       {/* Tickets Feed */}
       {loading ? (
-        <div className="p-8 text-center text-[#9AA6B2] text-xs">Loading customer incident queue...</div>
+        <div className="p-8 text-center text-muted-foreground text-xs">Loading customer incident queue...</div>
       ) : filtered.length === 0 ? (
-        <div className="bg-[#121922] border border-[#26313C] rounded-2xl text-center py-12 px-4 space-y-2">
+        <div className="bg-card border border-border rounded-2xl text-center py-12 px-4 space-y-2">
           <div className="text-3xl mb-1">🛟</div>
-          <p className="text-xs text-[#9AA6B2]">No incidents matching the selected filter.</p>
+          <p className="text-xs text-muted-foreground">No incidents matching the selected filter.</p>
         </div>
       ) : (
         <div className="space-y-3">
           {filtered.map((ticket) => (
-            <div key={ticket.id} className="bg-[#121922] border border-[#26313C] rounded-2xl p-5 space-y-3">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-[#26313C] pb-3">
+            <div key={ticket.id} className="bg-card border border-border rounded-2xl p-5 space-y-3">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-border pb-3">
                 <div className="flex items-center gap-2.5">
-                  <span className="font-mono text-xs px-2 py-0.5 rounded bg-[#0B0F14] border border-[#26313C] text-[#2AFEB7] font-bold">
+                  <span className="font-mono text-xs px-2 py-0.5 rounded bg-background border border-border text-primary font-bold">
                     {ticket.ticketNumber}
                   </span>
-                  <span className="text-xs font-bold text-white">
+                  <span className="text-xs font-bold text-foreground">
                     🏢 {ticket.restaurant?.name || 'Unknown Restaurant'}
                   </span>
-                  <span className="text-[10px] px-2 py-0.5 rounded bg-[#18212B] text-[#9AA6B2]">
+                  <span className="text-[10px] px-2 py-0.5 rounded bg-secondary text-muted-foreground">
                     {ticket.priority}
                   </span>
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#2AFEB7]/10 text-[#2AFEB7] border border-[#2AFEB7]/20 font-semibold">
+                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 font-semibold">
                     {ticket.status}
                   </span>
                   {ticket.status !== 'RESOLVED' && ticket.status !== 'CLOSED' && (
@@ -160,7 +160,7 @@ export function PlatformSupportDashboard() {
                         setResolvingId(ticket.id);
                         setResolutionText('');
                       }}
-                      className="px-3 py-1 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white"
+                      className="px-3 py-1 rounded-xl text-xs font-bold bg-primary hover:bg-primary text-foreground"
                     >
                       Respond & Resolve
                     </button>
@@ -169,26 +169,26 @@ export function PlatformSupportDashboard() {
               </div>
 
               <div>
-                <h4 className="text-xs font-bold text-white">{ticket.subject}</h4>
-                <p className="text-xs text-[#9AA6B2] mt-1 whitespace-pre-wrap">{ticket.description}</p>
+                <h4 className="text-xs font-bold text-foreground">{ticket.subject}</h4>
+                <p className="text-xs text-muted-foreground mt-1 whitespace-pre-wrap">{ticket.description}</p>
               </div>
 
               {ticket.resolutionNotes && (
-                <div className="p-3 bg-emerald-950/20 border border-emerald-500/20 rounded-xl text-xs text-emerald-300">
-                  <span className="font-bold text-emerald-400">Resolution Note: </span>
+                <div className="p-3 bg-primary/20 border border-primary/20 rounded-xl text-xs text-primary">
+                  <span className="font-bold text-primary">Resolution Note: </span>
                   {ticket.resolutionNotes}
                 </div>
               )}
 
               {/* Inline Resolver Form */}
               {resolvingId === ticket.id && (
-                <div className="p-4 bg-[#0B0F14] border border-[#2AFEB7]/30 rounded-xl space-y-3">
-                  <div className="flex justify-between items-center text-xs font-semibold text-[#2AFEB7]">
+                <div className="p-4 bg-background border border-primary/30 rounded-xl space-y-3">
+                  <div className="flex justify-between items-center text-xs font-semibold text-primary">
                     <span>Engineer Incident Response</span>
                     <select
                       value={resolutionStatus}
                       onChange={(e: any) => setResolutionStatus(e.target.value)}
-                      className="bg-[#18212B] border border-[#26313C] text-white text-xs rounded-lg px-2 py-1"
+                      className="bg-secondary border border-border text-foreground text-xs rounded-lg px-2 py-1"
                     >
                       <option value="RESOLVED">Mark RESOLVED</option>
                       <option value="IN_PROGRESS">Mark IN_PROGRESS</option>
@@ -201,14 +201,14 @@ export function PlatformSupportDashboard() {
                     value={resolutionText}
                     onChange={(e) => setResolutionText(e.target.value)}
                     placeholder="Enter operational fix notes, customer response, or resolution details..."
-                    className="w-full p-2.5 rounded-xl bg-[#18212B] border border-[#26313C] text-white text-xs focus:border-[#2AFEB7] focus:outline-none"
+                    className="w-full p-2.5 rounded-xl bg-secondary border border-border text-foreground text-xs focus:border-primary focus:outline-none"
                   />
 
                   <div className="flex justify-end gap-2">
                     <button
                       type="button"
                       onClick={() => setResolvingId(null)}
-                      className="px-3 py-1 text-xs rounded-xl bg-[#18212B] border border-[#26313C] text-[#9AA6B2]"
+                      className="px-3 py-1 text-xs rounded-xl bg-secondary border border-border text-muted-foreground"
                     >
                       Cancel
                     </button>
@@ -216,7 +216,7 @@ export function PlatformSupportDashboard() {
                       type="button"
                       disabled={actionLoading || !resolutionText}
                       onClick={() => handleResolve(ticket.id)}
-                      className="px-4 py-1 text-xs rounded-xl bg-[#2AFEB7] text-[#0B0F14] font-bold hover:bg-[#20df9f]"
+                      className="px-4 py-1 text-xs rounded-xl bg-primary text-background font-bold hover:bg-primary"
                     >
                       Send Resolution
                     </button>

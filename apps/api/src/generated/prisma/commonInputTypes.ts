@@ -637,6 +637,23 @@ export type EnumUnitOfMeasureWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumUnitOfMeasureFilter<$PrismaModel>
 }
 
+export type EnumRecipeTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.RecipeType | Prisma.EnumRecipeTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.RecipeType[] | Prisma.ListEnumRecipeTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.RecipeType[] | Prisma.ListEnumRecipeTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumRecipeTypeFilter<$PrismaModel> | $Enums.RecipeType
+}
+
+export type EnumRecipeTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.RecipeType | Prisma.EnumRecipeTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.RecipeType[] | Prisma.ListEnumRecipeTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.RecipeType[] | Prisma.ListEnumRecipeTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumRecipeTypeWithAggregatesFilter<$PrismaModel> | $Enums.RecipeType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumRecipeTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumRecipeTypeFilter<$PrismaModel>
+}
+
 export type EnumStockTransactionTypeFilter<$PrismaModel = never> = {
   equals?: $Enums.StockTransactionType | Prisma.EnumStockTransactionTypeFieldRefInput<$PrismaModel>
   in?: $Enums.StockTransactionType[] | Prisma.ListEnumStockTransactionTypeFieldRefInput<$PrismaModel>
@@ -1468,6 +1485,23 @@ export type NestedEnumUnitOfMeasureWithAggregatesFilter<$PrismaModel = never> = 
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumUnitOfMeasureFilter<$PrismaModel>
   _max?: Prisma.NestedEnumUnitOfMeasureFilter<$PrismaModel>
+}
+
+export type NestedEnumRecipeTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.RecipeType | Prisma.EnumRecipeTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.RecipeType[] | Prisma.ListEnumRecipeTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.RecipeType[] | Prisma.ListEnumRecipeTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumRecipeTypeFilter<$PrismaModel> | $Enums.RecipeType
+}
+
+export type NestedEnumRecipeTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.RecipeType | Prisma.EnumRecipeTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.RecipeType[] | Prisma.ListEnumRecipeTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.RecipeType[] | Prisma.ListEnumRecipeTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumRecipeTypeWithAggregatesFilter<$PrismaModel> | $Enums.RecipeType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumRecipeTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumRecipeTypeFilter<$PrismaModel>
 }
 
 export type NestedEnumStockTransactionTypeFilter<$PrismaModel = never> = {

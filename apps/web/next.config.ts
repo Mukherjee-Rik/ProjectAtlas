@@ -19,6 +19,7 @@ function getLocalNetworkIps(): string[] {
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: getLocalNetworkIps(),
+
 };
 
 export default nextConfig;

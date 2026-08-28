@@ -221,6 +221,11 @@ export const VOCABULARY = {
 };
 
 export type AiIntent =
+  | 'FORECAST'
+  | 'GREETING'
+  | 'CAPABILITIES'
+  | 'GRATITUDE'
+  | 'COMPARISON'
   | 'STRATEGY_GROWTH'
   | 'WEATHER_QUERY'
   | 'UNRELATED_QUERY'
@@ -239,6 +244,46 @@ export type AiIntent =
 export function detectIntent(query: string): { intent: AiIntent; confidence: number } {
   const tokens = tokenizeQuery(query);
   const queryLower = query.toLowerCase();
+
+  // 0a. Small talk. Cheap exact-ish checks first so 'thanks' never gets
+  //     scored against the metric vocabularies.
+  const bare = queryLower.trim().replace(/[!.?]+$/, '');
+  if (/^(hi|hey|hello|yo|hola|namaste|good\s*(morning|afternoon|evening)|sup)\b/.test(bare)) {
+    return { intent: 'GREETING', confidence: 10 };
+  }
+  if (/^(thanks|thank you|thx|ty|great|nice|cool|awesome|perfect|ok|okay|got it)\b/.test(bare)) {
+    return { intent: 'GRATITUDE', confidence: 10 };
+  }
+  if (
+    /what can you do|what do you do|help me|^help\b|capabilities|who are you|what are you|commands|options/.test(
+      queryLower,
+    )
+  ) {
+    return { intent: 'CAPABILITIES', confidence: 10 };
+  }
+
+  // 0a2. Phrase-level stock cues. Token matching misses these because the
+  //      signal is the phrase, not any single word.
+  if (/running low|low stock|out of stock|restock|re-?order|need to buy|short on|stock level/.test(queryLower)) {
+    return { intent: 'INVENTORY_STOCK', confidence: 9 };
+  }
+
+  // 0b. FUTURE-LOOKING questions. This must beat the SALES keywords: the
+  //     phrase 'upcoming income' contains 'income', which previously matched
+  //     SALES_REVENUE and answered with TODAY's figure — the same reply no
+  //     matter what was asked.
+  const isFutureLooking =
+    /\b(tomorrow|tmrw|kal ka|next week|next month|upcoming|coming|future|forecast|predict|projection|projected|expect|expected|estimate|will i|going to make|outlook)\b/.test(
+      queryLower,
+    );
+  if (isFutureLooking) {
+    return { intent: 'FORECAST', confidence: 10 };
+  }
+
+  // 0c. Explicit comparisons ('vs yesterday', 'compare to last week').
+  if (/\b(compare|comparison|versus|vs\.?|against|better than|worse than|difference between)\b/.test(queryLower)) {
+    return { intent: 'COMPARISON', confidence: 9 };
+  }
 
   // 1. High priority check: Advisory & Growth Strategies ("how to increase sales", "how to grow revenue", etc.)
   const isGrowthAdvice =
@@ -276,6 +321,12 @@ export function detectIntent(query: string): { intent: AiIntent; confidence: num
   }
 
   const scores: Record<AiIntent, number> = {
+    // Resolved earlier by explicit checks; present so the record stays total.
+    FORECAST: 0,
+    GREETING: 0,
+    CAPABILITIES: 0,
+    GRATITUDE: 0,
+    COMPARISON: 0,
     STRATEGY_GROWTH: 0,
     WEATHER_QUERY: 0,
     UNRELATED_QUERY: 0,
@@ -370,6 +421,24 @@ export function extractDateRange(queryInput: string): { startDate: Date; endDate
   const now = new Date();
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+
+  // 0. FUTURE ranges. Returned with a forward-looking label so the caller can
+  //    tell it apart from a historical window and answer as a projection.
+  if (/\b(tomorrow|tmrw|kal ka)\b/.test(query)) {
+    const start = new Date(todayStart.getTime() + 24 * 60 * 60 * 1000);
+    const end = new Date(todayEnd.getTime() + 24 * 60 * 60 * 1000);
+    return { startDate: start, endDate: end, label: `tomorrow (${formatDateLabel(start)})` };
+  }
+  if (/\bnext week\b/.test(query)) {
+    const start = new Date(todayStart.getTime() + 24 * 60 * 60 * 1000);
+    const end = new Date(todayStart.getTime() + 7 * 24 * 60 * 60 * 1000);
+    return { startDate: start, endDate: end, label: 'next week' };
+  }
+  if (/\bnext month\b/.test(query)) {
+    const start = new Date(todayStart.getTime() + 24 * 60 * 60 * 1000);
+    const end = new Date(todayStart.getTime() + 30 * 24 * 60 * 60 * 1000);
+    return { startDate: start, endDate: end, label: 'next month' };
+  }
 
   // 1. Specific N days ago (e.g. "3 days ago", "3days ago", "2 days back", "5 days before")
   const daysAgoMatch = query.match(/(\d+)\s*(?:days?|d)\s*(?:ago|back|before|earlier)/);

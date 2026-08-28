@@ -76,42 +76,65 @@ export default function ReportDetailPage() {
     }
   };
 
-  const handleExport = () => {
-    window.open(`/api/v1/reports/${reportId}/export`, '_blank');
+  const [isExporting, setIsExporting] = useState(false);
+
+  const handleExport = async () => {
+    try {
+      setIsExporting(true);
+      const csvData = await reportsService.exportReportCsv(reportId);
+      if (!csvData) {
+        alert('No data returned for export.');
+        return;
+      }
+      const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `${(report?.name || 'report').toLowerCase().replace(/\s+/g, '_')}_${new Date().toISOString().slice(0, 10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (err: any) {
+      console.error('Failed to export report CSV:', err);
+      alert('Failed to export report CSV: ' + (err.message || 'Unknown error'));
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   return (
-    <div className="space-y-6 pb-12">
+    <div className="space-y-8 pb-12">
       {/* Header Bar */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
           <Link
             href="/reports"
-            className="p-2 rounded-xl border border-border hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+            className="p-2 rounded-xl border border-border bg-secondary text-muted-foreground hover:text-foreground hover:border-primary transition-colors shadow-sm"
           >
             <ArrowLeft className="w-4 h-4" />
           </Link>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-primary/10 text-primary">
+              <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-primary/15 text-primary border border-primary/30">
                 {report?.dataSource || 'REPORT'}
               </span>
-              <h1 className="text-xl font-bold tracking-tight text-foreground">
+              <h1 className="font-display text-2xl font-semibold tracking-[-0.02em] tracking-tight text-foreground">
                 {report?.name || 'Loading Report...'}
               </h1>
             </div>
-            <p className="text-xs text-muted-foreground mt-0.5">
+            <p className="text-xs text-muted-foreground mt-1">
               {report?.description || 'Custom report definition'}
             </p>
           </div>
         </div>
 
         {/* Action Controls */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <button
             onClick={() => loadReportAndRun()}
             disabled={executing}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border bg-card text-foreground hover:bg-muted text-xs font-semibold shadow-xs transition-all"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-border bg-secondary text-foreground hover:border-primary text-xs font-semibold shadow-sm transition-all"
           >
             <Play className="w-3.5 h-3.5 text-primary" />
             {executing ? 'Executing...' : 'Refresh Data'}
@@ -119,15 +142,15 @@ export default function ReportDetailPage() {
 
           <button
             onClick={() => setScheduleModalOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border bg-card text-foreground hover:bg-muted text-xs font-semibold shadow-xs transition-all"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-border bg-secondary text-foreground hover:border-primary text-xs font-semibold shadow-sm transition-all"
           >
-            <Clock className="w-3.5 h-3.5" />
+            <Clock className="w-3.5 h-3.5 text-primary" />
             Schedule
           </button>
 
           <button
             onClick={handleExport}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 text-xs font-semibold shadow-xs transition-all"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary text-background hover:bg-primary-hover text-xs font-bold shadow-md transition-all"
           >
             <Download className="w-3.5 h-3.5" />
             Export CSV
@@ -136,7 +159,7 @@ export default function ReportDetailPage() {
           <button
             onClick={handleDuplicate}
             title="Duplicate Report"
-            className="p-2 rounded-xl border border-border hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+            className="p-2 rounded-lg border border-border bg-secondary text-muted-foreground hover:text-foreground hover:border-primary transition-colors"
           >
             <Copy className="w-4 h-4" />
           </button>
@@ -144,7 +167,7 @@ export default function ReportDetailPage() {
           <button
             onClick={handleDelete}
             title="Delete Report"
-            className="p-2 rounded-xl border border-border hover:bg-rose-500/10 text-muted-foreground hover:text-rose-500 transition-colors"
+            className="p-2 rounded-lg border border-border bg-secondary text-muted-foreground hover:text-atlas-error hover:border-atlas-error transition-colors"
           >
             <Trash2 className="w-4 h-4" />
           </button>
@@ -154,8 +177,8 @@ export default function ReportDetailPage() {
       {/* Report Results Visualizer */}
       {loading ? (
         <div className="space-y-4">
-          <div className="h-64 rounded-xl bg-card/60 animate-pulse border border-border/50" />
-          <div className="h-44 rounded-xl bg-card/60 animate-pulse border border-border/50" />
+          <div className="h-64 rounded-xl bg-card animate-pulse border border-border" />
+          <div className="h-44 rounded-xl bg-card animate-pulse border border-border" />
         </div>
       ) : executionResult ? (
         <div className="space-y-4">
@@ -170,7 +193,7 @@ export default function ReportDetailPage() {
           <ReportVisualizer data={executionResult} />
         </div>
       ) : (
-        <div className="p-12 text-center text-muted-foreground border border-dashed rounded-xl">
+        <div className="p-12 text-center text-muted-foreground border border-dashed border-border rounded-xl bg-card">
           Report execution failed to return records.
         </div>
       )}

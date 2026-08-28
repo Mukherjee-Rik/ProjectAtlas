@@ -207,16 +207,16 @@ export function AutomationDashboard() {
   ];
 
   const statusColor: Record<string, string> = {
-    COMPLETED: 'text-emerald-400',
-    FAILED: 'text-red-400',
-    RUNNING: 'text-amber-400',
-    PENDING: 'text-[#9AA6B2]',
+    COMPLETED: 'text-primary',
+    FAILED: 'text-atlas-error',
+    RUNNING: 'text-atlas-warning',
+    PENDING: 'text-muted-foreground',
   };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="h-6 w-6 border-2 border-[#2AFEB7] border-t-transparent rounded-full animate-spin" />
+        <div className="h-6 w-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -226,15 +226,15 @@ export function AutomationDashboard() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-bold text-[#F5F7FA]">Automation Engine</h2>
-          <p className="text-xs text-[#9AA6B2] mt-1">
+          <h2 className="text-xl font-bold text-foreground">Automation Engine</h2>
+          <p className="text-xs text-muted-foreground mt-1">
             Proactively monitor operations, low inventory, delayed orders, and scheduled reports
           </p>
         </div>
         <button
           type="button"
           onClick={() => setShowCreate(!showCreate)}
-          className="rounded-xl border border-[#2AFEB7]/30 bg-[#2AFEB7]/10 px-4 py-2 text-sm font-semibold text-[#2AFEB7] hover:bg-[#2AFEB7]/20 transition-all"
+          className="rounded-xl border border-primary/30 bg-primary/10 px-4 py-2 text-sm font-semibold text-primary hover:bg-primary/20 transition-all"
         >
           {showCreate ? 'Cancel' : '+ New Rule'}
         </button>
@@ -242,7 +242,7 @@ export function AutomationDashboard() {
 
       {/* Preset Rule Templates */}
       <div className="space-y-2">
-        <span className="text-[11px] font-bold uppercase tracking-wider text-[#9AA6B2]">Recommended Rule Presets</span>
+        <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Recommended Rule Presets</span>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {TEMPLATES.map((tmpl, idx) => (
             <button
@@ -262,15 +262,15 @@ export function AutomationDashboard() {
                 });
                 setShowCreate(true);
               }}
-              className="group rounded-xl border border-[#26313C] bg-[#111820] p-3 text-left hover:border-[#2AFEB7]/50 hover:bg-[#18212B] transition-all"
+              className="group rounded-xl border border-border bg-card p-3 text-left hover:border-primary/50 hover:bg-secondary transition-all"
             >
-              <p className="text-xs font-bold text-[#F5F7FA] group-hover:text-[#2AFEB7] transition-colors">{tmpl.name}</p>
-              <p className="text-[11px] text-[#9AA6B2] mt-1 leading-snug">{tmpl.description}</p>
+              <p className="text-xs font-bold text-foreground group-hover:text-primary transition-colors">{tmpl.name}</p>
+              <p className="text-[11px] text-muted-foreground mt-1 leading-snug">{tmpl.description}</p>
               <div className="mt-2.5 flex items-center justify-between">
-                <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-[#18212B] text-[#2AFEB7] border border-[#26313C]">
+                <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-secondary text-primary border border-border">
                   {tmpl.triggerType}
                 </span>
-                <span className="text-[10px] text-[#2AFEB7] opacity-0 group-hover:opacity-100 transition-opacity font-semibold">
+                <span className="text-[10px] text-primary opacity-0 group-hover:opacity-100 transition-opacity font-semibold">
                   Use Preset →
                 </span>
               </div>
@@ -281,25 +281,25 @@ export function AutomationDashboard() {
 
       {/* Create Rule Form */}
       {showCreate && (
-        <div className="rounded-xl border border-[#26313C] bg-[#111820] p-5 space-y-4">
-          <h3 className="text-sm font-semibold text-[#F5F7FA]">Create Automation Rule</h3>
+        <div className="rounded-xl border border-border bg-card p-5 space-y-4">
+          <h3 className="text-sm font-semibold text-foreground">Create Automation Rule</h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs text-[#9AA6B2] mb-1">Name *</label>
+              <label className="block text-xs text-muted-foreground mb-1">Name *</label>
               <input
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
-                className="w-full rounded-lg border border-[#26313C] bg-[#18212B] px-3 py-2 text-sm text-[#F5F7FA] focus:border-[#2AFEB7] outline-none"
+                className="w-full rounded-lg border border-border bg-secondary px-3 py-2 text-sm text-foreground focus:border-primary outline-none"
                 placeholder="e.g. High cancellation alert"
               />
             </div>
             <div>
-              <label className="block text-xs text-[#9AA6B2] mb-1">Description</label>
+              <label className="block text-xs text-muted-foreground mb-1">Description</label>
               <input
                 value={form.description}
                 onChange={(e) => setForm({ ...form, description: e.target.value })}
-                className="w-full rounded-lg border border-[#26313C] bg-[#18212B] px-3 py-2 text-sm text-[#F5F7FA] focus:border-[#2AFEB7] outline-none"
+                className="w-full rounded-lg border border-border bg-secondary px-3 py-2 text-sm text-foreground focus:border-primary outline-none"
                 placeholder="Optional description"
               />
             </div>
@@ -307,11 +307,11 @@ export function AutomationDashboard() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-xs text-[#9AA6B2] mb-1">Trigger Type</label>
+              <label className="block text-xs text-muted-foreground mb-1">Trigger Type</label>
               <select
                 value={form.triggerType}
                 onChange={(e) => setForm({ ...form, triggerType: e.target.value })}
-                className="w-full rounded-lg border border-[#26313C] bg-[#18212B] px-3 py-2 text-sm text-[#F5F7FA] focus:border-[#2AFEB7] outline-none"
+                className="w-full rounded-lg border border-border bg-secondary px-3 py-2 text-sm text-foreground focus:border-primary outline-none"
               >
                 {TRIGGER_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
               </select>
@@ -319,11 +319,11 @@ export function AutomationDashboard() {
 
             {form.triggerType === 'SCHEDULED' && (
               <div>
-                <label className="block text-xs text-[#9AA6B2] mb-1">Cron Schedule</label>
+                <label className="block text-xs text-muted-foreground mb-1">Cron Schedule</label>
                 <input
                   value={form.schedule}
                   onChange={(e) => setForm({ ...form, schedule: e.target.value })}
-                  className="w-full rounded-lg border border-[#26313C] bg-[#18212B] px-3 py-2 text-sm text-[#F5F7FA] focus:border-[#2AFEB7] outline-none font-mono"
+                  className="w-full rounded-lg border border-border bg-secondary px-3 py-2 text-sm text-foreground focus:border-primary outline-none font-mono"
                   placeholder="0 9 * * *"
                 />
               </div>
@@ -331,11 +331,11 @@ export function AutomationDashboard() {
 
             {form.triggerType === 'EVENT' && (
               <div>
-                <label className="block text-xs text-[#9AA6B2] mb-1">Event Type</label>
+                <label className="block text-xs text-muted-foreground mb-1">Event Type</label>
                 <select
                   value={form.eventType}
                   onChange={(e) => setForm({ ...form, eventType: e.target.value })}
-                  className="w-full rounded-lg border border-[#26313C] bg-[#18212B] px-3 py-2 text-sm text-[#F5F7FA] focus:border-[#2AFEB7] outline-none"
+                  className="w-full rounded-lg border border-border bg-secondary px-3 py-2 text-sm text-foreground focus:border-primary outline-none"
                 >
                   <option value="">Select event...</option>
                   {EVENT_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
@@ -344,11 +344,11 @@ export function AutomationDashboard() {
             )}
 
             <div>
-              <label className="block text-xs text-[#9AA6B2] mb-1">Action</label>
+              <label className="block text-xs text-muted-foreground mb-1">Action</label>
               <select
                 value={form.actionType}
                 onChange={(e) => setForm({ ...form, actionType: e.target.value })}
-                className="w-full rounded-lg border border-[#26313C] bg-[#18212B] px-3 py-2 text-sm text-[#F5F7FA] focus:border-[#2AFEB7] outline-none"
+                className="w-full rounded-lg border border-border bg-secondary px-3 py-2 text-sm text-foreground focus:border-primary outline-none"
               >
                 {ACTION_TYPES.map((t) => <option key={t} value={t}>{t.replace(/_/g, ' ')}</option>)}
               </select>
@@ -357,11 +357,11 @@ export function AutomationDashboard() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-xs text-[#9AA6B2] mb-1">Condition</label>
+              <label className="block text-xs text-muted-foreground mb-1">Condition</label>
               <select
                 value={form.conditionType}
                 onChange={(e) => setForm({ ...form, conditionType: e.target.value })}
-                className="w-full rounded-lg border border-[#26313C] bg-[#18212B] px-3 py-2 text-sm text-[#F5F7FA] focus:border-[#2AFEB7] outline-none"
+                className="w-full rounded-lg border border-border bg-secondary px-3 py-2 text-sm text-foreground focus:border-primary outline-none"
               >
                 <option value="">No condition (always fire)</option>
                 {CONDITION_TYPES.map((t) => <option key={t} value={t}>{t.replace(/_/g, ' ')}</option>)}
@@ -369,23 +369,23 @@ export function AutomationDashboard() {
             </div>
             {form.conditionType && (
               <div>
-                <label className="block text-xs text-[#9AA6B2] mb-1">Threshold Value</label>
+                <label className="block text-xs text-muted-foreground mb-1">Threshold Value</label>
                 <input
                   type="number"
                   value={form.conditionValue}
                   onChange={(e) => setForm({ ...form, conditionValue: e.target.value })}
-                  className="w-full rounded-lg border border-[#26313C] bg-[#18212B] px-3 py-2 text-sm text-[#F5F7FA] focus:border-[#2AFEB7] outline-none"
+                  className="w-full rounded-lg border border-border bg-secondary px-3 py-2 text-sm text-foreground focus:border-primary outline-none"
                   placeholder="e.g. 5"
                 />
               </div>
             )}
             <div>
-              <label className="block text-xs text-[#9AA6B2] mb-1">Cooldown (minutes)</label>
+              <label className="block text-xs text-muted-foreground mb-1">Cooldown (minutes)</label>
               <input
                 type="number"
                 value={form.cooldownMinutes}
                 onChange={(e) => setForm({ ...form, cooldownMinutes: e.target.value })}
-                className="w-full rounded-lg border border-[#26313C] bg-[#18212B] px-3 py-2 text-sm text-[#F5F7FA] focus:border-[#2AFEB7] outline-none"
+                className="w-full rounded-lg border border-border bg-secondary px-3 py-2 text-sm text-foreground focus:border-primary outline-none"
               />
             </div>
           </div>
@@ -394,7 +394,7 @@ export function AutomationDashboard() {
             type="button"
             onClick={createRule}
             disabled={!form.name || !form.actionType}
-            className="rounded-xl bg-[#2AFEB7] px-5 py-2 text-sm font-bold text-[#0B0F14] hover:bg-[#22e8a5] disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+            className="rounded-xl bg-primary px-5 py-2 text-sm font-bold text-background hover:bg-primary-hover disabled:opacity-40 disabled:cursor-not-allowed transition-all"
           >
             Create Rule
           </button>
@@ -403,25 +403,25 @@ export function AutomationDashboard() {
 
       {/* Rules List */}
       {rules.length === 0 ? (
-        <div className="rounded-xl border border-[#26313C] bg-[#111820] p-12 text-center">
+        <div className="rounded-xl border border-border bg-card p-12 text-center">
           <p className="text-3xl mb-3">⚙️</p>
-          <p className="text-sm text-[#9AA6B2]">No automation rules yet. Create your first rule to get started.</p>
+          <p className="text-sm text-muted-foreground">No automation rules yet. Create your first rule to get started.</p>
         </div>
       ) : (
         <div className="space-y-3">
           {rules.map((rule) => (
-            <div key={rule.id} className="rounded-xl border border-[#26313C] bg-[#111820] overflow-hidden">
+            <div key={rule.id} className="rounded-xl border border-border bg-card overflow-hidden">
               <div className="px-5 py-4 flex items-center gap-4">
                 {/* Toggle */}
                 <button
                   type="button"
                   onClick={() => toggleRule(rule.id, rule.enabled)}
                   className={`relative h-6 w-11 rounded-full transition-colors ${
-                    rule.enabled ? 'bg-[#2AFEB7]' : 'bg-[#26313C]'
+                    rule.enabled ? 'bg-primary' : 'bg-border'
                   }`}
                 >
                   <span
-                    className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
+                    className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-foreground shadow transition-transform ${
                       rule.enabled ? 'translate-x-5' : ''
                     }`}
                   />
@@ -433,16 +433,16 @@ export function AutomationDashboard() {
                 {/* Info */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <p className="text-sm font-medium text-[#F5F7FA] truncate">{rule.name}</p>
+                    <p className="text-sm font-medium text-foreground truncate">{rule.name}</p>
                     <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono ${
                       rule.triggerType === 'SCHEDULED'
-                        ? 'bg-blue-500/10 text-blue-400'
-                        : 'bg-amber-500/10 text-amber-400'
+                        ? 'bg-atlas-info/10 text-atlas-info'
+                        : 'bg-atlas-warning/10 text-atlas-warning'
                     }`}>
                       {rule.triggerType}
                     </span>
                   </div>
-                  <p className="text-xs text-[#9AA6B2] mt-0.5">
+                  <p className="text-xs text-muted-foreground mt-0.5">
                     {rule.conditionType
                       ? `${rule.conditionType.replace(/_/g, ' ')} ${rule.conditionValue ?? ''}`
                       : 'Always fires'}
@@ -453,7 +453,7 @@ export function AutomationDashboard() {
                 </div>
 
                 {/* Executions count */}
-                <span className="text-xs text-[#9AA6B2]">
+                <span className="text-xs text-muted-foreground">
                   {rule._count?.executions ?? 0} runs
                 </span>
 
@@ -463,21 +463,21 @@ export function AutomationDashboard() {
                     type="button"
                     onClick={() => testRule(rule.id)}
                     disabled={testing === rule.id}
-                    className="text-xs text-[#2AFEB7] hover:text-[#22e8a5] disabled:opacity-40"
+                    className="text-xs text-primary hover:text-primary-hover disabled:opacity-40"
                   >
                     {testing === rule.id ? '⏳' : '▶️'} Test
                   </button>
                   <button
                     type="button"
                     onClick={() => viewExecutions(rule.id)}
-                    className="text-xs text-[#9AA6B2] hover:text-[#F5F7FA]"
+                    className="text-xs text-muted-foreground hover:text-foreground"
                   >
                     📜 History
                   </button>
                   <button
                     type="button"
                     onClick={() => deleteRule(rule.id)}
-                    className="text-xs text-red-400 hover:text-red-300"
+                    className="text-xs text-atlas-error hover:text-red-300"
                   >
                     🗑️
                   </button>
@@ -486,22 +486,22 @@ export function AutomationDashboard() {
 
               {/* Execution History */}
               {selectedRule === rule.id && (
-                <div className="border-t border-[#26313C] bg-[#0B0F14]/50 px-5 py-3">
-                  <h4 className="text-xs font-semibold text-[#9AA6B2] mb-2">Execution History</h4>
+                <div className="border-t border-border bg-background/50 px-5 py-3">
+                  <h4 className="text-xs font-semibold text-muted-foreground mb-2">Execution History</h4>
                   {executions.length === 0 ? (
-                    <p className="text-xs text-[#9AA6B2]">No executions yet</p>
+                    <p className="text-xs text-muted-foreground">No executions yet</p>
                   ) : (
                     <div className="space-y-1.5">
                       {executions.map((exec) => (
                         <div key={exec.id} className="flex items-center gap-3 text-xs">
-                          <span className={`font-mono ${statusColor[exec.status] || 'text-[#9AA6B2]'}`}>
+                          <span className={`font-mono ${statusColor[exec.status] || 'text-muted-foreground'}`}>
                             {exec.status}
                           </span>
-                          <span className="text-[#9AA6B2]">
+                          <span className="text-muted-foreground">
                             {new Date(exec.startedAt).toLocaleString()}
                           </span>
                           {exec.errorMessage && (
-                            <span className="text-red-400 truncate max-w-xs">{exec.errorMessage}</span>
+                            <span className="text-atlas-error truncate max-w-xs">{exec.errorMessage}</span>
                           )}
                         </div>
                       ))}

@@ -103,12 +103,12 @@ export default function CustomerMenuPage({
 
   if (isLoading) {
     return (
-      <main className="min-h-screen bg-[#0B0F14] p-4 text-[#F5F7FA]">
+      <main className="min-h-screen bg-background p-4 text-foreground">
         <div className="mx-auto w-full max-w-sm space-y-4 animate-pulse">
-          <div className="h-5 w-40 rounded bg-[#18212B]" />
-          <div className="h-3 w-56 rounded bg-[#18212B]" />
+          <div className="h-5 w-40 rounded bg-secondary" />
+          <div className="h-3 w-56 rounded bg-secondary" />
           {[0, 1, 2].map((key) => (
-            <div key={key} className="h-24 rounded-2xl bg-[#111820]" />
+            <div key={key} className="h-24 rounded-2xl bg-card" />
           ))}
         </div>
       </main>
@@ -117,16 +117,16 @@ export default function CustomerMenuPage({
 
   if (loadError || !menu) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-[#0B0F14] p-4 text-[#F5F7FA]">
-        <div className="w-full max-w-sm space-y-4 rounded-2xl border border-[#EF4444]/30 bg-[#111820] p-8 text-center">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#EF4444]/10 text-2xl text-[#EF4444]">
+      <main className="flex min-h-screen items-center justify-center bg-background p-4 text-foreground">
+        <div className="w-full max-w-sm space-y-4 rounded-2xl border border-atlas-error/30 bg-card p-8 text-center">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-atlas-error/10 text-2xl text-atlas-error">
             ⚠️
           </div>
           <p className="text-sm font-bold">Menu unavailable</p>
-          <p className="text-xs text-[#9AA6B2]">{loadError}</p>
+          <p className="text-xs text-muted-foreground">{loadError}</p>
           <Link
             href={`/t/${token}`}
-            className="inline-block rounded-xl border border-[#26313C] px-4 py-2 text-xs font-semibold text-[#9AA6B2]"
+            className="inline-block rounded-xl border border-border px-4 py-2 text-xs font-semibold text-muted-foreground"
           >
             Back to table
           </Link>
@@ -136,17 +136,17 @@ export default function CustomerMenuPage({
   }
 
   return (
-    <main className="min-h-screen bg-[#0B0F14] pb-28 text-[#F5F7FA]">
-      <header className="sticky top-0 z-30 border-b border-[#26313C] bg-[#0B0F14]/95 px-4 py-4 backdrop-blur">
+    <main className="min-h-screen bg-background pb-28 text-foreground">
+      <header className="sticky top-0 z-30 border-b border-border bg-background/95 px-4 py-4 backdrop-blur">
         <div className="mx-auto w-full max-w-sm space-y-1">
           <div className="flex items-center gap-2">
-            <div className="h-2 w-2 rounded-full bg-[#2AFEB7] shadow-[0_0_10px_#2AFEB7]" />
-            <span className="text-[10px] font-bold uppercase tracking-widest text-[#2AFEB7]">
+            <div className="h-2 w-2 rounded-full bg-primary shadow-[0_0_10px_#34D399]" />
+            <span className="text-[10px] font-bold uppercase tracking-widest text-primary">
               {menu.menu.name}
             </span>
           </div>
           <h1 className="text-xl font-black">{menu.restaurant.name}</h1>
-          <p className="text-[11px] text-[#9AA6B2]">
+          <p className="text-[11px] text-muted-foreground">
             {menu.branch.name} • {menu.diningArea.name} • {menu.table.name}
           </p>
         </div>
@@ -157,10 +157,10 @@ export default function CustomerMenuPage({
         <div className="mx-auto w-full max-w-sm px-4 pt-3">
           <Link
             href={`/t/${token}/orders`}
-            className="flex items-center justify-between rounded-xl border border-[#2AFEB7]/40 bg-[#2AFEB7]/10 p-2.5 text-xs font-bold text-[#2AFEB7] transition-all hover:bg-[#2AFEB7]/20 shadow-md animate-fadeIn"
+            className="flex items-center justify-between rounded-xl border border-primary/40 bg-primary/10 p-2.5 text-xs font-bold text-primary transition-all hover:bg-primary/20 shadow-md animate-fadeIn"
           >
             <span className="flex items-center gap-2">
-              <span className="flex h-2 w-2 rounded-full bg-[#2AFEB7] animate-pulse" />
+              <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
               <span>
                 {activeOrders.length} Active {activeOrders.length === 1 ? 'Order' : 'Orders'} (Tokens:{' '}
                 {activeOrders.map((o) => `#${o.orderNumber}`).join(', ')})
@@ -172,13 +172,13 @@ export default function CustomerMenuPage({
       )}
 
       {menu.categories.length > 1 && (
-        <nav className="border-b border-[#26313C] bg-[#111820]/60 px-4 py-3 sticky top-[81px] z-20 backdrop-blur">
+        <nav className="border-b border-border bg-card/60 px-4 py-3 sticky top-[81px] z-20 backdrop-blur">
           <div className="mx-auto flex w-full max-w-sm gap-2 overflow-x-auto no-scrollbar">
             {menu.categories.map((category) => (
               <a
                 key={category.id}
                 href={`#category-${category.id}`}
-                className="whitespace-nowrap rounded-full border border-[#26313C] bg-[#18212B] px-3.5 py-1.5 text-[11px] font-semibold text-[#9AA6B2] transition-colors hover:border-[#2AFEB7]/40 hover:text-[#2AFEB7] active:scale-95"
+                className="whitespace-nowrap rounded-full border border-border bg-secondary px-3.5 py-1.5 text-[11px] font-semibold text-muted-foreground transition-colors hover:border-primary/40 hover:text-primary active:scale-95"
               >
                 {category.name}
               </a>
@@ -189,20 +189,20 @@ export default function CustomerMenuPage({
 
       <div className="mx-auto w-full max-w-sm space-y-6 p-4">
         {menu.categories.length === 0 && (
-          <p className="rounded-xl border border-[#26313C] bg-[#111820] p-4 text-center text-xs text-[#9AA6B2]">
+          <p className="rounded-xl border border-border bg-card p-4 text-center text-xs text-muted-foreground">
             Nothing on the menu yet. Please ask staff for assistance.
           </p>
         )}
 
         {menu.categories.map((category) => (
           <section key={category.id} id={`category-${category.id}`} className="space-y-3 pt-2">
-            <h2 className="text-xs font-bold uppercase tracking-widest text-[#9AA6B2] flex items-center gap-2">
+            <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
               <span>{category.name}</span>
-              <span className="h-[1px] flex-1 bg-[#26313C]" />
+              <span className="h-[1px] flex-1 bg-border" />
             </h2>
 
             {category.items.length === 0 ? (
-              <p className="rounded-xl border border-[#26313C] bg-[#111820] p-3 text-[11px] text-[#9AA6B2]">
+              <p className="rounded-xl border border-border bg-card p-3 text-[11px] text-muted-foreground">
                 No items available in this category.
               </p>
             ) : (
@@ -217,7 +217,7 @@ export default function CustomerMenuPage({
                 return (
                   <article
                     key={item.id}
-                    className="space-y-3 rounded-2xl border border-[#26313C] bg-[#111820] p-4 transition-all hover:border-[#2AFEB7]/30 shadow-md"
+                    className="space-y-3 rounded-2xl border border-border bg-card p-4 transition-all hover:border-primary/30 shadow-md"
                   >
                     <div
                       onClick={() => setOpenItemId(item.id)}
@@ -229,15 +229,15 @@ export default function CustomerMenuPage({
                             <span
                               className="h-2.5 w-2.5 shrink-0 rounded-full"
                               style={{
-                                backgroundColor: DIETARY_COLOR[item.dietaryType] ?? '#9AA6B2',
+                                backgroundColor: DIETARY_COLOR[item.dietaryType] ?? '#A1A1AA',
                               }}
                             />
-                            <h3 className="text-sm font-bold leading-tight text-[#F5F7FA]">
+                            <h3 className="text-sm font-bold leading-tight text-foreground">
                               {item.name}
                             </h3>
                           </div>
                           {item.description && (
-                            <p className="line-clamp-2 text-[11px] leading-relaxed text-[#9AA6B2]">
+                            <p className="line-clamp-2 text-[11px] leading-relaxed text-muted-foreground">
                               {item.description}
                             </p>
                           )}
@@ -247,23 +247,23 @@ export default function CustomerMenuPage({
                           <img
                             src={item.imageUrl}
                             alt={item.name}
-                            className="h-16 w-16 shrink-0 rounded-xl object-cover border border-[#26313C]"
+                            className="h-16 w-16 shrink-0 rounded-xl object-cover border border-border"
                           />
                         )}
                       </div>
                     </div>
 
                     {/* Bottom Row: Price + Direct Inline Quantity Controls */}
-                    <div className="flex items-center justify-between pt-2 border-t border-[#26313C]/40">
+                    <div className="flex items-center justify-between pt-2 border-t border-border/40">
                       <div className="flex flex-col">
-                        <span className="text-base font-black text-[#2AFEB7]">
+                        <span className="text-base font-black text-primary">
                           {formatCurrency(item.price)}
                         </span>
                         {hasCustomizations && (
                           <button
                             type="button"
                             onClick={() => setOpenItemId(item.id)}
-                            className="text-[10px] text-[#9AA6B2] hover:text-[#2AFEB7] text-left underline"
+                            className="text-[10px] text-muted-foreground hover:text-primary text-left underline"
                           >
                             Customisable options
                           </button>
@@ -274,29 +274,29 @@ export default function CustomerMenuPage({
                         <button
                           type="button"
                           onClick={() => handleQuickAdd(item)}
-                          className="flex items-center gap-1.5 rounded-xl border border-[#2AFEB7] bg-[#2AFEB7]/10 px-5 py-2 text-xs font-bold text-[#2AFEB7] transition-all hover:bg-[#2AFEB7] hover:text-[#0B0F14] active:scale-90 shadow-sm cursor-pointer"
+                          className="flex items-center gap-1.5 rounded-xl border border-primary bg-primary/10 px-5 py-2 text-xs font-bold text-primary transition-all hover:bg-primary hover:text-background active:scale-90 shadow-sm cursor-pointer"
                         >
                           <span>+</span> {hasCustomizations ? 'ADD' : 'ADD'}
                         </button>
                       ) : (
-                        <div className="flex items-center rounded-xl border border-[#2AFEB7] bg-[#18212B] p-0.5 shadow-sm">
+                        <div className="flex items-center rounded-xl border border-primary bg-secondary p-0.5 shadow-sm">
                           <button
                             type="button"
                             onClick={() => handleDecrement(item, quantityInCart)}
-                            className="flex h-7 w-8 items-center justify-center rounded-lg text-base font-bold text-[#2AFEB7] transition-all hover:bg-[#2AFEB7]/20 active:scale-75 cursor-pointer"
+                            className="flex h-7 w-8 items-center justify-center rounded-lg text-base font-bold text-primary transition-all hover:bg-primary/20 active:scale-75 cursor-pointer"
                             aria-label="Decrease quantity"
                           >
                             −
                           </button>
 
-                          <span className="min-w-7 text-center text-xs font-bold font-mono text-[#F5F7FA]">
+                          <span className="min-w-7 text-center text-xs font-bold font-mono text-foreground">
                             {quantityInCart}
                           </span>
 
                           <button
                             type="button"
                             onClick={() => handleIncrement(item, quantityInCart)}
-                            className="flex h-7 w-8 items-center justify-center rounded-lg text-base font-bold text-[#2AFEB7] transition-all hover:bg-[#2AFEB7]/20 active:scale-75 cursor-pointer"
+                            className="flex h-7 w-8 items-center justify-center rounded-lg text-base font-bold text-primary transition-all hover:bg-primary/20 active:scale-75 cursor-pointer"
                             aria-label="Increase quantity"
                           >
                             +

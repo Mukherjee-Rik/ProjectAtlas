@@ -9,8 +9,13 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiHeader, ApiTags } from '@nestjs/swagger';
-import { SupportService, CreateSupportTicketDto, ResolveSupportTicketDto } from './support.service';
+import { ApiBearerAuth, ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  SupportService,
+  CreateSupportTicketDto,
+  ResolveSupportTicketDto,
+  ContactInquiryDto,
+} from './support.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RestaurantAccessGuard } from '../auth/guards/restaurant-access.guard';
 import { PlatformAdminGuard } from '../auth/guards/platform-admin.guard';
@@ -24,6 +29,15 @@ import { RESTAURANT_HEADER } from '../auth/constants/tenant.constants';
 @Controller({ path: 'support', version: '1' })
 export class SupportController {
   constructor(private readonly supportService: SupportService) {}
+
+  @Post('contact')
+  @ApiOperation({ summary: 'Submit public contact / talk-to-us inquiry' })
+  async submitContactInquiry(@Body() dto: ContactInquiryDto) {
+    if (!dto.name || !dto.email || !dto.phone || !dto.message) {
+      throw new BadRequestException('Name, email, phone number, and message are required');
+    }
+    return this.supportService.handleContactInquiry(dto);
+  }
 
   @Post('tickets')
   @ApiBearerAuth('access-token')

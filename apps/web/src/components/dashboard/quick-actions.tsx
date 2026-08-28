@@ -4,12 +4,12 @@ import Link from 'next/link';
 
 export function QuickActions() {
   return (
-    <div className="rounded-xl border border-[#26313C] bg-[#111820] shadow-xl">
-      <div className="border-b border-[#26313C] p-6 bg-[#18212B]/40">
-        <h2 className="text-lg font-semibold text-[#F5F7FA]">
+    <div className="rounded-xl border border-border bg-card">
+      <div className="border-b border-border p-6 bg-secondary/40">
+        <h2 className="text-lg font-semibold text-foreground">
           Quick Actions
         </h2>
-        <p className="mt-1 text-sm text-[#9AA6B2]">
+        <p className="mt-1 text-sm text-muted-foreground">
           Common management tasks
         </p>
       </div>
@@ -17,26 +17,26 @@ export function QuickActions() {
       <div className="p-4 space-y-2">
         <Link
           href="/users/create"
-          className="flex items-center justify-between rounded-lg border border-[#26313C] bg-[#18212B] px-4 py-3 text-sm font-medium text-[#F5F7FA] transition-colors hover:border-[#2AFEB7] hover:text-[#2AFEB7]"
+          className="flex items-center justify-between rounded-lg border border-border bg-secondary px-4 py-3 text-sm font-medium text-foreground transition-colors hover:border-primary hover:text-primary"
         >
           <span>+ Add User</span>
-          <span className="text-[#9AA6B2]">→</span>
+          <span className="text-muted-foreground">→</span>
         </Link>
 
         <Link
           href="/users"
-          className="flex items-center justify-between rounded-lg border border-[#26313C] bg-[#18212B] px-4 py-3 text-sm font-medium text-[#F5F7FA] transition-colors hover:border-[#2AFEB7] hover:text-[#2AFEB7]"
+          className="flex items-center justify-between rounded-lg border border-border bg-secondary px-4 py-3 text-sm font-medium text-foreground transition-colors hover:border-primary hover:text-primary"
         >
           <span>→ View Users</span>
-          <span className="text-[#9AA6B2]">→</span>
+          <span className="text-muted-foreground">→</span>
         </Link>
 
         <Link
           href="/settings"
-          className="flex items-center justify-between rounded-lg border border-[#26313C] bg-[#18212B] px-4 py-3 text-sm font-medium text-[#F5F7FA] transition-colors hover:border-[#2AFEB7] hover:text-[#2AFEB7]"
+          className="flex items-center justify-between rounded-lg border border-border bg-secondary px-4 py-3 text-sm font-medium text-foreground transition-colors hover:border-primary hover:text-primary"
         >
           <span>⚙ Settings</span>
-          <span className="text-[#9AA6B2]">→</span>
+          <span className="text-muted-foreground">→</span>
         </Link>
       </div>
     </div>

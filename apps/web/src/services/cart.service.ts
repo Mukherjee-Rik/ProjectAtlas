@@ -12,11 +12,17 @@ export async function getCart(token: string) {
 }
 
 export async function addCartItem(token: string, payload: AddCartItemPayload) {
-  return publicApiClient.post<CartResponse>(`${cartPath(token)}/items`, payload);
+  const cleanPayload = {
+    menuItemId: payload.menuItemId,
+    quantity: payload.quantity ?? 1,
+    ...(payload.variantIds && payload.variantIds.length > 0 ? { variantIds: payload.variantIds } : {}),
+    ...(payload.addonIds && payload.addonIds.length > 0 ? { addonIds: payload.addonIds } : {}),
+  };
+  return publicApiClient.post<CartResponse>(`${cartPath(token)}/items`, cleanPayload);
 }
 
 export async function setCartItem(token: string, payload: AddCartItemPayload) {
-  return publicApiClient.post<CartResponse>(`${cartPath(token)}/set-item`, payload);
+  return addCartItem(token, payload);
 }
 
 export async function updateCartItemQuantity(
@@ -24,9 +30,15 @@ export async function updateCartItemQuantity(
   itemId: string,
   quantity: number,
 ) {
-  return publicApiClient.patch<CartResponse>(`${cartPath(token)}/items/${itemId}`, {
-    quantity,
-  });
+  try {
+    return await publicApiClient.patch<CartResponse>(`${cartPath(token)}/items/${itemId}`, {
+      quantity,
+    });
+  } catch {
+    return publicApiClient.post<CartResponse>(`${cartPath(token)}/items/${itemId}`, {
+      quantity,
+    });
+  }
 }
 
 export async function removeCartItem(token: string, itemId: string) {

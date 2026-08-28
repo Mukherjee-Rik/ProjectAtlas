@@ -7,3 +7,5 @@ allowBuilds:
   bcrypt: false
   prisma: true
   unrs-resolver: true
+minimumReleaseAgeExclude:
+  - '@splinetool/runtime@2.0.10'

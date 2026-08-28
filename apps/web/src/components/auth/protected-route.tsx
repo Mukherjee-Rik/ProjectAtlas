@@ -60,8 +60,8 @@ export function ProtectedRoute({
 
   if (!mounted || isLoading) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-[#0B0F14]">
-        <div className="h-6 w-6 border-2 border-[#2AFEB7] border-t-transparent rounded-full animate-spin" />
+      <main className="flex min-h-screen items-center justify-center bg-background">
+        <div className="h-6 w-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
       </main>
     );
   }

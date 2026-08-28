@@ -83,6 +83,7 @@ export const ModelName = {
   InventoryLocation: 'InventoryLocation',
   Ingredient: 'Ingredient',
   Recipe: 'Recipe',
+  BatchProduction: 'BatchProduction',
   RecipeIngredient: 'RecipeIngredient',
   StockLedger: 'StockLedger',
   Plan: 'Plan',
@@ -594,11 +595,32 @@ export type IngredientScalarFieldEnum = (typeof IngredientScalarFieldEnum)[keyof
 export const RecipeScalarFieldEnum = {
   id: 'id',
   menuItemId: 'menuItemId',
+  recipeType: 'recipeType',
+  batchYieldPortions: 'batchYieldPortions',
+  preparedStock: 'preparedStock',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type RecipeScalarFieldEnum = (typeof RecipeScalarFieldEnum)[keyof typeof RecipeScalarFieldEnum]
+
+
+export const BatchProductionScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  branchId: 'branchId',
+  recipeId: 'recipeId',
+  portionsProduced: 'portionsProduced',
+  portionsRemaining: 'portionsRemaining',
+  notes: 'notes',
+  producedAt: 'producedAt',
+  expiresAt: 'expiresAt',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type BatchProductionScalarFieldEnum = (typeof BatchProductionScalarFieldEnum)[keyof typeof BatchProductionScalarFieldEnum]
 
 
 export const RecipeIngredientScalarFieldEnum = {

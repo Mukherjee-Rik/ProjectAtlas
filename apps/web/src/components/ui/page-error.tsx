@@ -8,8 +8,8 @@ export function PageError({
   onRetry,
 }: PageErrorProps) {
   return (
-    <div className="rounded-xl border border-[#EF4444]/30 bg-[#EF4444]/10 p-6 text-center">
-      <p className="text-sm font-medium text-[#EF4444]">
+    <div className="rounded-xl border border-atlas-error/30 bg-atlas-error/10 p-6 text-center">
+      <p className="text-sm font-medium text-atlas-error">
         {message}
       </p>
 
@@ -17,7 +17,7 @@ export function PageError({
         <button
           type="button"
           onClick={onRetry}
-          className="mt-4 rounded-lg border border-[#26313C] bg-[#18212B] px-4 py-2 text-sm text-[#F5F7FA] transition-all hover:border-[#2AFEB7] hover:text-[#2AFEB7]"
+          className="mt-4 rounded-lg border border-border bg-secondary px-4 py-2 text-sm text-foreground transition-all hover:border-primary hover:text-primary"
         >
           Try again
         </button>
