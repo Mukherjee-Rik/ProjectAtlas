@@ -208,23 +208,23 @@ export default function EditMenuItemPage({ params }: { params: Promise<{ id: str
   };
 
   if (isLoading) {
-    return <div className="rounded-xl border border-[#26313C] bg-[#111820] p-8 text-center text-[#9AA6B2]">Loading item details...</div>;
+    return <div className="rounded-xl border border-border bg-card p-8 text-center text-muted-foreground">Loading item details...</div>;
   }
 
   return (
     <div className="mx-auto max-w-3xl space-y-6 font-sans">
       <div>
-        <button type="button" onClick={() => router.back()} className="mb-2 text-xs text-[#9AA6B2] hover:text-[#2AFEB7]">← Back</button>
-        <h1 className="text-3xl font-bold text-[#F5F7FA]">Edit Menu Item & Recipe</h1>
-        <p className="mt-1 text-sm text-[#9AA6B2]">
-          {item?.category?.name && <><span className="text-[#F5F7FA]">{item.category.name}</span> → </>}
-          <span className="font-semibold text-[#F5F7FA]">{item?.name}</span>
+        <button type="button" onClick={() => router.back()} className="mb-2 text-xs text-muted-foreground hover:text-primary">← Back</button>
+        <h1 className="font-display text-3xl font-semibold tracking-[-0.02em] text-foreground">Edit Menu Item & Recipe</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          {item?.category?.name && <><span className="text-foreground">{item.category.name}</span> → </>}
+          <span className="font-semibold text-foreground">{item?.name}</span>
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6 rounded-xl border border-[#26313C] bg-[#111820] p-6 shadow-xl" noValidate>
+      <form onSubmit={handleSubmit} className="space-y-6 rounded-xl border border-border bg-card p-6" noValidate>
         {error && (
-          <div className="rounded-lg border border-[#EF4444]/40 bg-[#EF4444]/10 p-3 text-xs text-[#EF4444] animate-in fade-in">{error}</div>
+          <div className="rounded-lg border border-atlas-error/40 bg-atlas-error/10 p-3 text-xs text-atlas-error animate-in fade-in">{error}</div>
         )}
 
         {/* Basic details */}
@@ -381,13 +381,13 @@ export default function EditMenuItemPage({ params }: { params: Promise<{ id: str
           <option value="INACTIVE">INACTIVE</option>
         </ValidatedSelect>
 
-        <div className="flex justify-end gap-3 border-t border-[#26313C] pt-4">
+        <div className="flex justify-end gap-3 border-t border-border pt-4">
           <button type="button" onClick={() => router.back()} disabled={isSubmitting}
-            className="rounded-lg border border-[#26313C] bg-[#18212B] px-4 py-2 text-xs font-semibold text-[#F5F7FA] hover:border-[#2AFEB7] disabled:opacity-50">
+            className="rounded-lg border border-border bg-secondary px-4 py-2 text-xs font-semibold text-foreground hover:border-primary disabled:opacity-50">
             Cancel
           </button>
           <button type="submit" disabled={isSubmitting}
-            className="rounded-lg bg-[#2AFEB7] px-5 py-2 text-xs font-bold text-[#0B0F14] hover:bg-[#22E5A4] disabled:opacity-50 shadow">
+            className="rounded-lg bg-primary px-5 py-2 text-xs font-bold text-background hover:bg-primary-hover disabled:opacity-50 shadow">
             {isSubmitting ? 'Saving...' : 'Update Item'}
           </button>
         </div>

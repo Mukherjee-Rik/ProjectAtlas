@@ -94,7 +94,7 @@ export function MenuForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-4" noValidate>
       {error && (
-        <div className="rounded-lg border border-[#EF4444]/40 bg-[#EF4444]/10 p-3 text-xs text-[#EF4444] animate-in fade-in">
+        <div className="rounded-lg border border-atlas-error/40 bg-atlas-error/10 p-3 text-xs text-atlas-error animate-in fade-in">
           {error}
         </div>
       )}
@@ -145,14 +145,14 @@ export function MenuForm({
           type="button"
           onClick={onCancel}
           disabled={isSubmitting}
-          className="rounded-lg border border-[#26313C] bg-[#18212B] px-4 py-2 text-xs font-semibold text-[#F5F7FA] hover:border-[#2AFEB7] disabled:opacity-50"
+          className="rounded-lg border border-border bg-secondary px-4 py-2 text-xs font-semibold text-foreground hover:border-primary disabled:opacity-50"
         >
           Cancel
         </button>
         <button
           type="submit"
           disabled={isSubmitting}
-          className="rounded-lg bg-[#2AFEB7] px-4 py-2 text-xs font-semibold text-[#0B0F14] hover:bg-[#22E5A4] disabled:opacity-50 font-bold"
+          className="rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-background hover:bg-primary-hover disabled:opacity-50 font-bold"
         >
           {isSubmitting ? 'Saving...' : initialValues ? 'Update Menu' : 'Create Menu'}
         </button>

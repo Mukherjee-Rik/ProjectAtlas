@@ -91,30 +91,30 @@ export function NotificationBell() {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="relative rounded-lg border border-[#26313C] bg-[#18212B]/85 hover:border-[#2AFEB7] hover:bg-[#18212B] px-2.5 py-2 text-sm transition-all"
+        className="relative rounded-lg border border-border bg-secondary/85 hover:border-primary hover:bg-secondary px-2.5 py-2 text-sm transition-all"
         aria-label="Notifications"
       >
         🔔
         {unreadCount > 0 && (
-          <span className="absolute -top-1.5 -right-1.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white px-1 shadow-md">
+          <span className="absolute -top-1.5 -right-1.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-atlas-error text-[10px] font-bold text-foreground px-1 shadow-md">
             {unreadCount > 99 ? '99+' : unreadCount}
           </span>
         )}
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-12 z-50 w-80 max-h-[420px] overflow-y-auto rounded-xl border border-[#26313C] bg-[#111820] shadow-2xl animate-in fade-in zoom-in-95">
-          <div className="sticky top-0 bg-[#111820] border-b border-[#26313C] px-4 py-3 flex items-center justify-between z-10">
-            <h3 className="text-sm font-semibold text-[#F5F7FA]">Notifications</h3>
+        <div className="absolute right-0 top-12 z-50 w-80 max-h-[420px] overflow-y-auto rounded-xl border border-border bg-card animate-in fade-in zoom-in-95">
+          <div className="sticky top-0 bg-card border-b border-border px-4 py-3 flex items-center justify-between z-10">
+            <h3 className="text-sm font-semibold text-foreground">Notifications</h3>
             {unreadCount > 0 && (
-              <span className="text-[10px] text-[#2AFEB7] font-medium">
+              <span className="text-[10px] text-primary font-medium">
                 {unreadCount} unread
               </span>
             )}
           </div>
 
           {safeNotifications.length === 0 ? (
-            <div className="p-6 text-center text-xs text-[#9AA6B2]">
+            <div className="p-6 text-center text-xs text-muted-foreground">
               No notifications yet
             </div>
           ) : (
@@ -126,8 +126,8 @@ export function NotificationBell() {
                   onClick={() => {
                     if (!n.isRead) markAsRead(n.id);
                   }}
-                  className={`w-full text-left px-4 py-3 border-b border-[#26313C]/50 hover:bg-[#18212B] transition-colors ${
-                    !n.isRead ? 'bg-[#18212B]/50' : ''
+                  className={`w-full text-left px-4 py-3 border-b border-border/50 hover:bg-secondary transition-colors ${
+                    !n.isRead ? 'bg-secondary/50' : ''
                   }`}
                 >
                   <div className="flex items-start gap-2.5">
@@ -135,18 +135,18 @@ export function NotificationBell() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2">
                         <p className={`text-xs font-medium truncate ${
-                          !n.isRead ? 'text-[#F5F7FA]' : 'text-[#9AA6B2]'
+                          !n.isRead ? 'text-foreground' : 'text-muted-foreground'
                         }`}>
                           {n.title}
                         </p>
                         {!n.isRead && (
-                          <span className="h-2 w-2 rounded-full bg-[#2AFEB7] flex-shrink-0" />
+                          <span className="h-2 w-2 rounded-full bg-primary flex-shrink-0" />
                         )}
                       </div>
-                      <p className="text-[11px] text-[#9AA6B2] mt-0.5 line-clamp-2">
+                      <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-2">
                         {n.message}
                       </p>
-                      <p className="text-[10px] text-[#9AA6B2]/60 mt-1">
+                      <p className="text-[10px] text-muted-foreground/60 mt-1">
                         {timeAgo(n.createdAt)}
                       </p>
                     </div>

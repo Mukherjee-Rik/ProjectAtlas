@@ -429,6 +429,7 @@ export const ModelName = {
   InventoryLocation: 'InventoryLocation',
   Ingredient: 'Ingredient',
   Recipe: 'Recipe',
+  BatchProduction: 'BatchProduction',
   RecipeIngredient: 'RecipeIngredient',
   StockLedger: 'StockLedger',
   Plan: 'Plan',
@@ -471,7 +472,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "tenant" | "restaurant" | "tenantMembership" | "branch" | "diningArea" | "table" | "customerSession" | "menu" | "menuCategory" | "menuItem" | "taxRate" | "menuItemVariantGroup" | "menuItemVariant" | "menuItemAddonGroup" | "menuItemAddon" | "cart" | "cartItem" | "cartItemVariant" | "cartItemAddon" | "order" | "orderItem" | "orderItemVariant" | "orderItemAddon" | "cancellationRequest" | "refund" | "payment" | "invoice" | "supplier" | "inventoryLocation" | "ingredient" | "recipe" | "recipeIngredient" | "stockLedger" | "plan" | "subscription" | "session" | "auditLog" | "externalOrder" | "restaurantDeliveryProvider" | "webhookEvent" | "aiUsage" | "automationRule" | "automationExecution" | "notification" | "supportTicket" | "customer" | "operationalEvent" | "dailySalesAggregate" | "menuItemDailyMetrics" | "savedReport" | "intelligenceQueryAudit" | "customReport" | "reportSchedule" | "reportExecutionHistory" | "forecast" | "forecastPoint" | "forecastRun" | "forecastAccuracy"
+    modelProps: "user" | "tenant" | "restaurant" | "tenantMembership" | "branch" | "diningArea" | "table" | "customerSession" | "menu" | "menuCategory" | "menuItem" | "taxRate" | "menuItemVariantGroup" | "menuItemVariant" | "menuItemAddonGroup" | "menuItemAddon" | "cart" | "cartItem" | "cartItemVariant" | "cartItemAddon" | "order" | "orderItem" | "orderItemVariant" | "orderItemAddon" | "cancellationRequest" | "refund" | "payment" | "invoice" | "supplier" | "inventoryLocation" | "ingredient" | "recipe" | "batchProduction" | "recipeIngredient" | "stockLedger" | "plan" | "subscription" | "session" | "auditLog" | "externalOrder" | "restaurantDeliveryProvider" | "webhookEvent" | "aiUsage" | "automationRule" | "automationExecution" | "notification" | "supportTicket" | "customer" | "operationalEvent" | "dailySalesAggregate" | "menuItemDailyMetrics" | "savedReport" | "intelligenceQueryAudit" | "customReport" | "reportSchedule" | "reportExecutionHistory" | "forecast" | "forecastPoint" | "forecastRun" | "forecastAccuracy"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2840,6 +2841,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.RecipeCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.RecipeCountAggregateOutputType> | number
+        }
+      }
+    }
+    BatchProduction: {
+      payload: Prisma.$BatchProductionPayload<ExtArgs>
+      fields: Prisma.BatchProductionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.BatchProductionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BatchProductionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.BatchProductionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BatchProductionPayload>
+        }
+        findFirst: {
+          args: Prisma.BatchProductionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BatchProductionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.BatchProductionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BatchProductionPayload>
+        }
+        findMany: {
+          args: Prisma.BatchProductionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BatchProductionPayload>[]
+        }
+        create: {
+          args: Prisma.BatchProductionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BatchProductionPayload>
+        }
+        createMany: {
+          args: Prisma.BatchProductionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.BatchProductionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BatchProductionPayload>[]
+        }
+        delete: {
+          args: Prisma.BatchProductionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BatchProductionPayload>
+        }
+        update: {
+          args: Prisma.BatchProductionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BatchProductionPayload>
+        }
+        deleteMany: {
+          args: Prisma.BatchProductionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.BatchProductionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.BatchProductionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BatchProductionPayload>[]
+        }
+        upsert: {
+          args: Prisma.BatchProductionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BatchProductionPayload>
+        }
+        aggregate: {
+          args: Prisma.BatchProductionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateBatchProduction>
+        }
+        groupBy: {
+          args: Prisma.BatchProductionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BatchProductionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.BatchProductionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BatchProductionCountAggregateOutputType> | number
         }
       }
     }
@@ -5346,11 +5421,32 @@ export type IngredientScalarFieldEnum = (typeof IngredientScalarFieldEnum)[keyof
 export const RecipeScalarFieldEnum = {
   id: 'id',
   menuItemId: 'menuItemId',
+  recipeType: 'recipeType',
+  batchYieldPortions: 'batchYieldPortions',
+  preparedStock: 'preparedStock',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type RecipeScalarFieldEnum = (typeof RecipeScalarFieldEnum)[keyof typeof RecipeScalarFieldEnum]
+
+
+export const BatchProductionScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  branchId: 'branchId',
+  recipeId: 'recipeId',
+  portionsProduced: 'portionsProduced',
+  portionsRemaining: 'portionsRemaining',
+  notes: 'notes',
+  producedAt: 'producedAt',
+  expiresAt: 'expiresAt',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type BatchProductionScalarFieldEnum = (typeof BatchProductionScalarFieldEnum)[keyof typeof BatchProductionScalarFieldEnum]
 
 
 export const RecipeIngredientScalarFieldEnum = {
@@ -6278,6 +6374,20 @@ export type ListEnumUnitOfMeasureFieldRefInput<$PrismaModel> = FieldRefInputType
 
 
 /**
+ * Reference to a field of type 'RecipeType'
+ */
+export type EnumRecipeTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RecipeType'>
+    
+
+
+/**
+ * Reference to a field of type 'RecipeType[]'
+ */
+export type ListEnumRecipeTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RecipeType[]'>
+    
+
+
+/**
  * Reference to a field of type 'StockTransactionType'
  */
 export type EnumStockTransactionTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'StockTransactionType'>
@@ -6543,6 +6653,7 @@ export type GlobalOmitConfig = {
   inventoryLocation?: Prisma.InventoryLocationOmit
   ingredient?: Prisma.IngredientOmit
   recipe?: Prisma.RecipeOmit
+  batchProduction?: Prisma.BatchProductionOmit
   recipeIngredient?: Prisma.RecipeIngredientOmit
   stockLedger?: Prisma.StockLedgerOmit
   plan?: Prisma.PlanOmit

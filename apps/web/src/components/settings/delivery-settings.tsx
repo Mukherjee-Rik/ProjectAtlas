@@ -101,39 +101,39 @@ export function DeliverySettings() {
     const health = healthMap[name];
 
     return (
-      <div className="rounded-2xl border border-[#26313C] bg-[#111820] p-6 flex flex-col justify-between gap-6 shadow-xl text-left">
+      <div className="rounded-2xl border border-border bg-card p-6 flex flex-col justify-between gap-6 text-left">
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <h4 className="text-base font-bold text-[#F5F7FA]">{label}</h4>
+            <h4 className="text-base font-bold text-foreground">{label}</h4>
             <div className="flex items-center gap-2">
               {isSetup && enabled ? (
                 <>
                   <span className={`h-2.5 w-2.5 rounded-full ${
                     health === 'HEALTHY'
-                      ? 'bg-green-500 shadow-[0_0_8px_#22C55E]'
+                      ? 'bg-atlas-success shadow-[0_0_8px_#22C55E]'
                       : health === 'CHECKING'
-                      ? 'bg-amber-500 animate-pulse'
-                      : 'bg-red-500 shadow-[0_0_8px_#EF4444]'
+                      ? 'bg-atlas-warning animate-pulse'
+                      : 'bg-atlas-error shadow-[0_0_8px_#EF4444]'
                   }`} />
-                  <span className="text-[10px] font-bold text-[#9AA6B2]">
+                  <span className="text-[10px] font-bold text-muted-foreground">
                     {health === 'HEALTHY' ? 'Connected' : health === 'CHECKING' ? 'Syncing...' : 'Error'}
                   </span>
                 </>
               ) : (
-                <span className="rounded bg-[#18212B] border border-[#26313C] px-2 py-0.5 text-[10px] text-[#9AA6B2]">
+                <span className="rounded bg-secondary border border-border px-2 py-0.5 text-[10px] text-muted-foreground">
                   Not Configured
                 </span>
               )}
             </div>
           </div>
-          <p className="text-xs text-[#9AA6B2]">{description}</p>
+          <p className="text-xs text-muted-foreground">{description}</p>
         </div>
 
         <div className="flex gap-2">
           <button
             type="button"
             onClick={() => handleEditClick(name)}
-            className="flex-1 rounded-xl bg-[#18212B] border border-[#26313C] hover:border-[#2AFEB7] py-2 text-xs font-bold text-[#F5F7FA] transition-all"
+            className="flex-1 rounded-xl bg-secondary border border-border hover:border-primary py-2 text-xs font-bold text-foreground transition-all"
           >
             {isSetup ? 'Configure Credentials' : 'Set Up Integration'}
           </button>
@@ -141,7 +141,7 @@ export function DeliverySettings() {
             <button
               type="button"
               onClick={() => void checkHealth(name)}
-              className="rounded-xl bg-[#18212B] border border-[#26313C] hover:border-[#2AFEB7] px-3 py-2 text-xs font-bold text-[#9AA6B2] hover:text-[#F5F7FA] transition-all"
+              className="rounded-xl bg-secondary border border-border hover:border-primary px-3 py-2 text-xs font-bold text-muted-foreground hover:text-foreground transition-all"
             >
               ⟳ Test
             </button>
@@ -154,8 +154,8 @@ export function DeliverySettings() {
   if (isLoading && configs.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center p-8 space-y-2">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#2AFEB7] border-t-transparent" />
-        <span className="text-xs text-[#9AA6B2]">Loading delivery integrations...</span>
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+        <span className="text-xs text-muted-foreground">Loading delivery integrations...</span>
       </div>
     );
   }
@@ -163,14 +163,14 @@ export function DeliverySettings() {
   return (
     <div className="space-y-6 text-left">
       <div>
-        <h3 className="text-base font-bold text-[#F5F7FA]">Delivery Aggregator Integrations</h3>
-        <p className="text-xs text-[#9AA6B2]">
+        <h3 className="text-base font-bold text-foreground">Delivery Aggregator Integrations</h3>
+        <p className="text-xs text-muted-foreground">
           Manage connections to external third-party ordering platforms.
         </p>
       </div>
 
       {error && (
-        <div className="rounded-xl border border-red-500/20 bg-red-500/10 p-3 text-xs text-red-500">
+        <div className="rounded-xl border border-atlas-error/20 bg-atlas-error/10 p-3 text-xs text-atlas-error">
           {error}
         </div>
       )}
@@ -182,16 +182,16 @@ export function DeliverySettings() {
 
       {/* Edit Credentials Modal */}
       {editingProvider && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#070B0E]/80 backdrop-blur-sm p-4">
-          <form onSubmit={handleSave} className="w-full max-w-md rounded-2xl border border-[#26313C] bg-[#111820] p-6 shadow-2xl space-y-5">
-            <div className="flex items-center justify-between border-b border-[#26313C] pb-4">
-              <h3 className="text-sm font-bold text-[#F5F7FA]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4">
+          <form onSubmit={handleSave} className="w-full max-w-md rounded-2xl border border-border bg-card p-6 space-y-5">
+            <div className="flex items-center justify-between border-b border-border pb-4">
+              <h3 className="text-sm font-bold text-foreground">
                 Configure {editingProvider === 'PROVIDER_A' ? 'Provider A (Zomato)' : 'Provider B (Swiggy)'}
               </h3>
               <button
                 type="button"
                 onClick={() => setEditingProvider(null)}
-                className="text-xs text-[#9AA6B2] hover:text-[#F5F7FA]"
+                className="text-xs text-muted-foreground hover:text-foreground"
               >
                 ✕ Close
               </button>
@@ -199,26 +199,26 @@ export function DeliverySettings() {
 
             <div className="space-y-4 text-xs">
               <div className="flex flex-col gap-1.5">
-                <span className="font-bold text-[#9AA6B2]">API Configuration Key (must start with {editingProvider === 'PROVIDER_A' ? 'PROV_A_' : 'PROV_B_'})</span>
+                <span className="font-bold text-muted-foreground">API Configuration Key (must start with {editingProvider === 'PROVIDER_A' ? 'PROV_A_' : 'PROV_B_'})</span>
                 <input
                   type="text"
                   required
                   placeholder="e.g. PROV_A_abc123"
                   value={apiKey}
                   onChange={(e) => setApiKey(e.target.value)}
-                  className="rounded-xl border border-[#26313C] bg-[#18212B] px-3 py-2.5 text-xs text-[#F5F7FA] outline-none hover:border-[#2AFEB7] focus:border-[#2AFEB7] transition-all"
+                  className="rounded-xl border border-border bg-secondary px-3 py-2.5 text-xs text-foreground outline-none hover:border-primary focus:border-primary transition-all"
                 />
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <span className="font-bold text-[#9AA6B2]">Client Signature Secret</span>
+                <span className="font-bold text-muted-foreground">Client Signature Secret</span>
                 <input
                   type="password"
                   required
                   placeholder="••••••••••••••"
                   value={apiSecret}
                   onChange={(e) => setApiSecret(e.target.value)}
-                  className="rounded-xl border border-[#26313C] bg-[#18212B] px-3 py-2.5 text-xs text-[#F5F7FA] outline-none hover:border-[#2AFEB7] focus:border-[#2AFEB7] transition-all"
+                  className="rounded-xl border border-border bg-secondary px-3 py-2.5 text-xs text-foreground outline-none hover:border-primary focus:border-primary transition-all"
                 />
               </div>
 
@@ -228,26 +228,26 @@ export function DeliverySettings() {
                   id="provider-enabled"
                   checked={isEnabled}
                   onChange={(e) => setIsEnabled(e.target.checked)}
-                  className="h-4 w-4 rounded border-[#26313C] bg-[#18212B] text-[#2AFEB7] accent-[#2AFEB7] cursor-pointer"
+                  className="h-4 w-4 rounded border-border bg-secondary text-primary accent-primary cursor-pointer"
                 />
-                <label htmlFor="provider-enabled" className="font-bold text-[#F5F7FA] cursor-pointer selection:bg-transparent">
+                <label htmlFor="provider-enabled" className="font-bold text-foreground cursor-pointer selection:bg-transparent">
                   Enable this integration
                 </label>
               </div>
             </div>
 
-            <div className="flex justify-end gap-2 border-t border-[#26313C] pt-4">
+            <div className="flex justify-end gap-2 border-t border-border pt-4">
               <button
                 type="button"
                 onClick={() => setEditingProvider(null)}
-                className="rounded-xl border border-[#26313C] bg-[#18212B] px-4 py-2 text-xs font-semibold text-[#9AA6B2] hover:text-[#F5F7FA]"
+                className="rounded-xl border border-border bg-secondary px-4 py-2 text-xs font-semibold text-muted-foreground hover:text-foreground"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={isSaving}
-                className="rounded-xl bg-[#2AFEB7] hover:bg-[#2AFEB7]/80 px-4 py-2 text-xs font-bold text-[#0B0F14] disabled:opacity-50 transition-colors"
+                className="rounded-xl bg-primary hover:bg-primary/80 px-4 py-2 text-xs font-bold text-background disabled:opacity-50 transition-colors"
               >
                 {isSaving ? 'Saving...' : 'Save Configuration'}
               </button>

@@ -6,6 +6,7 @@ import * as express from 'express';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterRestaurantDto } from './dto/register-restaurant.dto';
+import { OAuthLoginDto } from './dto/oauth-login.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CurrentUser } from './decorators/current-user.decorator';
 
@@ -20,6 +21,9 @@ const LOGIN_LIMIT = Number(process.env.AUTH_LOGIN_LIMIT ?? 5);
 const SIGNUP_LIMIT = Number(process.env.AUTH_SIGNUP_LIMIT ?? 5);
 const REFRESH_LIMIT = Number(process.env.AUTH_REFRESH_LIMIT ?? 10);
 
+import { VerifyOtpDto, ResendOtpDto } from './dto/verify-otp.dto';
+import { ForgotPasswordDto, ResetPasswordDto, ResendResetOtpDto } from './dto/forgot-password.dto';
+
 @ApiTags('Auth')
 @Controller({
   path: 'auth',
@@ -27,6 +31,42 @@ const REFRESH_LIMIT = Number(process.env.AUTH_REFRESH_LIMIT ?? 10);
 })
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
+
+  @HttpCode(HttpStatus.OK)
+  @Post('oauth')
+  @ApiOperation({ summary: 'Single sign-on / OAuth login and registration' })
+  async oauthLogin(
+    @Body() dto: OAuthLoginDto,
+    @Req() req: express.Request,
+    @Res({ passthrough: true }) res: express.Response,
+  ) {
+    const ip = (req.headers['x-forwarded-for'] as string) || req.ip || req.socket.remoteAddress;
+    const userAgent = req.headers['user-agent'] || '';
+
+    const result = await this.authService.loginWithOAuth(
+      dto.provider,
+      dto.email,
+      dto.name,
+      dto.token,
+      dto.avatarUrl,
+      ip,
+      userAgent,
+    );
+
+    res.cookie('refreshToken', result.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      path: '/',
+    });
+
+    return {
+      accessToken: result.accessToken,
+      user: result.user,
+      memberships: result.memberships,
+    };
+  }
 
   @Throttle({
     default: {
@@ -36,7 +76,7 @@ export class AuthController {
   })
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  @ApiOperation({ summary: 'Login to restaurant management account' })
+  @ApiOperation({ summary: 'Login with credentials: logs in directly if password matches' })
   async login(
     @Body() loginDto: LoginDto,
     @Req() req: express.Request,
@@ -46,6 +86,36 @@ export class AuthController {
     const userAgent = req.headers['user-agent'] || '';
 
     const result = await this.authService.login(loginDto.email, loginDto.password, ip, userAgent);
+
+    if (result.refreshToken) {
+      res.cookie('refreshToken', result.refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        path: '/',
+      });
+    }
+
+    return {
+      accessToken: result.accessToken,
+      user: result.user,
+      memberships: result.memberships,
+    };
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Post('verify-otp')
+  @ApiOperation({ summary: 'Verify 6-digit phone OTP and complete sign-in' })
+  async verifyOtp(
+    @Body() dto: VerifyOtpDto,
+    @Req() req: express.Request,
+    @Res({ passthrough: true }) res: express.Response,
+  ) {
+    const ip = (req.headers['x-forwarded-for'] as string) || req.ip || req.socket.remoteAddress;
+    const userAgent = req.headers['user-agent'] || '';
+
+    const result = await this.authService.verifyOtp(dto.challengeId, dto.otp, ip, userAgent);
 
     res.cookie('refreshToken', result.refreshToken, {
       httpOnly: true,
@@ -60,6 +130,60 @@ export class AuthController {
       user: result.user,
       memberships: result.memberships,
     };
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Post('resend-otp')
+  @ApiOperation({ summary: 'Resend new 6-digit phone OTP for active challenge' })
+  async resendOtp(
+    @Body() dto: ResendOtpDto,
+    @Req() req: express.Request,
+  ) {
+    const ip = (req.headers['x-forwarded-for'] as string) || req.ip || req.socket.remoteAddress;
+    const userAgent = req.headers['user-agent'] || '';
+
+    return this.authService.resendOtp(dto.challengeId, ip, userAgent);
+  }
+
+  @Throttle({
+    default: {
+      ttl: AUTH_WINDOW_MS,
+      limit: LOGIN_LIMIT,
+    },
+  })
+  @HttpCode(HttpStatus.OK)
+  @Post('forgot-password')
+  @ApiOperation({ summary: 'Initiate password reset: verifies email/phone and dispatches 6-digit OTP' })
+  async forgotPassword(
+    @Body() dto: ForgotPasswordDto,
+    @Req() req: express.Request,
+  ) {
+    const ip = (req.headers['x-forwarded-for'] as string) || req.ip || req.socket.remoteAddress;
+    const userAgent = req.headers['user-agent'] || '';
+
+    return this.authService.forgotPassword(dto.identifier, ip, userAgent);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Post('reset-password')
+  @ApiOperation({ summary: 'Verify OTP and set new password' })
+  async resetPassword(
+    @Body() dto: ResetPasswordDto,
+    @Req() req: express.Request,
+  ) {
+    const ip = (req.headers['x-forwarded-for'] as string) || req.ip || req.socket.remoteAddress;
+    const userAgent = req.headers['user-agent'] || '';
+
+    return this.authService.resetPassword(dto.challengeId, dto.otp, dto.newPassword, ip, userAgent);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Post('resend-reset-otp')
+  @ApiOperation({ summary: 'Resend new 6-digit password reset OTP' })
+  async resendResetOtp(
+    @Body() dto: ResendResetOtpDto,
+  ) {
+    return this.authService.resendResetOtp(dto.challengeId);
   }
 
   @Throttle({

@@ -56,8 +56,8 @@ export default function BranchDetailsPage({
   if (isLoading) {
     return (
       <div className="space-y-6 max-w-3xl">
-        <h1 className="text-3xl font-bold text-[#F5F7FA]">Branch Details</h1>
-        <div className="rounded-xl border border-[#26313C] bg-[#111820] p-8 text-center text-[#9AA6B2]">
+        <h1 className="font-display text-3xl font-semibold tracking-[-0.02em] text-foreground">Branch Details</h1>
+        <div className="rounded-xl border border-border bg-card p-8 text-center text-muted-foreground">
           Loading branch information...
         </div>
       </div>
@@ -67,13 +67,13 @@ export default function BranchDetailsPage({
   if (error || !branch) {
     return (
       <div className="space-y-6 max-w-3xl">
-        <h1 className="text-3xl font-bold text-[#F5F7FA]">Branch Details</h1>
-        <div className="rounded-xl border border-[#EF4444]/40 bg-[#EF4444]/10 p-8 text-center text-[#EF4444]">
+        <h1 className="font-display text-3xl font-semibold tracking-[-0.02em] text-foreground">Branch Details</h1>
+        <div className="rounded-xl border border-atlas-error/40 bg-atlas-error/10 p-8 text-center text-atlas-error">
           <p>{error || 'Branch not found.'}</p>
           <button
             type="button"
             onClick={() => router.push('/branches')}
-            className="mt-4 rounded-lg border border-[#26313C] bg-[#18212B] px-4 py-2 text-sm text-[#F5F7FA]"
+            className="mt-4 rounded-lg border border-border bg-secondary px-4 py-2 text-sm text-foreground"
           >
             Back to Branches
           </button>
@@ -86,10 +86,10 @@ export default function BranchDetailsPage({
     <div className="space-y-8 max-w-3xl">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-[#F5F7FA]">
+          <h1 className="font-display text-3xl font-semibold tracking-[-0.02em] text-foreground">
             {branch.name}
           </h1>
-          <p className="mt-1 text-sm font-mono text-[#2AFEB7]">
+          <p className="mt-1 text-sm font-mono text-primary">
             Code: {branch.code}
           </p>
         </div>
@@ -98,7 +98,7 @@ export default function BranchDetailsPage({
           <button
             type="button"
             onClick={() => router.push(`/branches/${branch.id}/edit`)}
-            className="rounded-lg border border-[#26313C] bg-[#18212B] px-4 py-2 text-sm font-semibold text-[#F5F7FA] hover:border-[#2AFEB7]"
+            className="rounded-lg border border-border bg-secondary px-4 py-2 text-sm font-semibold text-foreground hover:border-primary"
           >
             Edit
           </button>
@@ -106,73 +106,73 @@ export default function BranchDetailsPage({
           <button
             type="button"
             onClick={() => setShowDeleteConfirm(true)}
-            className="rounded-lg border border-[#EF4444]/40 bg-[#EF4444]/10 px-4 py-2 text-sm font-semibold text-[#EF4444] hover:bg-[#EF4444]/20"
+            className="rounded-lg border border-atlas-error/40 bg-atlas-error/10 px-4 py-2 text-sm font-semibold text-atlas-error hover:bg-atlas-error/20"
           >
             Delete
           </button>
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-[#26313C] bg-[#111820] shadow-xl">
-        <div className="border-b border-[#26313C] p-6 bg-[#18212B]/40">
-          <h2 className="text-xl font-bold text-[#F5F7FA]">Branch Overview</h2>
+      <div className="overflow-hidden rounded-xl border border-border bg-card">
+        <div className="border-b border-border p-6 bg-secondary/40">
+          <h2 className="text-xl font-bold text-foreground">Branch Overview</h2>
         </div>
 
         <div className="p-6 space-y-6">
           <div className="grid gap-6 sm:grid-cols-2">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Restaurant
               </p>
-              <p className="mt-1.5 text-base font-semibold text-[#F5F7FA]">
+              <p className="mt-1.5 text-base font-semibold text-foreground">
                 {branch.restaurant?.name ?? '—'}
               </p>
             </div>
 
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Status
               </p>
               <div className="mt-1.5">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#22C55E]/15 px-3 py-1 text-xs font-semibold text-[#22C55E] border border-[#22C55E]/30">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[#22C55E]" />
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-atlas-success/15 px-3 py-1 text-xs font-semibold text-atlas-success border border-atlas-success/30">
+                  <span className="h-1.5 w-1.5 rounded-full bg-atlas-success" />
                   {branch.status}
                 </span>
               </div>
             </div>
 
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 City / State
               </p>
-              <p className="mt-1.5 text-sm text-[#F5F7FA]">
+              <p className="mt-1.5 text-sm text-foreground">
                 {branch.city ?? '—'}{branch.state ? `, ${branch.state}` : ''}
               </p>
             </div>
 
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Postal Code
               </p>
-              <p className="mt-1.5 text-sm text-[#F5F7FA]">
+              <p className="mt-1.5 text-sm text-foreground">
                 {branch.postalCode ?? '—'}
               </p>
             </div>
 
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Address
               </p>
-              <p className="mt-1.5 text-sm text-[#F5F7FA]">
+              <p className="mt-1.5 text-sm text-foreground">
                 {branch.address ?? '—'}
               </p>
             </div>
 
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Phone
               </p>
-              <p className="mt-1.5 text-sm text-[#F5F7FA]">
+              <p className="mt-1.5 text-sm text-foreground">
                 {branch.phone ?? '—'}
               </p>
             </div>

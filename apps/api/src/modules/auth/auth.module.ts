@@ -4,9 +4,11 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PassportModule } from '@nestjs/passport';
 
 import { PrismaModule } from '../../database/prisma/prisma.module';
+import { SupportModule } from '../support/support.module';
 
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { SmsDispatcherService } from './sms-dispatcher.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { PermissionsGuard } from './guards/permissions.guard';
 import { TenantAccessGuard } from './guards/tenant-access.guard';
@@ -16,6 +18,7 @@ import { BranchAccessGuard } from './guards/branch-access.guard';
 @Module({
   imports: [
     PrismaModule,
+    SupportModule,
     PassportModule,
     ConfigModule,
     JwtModule.registerAsync({
@@ -32,6 +35,7 @@ import { BranchAccessGuard } from './guards/branch-access.guard';
   controllers: [AuthController],
   providers: [
     AuthService,
+    SmsDispatcherService,
     JwtStrategy,
     PermissionsGuard,
     TenantAccessGuard,
@@ -40,6 +44,7 @@ import { BranchAccessGuard } from './guards/branch-access.guard';
   ],
   exports: [
     AuthService,
+    SmsDispatcherService,
     PermissionsGuard,
     TenantAccessGuard,
     RestaurantAccessGuard,

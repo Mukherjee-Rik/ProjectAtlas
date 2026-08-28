@@ -171,7 +171,7 @@ export function ReportBuilderWizard() {
   return (
     <div className="space-y-6">
       {/* Wizard Step Indicator */}
-      <div className="bg-card border border-border rounded-xl p-4 flex items-center justify-between overflow-x-auto gap-2 text-xs font-semibold">
+      <div className="bg-card border border-border rounded-xl p-3 flex items-center justify-between overflow-x-auto gap-2 text-xs font-semibold shadow-md">
         {[
           { num: 1, label: 'Data Source', icon: Database },
           { num: 2, label: 'Metrics', icon: CheckSquare },
@@ -188,16 +188,16 @@ export function ReportBuilderWizard() {
             <button
               key={s.num}
               onClick={() => setStep(s.num)}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg whitespace-nowrap transition-all ${
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg whitespace-nowrap transition-all ${
                 isActive
-                  ? 'bg-primary text-primary-foreground font-bold shadow-xs'
+                  ? 'bg-primary text-background font-bold shadow-sm'
                   : isDone
-                  ? 'text-foreground hover:bg-muted'
-                  : 'text-muted-foreground hover:bg-muted/50'
+                  ? 'text-foreground hover:bg-secondary'
+                  : 'text-muted-foreground hover:bg-secondary'
               }`}
             >
-              <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] ${
-                isActive ? 'bg-primary-foreground text-primary' : 'bg-muted text-foreground'
+              <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${
+                isActive ? 'bg-background text-primary' : 'bg-secondary text-foreground border border-border'
               }`}>
                 {s.num}
               </span>
@@ -209,14 +209,14 @@ export function ReportBuilderWizard() {
       </div>
 
       {error && (
-        <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-500 text-xs font-semibold">
+        <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-semibold">
           {error}
         </div>
       )}
 
       {/* Step 1: Data Source */}
       {step === 1 && (
-        <div className="bg-card border border-border rounded-xl p-6 space-y-4 shadow-xs">
+        <div className="bg-card border border-border rounded-xl p-6 space-y-4">
           <h3 className="text-base font-bold text-foreground">Step 1: Choose Operational Data Source</h3>
           <p className="text-xs text-muted-foreground">
             Select the primary data domain you wish to query
@@ -236,8 +236,8 @@ export function ReportBuilderWizard() {
                 }}
                 className={`p-4 rounded-xl border cursor-pointer transition-all ${
                   dataSource === ds.id
-                    ? 'border-primary bg-primary/10 shadow-xs'
-                    : 'border-border bg-card hover:border-primary/40'
+                    ? 'border-primary bg-primary/10 shadow-sm'
+                    : 'border-border bg-secondary hover:border-primary/40'
                 }`}
               >
                 <div className="font-bold text-sm text-foreground">{ds.label}</div>
@@ -250,7 +250,7 @@ export function ReportBuilderWizard() {
 
       {/* Step 2: Metrics */}
       {step === 2 && (
-        <div className="bg-card border border-border rounded-xl p-6 space-y-4 shadow-xs">
+        <div className="bg-card border border-border rounded-xl p-6 space-y-4">
           <h3 className="text-base font-bold text-foreground">Step 2: Select Report Metrics</h3>
           <p className="text-xs text-muted-foreground">
             Choose what calculations you want to include in this report
@@ -266,12 +266,12 @@ export function ReportBuilderWizard() {
                   className={`p-3.5 rounded-xl border flex items-center justify-between cursor-pointer transition-all text-xs font-semibold ${
                     isChecked
                       ? 'border-primary bg-primary/10 text-primary'
-                      : 'border-border bg-card text-foreground hover:bg-muted/30'
+                      : 'border-border bg-secondary text-foreground hover:border-primary/40'
                   }`}
                 >
                   <span>{m.label}</span>
-                  <div className={`w-4 h-4 rounded border flex items-center justify-center ${
-                    isChecked ? 'bg-primary border-primary text-primary-foreground' : 'border-border'
+                  <div className={`w-4 h-4 rounded border flex items-center justify-center font-bold text-[10px] ${
+                    isChecked ? 'bg-primary border-primary text-background' : 'border-border bg-background'
                   }`}>
                     {isChecked && '✓'}
                   </div>
@@ -284,7 +284,7 @@ export function ReportBuilderWizard() {
 
       {/* Step 3: Dimension */}
       {step === 3 && (
-        <div className="bg-card border border-border rounded-xl p-6 space-y-4 shadow-xs">
+        <div className="bg-card border border-border rounded-xl p-6 space-y-4">
           <h3 className="text-base font-bold text-foreground">Step 3: Choose Grouping Dimension</h3>
           <p className="text-xs text-muted-foreground">
             Select how the metrics should be grouped
@@ -297,8 +297,8 @@ export function ReportBuilderWizard() {
                 onClick={() => setSelectedDimension(d.id)}
                 className={`p-3.5 rounded-xl border cursor-pointer transition-all text-xs font-semibold ${
                   selectedDimension === d.id
-                    ? 'border-primary bg-primary/10 text-primary shadow-xs'
-                    : 'border-border bg-card text-foreground hover:bg-muted/30'
+                    ? 'border-primary bg-primary/10 text-primary shadow-sm'
+                    : 'border-border bg-secondary text-foreground hover:border-primary/40'
                 }`}
               >
                 {d.label}
@@ -310,7 +310,7 @@ export function ReportBuilderWizard() {
 
       {/* Step 4: Date Range & Limits */}
       {step === 4 && (
-        <div className="bg-card border border-border rounded-xl p-6 space-y-5 shadow-xs">
+        <div className="bg-card border border-border rounded-xl p-6 space-y-5">
           <h3 className="text-base font-bold text-foreground">Step 4: Date Range & Result Limits</h3>
 
           <div>
@@ -323,8 +323,8 @@ export function ReportBuilderWizard() {
                   onClick={() => setDatePreset(preset)}
                   className={`py-2 px-3 rounded-lg border transition-all ${
                     datePreset === preset
-                      ? 'border-primary bg-primary/10 text-primary'
-                      : 'border-border bg-card text-muted-foreground hover:text-foreground'
+                      ? 'border-primary bg-primary/15 text-primary font-bold'
+                      : 'border-border bg-secondary text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   {preset.replace(/_/g, ' ')}
@@ -339,7 +339,7 @@ export function ReportBuilderWizard() {
               <select
                 value={sortDirection}
                 onChange={(e) => setSortDirection(e.target.value as any)}
-                className="w-full px-3 py-2 rounded-lg border border-border bg-background text-xs font-medium text-foreground"
+                className="w-full px-3 py-2 rounded-lg border border-border bg-background text-xs font-medium text-foreground focus:border-primary focus:outline-none"
               >
                 <option value="DESC">Highest First (Descending)</option>
                 <option value="ASC">Lowest First (Ascending)</option>
@@ -351,7 +351,7 @@ export function ReportBuilderWizard() {
               <select
                 value={limit || ''}
                 onChange={(e) => setLimit(e.target.value ? Number(e.target.value) : undefined)}
-                className="w-full px-3 py-2 rounded-lg border border-border bg-background text-xs font-medium text-foreground"
+                className="w-full px-3 py-2 rounded-lg border border-border bg-background text-xs font-medium text-foreground focus:border-primary focus:outline-none"
               >
                 <option value="">All Results</option>
                 <option value="5">Top 5</option>
@@ -365,7 +365,7 @@ export function ReportBuilderWizard() {
 
       {/* Step 5: Visualization */}
       {step === 5 && (
-        <div className="bg-card border border-border rounded-xl p-6 space-y-4 shadow-xs">
+        <div className="bg-card border border-border rounded-xl p-6 space-y-4">
           <h3 className="text-base font-bold text-foreground">Step 5: Select Visualization</h3>
           <p className="text-xs text-muted-foreground">
             Choose how to present the generated report data
@@ -378,8 +378,8 @@ export function ReportBuilderWizard() {
                 onClick={() => setVisualizationType(v.id)}
                 className={`p-4 rounded-xl border cursor-pointer transition-all ${
                   visualizationType === v.id
-                    ? 'border-primary bg-primary/10 shadow-xs'
-                    : 'border-border bg-card hover:border-primary/40'
+                    ? 'border-primary bg-primary/10 shadow-sm'
+                    : 'border-border bg-secondary hover:border-primary/40'
                 }`}
               >
                 <div className="font-bold text-sm text-foreground">{v.label}</div>
@@ -393,7 +393,7 @@ export function ReportBuilderWizard() {
       {/* Step 6: Preview & Save */}
       {step === 6 && (
         <div className="space-y-6">
-          <div className="bg-card border border-border rounded-xl p-6 space-y-4 shadow-xs">
+          <div className="bg-card border border-border rounded-xl p-6 space-y-4">
             <h3 className="text-base font-bold text-foreground">Step 6: Name, Preview & Save</h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -403,7 +403,7 @@ export function ReportBuilderWizard() {
                   type="text"
                   value={reportName}
                   onChange={(e) => setReportName(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-border bg-background text-xs font-medium text-foreground"
+                  className="w-full px-3 py-2 rounded-lg border border-border bg-background text-xs font-medium text-foreground focus:border-primary focus:outline-none"
                 />
               </div>
               <div>
@@ -413,7 +413,7 @@ export function ReportBuilderWizard() {
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="e.g. Monthly breakdown of dish velocity"
-                  className="w-full px-3 py-2 rounded-lg border border-border bg-background text-xs font-medium text-foreground"
+                  className="w-full px-3 py-2 rounded-lg border border-border bg-background text-xs font-medium text-foreground focus:border-primary focus:outline-none"
                 />
               </div>
             </div>
@@ -423,9 +423,9 @@ export function ReportBuilderWizard() {
                 type="button"
                 onClick={handlePreview}
                 disabled={previewLoading}
-                className="px-4 py-2 rounded-xl text-xs font-bold bg-muted hover:bg-muted/80 text-foreground transition-all flex items-center gap-1.5"
+                className="px-4 py-2 rounded-lg text-xs font-bold bg-secondary border border-border hover:border-primary text-foreground transition-all flex items-center gap-1.5"
               >
-                <Eye className="w-3.5 h-3.5" />
+                <Eye className="w-3.5 h-3.5 text-primary" />
                 {previewLoading ? 'Executing Query...' : 'Run Live Preview'}
               </button>
             </div>
@@ -449,7 +449,7 @@ export function ReportBuilderWizard() {
         {step > 1 ? (
           <button
             onClick={() => setStep(step - 1)}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-muted text-foreground hover:bg-muted/80 transition-all"
+            className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-xs font-semibold bg-secondary border border-border text-foreground hover:border-primary transition-all"
           >
             <ChevronLeft className="w-4 h-4" />
             Previous Step
@@ -459,7 +459,7 @@ export function ReportBuilderWizard() {
         {step < 6 ? (
           <button
             onClick={() => setStep(step + 1)}
-            className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-xs font-bold bg-primary text-primary-foreground hover:bg-primary/90 transition-all shadow-xs"
+            className="flex items-center gap-1.5 px-5 py-2.5 rounded-lg text-xs font-bold bg-primary text-background hover:bg-primary-hover transition-all shadow-md"
           >
             Next Step
             <ChevronRight className="w-4 h-4" />
@@ -468,7 +468,7 @@ export function ReportBuilderWizard() {
           <button
             onClick={handleSave}
             disabled={saving}
-            className="flex items-center gap-1.5 px-6 py-2.5 rounded-xl text-xs font-bold bg-primary text-primary-foreground hover:bg-primary/90 transition-all shadow-xs"
+            className="flex items-center gap-1.5 px-6 py-2.5 rounded-lg text-xs font-bold bg-primary text-background hover:bg-primary-hover transition-all shadow-md"
           >
             <Save className="w-4 h-4" />
             {saving ? 'Saving...' : 'Save & Publish Report'}

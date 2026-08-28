@@ -293,4 +293,12 @@ export const analyticsService = {
   saveReport(data: { name: string; description?: string; reportType: string; filters: Record<string, any> }) {
     return apiClient.post<{ success: boolean; data: SavedReport }>('/analytics/reports', data);
   },
+  exportCsv(type: 'ORDERS' | 'MENU', filter?: AnalyticsQueryFilter) {
+    const params = new URLSearchParams();
+    if (filter?.dateFrom) params.append('dateFrom', filter.dateFrom);
+    if (filter?.dateTo) params.append('dateTo', filter.dateTo);
+    if (filter?.branchId) params.append('branchId', filter.branchId);
+    params.append('type', type);
+    return apiClient.get<string>(`/analytics/export?${params.toString()}`);
+  },
 };

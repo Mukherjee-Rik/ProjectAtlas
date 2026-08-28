@@ -11,12 +11,12 @@ interface ProfileCardProps {
 
 export function ProfileCard({ user }: ProfileCardProps) {
   return (
-    <div className="overflow-hidden rounded-xl border border-[#26313C] bg-[#111820] shadow-xl">
-      <div className="border-b border-[#26313C] p-6 bg-[#18212B]/40">
-        <h2 className="text-xl font-bold text-[#F5F7FA]">
+    <div className="overflow-hidden rounded-xl border border-border bg-card">
+      <div className="border-b border-border p-6 bg-secondary/40">
+        <h2 className="text-xl font-bold text-foreground">
           Personal Information
         </h2>
-        <p className="mt-1 text-sm text-[#9AA6B2]">
+        <p className="mt-1 text-sm text-muted-foreground">
           Your account details and status
         </p>
       </div>
@@ -24,43 +24,43 @@ export function ProfileCard({ user }: ProfileCardProps) {
       <div className="p-6 space-y-6">
         <div className="grid gap-6 sm:grid-cols-2">
           <div>
-            <p className="text-xs font-medium uppercase tracking-wider text-[#9AA6B2]">
+            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
               Name
             </p>
-            <p className="mt-1.5 text-base font-semibold text-[#F5F7FA]">
+            <p className="mt-1.5 text-base font-semibold text-foreground">
               {user.name}
             </p>
           </div>
 
           <div>
-            <p className="text-xs font-medium uppercase tracking-wider text-[#9AA6B2]">
+            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
               Email Address
             </p>
-            <p className="mt-1.5 text-base font-semibold text-[#F5F7FA]">
+            <p className="mt-1.5 text-base font-semibold text-foreground">
               {user.email}
             </p>
           </div>
 
           <div>
-            <p className="text-xs font-medium uppercase tracking-wider text-[#9AA6B2]">
+            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
               Phone Number
             </p>
-            <p className="mt-1.5 text-base font-semibold text-[#F5F7FA]">
+            <p className="mt-1.5 text-base font-semibold text-foreground">
               {user.phone ?? 'Not provided'}
             </p>
           </div>
 
           <div>
-            <p className="text-xs font-medium uppercase tracking-wider text-[#9AA6B2]">
+            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
               Account Created
             </p>
-            <p className="mt-1.5 text-base font-semibold text-[#F5F7FA]">
+            <p className="mt-1.5 text-base font-semibold text-foreground">
               {new Date(user.createdAt).toLocaleDateString()}
             </p>
           </div>
 
           <div>
-            <p className="text-xs font-medium uppercase tracking-wider text-[#9AA6B2]">
+            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
               Role
             </p>
             <div className="mt-1.5">
@@ -69,7 +69,7 @@ export function ProfileCard({ user }: ProfileCardProps) {
           </div>
 
           <div>
-            <p className="text-xs font-medium uppercase tracking-wider text-[#9AA6B2]">
+            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
               Status
             </p>
             <div className="mt-1.5">
@@ -78,10 +78,10 @@ export function ProfileCard({ user }: ProfileCardProps) {
           </div>
         </div>
 
-        <div className="flex justify-end border-t border-[#26313C] pt-6">
+        <div className="flex justify-end border-t border-border pt-6">
           <Link
             href="/profile/edit"
-            className="rounded-lg bg-[#2AFEB7] px-4 py-2 text-sm font-semibold text-[#0B0F14] transition-all hover:bg-[#22E5A4] active:scale-[0.99]"
+            className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-background transition-all hover:bg-primary-hover active:scale-[0.99]"
           >
             Edit Profile
           </Link>

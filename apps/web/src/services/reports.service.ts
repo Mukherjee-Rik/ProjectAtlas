@@ -130,4 +130,7 @@ export const reportsService = {
   deleteSchedule(scheduleId: string) {
     return apiClient.delete<{ success: boolean }>(`/reports/schedules/${scheduleId}`);
   },
+  exportReportCsv(id: string) {
+    return apiClient.get<string>(`/reports/${id}/export`);
+  },
 };

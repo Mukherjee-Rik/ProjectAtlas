@@ -70,8 +70,8 @@ export default function EditTablePage({
   if (isLoading) {
     return (
       <div className="space-y-6 max-w-3xl">
-        <h1 className="text-3xl font-bold text-[#F5F7FA]">Edit Table</h1>
-        <div className="rounded-xl border border-[#26313C] bg-[#111820] p-8 text-center text-[#9AA6B2]">
+        <h1 className="font-display text-3xl font-semibold tracking-[-0.02em] text-foreground">Edit Table</h1>
+        <div className="rounded-xl border border-border bg-card p-8 text-center text-muted-foreground">
           Loading table information...
         </div>
       </div>
@@ -81,13 +81,13 @@ export default function EditTablePage({
   if (error || !table) {
     return (
       <div className="space-y-6 max-w-3xl">
-        <h1 className="text-3xl font-bold text-[#F5F7FA]">Edit Table</h1>
-        <div className="rounded-xl border border-[#EF4444]/40 bg-[#EF4444]/10 p-8 text-center text-[#EF4444]">
+        <h1 className="font-display text-3xl font-semibold tracking-[-0.02em] text-foreground">Edit Table</h1>
+        <div className="rounded-xl border border-atlas-error/40 bg-atlas-error/10 p-8 text-center text-atlas-error">
           <p>{error || 'Table not found.'}</p>
           <button
             type="button"
             onClick={() => router.push('/tables')}
-            className="mt-4 rounded-lg border border-[#26313C] bg-[#18212B] px-4 py-2 text-sm text-[#F5F7FA]"
+            className="mt-4 rounded-lg border border-border bg-secondary px-4 py-2 text-sm text-foreground"
           >
             Back to Tables
           </button>
@@ -99,14 +99,14 @@ export default function EditTablePage({
   return (
     <div className="space-y-6 max-w-3xl">
       <div>
-        <h1 className="text-3xl font-bold text-[#F5F7FA]">Edit Table</h1>
-        <p className="mt-2 text-[#9AA6B2]">
-          Updating <span className="font-semibold text-[#F5F7FA]">{table.name}</span> ({table.code}).
+        <h1 className="font-display text-3xl font-semibold tracking-[-0.02em] text-foreground">Edit Table</h1>
+        <p className="mt-2 text-muted-foreground">
+          Updating <span className="font-semibold text-foreground">{table.name}</span> ({table.code}).
         </p>
       </div>
 
       {error && (
-        <div className="rounded-lg border border-[#EF4444]/40 bg-[#EF4444]/10 p-4 text-sm text-[#EF4444]">
+        <div className="rounded-lg border border-atlas-error/40 bg-atlas-error/10 p-4 text-sm text-atlas-error">
           {error}
         </div>
       )}

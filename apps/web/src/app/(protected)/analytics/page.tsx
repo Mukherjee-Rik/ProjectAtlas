@@ -19,6 +19,8 @@ import { CustomerCohortTable } from '@/components/analytics/customer-cohort-tabl
 import { BranchBenchmarkingView } from '@/components/analytics/branch-benchmarking-view';
 import { OperationalHeatmap } from '@/components/analytics/operational-heatmap';
 import { DrillDownModal } from '@/components/analytics/drill-down-modal';
+import { useRestaurant } from '@/hooks/use-restaurant';
+import { useBranch } from '@/hooks/use-branch';
 import {
   TrendingUp,
   Download,
@@ -32,6 +34,9 @@ import {
 } from 'lucide-react';
 
 export default function AnalyticsPage() {
+  const { currentRestaurant } = useRestaurant();
+  const { currentBranch } = useBranch();
+
   const [activeTab, setActiveTab] = useState<'overview' | 'revenue' | 'menu' | 'customers' | 'branches' | 'operations'>(
     'overview',
   );
@@ -66,10 +71,11 @@ export default function AnalyticsPage() {
   const loadData = async () => {
     setLoading(true);
     const { dateFrom, dateTo } = getDateRange(periodPreset);
+    const effectiveBranch = selectedBranchId || currentBranch?.id || undefined;
     const filter = {
       dateFrom,
       dateTo,
-      branchId: selectedBranchId || undefined,
+      branchId: effectiveBranch,
     };
 
     try {
@@ -99,7 +105,7 @@ export default function AnalyticsPage() {
 
   useEffect(() => {
     loadData();
-  }, [periodPreset, selectedBranchId]);
+  }, [periodPreset, selectedBranchId, currentRestaurant?.id, currentBranch?.id]);
 
   const handleKpiClick = (kpiKey: string) => {
     setDrillDownTitle(`Underlying Orders (${kpiKey.replace(/_/g, ' ').toUpperCase()})`);
@@ -108,29 +114,61 @@ export default function AnalyticsPage() {
     setDrillDownOpen(true);
   };
 
-  const handleExport = (type: 'ORDERS' | 'MENU') => {
-    const { dateFrom, dateTo } = getDateRange(periodPreset);
-    const params = new URLSearchParams({
-      dateFrom,
-      dateTo,
-      type,
-      ...(selectedBranchId ? { branchId: selectedBranchId } : {}),
-    });
-    window.open(`/api/v1/analytics/export?${params.toString()}`, '_blank');
+  const [isExporting, setIsExporting] = useState(false);
+
+  const handleExport = async (type: 'ORDERS' | 'MENU') => {
+    try {
+      setIsExporting(true);
+      const { dateFrom, dateTo } = getDateRange(periodPreset);
+      const effectiveBranch = selectedBranchId || currentBranch?.id || undefined;
+      const csvData = await analyticsService.exportCsv(type, {
+        dateFrom,
+        dateTo,
+        branchId: effectiveBranch,
+      });
+
+      if (!csvData) {
+        alert('No data available to export for the selected period.');
+        return;
+      }
+
+      // Create blob and trigger automatic browser download
+      const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute(
+        'download',
+        `atlas_${type.toLowerCase()}_analytics_${new Date().toISOString().slice(0, 10)}.csv`,
+      );
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (err: any) {
+      console.error('Export failed:', err);
+      alert('Failed to export CSV: ' + (err.message || 'Unknown error'));
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   return (
-    <div className="space-y-6 pb-12">
+    <div className="space-y-8 pb-12">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2.5">
-            <TrendingUp className="w-6 h-6 text-primary" />
-            <h1 className="text-2xl font-bold tracking-tight text-foreground">Advanced Analytics Engine</h1>
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary border border-primary/20">
+              <TrendingUp className="w-5 h-5" />
+            </div>
+            <div>
+              <h1 className="font-display text-3xl font-semibold tracking-[-0.02em] text-foreground">Advanced Analytics Engine</h1>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Single-source-of-truth data intelligence, multi-period comparisons, and drill-down metrics.
+              </p>
+            </div>
           </div>
-          <p className="text-xs text-muted-foreground mt-1">
-            Single-source-of-truth data intelligence, multi-period comparisons, and drill-down metrics
-          </p>
         </div>
 
         {/* Global Filter Bar */}
@@ -140,7 +178,7 @@ export default function AnalyticsPage() {
             <select
               value={selectedBranchId}
               onChange={(e) => setSelectedBranchId(e.target.value)}
-              className="px-3 py-1.5 rounded-xl border border-border bg-card text-xs font-medium text-foreground focus:outline-hidden focus:ring-2 focus:ring-primary/40"
+              className="px-3 py-2 rounded-xl border border-border bg-card text-xs font-medium text-foreground focus:border-primary focus:outline-none"
             >
               <option value="">All Branches ({branchData.branches.length})</option>
               {branchData.branches.map((b) => (
@@ -152,35 +190,35 @@ export default function AnalyticsPage() {
           )}
 
           {/* Period Presets */}
-          <div className="flex items-center p-1 bg-muted/60 rounded-xl text-xs font-medium border border-border/50">
+          <div className="flex items-center p-1 bg-card rounded-xl text-xs font-medium border border-border">
             <button
               onClick={() => setPeriodPreset('7D')}
-              className={`px-3 py-1 rounded-lg transition-all ${
-                periodPreset === '7D' ? 'bg-background shadow-xs font-semibold text-foreground' : 'text-muted-foreground'
+              className={`px-3 py-1.5 rounded-lg transition-all ${
+                periodPreset === '7D' ? 'bg-primary font-bold text-background shadow-sm' : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               7 Days
             </button>
             <button
               onClick={() => setPeriodPreset('30D')}
-              className={`px-3 py-1 rounded-lg transition-all ${
-                periodPreset === '30D' ? 'bg-background shadow-xs font-semibold text-foreground' : 'text-muted-foreground'
+              className={`px-3 py-1.5 rounded-lg transition-all ${
+                periodPreset === '30D' ? 'bg-primary font-bold text-background shadow-sm' : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               30 Days
             </button>
             <button
               onClick={() => setPeriodPreset('90D')}
-              className={`px-3 py-1 rounded-lg transition-all ${
-                periodPreset === '90D' ? 'bg-background shadow-xs font-semibold text-foreground' : 'text-muted-foreground'
+              className={`px-3 py-1.5 rounded-lg transition-all ${
+                periodPreset === '90D' ? 'bg-primary font-bold text-background shadow-sm' : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               Quarter
             </button>
             <button
               onClick={() => setPeriodPreset('1Y')}
-              className={`px-3 py-1 rounded-lg transition-all ${
-                periodPreset === '1Y' ? 'bg-background shadow-xs font-semibold text-foreground' : 'text-muted-foreground'
+              className={`px-3 py-1.5 rounded-lg transition-all ${
+                periodPreset === '1Y' ? 'bg-primary font-bold text-background shadow-sm' : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               Year
@@ -189,24 +227,31 @@ export default function AnalyticsPage() {
 
           {/* Export Dropdown */}
           <div className="relative group">
-            <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary text-primary-foreground text-xs font-semibold shadow-xs hover:bg-primary/90 transition-all">
-              <Download className="w-3.5 h-3.5" />
-              Export
+            <button
+              disabled={isExporting}
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary text-background text-xs font-bold shadow-md hover:bg-primary-hover transition-all ${
+                isExporting ? 'opacity-70 cursor-not-allowed' : ''
+              }`}
+            >
+              <Download className={`w-3.5 h-3.5 ${isExporting ? 'animate-bounce' : ''}`} />
+              {isExporting ? 'Exporting...' : 'Export'}
             </button>
-            <div className="absolute right-0 top-full mt-1.5 w-44 bg-card border border-border rounded-xl shadow-xl p-1 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-all z-30">
-              <button
-                onClick={() => handleExport('ORDERS')}
-                className="w-full text-left px-3 py-2 text-xs rounded-lg hover:bg-muted font-medium text-foreground transition-colors"
-              >
-                Export Orders CSV
-              </button>
-              <button
-                onClick={() => handleExport('MENU')}
-                className="w-full text-left px-3 py-2 text-xs rounded-lg hover:bg-muted font-medium text-foreground transition-colors"
-              >
-                Export Menu Analytics CSV
-              </button>
-            </div>
+            {!isExporting && (
+              <div className="absolute right-0 top-full mt-1.5 w-48 bg-card border border-border rounded-xl p-1.5 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-all z-30">
+                <button
+                  onClick={() => handleExport('ORDERS')}
+                  className="w-full text-left px-3 py-2 text-xs rounded-lg hover:bg-secondary font-medium text-foreground transition-colors"
+                >
+                  Export Orders CSV
+                </button>
+                <button
+                  onClick={() => handleExport('MENU')}
+                  className="w-full text-left px-3 py-2 text-xs rounded-lg hover:bg-secondary font-medium text-foreground transition-colors"
+                >
+                  Export Menu Analytics CSV
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -219,10 +264,10 @@ export default function AnalyticsPage() {
       />
 
       {/* Main Tabs Navigation */}
-      <div className="flex items-center gap-2 border-b border-border/80 pb-px overflow-x-auto">
+      <div className="flex items-center gap-2 border-b border-border pb-px overflow-x-auto">
         <button
           onClick={() => setActiveTab('overview')}
-          className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold border-b-2 transition-all whitespace-nowrap ${
+          className={`flex items-center gap-2 px-4 py-3 text-xs font-semibold border-b-2 transition-all whitespace-nowrap ${
             activeTab === 'overview'
               ? 'border-primary text-primary font-bold'
               : 'border-transparent text-muted-foreground hover:text-foreground'
@@ -233,7 +278,7 @@ export default function AnalyticsPage() {
         </button>
         <button
           onClick={() => setActiveTab('revenue')}
-          className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold border-b-2 transition-all whitespace-nowrap ${
+          className={`flex items-center gap-2 px-4 py-3 text-xs font-semibold border-b-2 transition-all whitespace-nowrap ${
             activeTab === 'revenue'
               ? 'border-primary text-primary font-bold'
               : 'border-transparent text-muted-foreground hover:text-foreground'
@@ -244,7 +289,7 @@ export default function AnalyticsPage() {
         </button>
         <button
           onClick={() => setActiveTab('menu')}
-          className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold border-b-2 transition-all whitespace-nowrap ${
+          className={`flex items-center gap-2 px-4 py-3 text-xs font-semibold border-b-2 transition-all whitespace-nowrap ${
             activeTab === 'menu'
               ? 'border-primary text-primary font-bold'
               : 'border-transparent text-muted-foreground hover:text-foreground'
@@ -255,7 +300,7 @@ export default function AnalyticsPage() {
         </button>
         <button
           onClick={() => setActiveTab('customers')}
-          className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold border-b-2 transition-all whitespace-nowrap ${
+          className={`flex items-center gap-2 px-4 py-3 text-xs font-semibold border-b-2 transition-all whitespace-nowrap ${
             activeTab === 'customers'
               ? 'border-primary text-primary font-bold'
               : 'border-transparent text-muted-foreground hover:text-foreground'
@@ -266,7 +311,7 @@ export default function AnalyticsPage() {
         </button>
         <button
           onClick={() => setActiveTab('branches')}
-          className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold border-b-2 transition-all whitespace-nowrap ${
+          className={`flex items-center gap-2 px-4 py-3 text-xs font-semibold border-b-2 transition-all whitespace-nowrap ${
             activeTab === 'branches'
               ? 'border-primary text-primary font-bold'
               : 'border-transparent text-muted-foreground hover:text-foreground'
@@ -277,7 +322,7 @@ export default function AnalyticsPage() {
         </button>
         <button
           onClick={() => setActiveTab('operations')}
-          className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold border-b-2 transition-all whitespace-nowrap ${
+          className={`flex items-center gap-2 px-4 py-3 text-xs font-semibold border-b-2 transition-all whitespace-nowrap ${
             activeTab === 'operations'
               ? 'border-primary text-primary font-bold'
               : 'border-transparent text-muted-foreground hover:text-foreground'

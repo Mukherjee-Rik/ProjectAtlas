@@ -36,18 +36,18 @@ export default function CreateUserPage() {
   return (
     <div className="mx-auto max-w-2xl space-y-8">
       <div>
-        <h1 className="text-3xl font-bold text-[#F5F7FA]">
+        <h1 className="font-display text-3xl font-semibold tracking-[-0.02em] text-foreground">
           Create User
         </h1>
 
-        <p className="mt-2 text-sm text-[#9AA6B2]">
+        <p className="mt-2 text-sm text-muted-foreground">
           Create a new Atlas user.
         </p>
       </div>
 
-      <div className="rounded-2xl border border-[#26313C] bg-[#111820] p-8 shadow-xl">
+      <div className="rounded-2xl border border-border bg-card p-8">
         {error && (
-          <div className="mb-5 rounded-lg border border-[#EF4444]/30 bg-[#EF4444]/10 p-3 text-sm font-medium text-[#EF4444]">
+          <div className="mb-5 rounded-lg border border-atlas-error/30 bg-atlas-error/10 p-3 text-sm font-medium text-atlas-error">
             {error}
           </div>
         )}

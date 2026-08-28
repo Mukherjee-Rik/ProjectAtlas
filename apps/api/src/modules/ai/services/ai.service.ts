@@ -51,7 +51,11 @@ export class AiService {
     this.checkRateLimit(userId);
 
     const { intent } = detectIntent(query);
-    const isFinancialQuery = intent === 'SALES_REVENUE';
+    // FORECAST and COMPARISON both surface revenue figures, so they must sit
+    // behind the same permission gate as a direct sales question — otherwise
+    // they bypass the block and its audit entry.
+    const FINANCIAL_INTENTS = ['SALES_REVENUE', 'FORECAST', 'COMPARISON'];
+    const isFinancialQuery = FINANCIAL_INTENTS.includes(intent);
 
     // Enforce permission checks: waiters/kitchen staff cannot query sales context
     const allowedRoles: UserRole[] = [UserRole.PLATFORM_ADMIN, UserRole.OWNER, UserRole.ADMIN, UserRole.MANAGER];
@@ -116,7 +120,7 @@ NATURAL LANGUAGE UNDERSTANDING (NLU) DIRECTIVES:
 
     const fullPrompt = `${systemPrompt}\n\nHistory:\n${chatHistoryText}\n\nUser Question: ${query}`;
 
-    const { text, inputTokens, outputTokens } = await this.provider.generate(fullPrompt, aiContext, query);
+    const { text, inputTokens, outputTokens } = await this.provider.generate(fullPrompt, aiContext, query, history);
 
     const requestId = crypto.randomUUID();
 

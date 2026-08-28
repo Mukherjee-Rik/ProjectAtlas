@@ -87,6 +87,17 @@ export class TtlCacheService implements OnModuleDestroy {
     this.store.set(key, { value, expiresAt: Date.now() + ttlMs });
   }
 
+  get<T>(key: string): T | undefined {
+    const hit = this.store.get(key);
+    if (hit && hit.expiresAt > Date.now()) {
+      return hit.value as T;
+    }
+    if (hit) {
+      this.store.delete(key);
+    }
+    return undefined;
+  }
+
   invalidate(key: string): void {
     this.store.delete(key);
     this.inflight.delete(key);

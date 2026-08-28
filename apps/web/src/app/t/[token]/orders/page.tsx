@@ -7,13 +7,13 @@ import { getPublicOrders } from '@/services/orders.service';
 import { formatCurrency } from '@/lib/currency';
 
 const STATUS_STYLE: Record<string, { bg: string; text: string; border: string }> = {
-  PENDING: { bg: 'bg-[#EAB308]/15', text: 'text-[#EAB308]', border: 'border-[#EAB308]/30' },
-  CONFIRMED: { bg: 'bg-[#3B82F6]/15', text: 'text-[#3B82F6]', border: 'border-[#3B82F6]/30' },
+  PENDING: { bg: 'bg-atlas-warning/15', text: 'text-atlas-warning', border: 'border-atlas-warning/30' },
+  CONFIRMED: { bg: 'bg-atlas-info/15', text: 'text-atlas-info', border: 'border-atlas-info/30' },
   PREPARING: { bg: 'bg-[#A855F7]/15', text: 'text-[#A855F7]', border: 'border-[#A855F7]/30' },
-  READY: { bg: 'bg-[#22C55E]/15', text: 'text-[#22C55E]', border: 'border-[#22C55E]/30' },
-  SERVED: { bg: 'bg-[#2AFEB7]/15', text: 'text-[#2AFEB7]', border: 'border-[#2AFEB7]/30' },
-  COMPLETED: { bg: 'bg-[#9AA6B2]/15', text: 'text-[#9AA6B2]', border: 'border-[#9AA6B2]/30' },
-  CANCELLED: { bg: 'bg-[#EF4444]/15', text: 'text-[#EF4444]', border: 'border-[#EF4444]/30' },
+  READY: { bg: 'bg-atlas-success/15', text: 'text-atlas-success', border: 'border-atlas-success/30' },
+  SERVED: { bg: 'bg-primary/15', text: 'text-primary', border: 'border-primary/30' },
+  COMPLETED: { bg: 'bg-muted-foreground/15', text: 'text-muted-foreground', border: 'border-muted-foreground/30' },
+  CANCELLED: { bg: 'bg-atlas-error/15', text: 'text-atlas-error', border: 'border-atlas-error/30' },
 };
 
 export default function CustomerOrdersHistoryPage({
@@ -55,18 +55,18 @@ export default function CustomerOrdersHistoryPage({
   const grandTotal = activeOrders.reduce((acc, o) => acc + Number(o.totalAmount || 0), 0);
 
   return (
-    <main className="min-h-screen bg-[#0B0F14] pb-8 text-[#F5F7FA]">
-      <header className="sticky top-0 z-30 border-b border-[#26313C] bg-[#0B0F14]/95 px-4 py-4 backdrop-blur">
+    <main className="min-h-screen bg-background pb-8 text-foreground">
+      <header className="sticky top-0 z-30 border-b border-border bg-background/95 px-4 py-4 backdrop-blur">
         <div className="mx-auto flex w-full max-w-sm items-center justify-between gap-3">
           <div>
             <h1 className="text-lg font-black">Your Table Orders</h1>
-            <p className="text-[11px] text-[#9AA6B2]">
+            <p className="text-[11px] text-muted-foreground">
               {orders.length} {orders.length === 1 ? 'order' : 'orders'} placed during this session
             </p>
           </div>
           <Link
             href={`/t/${token}/menu`}
-            className="rounded-xl border border-[#26313C] px-3 py-2 text-[11px] font-semibold text-[#2AFEB7] transition-colors hover:border-[#2AFEB7]/40 hover:bg-[#2AFEB7]/10"
+            className="rounded-xl border border-border px-3 py-2 text-[11px] font-semibold text-primary transition-colors hover:border-primary/40 hover:bg-primary/10"
           >
             + Add Items
           </Link>
@@ -77,29 +77,29 @@ export default function CustomerOrdersHistoryPage({
         {isLoading && (
           <div className="space-y-3 animate-pulse">
             {[0, 1].map((k) => (
-              <div key={k} className="h-28 rounded-2xl bg-[#111820]" />
+              <div key={k} className="h-28 rounded-2xl bg-card" />
             ))}
           </div>
         )}
 
         {error && (
-          <div className="rounded-xl border border-[#EF4444]/30 bg-[#EF4444]/10 p-3 text-xs text-[#EF4444]">
+          <div className="rounded-xl border border-atlas-error/30 bg-atlas-error/10 p-3 text-xs text-atlas-error">
             {error}
           </div>
         )}
 
         {!isLoading && orders.length === 0 && (
-          <div className="space-y-4 rounded-2xl border border-[#26313C] bg-[#111820] p-8 text-center">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#18212B] text-2xl">
+          <div className="space-y-4 rounded-2xl border border-border bg-card p-8 text-center">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-secondary text-2xl">
               🧾
             </div>
             <p className="text-sm font-bold">No orders placed yet</p>
-            <p className="text-xs text-[#9AA6B2]">
+            <p className="text-xs text-muted-foreground">
               Orders created from this table will appear here in real-time.
             </p>
             <Link
               href={`/t/${token}/menu`}
-              className="inline-block rounded-xl bg-[#2AFEB7] px-5 py-3 text-xs font-bold text-[#0B0F14] shadow-md hover:bg-[#22E5A4]"
+              className="inline-block rounded-xl bg-primary px-5 py-3 text-xs font-bold text-background shadow-md hover:bg-primary-hover"
             >
               Browse the Menu
             </Link>
@@ -108,19 +108,19 @@ export default function CustomerOrdersHistoryPage({
 
         {/* Session Orders Summary Header */}
         {!isLoading && orders.length > 0 && (
-          <div className="rounded-2xl border border-[#2AFEB7]/30 bg-gradient-to-b from-[#18212B] to-[#111820] p-4 flex items-center justify-between shadow-lg">
+          <div className="rounded-2xl border border-primary/30 bg-gradient-to-b from-secondary to-card p-4 flex items-center justify-between shadow-lg">
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[#9AA6B2]">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                 Session Total ({activeOrders.length} {activeOrders.length === 1 ? 'Order' : 'Orders'})
               </span>
-              <p className="text-xl font-black text-[#2AFEB7] mt-0.5">
+              <p className="text-xl font-black text-primary mt-0.5">
                 {formatCurrency(grandTotal)}
               </p>
             </div>
 
             <Link
               href={`/t/${token}/menu`}
-              className="rounded-xl bg-[#2AFEB7] px-3.5 py-2 text-xs font-bold text-[#0B0F14] hover:bg-[#22E5A4] transition-all"
+              className="rounded-xl bg-primary px-3.5 py-2 text-xs font-bold text-background hover:bg-primary-hover transition-all"
             >
               + Order More
             </Link>
@@ -145,16 +145,16 @@ export default function CustomerOrdersHistoryPage({
               <Link
                 key={order.id}
                 href={`/t/${token}/orders/${order.id}`}
-                className="block space-y-3 rounded-2xl border border-[#26313C] bg-[#111820] p-4 transition-all hover:border-[#2AFEB7]/60 hover:shadow-[0_0_15px_rgba(42,254,183,0.1)] active:scale-[0.99]"
+                className="block space-y-3 rounded-2xl border border-border bg-card p-4 transition-all hover:border-primary/60 active:scale-[0.99]"
               >
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#2AFEB7]">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-primary">
                       {orderRound}
                     </span>
                     <div className="flex items-center gap-1.5">
-                      <span className="text-xs text-[#9AA6B2]">Token:</span>
-                      <span className="font-mono text-sm font-black text-[#F5F7FA]">
+                      <span className="text-xs text-muted-foreground">Token:</span>
+                      <span className="font-mono text-sm font-black text-foreground">
                         #{order.orderNumber}
                       </span>
                     </div>
@@ -169,15 +169,15 @@ export default function CustomerOrdersHistoryPage({
                 </div>
 
                 {/* Items preview */}
-                <div className="text-xs text-[#9AA6B2] line-clamp-2 bg-[#0B0F14]/50 p-2.5 rounded-xl border border-[#26313C]/60">
+                <div className="text-xs text-muted-foreground line-clamp-2 bg-background/50 p-2.5 rounded-xl border border-border/60">
                   {order.items?.map((i) => `${i.quantity}x ${i.name}`).join(', ')}
                 </div>
 
-                <div className="flex items-center justify-between border-t border-[#26313C] pt-2 text-xs">
-                  <span className="text-[#9AA6B2]">
+                <div className="flex items-center justify-between border-t border-border pt-2 text-xs">
+                  <span className="text-muted-foreground">
                     🕒 {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </span>
-                  <span className="font-black text-[#F5F7FA] text-sm">
+                  <span className="font-black text-foreground text-sm">
                     {formatCurrency(order.totalAmount)}
                   </span>
                 </div>

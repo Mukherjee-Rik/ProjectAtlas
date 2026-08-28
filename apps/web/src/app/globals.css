@@ -1,20 +1,103 @@
 @import "tailwindcss";
 
-:root {
-  --background: #0B0F14;
-  --foreground: #F5F7FA;
-  --surface: #111820;
-  --surface-elevated: #18212B;
-  --border-color: #26313C;
-  --primary-mint: #2AFEB7;
-  --primary-mint-hover: #22E5A4;
-  --text-primary: #F5F7FA;
-  --text-muted: #9AA6B2;
+/* ---------------------------------------------------------------------------
+   Theme — "Charcoal & red"
+   Neutral charcoal carries the interface; red is reserved for the accent, so
+   it keeps its force instead of becoming wallpaper.
 
-  --color-success: #22C55E;
-  --color-warning: #F59E0B;
-  --color-error: #EF4444;
-  --color-info: #3B82F6;
+   :root is LIGHT, .dark is DARK. Both must define every token — one that
+   exists in only one block silently inherits the other mode's value.
+
+   Rules this palette follows, each learned the hard way:
+     - The accent is a DIFFERENT red per mode. A single red cannot clear AA on
+       both charcoal and near-white.
+     - The accent and the dimmer text levels are tuned against the LIGHTEST
+       surface they land on (--secondary), not against --background. Tuning
+       against the base passes on the page and then fails on cards.
+     - Surface steps stay tight; wide steps eat the contrast headroom and
+       force every text token up until the three levels collapse into one.
+     - --subtle inverts: dimmer means lighter on a light ground, darker on a
+       dark one.
+--------------------------------------------------------------------------- */
+:root {
+  --background: #F7F7F8;
+  --foreground: #17171A; /* charcoal */
+  --surface: #FFFFFF;
+  --surface-elevated: #EBEBEE;
+  --border-color: #D8D8DE;
+  --primary-mint: #C81E1E;
+  --primary-mint-hover: #A81818;
+  --text-primary: #17171A;
+  --text-muted: #55555E;
+
+  --color-success: #15803D;
+  --color-warning: #B45309;
+  /* Deeper than the brand red so a destructive action still reads as distinct
+     from an ordinary primary one. */
+  --color-error: #8B1116;
+  --color-info: #1D4ED8;
+
+  --card: #FFFFFF;
+  --card-foreground: #17171A;
+  --popover: #FFFFFF;
+  --popover-foreground: #17171A;
+  --primary: #C81E1E; /* red */
+  --primary-hover: #A81818;
+  --primary-foreground: #FFFFFF;
+  --secondary: #EBEBEE;
+  --secondary-foreground: #17171A;
+  --muted: #EBEBEE;
+  --muted-foreground: #55555E;
+  --subtle: #6E6E78;
+  --accent: #EBEBEE;
+  --accent-foreground: #17171A;
+  --destructive: #8B1116;
+  --destructive-foreground: #FFFFFF;
+  --border: #D8D8DE;
+  --input: #EBEBEE;
+  --ring: #C81E1E;
+  --radius: 0.5rem;
+}
+
+.dark {
+  --background: #17171A; /* charcoal */
+  --foreground: #F2F2F3;
+  --surface: #1F1F23;
+  --surface-elevated: #2A2A30;
+  --border-color: #35353D;
+  --primary-mint: #FF6B6B;
+  --primary-mint-hover: #FF9090;
+  --text-primary: #F2F2F3;
+  --text-muted: #A8A8B0;
+
+  --color-success: #6EE7A8;
+  --color-warning: #E8A33D;
+  /* Lighter and pinker than the brand red so the two stay tellable apart on
+     charcoal, where deep reds go almost black. */
+  --color-error: #FF9E9E;
+  --color-info: #7FA8F0;
+
+  --card: #1F1F23;
+  --card-foreground: #F2F2F3;
+  --popover: #1F1F23;
+  --popover-foreground: #F2F2F3;
+  /* #DC2626 measures 2.96:1 on the elevated surface — well under AA — so the
+     dark accent is lifted rather than reusing the light one. */
+  --primary: #FF6B6B;
+  --primary-hover: #FF9090;
+  --primary-foreground: #17171A;
+  --secondary: #2A2A30;
+  --secondary-foreground: #F2F2F3;
+  --muted: #2A2A30;
+  --muted-foreground: #A8A8B0;
+  --subtle: #94949D;
+  --accent: #2A2A30;
+  --accent-foreground: #F2F2F3;
+  --destructive: #FF9E9E;
+  --destructive-foreground: #17171A;
+  --border: #35353D;
+  --input: #2A2A30;
+  --ring: #FF6B6B;
 }
 
 @theme inline {
@@ -30,8 +113,30 @@
   --color-atlas-warning: var(--color-warning);
   --color-atlas-error: var(--color-error);
   --color-atlas-info: var(--color-info);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-subtle: var(--subtle);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-funnel-display), var(--font-geist-sans), system-ui, sans-serif;
 }
 
 body {
@@ -94,7 +199,7 @@ body {
   background-image: linear-gradient(
     90deg,
     var(--surface-elevated) 25%,
-    #22303d 50%,
+    var(--border-color) 50%,
     var(--surface-elevated) 75%
   );
   background-size: 200% 100%;
@@ -137,7 +242,7 @@ body {
   -webkit-overflow-scrolling: touch;
   touch-action: pan-x pan-y;
   scrollbar-width: thin;
-  scrollbar-color: #26313C #111820;
+  scrollbar-color: var(--border-color) var(--surface);
 }
 
 .table-container::-webkit-scrollbar, .table-responsive::-webkit-scrollbar {
@@ -146,17 +251,17 @@ body {
 }
 
 .table-container::-webkit-scrollbar-track, .table-responsive::-webkit-scrollbar-track {
-  background: #111820;
+  background: var(--surface);
   border-radius: 4px;
 }
 
 .table-container::-webkit-scrollbar-thumb, .table-responsive::-webkit-scrollbar-thumb {
-  background: #26313C;
+  background: var(--border-color);
   border-radius: 4px;
 }
 
 .table-container::-webkit-scrollbar-thumb:hover, .table-responsive::-webkit-scrollbar-thumb:hover {
-  background: #2AFEB7;
+  background: var(--primary);
 }
 
 /* Hide scrollbar utility */
@@ -166,6 +271,25 @@ body {
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* Sleek Sidebar Independent Scrollbar */
+.sidebar-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color) transparent;
+}
+.sidebar-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+.sidebar-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar-scroll::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 9999px;
+}
+.sidebar-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
 }
 
 /* Universal Interactive Pointer Cursor */
@@ -245,4 +369,342 @@ select:disabled,
   .print-hide {
     display: none !important;
   }
+}
+
+/* The landing page's display face comes from the `--font-display` token in the
+   @theme block above; it needs no extra CSS of its own. */
+
+/* ---------------------------------------------------------------------------
+   Theme change transition
+   The default cross-fade is replaced by a hard stack so the incoming theme can
+   be revealed with a clip-path circle (see toggle() in hooks/use-theme.tsx).
+   Without `animation: none` the browser's own fade runs underneath the wipe
+   and the whole thing looks muddy.
+--------------------------------------------------------------------------- */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+/* Old theme sits still underneath; new theme is clipped in on top. */
+::view-transition-old(root) {
+  z-index: 1;
+}
+::view-transition-new(root) {
+  z-index: 2;
+}
+
+/* Someone who asked for less motion gets an instant swap, not a wipe. */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Theme toggle icon
+   The sun/moon morph. Default (no .dark) is the SUN; .dark drives it to the
+   MOON. transform is used rather than animating cx/cy/r so it works even
+   where SVG geometry properties aren't animatable via CSS.
+--------------------------------------------------------------------------- */
+.atlas-theme-icon,
+.atlas-theme-cut,
+.atlas-theme-disc,
+.atlas-theme-rays {
+  transform-box: view-box;
+  transition:
+    transform 0.5s cubic-bezier(0.32, 0.72, 0, 1),
+    opacity 0.35s ease;
+}
+
+.atlas-theme-icon { transform-origin: 12px 12px; }
+.atlas-theme-disc { transform-origin: 12px 12px; }
+.atlas-theme-rays { transform-origin: 12px 12px; }
+
+/* ── Sun (light mode) ── */
+/* Mask circle pushed clear of the disc, so nothing is cut out. */
+.atlas-theme-cut  { transform: translate(11px, -12px); }
+/* Disc shrunk to a sun core — the rays carry the rest of the visual weight. */
+.atlas-theme-disc { transform: scale(0.6); }
+.atlas-theme-rays { opacity: 1; transform: scale(1) rotate(0deg); }
+
+/* ── Moon (dark mode) ── */
+.dark .atlas-theme-icon { transform: rotate(-18deg); }
+.dark .atlas-theme-cut  { transform: translate(0, 0); }
+.dark .atlas-theme-disc { transform: scale(1); }
+.dark .atlas-theme-rays { opacity: 0; transform: scale(0.4) rotate(-45deg); }
+
+/* Press feedback. */
+.atlas-theme-toggle:active .atlas-theme-icon { transform: scale(0.88); }
+.dark .atlas-theme-toggle:active .atlas-theme-icon { transform: rotate(-18deg) scale(0.88); }
+
+/* ---------------------------------------------------------------------------
+   Glass
+   iOS-style frosted material. Three things make it read as glass rather than
+   as "a transparent box":
+
+     1. backdrop blur PLUS saturation. Real glass concentrates the colour
+        behind it; blur alone looks like fog.
+     2. A hairline top highlight (inset box-shadow). On Apple's material this
+        is the lit edge where the pane catches light, and it is the single
+        detail that sells the depth.
+     3. Something behind it worth refracting — see .ambient below. Glass over
+        a flat fill is just a lighter rectangle.
+
+   The tint alpha is kept high (0.62-0.72) on purpose: it keeps the composited
+   surface close to the solid token colour, so text contrast stays predictable
+   instead of depending on whatever happens to be behind the pane.
+--------------------------------------------------------------------------- */
+:root {
+  --glass-bg: 255 255 255;
+  --glass-alpha: 0.72;
+  --glass-brd: 255 255 255;
+  --glass-brd-alpha: 0.7;
+  --glass-highlight: rgba(255, 255, 255, 0.95);
+  --glass-shadow: 0 10px 34px rgba(23, 23, 26, 0.12), 0 2px 8px rgba(23, 23, 26, 0.07);
+  --amb-1: 0.20;
+  --amb-2: 0.28;
+  --amb-3: 0.12;
+  --amb-grain: 0.03;
+}
+
+.dark {
+  --glass-bg: 31 31 35;
+  --glass-alpha: 0.60;
+  --glass-brd: 242 242 243;
+  --glass-brd-alpha: 0.16;
+  --glass-highlight: rgba(242, 242, 243, 0.16);
+  --glass-shadow: 0 10px 34px rgba(0, 0, 0, 0.45), 0 2px 8px rgba(0, 0, 0, 0.30);
+  --amb-1: 0.52;
+  --amb-2: 0.30;
+  --amb-3: 0.28;
+  --amb-grain: 0.05;
+}
+
+.glass {
+  background-color: rgb(var(--glass-bg) / var(--glass-alpha));
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  backdrop-filter: blur(22px) saturate(180%);
+  border: 1px solid rgb(var(--glass-brd) / var(--glass-brd-alpha));
+  box-shadow: var(--glass-shadow), inset 0 1px 0 0 var(--glass-highlight);
+}
+
+/* Lighter pane for small controls, where a heavy blur is wasted. */
+.glass-soft {
+  background-color: rgb(var(--glass-bg) / calc(var(--glass-alpha) * 0.62));
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  backdrop-filter: blur(14px) saturate(160%);
+  border: 1px solid rgb(var(--glass-brd) / calc(var(--glass-brd-alpha) * 0.8));
+  box-shadow: inset 0 1px 0 0 var(--glass-highlight);
+}
+
+/* Without backdrop-filter the tint alone reads as washed-out, so go opaque. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass,
+  .glass-soft {
+    background-color: var(--card);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Ambient backdrop
+   Soft palette-coloured light for the glass to pick up, plus fine grain.
+   Deliberately only three very large, very low-opacity pools — this is meant
+   to read as lighting, not as decoration.
+--------------------------------------------------------------------------- */
+.ambient {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.ambient::before {
+  content: '';
+  position: absolute;
+  inset: -25%;
+  background:
+    radial-gradient(38rem 38rem at 14% 16%, rgb(200 30 30 / var(--amb-1)), transparent 62%),
+    radial-gradient(34rem 34rem at 86% 10%, rgb(140 140 152 / var(--amb-2)), transparent 64%),
+    radial-gradient(36rem 36rem at 72% 86%, rgb(255 107 107 / var(--amb-3)), transparent 62%);
+  filter: blur(28px);
+}
+
+/* Grain kills the banding you otherwise get across a wide soft gradient. */
+.ambient::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: var(--amb-grain);
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ---------------------------------------------------------------------------
+   Liquid glass
+   Frosted glass (.glass above) is blur. This is the lens version: the backdrop
+   is REFRACTED at the edges via an SVG displacement map (see
+   components/ui/liquid-glass-defs.tsx), which is what makes it read as a
+   physical pane rather than a translucent rectangle.
+
+   Four layers, in paint order:
+     1. backdrop  — refract, then blur and saturate what shows through.
+     2. body tint — low alpha; the lens does the work, not the fill.
+     3. ::before  — specular sheen that follows the pointer (the "liquid" part).
+     4. ::after   — a 1px rim lit from the pointer side, masked to the border.
+--------------------------------------------------------------------------- */
+@property --lg-x {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 50%;
+}
+@property --lg-y {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 0%;
+}
+
+:root {
+  --lg-tint: 255 255 255;
+  --lg-tint-a: 0.42;
+  --lg-sheen: rgba(255, 255, 255, 0.75);
+  --lg-rim: rgba(255, 255, 255, 1);
+  --lg-rim-dim: rgba(255, 255, 255, 0.25);
+  --lg-shadow: 0 16px 50px rgba(23, 23, 26, 0.18), 0 3px 12px rgba(23, 23, 26, 0.10);
+}
+
+.dark {
+  --lg-tint: 31 31 35;
+  --lg-tint-a: 0.32;
+  --lg-sheen: rgba(242, 242, 243, 0.40);
+  --lg-rim: rgba(242, 242, 243, 0.72);
+  --lg-rim-dim: rgba(242, 242, 243, 0.10);
+  --lg-shadow: 0 16px 50px rgba(0, 0, 0, 0.55), 0 3px 12px rgba(0, 0, 0, 0.35);
+}
+
+/* Must sit INSIDE a layer. Unlayered declarations outrank every layered one
+   regardless of specificity, so as plain CSS this silently beat Tailwind's
+   `sticky` utility and pinned the nav to position:relative. :where() did not
+   help — layer origin is compared before specificity. In @layer components
+   the utilities layer wins, which is what we want: any position utility on
+   the element overrides this default. */
+@layer components {
+  .liquid-glass {
+    position: relative;
+  }
+}
+
+.liquid-glass {
+  isolation: isolate;
+  background-color: rgb(var(--lg-tint) / var(--lg-tint-a));
+  -webkit-backdrop-filter: blur(16px) saturate(190%);
+  backdrop-filter: blur(16px) saturate(190%);
+  /* Progressive enhancement: adds edge refraction where url() is honoured. */
+  backdrop-filter: url(#atlas-lens) blur(16px) saturate(190%);
+  box-shadow:
+    var(--lg-shadow),
+    inset 0 1px 1px 0 var(--lg-rim),
+    inset 0 -1px 1px 0 var(--lg-rim-dim);
+  transition: --lg-x 400ms ease, --lg-y 400ms ease;
+}
+
+/* Specular sheen. Sits under the content, above the backdrop. */
+.liquid-glass::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(
+    120% 90% at var(--lg-x) var(--lg-y),
+    var(--lg-sheen) 0%,
+    transparent 55%
+  );
+}
+
+/* Lit rim. A border-width ring, masked so only the 1px edge paints. */
+.liquid-glass::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  pointer-events: none;
+  background: radial-gradient(
+    140% 140% at var(--lg-x) var(--lg-y),
+    var(--lg-rim) 0%,
+    var(--lg-rim-dim) 45%,
+    transparent 75%
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+/* Small controls get the gentler lens. */
+.liquid-glass-sm {
+  -webkit-backdrop-filter: blur(12px) saturate(175%);
+  backdrop-filter: blur(12px) saturate(175%);
+  backdrop-filter: url(#atlas-lens-sm) blur(12px) saturate(175%);
+}
+
+/* No SVG-filter support in backdrop-filter (Safari today): fall back to the
+   frosted material, which still looks intentional. */
+@supports not (backdrop-filter: url(#atlas-lens)) {
+  .liquid-glass,
+  .liquid-glass-sm {
+    backdrop-filter: blur(22px) saturate(180%);
+    -webkit-backdrop-filter: blur(22px) saturate(180%);
+    background-color: rgb(var(--lg-tint) / calc(var(--lg-tint-a) + 0.18));
+  }
+}
+
+/* A pane that never moves its highlight still reads fine; this just stops the
+   sheen chasing the cursor for anyone who asked for less motion. */
+@media (prefers-reduced-motion: reduce) {
+  .liquid-glass {
+    transition: none;
+  }
+}
+
+/* Native <option> ignores the parent select's colour and falls back to the OS
+   default (black on white). On a dark surface the open dropdown was black text
+   on dark teal, so pin both explicitly. */
+select option {
+  background-color: var(--popover);
+  color: var(--popover-foreground);
+}
+
+/* ---------------------------------------------------------------------------
+   .loader
+   Used by the Suspense fallback in components/ui/splite.tsx. The Spline
+   component references this class but ships no styles for it, so without this
+   the loading state renders an empty span while a multi-megabyte scene
+   downloads.
+--------------------------------------------------------------------------- */
+.loader {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  border-top-color: var(--primary);
+  animation: loader-spin 0.7s linear infinite;
+}
+
+@keyframes loader-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loader { animation-duration: 2s; }
 }

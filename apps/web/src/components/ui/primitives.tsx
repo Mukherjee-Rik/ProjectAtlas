@@ -17,7 +17,7 @@ export function Card({
 }) {
   return (
     <div
-      className={`rounded-xl border border-[#26313C] bg-[#111820] shadow-xl ${padded ? 'p-4 sm:p-6' : ''} ${className}`}
+      className={`rounded-xl border border-border bg-card ${padded ? 'p-4 sm:p-6' : ''} ${className}`}
     >
       {children}
     </div>
@@ -38,12 +38,12 @@ export type BadgeTone =
   | 'purple';
 
 const BADGE_TONES: Record<BadgeTone, string> = {
-  neutral: 'bg-[#9AA6B2]/15 text-[#9AA6B2] border-[#9AA6B2]/30',
-  success: 'bg-[#22C55E]/15 text-[#22C55E] border-[#22C55E]/30',
-  warning: 'bg-[#EAB308]/15 text-[#EAB308] border-[#EAB308]/30',
-  error: 'bg-[#EF4444]/15 text-[#EF4444] border-[#EF4444]/30',
-  info: 'bg-[#3B82F6]/15 text-[#3B82F6] border-[#3B82F6]/30',
-  mint: 'bg-[#2AFEB7]/15 text-[#2AFEB7] border-[#2AFEB7]/30',
+  neutral: 'bg-muted-foreground/15 text-muted-foreground border-muted-foreground/30',
+  success: 'bg-atlas-success/15 text-atlas-success border-atlas-success/30',
+  warning: 'bg-atlas-warning/15 text-atlas-warning border-atlas-warning/30',
+  error: 'bg-atlas-error/15 text-atlas-error border-atlas-error/30',
+  info: 'bg-atlas-info/15 text-atlas-info border-atlas-info/30',
+  mint: 'bg-primary/15 text-primary border-primary/30',
   purple: 'bg-[#A855F7]/15 text-[#A855F7] border-[#A855F7]/30',
 };
 
@@ -107,17 +107,17 @@ export function SkeletonTable({ rows = 5, columns = 4 }: { rows?: number; column
     <div
       role="status"
       aria-live="polite"
-      className="overflow-hidden rounded-xl border border-[#26313C] bg-[#111820] shadow-xl"
+      className="overflow-hidden rounded-xl border border-border bg-card"
     >
       <span className="sr-only">Loading data…</span>
 
-      <div className="hidden border-b border-[#26313C] bg-[#18212B] px-4 py-4 sm:flex sm:gap-4">
+      <div className="hidden border-b border-border bg-secondary px-4 py-4 sm:flex sm:gap-4">
         {Array.from({ length: columns }).map((_, i) => (
           <Skeleton key={i} className="h-3 flex-1" />
         ))}
       </div>
 
-      <div className="divide-y divide-[#26313C]">
+      <div className="divide-y divide-border">
         {Array.from({ length: rows }).map((_, r) => (
           <div key={r} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:gap-4">
             {Array.from({ length: columns }).map((_, c) => (
@@ -146,14 +146,14 @@ export function EmptyState({
   action?: ReactNode;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-4 rounded-xl border border-[#26313C] bg-[#111820] p-8 text-center sm:p-16">
+    <div className="flex flex-col items-center justify-center gap-4 rounded-xl border border-border bg-card p-8 text-center sm:p-16">
       {icon && (
-        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#18212B] text-[#2AFEB7]">
+        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-secondary text-primary">
           {icon}
         </div>
       )}
-      <h2 className="text-lg font-bold text-[#F5F7FA]">{title}</h2>
-      {description && <p className="max-w-md text-sm text-[#9AA6B2]">{description}</p>}
+      <h2 className="text-lg font-bold text-foreground">{title}</h2>
+      {description && <p className="max-w-md text-sm text-muted-foreground">{description}</p>}
       {action}
     </div>
   );
@@ -175,8 +175,8 @@ export function PageHeader({
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
       <div className="min-w-0">
-        <h1 className="text-2xl font-bold text-[#F5F7FA] sm:text-3xl">{title}</h1>
-        {description && <p className="mt-2 text-sm text-[#9AA6B2]">{description}</p>}
+        <h1 className="font-display text-2xl font-semibold tracking-[-0.02em] text-foreground sm:text-3xl">{title}</h1>
+        {description && <p className="mt-2 text-sm text-muted-foreground">{description}</p>}
       </div>
       {actions && <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div>}
     </div>
@@ -197,14 +197,14 @@ export function ErrorPanel({
   return (
     <div
       role="alert"
-      className="rounded-xl border border-[#EF4444]/40 bg-[#EF4444]/10 p-6 text-center"
+      className="rounded-xl border border-atlas-error/40 bg-atlas-error/10 p-6 text-center"
     >
-      <p className="text-sm font-medium text-[#EF4444]">{message}</p>
+      <p className="text-sm font-medium text-atlas-error">{message}</p>
       {onRetry && (
         <button
           type="button"
           onClick={onRetry}
-          className="mt-4 rounded-lg border border-[#26313C] bg-[#18212B] px-4 py-2 text-sm text-[#F5F7FA] transition-all hover:border-[#2AFEB7] hover:text-[#2AFEB7]"
+          className="mt-4 rounded-lg border border-border bg-secondary px-4 py-2 text-sm text-foreground transition-all hover:border-primary hover:text-primary"
         >
           Try again
         </button>

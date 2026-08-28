@@ -142,7 +142,7 @@ export function UserForm({
       noValidate
     >
       {formError && (
-        <div className="rounded-xl border border-[#EF4444]/40 bg-[#EF4444]/10 p-4 text-sm text-[#EF4444] animate-in fade-in">
+        <div className="rounded-xl border border-atlas-error/40 bg-atlas-error/10 p-4 text-sm text-atlas-error animate-in fade-in">
           {formError}
         </div>
       )}
@@ -243,7 +243,7 @@ export function UserForm({
           type="button"
           onClick={onCancel}
           disabled={isSubmitting}
-          className="rounded-lg border border-[#26313C] bg-[#18212B] px-4 py-2 text-sm font-medium text-[#F5F7FA] transition-colors hover:border-[#2AFEB7]"
+          className="rounded-lg border border-border bg-secondary px-4 py-2 text-sm font-medium text-foreground transition-colors hover:border-primary"
         >
           Cancel
         </button>
@@ -251,7 +251,7 @@ export function UserForm({
         <button
           type="submit"
           disabled={isSubmitting}
-          className="rounded-lg bg-[#2AFEB7] px-4 py-2 text-sm font-semibold text-[#0B0F14] transition-all hover:bg-[#22E5A4] active:scale-[0.99] disabled:opacity-50 font-bold"
+          className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-background transition-all hover:bg-primary-hover active:scale-[0.99] disabled:opacity-50 font-bold"
         >
           {isSubmitting
             ? 'Saving...'

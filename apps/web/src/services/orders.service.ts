@@ -1,4 +1,5 @@
 import { apiClient } from './api-client';
+import { publicApiClient } from './public-api-client';
 import type { CreateOrderPayload, Order, OrderStatus } from '@/types/order';
 
 export interface OrderResponse {
@@ -12,15 +13,15 @@ export interface OrdersResponse {
 }
 
 export async function createPublicOrder(token: string, payload?: CreateOrderPayload) {
-  return apiClient.post<OrderResponse>(`/public/tables/${token}/orders`, payload ?? {});
+  return publicApiClient.post<OrderResponse>(`/public/tables/${token}/orders`, payload ?? {});
 }
 
 export async function getPublicOrders(token: string) {
-  return apiClient.get<OrdersResponse>(`/public/tables/${token}/orders`);
+  return publicApiClient.get<OrdersResponse>(`/public/tables/${token}/orders`);
 }
 
 export async function getPublicOrderById(token: string, orderId: string) {
-  return apiClient.get<OrderResponse>(`/public/tables/${token}/orders/${orderId}`);
+  return publicApiClient.get<OrderResponse>(`/public/tables/${token}/orders/${orderId}`);
 }
 
 export async function getOrders(status?: OrderStatus) {

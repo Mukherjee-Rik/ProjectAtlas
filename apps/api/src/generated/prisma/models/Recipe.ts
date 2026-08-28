@@ -20,13 +20,28 @@ export type RecipeModel = runtime.Types.Result.DefaultSelection<Prisma.$RecipePa
 
 export type AggregateRecipe = {
   _count: RecipeCountAggregateOutputType | null
+  _avg: RecipeAvgAggregateOutputType | null
+  _sum: RecipeSumAggregateOutputType | null
   _min: RecipeMinAggregateOutputType | null
   _max: RecipeMaxAggregateOutputType | null
+}
+
+export type RecipeAvgAggregateOutputType = {
+  batchYieldPortions: runtime.Decimal | null
+  preparedStock: runtime.Decimal | null
+}
+
+export type RecipeSumAggregateOutputType = {
+  batchYieldPortions: runtime.Decimal | null
+  preparedStock: runtime.Decimal | null
 }
 
 export type RecipeMinAggregateOutputType = {
   id: string | null
   menuItemId: string | null
+  recipeType: $Enums.RecipeType | null
+  batchYieldPortions: runtime.Decimal | null
+  preparedStock: runtime.Decimal | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -34,6 +49,9 @@ export type RecipeMinAggregateOutputType = {
 export type RecipeMaxAggregateOutputType = {
   id: string | null
   menuItemId: string | null
+  recipeType: $Enums.RecipeType | null
+  batchYieldPortions: runtime.Decimal | null
+  preparedStock: runtime.Decimal | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -41,15 +59,31 @@ export type RecipeMaxAggregateOutputType = {
 export type RecipeCountAggregateOutputType = {
   id: number
   menuItemId: number
+  recipeType: number
+  batchYieldPortions: number
+  preparedStock: number
   createdAt: number
   updatedAt: number
   _all: number
 }
 
 
+export type RecipeAvgAggregateInputType = {
+  batchYieldPortions?: true
+  preparedStock?: true
+}
+
+export type RecipeSumAggregateInputType = {
+  batchYieldPortions?: true
+  preparedStock?: true
+}
+
 export type RecipeMinAggregateInputType = {
   id?: true
   menuItemId?: true
+  recipeType?: true
+  batchYieldPortions?: true
+  preparedStock?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -57,6 +91,9 @@ export type RecipeMinAggregateInputType = {
 export type RecipeMaxAggregateInputType = {
   id?: true
   menuItemId?: true
+  recipeType?: true
+  batchYieldPortions?: true
+  preparedStock?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -64,6 +101,9 @@ export type RecipeMaxAggregateInputType = {
 export type RecipeCountAggregateInputType = {
   id?: true
   menuItemId?: true
+  recipeType?: true
+  batchYieldPortions?: true
+  preparedStock?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -107,6 +147,18 @@ export type RecipeAggregateArgs<ExtArgs extends runtime.Types.Extensions.Interna
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: RecipeAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: RecipeSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: RecipeMinAggregateInputType
@@ -137,6 +189,8 @@ export type RecipeGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   _count?: RecipeCountAggregateInputType | true
+  _avg?: RecipeAvgAggregateInputType
+  _sum?: RecipeSumAggregateInputType
   _min?: RecipeMinAggregateInputType
   _max?: RecipeMaxAggregateInputType
 }
@@ -144,9 +198,14 @@ export type RecipeGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalA
 export type RecipeGroupByOutputType = {
   id: string
   menuItemId: string
+  recipeType: $Enums.RecipeType
+  batchYieldPortions: runtime.Decimal
+  preparedStock: runtime.Decimal
   createdAt: Date
   updatedAt: Date
   _count: RecipeCountAggregateOutputType | null
+  _avg: RecipeAvgAggregateOutputType | null
+  _sum: RecipeSumAggregateOutputType | null
   _min: RecipeMinAggregateOutputType | null
   _max: RecipeMaxAggregateOutputType | null
 }
@@ -172,19 +231,27 @@ export type RecipeWhereInput = {
   NOT?: Prisma.RecipeWhereInput | Prisma.RecipeWhereInput[]
   id?: Prisma.StringFilter<"Recipe"> | string
   menuItemId?: Prisma.StringFilter<"Recipe"> | string
+  recipeType?: Prisma.EnumRecipeTypeFilter<"Recipe"> | $Enums.RecipeType
+  batchYieldPortions?: Prisma.DecimalFilter<"Recipe"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  preparedStock?: Prisma.DecimalFilter<"Recipe"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFilter<"Recipe"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Recipe"> | Date | string
   menuItem?: Prisma.XOR<Prisma.MenuItemScalarRelationFilter, Prisma.MenuItemWhereInput>
   recipeIngredients?: Prisma.RecipeIngredientListRelationFilter
+  batchProductions?: Prisma.BatchProductionListRelationFilter
 }
 
 export type RecipeOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   menuItemId?: Prisma.SortOrder
+  recipeType?: Prisma.SortOrder
+  batchYieldPortions?: Prisma.SortOrder
+  preparedStock?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   menuItem?: Prisma.MenuItemOrderByWithRelationInput
   recipeIngredients?: Prisma.RecipeIngredientOrderByRelationAggregateInput
+  batchProductions?: Prisma.BatchProductionOrderByRelationAggregateInput
 }
 
 export type RecipeWhereUniqueInput = Prisma.AtLeast<{
@@ -193,20 +260,29 @@ export type RecipeWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.RecipeWhereInput | Prisma.RecipeWhereInput[]
   OR?: Prisma.RecipeWhereInput[]
   NOT?: Prisma.RecipeWhereInput | Prisma.RecipeWhereInput[]
+  recipeType?: Prisma.EnumRecipeTypeFilter<"Recipe"> | $Enums.RecipeType
+  batchYieldPortions?: Prisma.DecimalFilter<"Recipe"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  preparedStock?: Prisma.DecimalFilter<"Recipe"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFilter<"Recipe"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Recipe"> | Date | string
   menuItem?: Prisma.XOR<Prisma.MenuItemScalarRelationFilter, Prisma.MenuItemWhereInput>
   recipeIngredients?: Prisma.RecipeIngredientListRelationFilter
+  batchProductions?: Prisma.BatchProductionListRelationFilter
 }, "id" | "menuItemId">
 
 export type RecipeOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   menuItemId?: Prisma.SortOrder
+  recipeType?: Prisma.SortOrder
+  batchYieldPortions?: Prisma.SortOrder
+  preparedStock?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.RecipeCountOrderByAggregateInput
+  _avg?: Prisma.RecipeAvgOrderByAggregateInput
   _max?: Prisma.RecipeMaxOrderByAggregateInput
   _min?: Prisma.RecipeMinOrderByAggregateInput
+  _sum?: Prisma.RecipeSumOrderByAggregateInput
 }
 
 export type RecipeScalarWhereWithAggregatesInput = {
@@ -215,51 +291,76 @@ export type RecipeScalarWhereWithAggregatesInput = {
   NOT?: Prisma.RecipeScalarWhereWithAggregatesInput | Prisma.RecipeScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Recipe"> | string
   menuItemId?: Prisma.StringWithAggregatesFilter<"Recipe"> | string
+  recipeType?: Prisma.EnumRecipeTypeWithAggregatesFilter<"Recipe"> | $Enums.RecipeType
+  batchYieldPortions?: Prisma.DecimalWithAggregatesFilter<"Recipe"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  preparedStock?: Prisma.DecimalWithAggregatesFilter<"Recipe"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Recipe"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Recipe"> | Date | string
 }
 
 export type RecipeCreateInput = {
   id?: string
+  recipeType?: $Enums.RecipeType
+  batchYieldPortions?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  preparedStock?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
   menuItem: Prisma.MenuItemCreateNestedOneWithoutRecipeInput
   recipeIngredients?: Prisma.RecipeIngredientCreateNestedManyWithoutRecipeInput
+  batchProductions?: Prisma.BatchProductionCreateNestedManyWithoutRecipeInput
 }
 
 export type RecipeUncheckedCreateInput = {
   id?: string
   menuItemId: string
+  recipeType?: $Enums.RecipeType
+  batchYieldPortions?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  preparedStock?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
   recipeIngredients?: Prisma.RecipeIngredientUncheckedCreateNestedManyWithoutRecipeInput
+  batchProductions?: Prisma.BatchProductionUncheckedCreateNestedManyWithoutRecipeInput
 }
 
 export type RecipeUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  recipeType?: Prisma.EnumRecipeTypeFieldUpdateOperationsInput | $Enums.RecipeType
+  batchYieldPortions?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  preparedStock?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   menuItem?: Prisma.MenuItemUpdateOneRequiredWithoutRecipeNestedInput
   recipeIngredients?: Prisma.RecipeIngredientUpdateManyWithoutRecipeNestedInput
+  batchProductions?: Prisma.BatchProductionUpdateManyWithoutRecipeNestedInput
 }
 
 export type RecipeUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   menuItemId?: Prisma.StringFieldUpdateOperationsInput | string
+  recipeType?: Prisma.EnumRecipeTypeFieldUpdateOperationsInput | $Enums.RecipeType
+  batchYieldPortions?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  preparedStock?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   recipeIngredients?: Prisma.RecipeIngredientUncheckedUpdateManyWithoutRecipeNestedInput
+  batchProductions?: Prisma.BatchProductionUncheckedUpdateManyWithoutRecipeNestedInput
 }
 
 export type RecipeCreateManyInput = {
   id?: string
   menuItemId: string
+  recipeType?: $Enums.RecipeType
+  batchYieldPortions?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  preparedStock?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
 }
 
 export type RecipeUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  recipeType?: Prisma.EnumRecipeTypeFieldUpdateOperationsInput | $Enums.RecipeType
+  batchYieldPortions?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  preparedStock?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -267,6 +368,9 @@ export type RecipeUpdateManyMutationInput = {
 export type RecipeUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   menuItemId?: Prisma.StringFieldUpdateOperationsInput | string
+  recipeType?: Prisma.EnumRecipeTypeFieldUpdateOperationsInput | $Enums.RecipeType
+  batchYieldPortions?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  preparedStock?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -279,13 +383,24 @@ export type RecipeNullableScalarRelationFilter = {
 export type RecipeCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   menuItemId?: Prisma.SortOrder
+  recipeType?: Prisma.SortOrder
+  batchYieldPortions?: Prisma.SortOrder
+  preparedStock?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type RecipeAvgOrderByAggregateInput = {
+  batchYieldPortions?: Prisma.SortOrder
+  preparedStock?: Prisma.SortOrder
 }
 
 export type RecipeMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   menuItemId?: Prisma.SortOrder
+  recipeType?: Prisma.SortOrder
+  batchYieldPortions?: Prisma.SortOrder
+  preparedStock?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -293,8 +408,16 @@ export type RecipeMaxOrderByAggregateInput = {
 export type RecipeMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   menuItemId?: Prisma.SortOrder
+  recipeType?: Prisma.SortOrder
+  batchYieldPortions?: Prisma.SortOrder
+  preparedStock?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type RecipeSumOrderByAggregateInput = {
+  batchYieldPortions?: Prisma.SortOrder
+  preparedStock?: Prisma.SortOrder
 }
 
 export type RecipeScalarRelationFilter = {
@@ -334,6 +457,24 @@ export type RecipeUncheckedUpdateOneWithoutMenuItemNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.RecipeUpdateToOneWithWhereWithoutMenuItemInput, Prisma.RecipeUpdateWithoutMenuItemInput>, Prisma.RecipeUncheckedUpdateWithoutMenuItemInput>
 }
 
+export type EnumRecipeTypeFieldUpdateOperationsInput = {
+  set?: $Enums.RecipeType
+}
+
+export type RecipeCreateNestedOneWithoutBatchProductionsInput = {
+  create?: Prisma.XOR<Prisma.RecipeCreateWithoutBatchProductionsInput, Prisma.RecipeUncheckedCreateWithoutBatchProductionsInput>
+  connectOrCreate?: Prisma.RecipeCreateOrConnectWithoutBatchProductionsInput
+  connect?: Prisma.RecipeWhereUniqueInput
+}
+
+export type RecipeUpdateOneRequiredWithoutBatchProductionsNestedInput = {
+  create?: Prisma.XOR<Prisma.RecipeCreateWithoutBatchProductionsInput, Prisma.RecipeUncheckedCreateWithoutBatchProductionsInput>
+  connectOrCreate?: Prisma.RecipeCreateOrConnectWithoutBatchProductionsInput
+  upsert?: Prisma.RecipeUpsertWithoutBatchProductionsInput
+  connect?: Prisma.RecipeWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.RecipeUpdateToOneWithWhereWithoutBatchProductionsInput, Prisma.RecipeUpdateWithoutBatchProductionsInput>, Prisma.RecipeUncheckedUpdateWithoutBatchProductionsInput>
+}
+
 export type RecipeCreateNestedOneWithoutRecipeIngredientsInput = {
   create?: Prisma.XOR<Prisma.RecipeCreateWithoutRecipeIngredientsInput, Prisma.RecipeUncheckedCreateWithoutRecipeIngredientsInput>
   connectOrCreate?: Prisma.RecipeCreateOrConnectWithoutRecipeIngredientsInput
@@ -350,16 +491,24 @@ export type RecipeUpdateOneRequiredWithoutRecipeIngredientsNestedInput = {
 
 export type RecipeCreateWithoutMenuItemInput = {
   id?: string
+  recipeType?: $Enums.RecipeType
+  batchYieldPortions?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  preparedStock?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
   recipeIngredients?: Prisma.RecipeIngredientCreateNestedManyWithoutRecipeInput
+  batchProductions?: Prisma.BatchProductionCreateNestedManyWithoutRecipeInput
 }
 
 export type RecipeUncheckedCreateWithoutMenuItemInput = {
   id?: string
+  recipeType?: $Enums.RecipeType
+  batchYieldPortions?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  preparedStock?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
   recipeIngredients?: Prisma.RecipeIngredientUncheckedCreateNestedManyWithoutRecipeInput
+  batchProductions?: Prisma.BatchProductionUncheckedCreateNestedManyWithoutRecipeInput
 }
 
 export type RecipeCreateOrConnectWithoutMenuItemInput = {
@@ -380,13 +529,81 @@ export type RecipeUpdateToOneWithWhereWithoutMenuItemInput = {
 
 export type RecipeUpdateWithoutMenuItemInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  recipeType?: Prisma.EnumRecipeTypeFieldUpdateOperationsInput | $Enums.RecipeType
+  batchYieldPortions?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  preparedStock?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   recipeIngredients?: Prisma.RecipeIngredientUpdateManyWithoutRecipeNestedInput
+  batchProductions?: Prisma.BatchProductionUpdateManyWithoutRecipeNestedInput
 }
 
 export type RecipeUncheckedUpdateWithoutMenuItemInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  recipeType?: Prisma.EnumRecipeTypeFieldUpdateOperationsInput | $Enums.RecipeType
+  batchYieldPortions?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  preparedStock?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  recipeIngredients?: Prisma.RecipeIngredientUncheckedUpdateManyWithoutRecipeNestedInput
+  batchProductions?: Prisma.BatchProductionUncheckedUpdateManyWithoutRecipeNestedInput
+}
+
+export type RecipeCreateWithoutBatchProductionsInput = {
+  id?: string
+  recipeType?: $Enums.RecipeType
+  batchYieldPortions?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  preparedStock?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  menuItem: Prisma.MenuItemCreateNestedOneWithoutRecipeInput
+  recipeIngredients?: Prisma.RecipeIngredientCreateNestedManyWithoutRecipeInput
+}
+
+export type RecipeUncheckedCreateWithoutBatchProductionsInput = {
+  id?: string
+  menuItemId: string
+  recipeType?: $Enums.RecipeType
+  batchYieldPortions?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  preparedStock?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  recipeIngredients?: Prisma.RecipeIngredientUncheckedCreateNestedManyWithoutRecipeInput
+}
+
+export type RecipeCreateOrConnectWithoutBatchProductionsInput = {
+  where: Prisma.RecipeWhereUniqueInput
+  create: Prisma.XOR<Prisma.RecipeCreateWithoutBatchProductionsInput, Prisma.RecipeUncheckedCreateWithoutBatchProductionsInput>
+}
+
+export type RecipeUpsertWithoutBatchProductionsInput = {
+  update: Prisma.XOR<Prisma.RecipeUpdateWithoutBatchProductionsInput, Prisma.RecipeUncheckedUpdateWithoutBatchProductionsInput>
+  create: Prisma.XOR<Prisma.RecipeCreateWithoutBatchProductionsInput, Prisma.RecipeUncheckedCreateWithoutBatchProductionsInput>
+  where?: Prisma.RecipeWhereInput
+}
+
+export type RecipeUpdateToOneWithWhereWithoutBatchProductionsInput = {
+  where?: Prisma.RecipeWhereInput
+  data: Prisma.XOR<Prisma.RecipeUpdateWithoutBatchProductionsInput, Prisma.RecipeUncheckedUpdateWithoutBatchProductionsInput>
+}
+
+export type RecipeUpdateWithoutBatchProductionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  recipeType?: Prisma.EnumRecipeTypeFieldUpdateOperationsInput | $Enums.RecipeType
+  batchYieldPortions?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  preparedStock?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  menuItem?: Prisma.MenuItemUpdateOneRequiredWithoutRecipeNestedInput
+  recipeIngredients?: Prisma.RecipeIngredientUpdateManyWithoutRecipeNestedInput
+}
+
+export type RecipeUncheckedUpdateWithoutBatchProductionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  menuItemId?: Prisma.StringFieldUpdateOperationsInput | string
+  recipeType?: Prisma.EnumRecipeTypeFieldUpdateOperationsInput | $Enums.RecipeType
+  batchYieldPortions?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  preparedStock?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   recipeIngredients?: Prisma.RecipeIngredientUncheckedUpdateManyWithoutRecipeNestedInput
@@ -394,16 +611,24 @@ export type RecipeUncheckedUpdateWithoutMenuItemInput = {
 
 export type RecipeCreateWithoutRecipeIngredientsInput = {
   id?: string
+  recipeType?: $Enums.RecipeType
+  batchYieldPortions?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  preparedStock?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
   menuItem: Prisma.MenuItemCreateNestedOneWithoutRecipeInput
+  batchProductions?: Prisma.BatchProductionCreateNestedManyWithoutRecipeInput
 }
 
 export type RecipeUncheckedCreateWithoutRecipeIngredientsInput = {
   id?: string
   menuItemId: string
+  recipeType?: $Enums.RecipeType
+  batchYieldPortions?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  preparedStock?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
+  batchProductions?: Prisma.BatchProductionUncheckedCreateNestedManyWithoutRecipeInput
 }
 
 export type RecipeCreateOrConnectWithoutRecipeIngredientsInput = {
@@ -424,16 +649,24 @@ export type RecipeUpdateToOneWithWhereWithoutRecipeIngredientsInput = {
 
 export type RecipeUpdateWithoutRecipeIngredientsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  recipeType?: Prisma.EnumRecipeTypeFieldUpdateOperationsInput | $Enums.RecipeType
+  batchYieldPortions?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  preparedStock?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   menuItem?: Prisma.MenuItemUpdateOneRequiredWithoutRecipeNestedInput
+  batchProductions?: Prisma.BatchProductionUpdateManyWithoutRecipeNestedInput
 }
 
 export type RecipeUncheckedUpdateWithoutRecipeIngredientsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   menuItemId?: Prisma.StringFieldUpdateOperationsInput | string
+  recipeType?: Prisma.EnumRecipeTypeFieldUpdateOperationsInput | $Enums.RecipeType
+  batchYieldPortions?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  preparedStock?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  batchProductions?: Prisma.BatchProductionUncheckedUpdateManyWithoutRecipeNestedInput
 }
 
 
@@ -443,10 +676,12 @@ export type RecipeUncheckedUpdateWithoutRecipeIngredientsInput = {
 
 export type RecipeCountOutputType = {
   recipeIngredients: number
+  batchProductions: number
 }
 
 export type RecipeCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   recipeIngredients?: boolean | RecipeCountOutputTypeCountRecipeIngredientsArgs
+  batchProductions?: boolean | RecipeCountOutputTypeCountBatchProductionsArgs
 }
 
 /**
@@ -466,20 +701,34 @@ export type RecipeCountOutputTypeCountRecipeIngredientsArgs<ExtArgs extends runt
   where?: Prisma.RecipeIngredientWhereInput
 }
 
+/**
+ * RecipeCountOutputType without action
+ */
+export type RecipeCountOutputTypeCountBatchProductionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.BatchProductionWhereInput
+}
+
 
 export type RecipeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   menuItemId?: boolean
+  recipeType?: boolean
+  batchYieldPortions?: boolean
+  preparedStock?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   menuItem?: boolean | Prisma.MenuItemDefaultArgs<ExtArgs>
   recipeIngredients?: boolean | Prisma.Recipe$recipeIngredientsArgs<ExtArgs>
+  batchProductions?: boolean | Prisma.Recipe$batchProductionsArgs<ExtArgs>
   _count?: boolean | Prisma.RecipeCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["recipe"]>
 
 export type RecipeSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   menuItemId?: boolean
+  recipeType?: boolean
+  batchYieldPortions?: boolean
+  preparedStock?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   menuItem?: boolean | Prisma.MenuItemDefaultArgs<ExtArgs>
@@ -488,6 +737,9 @@ export type RecipeSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
 export type RecipeSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   menuItemId?: boolean
+  recipeType?: boolean
+  batchYieldPortions?: boolean
+  preparedStock?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   menuItem?: boolean | Prisma.MenuItemDefaultArgs<ExtArgs>
@@ -496,14 +748,18 @@ export type RecipeSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
 export type RecipeSelectScalar = {
   id?: boolean
   menuItemId?: boolean
+  recipeType?: boolean
+  batchYieldPortions?: boolean
+  preparedStock?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type RecipeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "menuItemId" | "createdAt" | "updatedAt", ExtArgs["result"]["recipe"]>
+export type RecipeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "menuItemId" | "recipeType" | "batchYieldPortions" | "preparedStock" | "createdAt" | "updatedAt", ExtArgs["result"]["recipe"]>
 export type RecipeInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   menuItem?: boolean | Prisma.MenuItemDefaultArgs<ExtArgs>
   recipeIngredients?: boolean | Prisma.Recipe$recipeIngredientsArgs<ExtArgs>
+  batchProductions?: boolean | Prisma.Recipe$batchProductionsArgs<ExtArgs>
   _count?: boolean | Prisma.RecipeCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type RecipeIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -518,10 +774,14 @@ export type $RecipePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
   objects: {
     menuItem: Prisma.$MenuItemPayload<ExtArgs>
     recipeIngredients: Prisma.$RecipeIngredientPayload<ExtArgs>[]
+    batchProductions: Prisma.$BatchProductionPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     menuItemId: string
+    recipeType: $Enums.RecipeType
+    batchYieldPortions: runtime.Decimal
+    preparedStock: runtime.Decimal
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["recipe"]>
@@ -920,6 +1180,7 @@ export interface Prisma__RecipeClient<T, Null = never, ExtArgs extends runtime.T
   readonly [Symbol.toStringTag]: "PrismaPromise"
   menuItem<T extends Prisma.MenuItemDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.MenuItemDefaultArgs<ExtArgs>>): Prisma.Prisma__MenuItemClient<runtime.Types.Result.GetResult<Prisma.$MenuItemPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   recipeIngredients<T extends Prisma.Recipe$recipeIngredientsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Recipe$recipeIngredientsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RecipeIngredientPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  batchProductions<T extends Prisma.Recipe$batchProductionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Recipe$batchProductionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BatchProductionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -951,6 +1212,9 @@ export interface Prisma__RecipeClient<T, Null = never, ExtArgs extends runtime.T
 export interface RecipeFieldRefs {
   readonly id: Prisma.FieldRef<"Recipe", 'String'>
   readonly menuItemId: Prisma.FieldRef<"Recipe", 'String'>
+  readonly recipeType: Prisma.FieldRef<"Recipe", 'RecipeType'>
+  readonly batchYieldPortions: Prisma.FieldRef<"Recipe", 'Decimal'>
+  readonly preparedStock: Prisma.FieldRef<"Recipe", 'Decimal'>
   readonly createdAt: Prisma.FieldRef<"Recipe", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Recipe", 'DateTime'>
 }
@@ -1384,6 +1648,30 @@ export type Recipe$recipeIngredientsArgs<ExtArgs extends runtime.Types.Extension
   take?: number
   skip?: number
   distinct?: Prisma.RecipeIngredientScalarFieldEnum | Prisma.RecipeIngredientScalarFieldEnum[]
+}
+
+/**
+ * Recipe.batchProductions
+ */
+export type Recipe$batchProductionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the BatchProduction
+   */
+  select?: Prisma.BatchProductionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the BatchProduction
+   */
+  omit?: Prisma.BatchProductionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.BatchProductionInclude<ExtArgs> | null
+  where?: Prisma.BatchProductionWhereInput
+  orderBy?: Prisma.BatchProductionOrderByWithRelationInput | Prisma.BatchProductionOrderByWithRelationInput[]
+  cursor?: Prisma.BatchProductionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.BatchProductionScalarFieldEnum | Prisma.BatchProductionScalarFieldEnum[]
 }
 
 /**

@@ -767,8 +767,15 @@ enum UnitOfMeasure {
   BOX
 }
 
+enum RecipeType {
+  COOKED_TO_ORDER
+  BATCH_PREPARED
+}
+
 enum StockTransactionType {
   RECIPE_DEDUCTION
+  BATCH_PRODUCTION
+  BATCH_WASTAGE
   MANUAL_PURCHASE
   WASTE_SPOILAGE
   AUDIT_ADJUSTMENT
@@ -836,15 +843,41 @@ model Ingredient {
 }
 
 model Recipe {
-  id         String   @id @default(uuid())
-  menuItemId String   @unique
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id                 String             @id @default(uuid())
+  menuItemId         String             @unique
+  recipeType         RecipeType         @default(COOKED_TO_ORDER)
+  batchYieldPortions Decimal            @default(1.00) @db.Decimal(10, 2)
+  preparedStock      Decimal            @default(0.00) @db.Decimal(10, 2)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
 
   menuItem          MenuItem           @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
   recipeIngredients RecipeIngredient[]
+  batchProductions  BatchProduction[]
 
   @@map("recipes")
+}
+
+model BatchProduction {
+  id                String    @id @default(uuid())
+  tenantId          String
+  branchId          String
+  recipeId          String
+  portionsProduced  Decimal   @db.Decimal(10, 2)
+  portionsRemaining Decimal   @db.Decimal(10, 2)
+  notes             String?
+  producedAt        DateTime  @default(now())
+  expiresAt         DateTime?
+  status            String    @default("ACTIVE")
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  recipe            Recipe    @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([branchId])
+  @@index([recipeId])
+  @@map("batch_productions")
 }
 
 model RecipeIngredient {

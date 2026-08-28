@@ -26,12 +26,18 @@ export class PaymentsService {
     // Verify order exists
     const order = await this.prisma.order.findUnique({
       where: { id: dto.orderId },
-      include: { invoice: true },
+      include: {
+        invoice: true,
+        restaurant: { select: { tenantId: true } },
+      },
     });
 
     if (!order) {
       throw new NotFoundException('Order not found');
     }
+
+    const tenantId = dto.tenantId || order.restaurant?.tenantId || '';
+    const restaurantId = dto.restaurantId || order.restaurantId;
 
     // Auto-generate invoice if not exists
     let invoice = order.invoice;
@@ -42,7 +48,7 @@ export class PaymentsService {
 
       invoice = await this.prisma.invoice.create({
         data: {
-          tenantId: order.restaurantId,
+          tenantId,
           branchId: order.branchId,
           orderId: order.id,
           invoiceNumber,
@@ -61,8 +67,8 @@ export class PaymentsService {
 
     return this.prisma.payment.create({
       data: {
-        tenantId: dto.tenantId,
-        restaurantId: dto.restaurantId,
+        tenantId,
+        restaurantId,
         orderId: dto.orderId,
         invoiceId: invoice.id,
         customerSessionId: order.customerSessionId,
@@ -115,8 +121,12 @@ export class PaymentsService {
           data: { status: 'COMPLETED' },
         });
 
-        // Deduct stock for completed order
-        await this.inventoryService.deductStockForOrder(payment.orderId, tx);
+        // Deduct stock for completed order (non-blocking if stock deduction encounters unmapped items)
+        try {
+          await this.inventoryService.deductStockForOrder(payment.orderId, tx);
+        } catch (invErr) {
+          // Non-blocking stock deduction error
+        }
       }
 
       // If this is a table/dine-in session, check if we should end the session

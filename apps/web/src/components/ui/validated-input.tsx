@@ -55,18 +55,18 @@ export const ValidatedInput = React.forwardRef<HTMLInputElement, ValidatedInputP
           <div className="flex items-center justify-between">
             <label
               htmlFor={inputId}
-              className="block text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]"
+              className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground"
             >
-              {label} {required && <span className="text-[#EF4444]">*</span>}
+              {label} {required && <span className="text-atlas-error">*</span>}
             </label>
             {shouldShowCount && (
               <span
                 className={`text-[10px] font-mono font-medium ${
                   currentLength > (maxLength || 0)
-                    ? 'text-[#EF4444]'
+                    ? 'text-atlas-error'
                     : currentLength === maxLength
-                    ? 'text-[#EAB308]'
-                    : 'text-[#9AA6B2]/70'
+                    ? 'text-atlas-warning'
+                    : 'text-muted-foreground/70'
                 }`}
               >
                 {currentLength}/{maxLength}
@@ -85,10 +85,10 @@ export const ValidatedInput = React.forwardRef<HTMLInputElement, ValidatedInputP
             required={required}
             aria-invalid={Boolean(error)}
             aria-describedby={error ? errorId : helperText ? helperId : undefined}
-            className={`w-full rounded-lg border bg-[#18212B] px-3.5 py-2 text-sm text-[#F5F7FA] placeholder-[#9AA6B2]/50 transition-colors outline-none ${
+            className={`w-full rounded-lg border bg-secondary px-3.5 py-2 text-sm text-foreground placeholder-muted-foreground/50 transition-colors outline-none ${
               error
-                ? 'border-[#EF4444] focus:border-[#EF4444] focus:ring-1 focus:ring-[#EF4444]'
-                : 'border-[#26313C] focus:border-[#2AFEB7] focus:ring-1 focus:ring-[#2AFEB7]'
+                ? 'border-atlas-error focus:border-atlas-error focus:ring-1 focus:ring-atlas-error'
+                : 'border-border focus:border-primary focus:ring-1 focus:ring-primary'
             } ${uppercase ? 'uppercase font-mono' : ''} ${className}`}
             {...props}
           />
@@ -97,13 +97,13 @@ export const ValidatedInput = React.forwardRef<HTMLInputElement, ValidatedInputP
         {error ? (
           <p
             id={errorId}
-            className="flex items-center gap-1.5 text-xs text-[#EF4444] animate-in fade-in slide-in-from-top-1 duration-150"
+            className="flex items-center gap-1.5 text-xs text-atlas-error animate-in fade-in slide-in-from-top-1 duration-150"
           >
             <AlertCircle className="w-3.5 h-3.5 shrink-0" />
             <span>{error}</span>
           </p>
         ) : helperText ? (
-          <p id={helperId} className="text-xs text-[#9AA6B2]/70">
+          <p id={helperId} className="text-xs text-muted-foreground/70">
             {helperText}
           </p>
         ) : null}
@@ -155,18 +155,18 @@ export const ValidatedTextarea = React.forwardRef<HTMLTextAreaElement, Validated
           <div className="flex items-center justify-between">
             <label
               htmlFor={inputId}
-              className="block text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]"
+              className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground"
             >
-              {label} {required && <span className="text-[#EF4444]">*</span>}
+              {label} {required && <span className="text-atlas-error">*</span>}
             </label>
             {shouldShowCount && (
               <span
                 className={`text-[10px] font-mono font-medium ${
                   currentLength > (maxLength || 0)
-                    ? 'text-[#EF4444]'
+                    ? 'text-atlas-error'
                     : currentLength === maxLength
-                    ? 'text-[#EAB308]'
-                    : 'text-[#9AA6B2]/70'
+                    ? 'text-atlas-warning'
+                    : 'text-muted-foreground/70'
                 }`}
               >
                 {currentLength}/{maxLength}
@@ -182,10 +182,10 @@ export const ValidatedTextarea = React.forwardRef<HTMLTextAreaElement, Validated
           maxLength={maxLength}
           required={required}
           aria-invalid={Boolean(error)}
-          className={`w-full rounded-lg border bg-[#18212B] px-3.5 py-2 text-sm text-[#F5F7FA] placeholder-[#9AA6B2]/50 transition-colors outline-none resize-y min-h-[80px] ${
+          className={`w-full rounded-lg border bg-secondary px-3.5 py-2 text-sm text-foreground placeholder-muted-foreground/50 transition-colors outline-none resize-y min-h-[80px] ${
             error
-              ? 'border-[#EF4444] focus:border-[#EF4444] focus:ring-1 focus:ring-[#EF4444]'
-              : 'border-[#26313C] focus:border-[#2AFEB7] focus:ring-1 focus:ring-[#2AFEB7]'
+              ? 'border-atlas-error focus:border-atlas-error focus:ring-1 focus:ring-atlas-error'
+              : 'border-border focus:border-primary focus:ring-1 focus:ring-primary'
           } ${className}`}
           {...props}
         />
@@ -193,13 +193,13 @@ export const ValidatedTextarea = React.forwardRef<HTMLTextAreaElement, Validated
         {error ? (
           <p
             id={errorId}
-            className="flex items-center gap-1.5 text-xs text-[#EF4444] animate-in fade-in slide-in-from-top-1 duration-150"
+            className="flex items-center gap-1.5 text-xs text-atlas-error animate-in fade-in slide-in-from-top-1 duration-150"
           >
             <AlertCircle className="w-3.5 h-3.5 shrink-0" />
             <span>{error}</span>
           </p>
         ) : helperText ? (
-          <p className="text-xs text-[#9AA6B2]/70">{helperText}</p>
+          <p className="text-xs text-muted-foreground/70">{helperText}</p>
         ) : null}
       </div>
     );
@@ -243,9 +243,9 @@ export const ValidatedSelect = React.forwardRef<HTMLSelectElement, ValidatedSele
         {label && (
           <label
             htmlFor={inputId}
-            className="block text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]"
+            className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground"
           >
-            {label} {required && <span className="text-[#EF4444]">*</span>}
+            {label} {required && <span className="text-atlas-error">*</span>}
           </label>
         )}
 
@@ -254,10 +254,10 @@ export const ValidatedSelect = React.forwardRef<HTMLSelectElement, ValidatedSele
           id={inputId}
           required={required}
           aria-invalid={Boolean(error)}
-          className={`w-full rounded-lg border bg-[#18212B] px-3.5 py-2 text-sm text-[#F5F7FA] transition-colors outline-none ${
+          className={`w-full rounded-lg border bg-secondary px-3.5 py-2 text-sm text-foreground transition-colors outline-none ${
             error
-              ? 'border-[#EF4444] focus:border-[#EF4444] focus:ring-1 focus:ring-[#EF4444]'
-              : 'border-[#26313C] focus:border-[#2AFEB7] focus:ring-1 focus:ring-[#2AFEB7]'
+              ? 'border-atlas-error focus:border-atlas-error focus:ring-1 focus:ring-atlas-error'
+              : 'border-border focus:border-primary focus:ring-1 focus:ring-primary'
           } ${className}`}
           {...props}
         >
@@ -267,13 +267,13 @@ export const ValidatedSelect = React.forwardRef<HTMLSelectElement, ValidatedSele
         {error ? (
           <p
             id={errorId}
-            className="flex items-center gap-1.5 text-xs text-[#EF4444] animate-in fade-in slide-in-from-top-1 duration-150"
+            className="flex items-center gap-1.5 text-xs text-atlas-error animate-in fade-in slide-in-from-top-1 duration-150"
           >
             <AlertCircle className="w-3.5 h-3.5 shrink-0" />
             <span>{error}</span>
           </p>
         ) : helperText ? (
-          <p className="text-xs text-[#9AA6B2]/70">{helperText}</p>
+          <p className="text-xs text-muted-foreground/70">{helperText}</p>
         ) : null}
       </div>
     );

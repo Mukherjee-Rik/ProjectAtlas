@@ -87,14 +87,14 @@ export default function DiningAreasPage() {
 
   if (!currentBranch) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-xl border border-[#26313C] bg-[#111820] p-12 text-center shadow-xl space-y-4">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#18212B] text-2xl">
+      <div className="flex flex-col items-center justify-center rounded-xl border border-border bg-card p-12 text-center space-y-4">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-secondary text-2xl">
           📍
         </div>
-        <h2 className="text-xl font-bold text-[#F5F7FA]">
+        <h2 className="text-xl font-bold text-foreground">
           Select a branch to continue
         </h2>
-        <p className="text-sm text-[#9AA6B2]">
+        <p className="text-sm text-muted-foreground">
           Choose the physical branch location you are currently operating in from the header selector.
         </p>
       </div>
@@ -106,18 +106,18 @@ export default function DiningAreasPage() {
       {/* Header & Create CTA */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-[#F5F7FA]">
+          <h1 className="font-display text-3xl font-semibold tracking-[-0.02em] text-foreground">
             Dining Areas
           </h1>
-          <p className="mt-2 text-sm text-[#9AA6B2]">
-            Seating areas for <span className="font-semibold text-[#F5F7FA]">{currentBranch.name}</span> ({currentBranch.code}).
+          <p className="mt-2 text-sm text-muted-foreground">
+            Seating areas for <span className="font-semibold text-foreground">{currentBranch.name}</span> ({currentBranch.code}).
           </p>
         </div>
 
         <button
           type="button"
           onClick={() => setShowCreateModal(true)}
-          className="rounded-lg bg-[#2AFEB7] px-4 py-2.5 text-sm font-semibold text-[#0B0F14] transition-all hover:bg-[#22E5A4] active:scale-[0.99]"
+          className="rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-background transition-all hover:bg-primary-hover active:scale-[0.99]"
         >
           + Add Dining Area
         </button>
@@ -125,9 +125,9 @@ export default function DiningAreasPage() {
 
       {/* Create Modal */}
       {showCreateModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B0F14]/80 backdrop-blur-sm p-4">
-          <div className="w-full max-w-lg rounded-xl border border-[#26313C] bg-[#111820] p-6 shadow-2xl space-y-6">
-            <h2 className="text-xl font-bold text-[#F5F7FA]">Create Dining Area</h2>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4">
+          <div className="w-full max-w-lg rounded-xl border border-border bg-card p-6 space-y-6">
+            <h2 className="text-xl font-bold text-foreground">Create Dining Area</h2>
             <DiningAreaForm
               isLoading={isSubmitting}
               onSubmit={handleCreate}
@@ -139,54 +139,54 @@ export default function DiningAreasPage() {
 
       {/* Table */}
       {isLoading ? (
-        <div className="rounded-xl border border-[#26313C] bg-[#111820] p-8 text-center text-[#9AA6B2]">
+        <div className="rounded-xl border border-border bg-card p-8 text-center text-muted-foreground">
           Loading dining areas...
         </div>
       ) : error ? (
-        <div className="rounded-xl border border-[#EF4444]/40 bg-[#EF4444]/10 p-6 text-center text-[#EF4444]">
+        <div className="rounded-xl border border-atlas-error/40 bg-atlas-error/10 p-6 text-center text-atlas-error">
           <p>{error}</p>
         </div>
       ) : (
-        <div className="table-responsive rounded-xl border border-[#26313C] bg-[#111820] shadow-xl">
+        <div className="table-responsive rounded-xl border border-border bg-card">
           <table className="w-full min-w-[600px] text-left">
-            <thead className="border-b border-[#26313C] bg-[#18212B]">
+            <thead className="border-b border-border bg-secondary">
               <tr>
-                <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
+                <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                   Dining Area
                 </th>
-                <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
+                <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                   Code
                 </th>
-                <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
+                <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                   Tables
                 </th>
-                <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
+                <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                   Status
                 </th>
-                <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-[#9AA6B2]">
+                <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                   Actions
                 </th>
               </tr>
             </thead>
 
-            <tbody className="divide-y divide-[#26313C]">
+            <tbody className="divide-y divide-border">
               {diningAreas.map((area) => (
-                <tr key={area.id} className="transition-colors hover:bg-[#18212B]">
-                  <td className="px-6 py-4 text-sm font-semibold text-[#F5F7FA]">
+                <tr key={area.id} className="transition-colors hover:bg-secondary">
+                  <td className="px-6 py-4 text-sm font-semibold text-foreground">
                     {area.name}
                   </td>
 
-                  <td className="px-6 py-4 text-sm font-mono text-[#2AFEB7]">
+                  <td className="px-6 py-4 text-sm font-mono text-primary">
                     {area.code}
                   </td>
 
-                  <td className="px-6 py-4 text-sm text-[#9AA6B2]">
+                  <td className="px-6 py-4 text-sm text-muted-foreground">
                     {area._count?.tables ?? 0} tables
                   </td>
 
                   <td className="px-6 py-4 text-sm">
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-[#22C55E]/15 px-3 py-1 text-xs font-semibold text-[#22C55E] border border-[#22C55E]/30">
-                      <span className="h-1.5 w-1.5 rounded-full bg-[#22C55E]" />
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-atlas-success/15 px-3 py-1 text-xs font-semibold text-atlas-success border border-atlas-success/30">
+                      <span className="h-1.5 w-1.5 rounded-full bg-atlas-success" />
                       {area.status}
                     </span>
                   </td>
@@ -195,7 +195,7 @@ export default function DiningAreasPage() {
                     <button
                       type="button"
                       onClick={() => setDeletingArea(area)}
-                      className="rounded-lg border border-[#EF4444]/40 bg-[#EF4444]/10 px-2.5 py-1 text-xs text-[#EF4444] hover:bg-[#EF4444]/20"
+                      className="rounded-lg border border-atlas-error/40 bg-atlas-error/10 px-2.5 py-1 text-xs text-atlas-error hover:bg-atlas-error/20"
                     >
                       Delete
                     </button>
@@ -206,7 +206,7 @@ export default function DiningAreasPage() {
           </table>
 
           {diningAreas.length === 0 && (
-            <div className="p-8 text-center text-[#9AA6B2]">
+            <div className="p-8 text-center text-muted-foreground">
               No dining areas found. Create your first dining area to start adding tables.
             </div>
           )}
