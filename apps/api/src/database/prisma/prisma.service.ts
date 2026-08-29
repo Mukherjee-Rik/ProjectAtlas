@@ -1,4 +1,5 @@
 import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import { Pool } from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '../../generated/prisma/client';
 
@@ -8,23 +9,33 @@ export class PrismaService
   implements OnModuleInit, OnModuleDestroy
 {
   private readonly logger = new Logger(PrismaService.name);
+  private readonly pool: Pool;
 
   constructor() {
     const connectionString = process.env.DATABASE_URL;
-    const adapter = new PrismaPg({
+    const pool = new Pool({
       connectionString,
-      // The database is reached over the network, so connection setup costs a
-      // full round trip. Keeping a warm pool avoids paying it per request.
+      // Keep a connection pool configured for cloud Postgres & PgBouncer
       max: Number(process.env.DATABASE_POOL_MAX ?? 10),
-      idleTimeoutMillis: 30_000,
+      idleTimeoutMillis: 15_000,
       connectionTimeoutMillis: 10_000,
-      // Fail fast instead of hanging a request behind a stalled socket.
+      keepAlive: true,
+      keepAliveInitialDelayMillis: 10_000,
       statement_timeout: Number(process.env.DATABASE_STATEMENT_TIMEOUT_MS ?? 15_000),
     });
+
+    pool.on('error', (err) => {
+      // Supabase / PgBouncer can drop idle sockets. Logging prevents unhandled errors and lets pg-pool create new clients on next query.
+      console.warn('[PrismaService] Idle database connection dropped by server:', err.message);
+    });
+
+    const adapter = new PrismaPg(pool);
 
     super({
       adapter,
     });
+
+    this.pool = pool;
   }
 
   async onModuleInit(): Promise<void> {
@@ -65,6 +76,7 @@ export class PrismaService
   async onModuleDestroy(): Promise<void> {
     try {
       await this.$disconnect();
+      await this.pool.end();
     } catch {
       // ignore disconnect error on exit
     }

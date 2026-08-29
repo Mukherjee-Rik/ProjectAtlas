@@ -42,6 +42,13 @@ export class AuthService {
       throw new UnauthorizedException('Invalid email or password');
     }
 
+    if (!user.passwordHash || user.passwordHash.length < 10) {
+      this.logger.warn({ email: normalizedEmail }, 'Login failed: OAuth account without password');
+      throw new UnauthorizedException(
+        'This account was created with Google Sign In. Please use Google Sign In to continue.',
+      );
+    }
+
     const passwordValid = await bcrypt.compare(password, user.passwordHash);
 
     if (!passwordValid) {
