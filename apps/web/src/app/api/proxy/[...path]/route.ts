@@ -6,7 +6,7 @@ export const runtime = 'nodejs';
 
 const EXPLICIT_BACKEND_URL = process.env.BACKEND_URL || process.env.API_INTERNAL_URL;
 
-const PRIMARY_BACKEND_URL = EXPLICIT_BACKEND_URL || 'http://localhost:4000/api/v1';
+const PRIMARY_BACKEND_URL = EXPLICIT_BACKEND_URL || 'http://127.0.0.1:4002/api/v1';
 
 /**
  * Last-resort target, used only when the primary is unreachable at the socket
@@ -42,6 +42,7 @@ const HOP_BY_HOP = new Set([
   'trailer',
   'transfer-encoding',
   'upgrade',
+  'expect',
 ]);
 
 function buildForwardHeaders(request: NextRequest): Headers {
@@ -84,15 +85,14 @@ async function forward(
   headers: Headers,
   body: ArrayBuffer | undefined,
 ): Promise<Response> {
-  return fetch(targetUrl, {
+  const init: RequestInit = {
     method: request.method,
     headers,
     body,
     redirect: 'manual',
     signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
-    // @ts-expect-error — Node fetch streaming request bodies
-    duplex: 'half',
-  });
+  };
+  return fetch(targetUrl, init);
 }
 
 async function handler(
@@ -117,9 +117,10 @@ async function handler(
 
   try {
     upstream = await forward(primaryUrl, request, forwardHeaders, body);
-  } catch (err) {
+  } catch (err: any) {
     lastError = err;
-    const message = err instanceof Error ? err.message : String(err);
+    const causeMsg = err?.cause ? ` (cause: ${err.cause.message || err.cause})` : '';
+    const message = (err instanceof Error ? err.message : String(err)) + causeMsg;
     console.warn(`[proxy] primary backend unreachable (${primaryUrl}): ${message}`);
 
     if (FALLBACK_BACKEND_URL && FALLBACK_BACKEND_URL !== PRIMARY_BACKEND_URL) {
@@ -127,10 +128,13 @@ async function handler(
       try {
         upstream = await forward(fallbackUrl, request, forwardHeaders, body);
         console.warn(`[proxy] served from fallback backend: ${fallbackUrl}`);
-      } catch (fallbackErr) {
+      } catch (fallbackErr: any) {
         lastError = fallbackErr;
+        const fallbackCauseMsg = fallbackErr?.cause
+          ? ` (cause: ${fallbackErr.cause.message || fallbackErr.cause})`
+          : '';
         const fallbackMessage =
-          fallbackErr instanceof Error ? fallbackErr.message : String(fallbackErr);
+          (fallbackErr instanceof Error ? fallbackErr.message : String(fallbackErr)) + fallbackCauseMsg;
         console.error(`[proxy] fallback backend unreachable (${fallbackUrl}): ${fallbackMessage}`);
       }
     }
