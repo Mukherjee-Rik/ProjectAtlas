@@ -98,8 +98,8 @@ export class BranchesService {
     });
   }
 
-  async findAll(tenantId: string, restaurantId?: string) {
-    return this.prisma.branch.findMany({
+  async findAll(tenantId: string, restaurantId?: string, user?: any) {
+    const branches = await this.prisma.branch.findMany({
       where: {
         restaurant: {
           tenantId,
@@ -128,12 +128,19 @@ export class BranchesService {
         },
       },
       orderBy: {
-        createdAt: 'desc',
+        createdAt: 'asc',
       },
     });
+
+    if (user && user.role !== 'OWNER' && user.role !== 'PLATFORM_ADMIN') {
+      // Non-owner staff (waiter, cashier, kitchen, manager, staff) only have access to their own branch
+      return branches.slice(0, 1);
+    }
+
+    return branches;
   }
 
-  async findById(id: string, tenantId: string) {
+  async findById(id: string, tenantId: string, user?: any) {
     const branch = await this.prisma.branch.findFirst({
       where: {
         id,
@@ -167,6 +174,20 @@ export class BranchesService {
 
     if (!branch) {
       throw new NotFoundException('Branch not found');
+    }
+
+    if (user && user.role !== 'OWNER' && user.role !== 'PLATFORM_ADMIN') {
+      const primaryBranch = await this.prisma.branch.findFirst({
+        where: { restaurantId: branch.restaurantId },
+        orderBy: { createdAt: 'asc' },
+        select: { id: true },
+      });
+
+      if (primaryBranch && primaryBranch.id !== branch.id) {
+        throw new ForbiddenException(
+          'Access denied: Staff members can only access their assigned branch. Only the restaurant owner has access to all branches.',
+        );
+      }
     }
 
     return branch;

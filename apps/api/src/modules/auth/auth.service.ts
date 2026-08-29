@@ -735,6 +735,13 @@ export class AuthService {
   }
 
   async getUserMemberships(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, role: true },
+    });
+
+    const isOwnerOrPlatformAdmin = user?.role === 'OWNER' || user?.role === 'PLATFORM_ADMIN';
+
     const memberships = await this.prisma.tenantMembership.findMany({
       where: { userId },
       select: {
@@ -752,6 +759,7 @@ export class AuthService {
                 slug: true,
                 branches: {
                   select: { id: true, name: true, code: true },
+                  orderBy: { createdAt: 'asc' },
                 },
               },
             },
@@ -759,6 +767,20 @@ export class AuthService {
         },
       },
     });
+
+    if (!isOwnerOrPlatformAdmin) {
+      // Non-owner staff (waiter, cashier, kitchen, manager, staff) only see their own single assigned branch
+      return memberships.map((m) => ({
+        ...m,
+        tenant: {
+          ...m.tenant,
+          restaurants: m.tenant.restaurants.map((r) => ({
+            ...r,
+            branches: r.branches.slice(0, 1),
+          })),
+        },
+      }));
+    }
 
     return memberships;
   }

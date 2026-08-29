@@ -17,6 +17,8 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
   const pathname = usePathname();
   const { user } = useAuth();
 
+  const isOwnerOrPlatformAdmin = user?.role === 'OWNER' || user?.role === 'PLATFORM_ADMIN';
+
   const filteredNavItems = navigationItems.filter((item) => {
     if (user?.role === 'PLATFORM_ADMIN') {
       return ['/platform-admin', '/restaurants', '/subscriptions', '/support', '/profile', '/settings'].includes(item.href);
@@ -33,6 +35,12 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
     if (user?.role === 'KITCHEN') {
       return ['/kitchen', '/support', '/profile'].includes(item.href);
     }
+
+    // Owner-only routes (Multi-branch administration, restaurant management, billing)
+    if (!isOwnerOrPlatformAdmin && ['/branches', '/restaurants', '/subscriptions'].includes(item.href)) {
+      return false;
+    }
+
     if (!item.permission) {
       return true;
     }
