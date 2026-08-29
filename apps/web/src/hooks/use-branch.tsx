@@ -15,6 +15,7 @@ import {
   clearCurrentBranch,
 } from '@/lib/branch-storage';
 import { useRestaurant } from './use-restaurant';
+import { useAuth } from './use-auth';
 import { getBranches } from '@/services/branches.service';
 
 interface BranchContextValue {
@@ -30,10 +31,13 @@ interface BranchContextValue {
 const BranchContext = createContext<BranchContextValue | undefined>(undefined);
 
 export function BranchProvider({ children }: { children: ReactNode }) {
+  const { user } = useAuth();
   const { currentRestaurant } = useRestaurant();
   const [currentBranch, setCurrentBranchState] = useState<Branch | null>(null);
   const [branches, setBranches] = useState<Branch[]>([]);
   const [isLoadingBranches, setIsLoadingBranches] = useState(false);
+
+  const isOwnerOrAdmin = user?.role === 'OWNER' || user?.role === 'PLATFORM_ADMIN';
 
   useEffect(() => {
     const stored = getCurrentBranch();
@@ -54,13 +58,17 @@ export function BranchProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const setCurrentBranch = useCallback((branch: Branch | null) => {
+    if (!isOwnerOrAdmin && branch && branches.length > 0 && branch.id !== branches[0].id) {
+      // Non-owner staff cannot switch away from their assigned branch
+      return;
+    }
     setCurrentBranchState(branch);
     if (branch) {
       saveCurrentBranch(branch);
     } else {
       clearCurrentBranch();
     }
-  }, []);
+  }, [isOwnerOrAdmin, branches]);
 
   const reloadBranches = useCallback(async () => {
     if (!currentRestaurant) {
@@ -71,7 +79,13 @@ export function BranchProvider({ children }: { children: ReactNode }) {
     setIsLoadingBranches(true);
     try {
       const response = await getBranches(currentRestaurant.id);
-      const loadedBranches = response.data ?? [];
+      let loadedBranches = response.data ?? [];
+
+      if (!isOwnerOrAdmin && loadedBranches.length > 0) {
+        // Non-owner staff (waiter, cashier, kitchen, manager, staff) only see their assigned branch
+        loadedBranches = loadedBranches.slice(0, 1);
+      }
+
       setBranches(loadedBranches);
 
       // Use functional state update to avoid capturing stale currentBranch
@@ -79,6 +93,11 @@ export function BranchProvider({ children }: { children: ReactNode }) {
         if (loadedBranches.length === 0) {
           clearCurrentBranch();
           return null;
+        }
+
+        if (!isOwnerOrAdmin) {
+          saveCurrentBranch(loadedBranches[0]!);
+          return loadedBranches[0]!;
         }
 
         if (!prevBranch || prevBranch.restaurantId !== currentRestaurant.id) {
@@ -97,9 +116,8 @@ export function BranchProvider({ children }: { children: ReactNode }) {
     } finally {
       setIsLoadingBranches(false);
     }
-    // ✅ currentBranch removed from deps - use functional setState instead
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentRestaurant?.id, clearBranch]);
+  }, [currentRestaurant?.id, isOwnerOrAdmin, clearBranch]);
 
   useEffect(() => {
     if (currentRestaurant) {
