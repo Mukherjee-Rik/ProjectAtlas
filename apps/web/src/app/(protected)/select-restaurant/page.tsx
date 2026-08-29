@@ -108,7 +108,7 @@ export default function SelectRestaurantPage() {
           </p>
           <button
             type="button"
-            onClick={() => router.push('/signup')}
+            onClick={() => router.push('/onboarding')}
             className="rounded-xl bg-primary px-4 py-2.5 text-xs font-bold text-background"
           >
             + Create a Restaurant

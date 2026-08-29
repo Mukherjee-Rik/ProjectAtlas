@@ -35,7 +35,7 @@ export async function POST(req: Request) {
 
     void sendDirectEmail({
       to: 'baleremailamar@gmail.com',
-      subject: `[Atlas Security] 🔐 New Password Reset Code: ${newOtp}`,
+      subject: `[Kafei Security] 🔐 New Password Reset Code: ${newOtp}`,
       html: `
         <div style="font-family: sans-serif; background-color: #0c0d12; color: #f4f4f5; padding: 24px; border-radius: 12px; max-width: 500px;">
           <h2 style="color: #f59e0b; margin: 0 0 8px 0; font-size: 20px;">🔐 New Password Reset Code</h2>
@@ -44,7 +44,7 @@ export async function POST(req: Request) {
           </div>
         </div>
       `,
-      text: `[Atlas Password Reset OTP] New Code: ${newOtp} for ${challenge.identifier}.`,
+      text: `[Kafei Password Reset OTP] New Code: ${newOtp} for ${challenge.identifier}.`,
     });
 
     return NextResponse.json({

@@ -53,7 +53,7 @@ export default function ProfilePage() {
           Profile
         </h1>
         <p className="mt-2 text-muted-foreground">
-          Manage your Atlas account information.
+          Manage your Kafei account information.
         </p>
       </div>
 

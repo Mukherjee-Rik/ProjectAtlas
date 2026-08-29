@@ -87,21 +87,10 @@ export class AuthController {
 
     const result = await this.authService.login(loginDto.email, loginDto.password, ip, userAgent);
 
-    if (result.refreshToken) {
-      res.cookie('refreshToken', result.refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-        path: '/',
-      });
-    }
-
-    return {
-      accessToken: result.accessToken,
-      user: result.user,
-      memberships: result.memberships,
-    };
+    // The password is only step one: sign-in now finishes at POST /auth/verify-otp
+    // with the code emailed to the account. No cookie is set until then, because
+    // no session exists yet.
+    return result;
   }
 
   @HttpCode(HttpStatus.OK)

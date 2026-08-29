@@ -91,11 +91,11 @@ async function handleDirectOAuthFallback(
 
     // 2. Fetch memberships
     const memRes = await pool.query(
-      `SELECT tm.id, tm.role, tm.status,
+      `SELECT tm.id, tm.role,
               t.id as tenant_id, t.name as tenant_name, t.slug as tenant_slug, t.status as tenant_status
        FROM tenant_memberships tm
        JOIN tenants t ON t.id = tm."tenantId"
-       WHERE tm."userId" = $1 AND tm.status = 'ACTIVE' AND t.status = 'ACTIVE'`,
+       WHERE tm."userId" = $1 AND t.status = 'ACTIVE'`,
       [user.id],
     );
 
@@ -125,7 +125,6 @@ async function handleDirectOAuthFallback(
         return {
           id: m.id,
           role: m.role,
-          status: m.status,
           tenant: {
             id: m.tenant_id,
             name: m.tenant_name,
@@ -139,8 +138,8 @@ async function handleDirectOAuthFallback(
 
     // 3. Create Session
     const sessionRes = await pool.query(
-      `INSERT INTO sessions (id, "userId", "refreshTokenHash", "deviceName", "ipAddress", "userAgent", "expiresAt", "updatedAt")
-       VALUES (gen_random_uuid(), $1, '', $2, $3, $4, NOW() + INTERVAL '7 days', NOW())
+      `INSERT INTO sessions (id, "userId", "refreshTokenHash", "deviceName", "ipAddress", "userAgent", "expiresAt")
+       VALUES (gen_random_uuid(), $1, '', $2, $3, $4, NOW() + INTERVAL '7 days')
        RETURNING id`,
       [
         user.id,
@@ -366,8 +365,8 @@ async function handler(
         success: false,
         statusCode: timedOut ? 504 : 503,
         error: timedOut
-          ? 'The Atlas API did not respond in time. Please try again.'
-          : 'Unable to reach the Atlas API. Please try again shortly.',
+          ? 'The Kafei API did not respond in time. Please try again.'
+          : 'Unable to reach the Kafei API. Please try again shortly.',
       },
       { status: timedOut ? 504 : 503 },
     );

@@ -28,7 +28,7 @@ export function Interactive3DShowcase() {
             </span>
           </h2>
           <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-            Click through the live interfaces below to experience how Project Atlas connects diners, chefs, waiters, cashiers, and managers seamlessly.
+            Click through the live interfaces below to experience how Kafei connects diners, chefs, waiters, cashiers, and managers seamlessly.
           </p>
         </div>
 
@@ -182,7 +182,7 @@ export function Interactive3DShowcase() {
                     Automated Recipe Depletion & Demand AI
                   </h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    Never run out of essential ingredients during peak weekend rushes. Project Atlas automatically tracks gram-level stock depletion per dish recipe and forecasts weekly material needs with AI.
+                    Never run out of essential ingredients during peak weekend rushes. Kafei automatically tracks gram-level stock depletion per dish recipe and forecasts weekly material needs with AI.
                   </p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
                     {[

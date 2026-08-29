@@ -22,7 +22,7 @@ export function RecentUsers({ users }: RecentUsersProps) {
             Recent Users
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Recently created Atlas users
+            Recently created Kafei users
           </p>
         </div>
 

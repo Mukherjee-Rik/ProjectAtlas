@@ -432,7 +432,7 @@ export function RestaurantDetailModal({ restaurantId, onClose }: RestaurantDetai
             {/* Modal Bottom Footer */}
             <div className="flex items-center justify-between border-t border-border bg-secondary px-6 py-3">
               <span className="text-xs text-muted-foreground">
-                Atlas Platform Admin Diagnostic View
+                Kafei Platform Admin Diagnostic View
               </span>
               <button
                 onClick={onClose}

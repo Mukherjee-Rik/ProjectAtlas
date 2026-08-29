@@ -71,47 +71,71 @@ const devices = [
   'A waiter’s own phone',
 ];
 
+/**
+ * The four plans, in the order a room grows through them.
+ *
+ * Every quota line here is the number the app actually enforces — they come
+ * from each plan's `limits` JSON in the database, so this page cannot quietly
+ * promise more than the software allows.
+ */
 const plans = [
   {
-    name: 'Starter',
+    name: 'Free trial',
     price: '₹0',
     period: 'for 14 days',
-    blurb: 'One café, one room, one screen in the kitchen.',
+    blurb: 'Set the room up and take real orders before you pay anything.',
     features: [
-      'Up to 10 tables',
-      'QR ordering at the table',
-      'One kitchen display',
-      'Cashier terminal',
+      '1 table',
+      '1 staff member',
+      '1 branch',
+      '1 menu',
+      'QR ordering, kitchen display and cashier terminal',
     ],
     cta: 'Start free',
     href: '/signup',
     featured: false,
   },
   {
-    name: 'Growth',
-    price: '₹1,499',
+    name: 'Starter',
+    price: '₹499',
     period: 'per month',
-    blurb: 'A full room running lunch and dinner service.',
+    blurb: 'One café or one room, running a full service.',
     features: [
-      'Unlimited tables and standees',
-      'Multi-round tokens on one table',
-      'Unlimited kitchen and waiter devices',
-      'Recipe-level stock deduction',
-      'Split billing and approval on voids',
+      'Up to 20 tables',
+      'Up to 5 staff members',
+      '5 menus, 1 branch',
+      'Orders, kitchen display and billing',
     ],
-    cta: 'Start free, then ₹1,499',
+    cta: 'Choose Starter',
+    href: '/signup',
+    featured: false,
+  },
+  {
+    name: 'Growth',
+    price: '₹999',
+    period: 'per month',
+    blurb: 'A busy floor, or a second outlet on the way.',
+    features: [
+      'Up to 100 tables',
+      'Up to 50 staff members',
+      '20 menus, 5 branches',
+      'Analytics and demand forecasting',
+      'AI copilot and automations',
+    ],
+    cta: 'Choose Growth',
     href: '/signup',
     featured: true,
   },
   {
     name: 'Enterprise',
-    price: '₹3,999',
-    period: 'per month',
+    subheading: 'Starting from',
+    price: '₹4,999',
+    period: '/ year',
     blurb: 'Several outlets that need to roll up into one view.',
     features: [
-      'Unlimited branches',
+      'Unlimited tables, staff, menus and branches',
       'Stock synced across outlets',
-      'Rush-hour demand forecasting',
+      'Everything in Growth',
       'Priority support with an SLA',
     ],
     cta: 'Talk to us',
@@ -127,7 +151,7 @@ const faqs = [
   },
   {
     q: 'What hardware do we need to buy?',
-    a: 'None, in most cases. Atlas is a website. If a device has a browser it can be a terminal — the tablet behind your counter, a kitchen touchscreen, a laptop, or a waiter’s own phone.',
+    a: 'None, in most cases. Kafei is a web application. If a device has a browser it can be a terminal — the tablet behind your counter, a kitchen touchscreen, a laptop, or a waiter’s own phone.',
   },
   {
     q: 'How does the payment QR work?',
@@ -157,18 +181,18 @@ export default function Home() {
 
       {/* ═══ Nav ═════════════════════════════════════════════════════════ */}
       <header className="liquid-glass sticky top-0 z-50 rounded-none border-b border-border/60">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-8 px-6 py-4 lg:px-8">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-8 px-6 py-3 lg:px-8">
           <Link href="/" className="flex shrink-0 items-center gap-2.5">
             <Image
               src="/logo.png"
-              alt=""
-              width={28}
-              height={28}
+              alt="Kafei"
+              width={34}
+              height={34}
               priority
-              className="h-7 w-7 object-contain"
+              className="h-8 w-auto object-contain rounded-md"
             />
-            <span className="font-display text-[15px] font-bold tracking-[-0.02em] text-foreground">
-              Atlas
+            <span className="font-display text-[17px] font-extrabold tracking-[-0.02em] text-foreground">
+              Kafei
             </span>
           </Link>
 
@@ -209,27 +233,25 @@ export default function Home() {
       </header>
 
       {/* ═══ Hero ════════════════════════════════════════════════════════
-          Text holds seven columns; the dish takes the remaining five. On a
-          phone the dish drops below the copy but stays above the CTAs, so the
-          buttons remain the last thing before the fold. */}
-      <section className="mx-auto max-w-6xl px-6 pb-20 pt-20 sm:pt-28 lg:px-8">
-        <div className="grid items-center gap-x-8 gap-y-10 md:grid-cols-12">
+          Reduced gap between navbar and content for a crisp, immediate hero view */}
+      <section className="mx-auto max-w-6xl px-6 pb-14 pt-4 sm:pt-8 lg:px-8">
+        <div className="grid items-center gap-x-8 gap-y-8 md:grid-cols-12">
           <div className="md:col-span-7">
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.4 }}
-              className="flex items-center gap-2.5 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground"
+              className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground"
             >
-              <span className="h-1 w-1 rounded-full bg-primary" />
-              Atlas 2.0 is live
+              <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+              Kafei 2.0 is live
             </motion.p>
 
             <motion.h1
-              initial={{ opacity: 0, y: 14 }}
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.55, delay: 0.05, ease: [0.22, 0.61, 0.36, 1] }}
-              className="mt-7 font-display text-[2.6rem] font-extrabold leading-[0.98] tracking-[-0.04em] text-foreground sm:text-[3.5rem] lg:text-[4.15rem]"
+              className="mt-3.5 font-display text-[2.4rem] font-extrabold leading-[1.02] tracking-[-0.04em] text-foreground sm:text-[3.25rem] lg:text-[3.85rem]"
             >
               Nothing gets lost
               <br />
@@ -239,21 +261,18 @@ export default function Home() {
             </motion.h1>
 
             <motion.p
-              initial={{ opacity: 0, y: 14 }}
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.55, delay: 0.15, ease: [0.22, 0.61, 0.36, 1] }}
-              className="mt-8 max-w-lg text-[15px] leading-[1.75] text-muted-foreground"
+              className="mt-4 max-w-lg text-[14.5px] leading-[1.7] text-muted-foreground"
             >
-              Atlas runs the whole floor on one system: the QR menu your guests order
+              Kafei runs the whole floor on one system: the QR menu your guests order
               from, the screen your kitchen cooks off, the tablet your waiters carry,
               and the counter where the bill gets settled.
             </motion.p>
           </div>
 
-          {/* Spline scene, replacing the procedural plated dish. Decorative,
-              so it is hidden from assistive tech — the headline carries the
-              meaning. aspect-square keeps the canvas box stable at every
-              width so the layout doesn't shift while the scene streams in. */}
+          {/* Spline scene */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -263,20 +282,20 @@ export default function Home() {
           >
             <SplineScene
               scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
-              className="aspect-square w-full max-w-[300px] md:max-w-[480px]"
+              className="aspect-square w-full max-w-[280px] md:max-w-[440px]"
             />
           </motion.div>
         </div>
 
         <motion.div
-          initial={{ opacity: 0, y: 14 }}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.55, delay: 0.25, ease: [0.22, 0.61, 0.36, 1] }}
-          className="mt-4 flex flex-col items-start gap-x-8 gap-y-5 sm:flex-row sm:items-center md:mt-2"
+          className="mt-4 flex flex-col items-start gap-x-8 gap-y-4 sm:flex-row sm:items-center"
         >
           <Link
             href="/signup"
-            className="group inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3.5 text-[14px] font-semibold text-background transition-colors hover:bg-primary-hover sm:w-auto"
+            className="group inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 text-[14px] font-semibold text-background transition-colors hover:bg-primary-hover sm:w-auto"
           >
             Start free for 14 days
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
@@ -293,12 +312,12 @@ export default function Home() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.4 }}
-          className="mt-8 font-mono text-[12px] text-subtle"
+          className="mt-6 font-mono text-[12px] text-subtle"
         >
           Or poke around the live demo —{' '}
-          <span className="text-muted-foreground">test@atlas.com</span>
+          <span className="text-muted-foreground">demo@kafei.app</span>
           <span className="mx-1.5 text-subtle">/</span>
-          <span className="text-muted-foreground">Atlas@12345</span>
+          <span className="text-muted-foreground">Kafei@12345</span>
         </motion.p>
       </section>
 
@@ -398,7 +417,7 @@ export default function Home() {
               </div>
               <div className="md:col-span-6 md:pt-2">
                 <p className="text-[15px] leading-[1.75] text-muted-foreground">
-                  Atlas is a website, not an install. There is no proprietary terminal to
+                  Kafei is a web application, not an install. There is no proprietary terminal to
                   buy or lease, and no dongle that stops working when a cable goes
                   missing. If a device has a browser, it can be a station.
                 </p>
@@ -433,12 +452,13 @@ export default function Home() {
               </div>
               <p className="text-[15px] leading-relaxed text-muted-foreground md:col-span-5">
                 We don’t sit between you and your payment provider, so there is no
-                percentage skimmed off each bill. Every plan starts with 14 free days.
+                percentage skimmed off each bill. Start on 14 free days, then pick the
+                plan that matches your floor.
               </p>
             </div>
           </ScrollReveal>
 
-          <div className="mt-16 grid gap-px overflow-hidden rounded-xl border border-border bg-secondary md:grid-cols-3">
+          <div className="mt-16 grid gap-px overflow-hidden rounded-xl border border-border bg-secondary sm:grid-cols-2 lg:grid-cols-4">
             {plans.map((plan) => (
               <div
                 key={plan.name}
@@ -458,12 +478,19 @@ export default function Home() {
                     )}
                   </div>
 
-                  <p className="mt-6 flex items-baseline gap-2">
-                    <span className="font-display text-[2.75rem] font-semibold leading-none tracking-[-0.04em] text-foreground">
-                      {plan.price}
-                    </span>
-                    <span className="text-[13px] text-muted-foreground">{plan.period}</span>
-                  </p>
+                  <div className="mt-6">
+                    {(plan as any).subheading && (
+                      <p className="text-[11px] font-bold uppercase tracking-wider text-primary mb-1">
+                        {(plan as any).subheading}
+                      </p>
+                    )}
+                    <p className="flex items-baseline gap-2">
+                      <span className="font-display text-[2.75rem] font-semibold leading-none tracking-[-0.04em] text-foreground">
+                        {plan.price}
+                      </span>
+                      <span className="text-[13px] text-muted-foreground">{plan.period}</span>
+                    </p>
+                  </div>
 
                   <p className="mt-4 text-[14px] leading-relaxed text-muted-foreground">
                     {plan.blurb}
@@ -595,17 +622,17 @@ export default function Home() {
               <div className="flex items-center gap-2.5">
                 <Image
                   src="/logo.png"
-                  alt=""
-                  width={24}
-                  height={24}
-                  className="h-6 w-6 object-contain"
+                  alt="Kafei"
+                  width={28}
+                  height={28}
+                  className="h-7 w-auto object-contain rounded-md"
                 />
-                <span className="font-display text-[14px] font-bold tracking-[-0.02em] text-foreground">
-                  Atlas
+                <span className="font-display text-[15px] font-extrabold tracking-[-0.02em] text-foreground">
+                  Kafei
                 </span>
               </div>
               <p className="mt-4 max-w-xs text-[13px] leading-relaxed text-muted-foreground">
-                Floor software for dine-in restaurants. Built for rooms that fill up.
+                Restaurant billing and floor software for dine-in operations. Built for rooms that fill up.
               </p>
             </div>
 
@@ -680,7 +707,7 @@ export default function Home() {
           </div>
 
           <p className="mt-14 border-t border-border pt-7 text-[12px] text-subtle">
-            © {new Date().getFullYear()} Project Atlas
+            © {new Date().getFullYear()} Kafei
           </p>
         </div>
       </footer>

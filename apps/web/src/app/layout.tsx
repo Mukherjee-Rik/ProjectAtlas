@@ -28,9 +28,9 @@ const funnelDisplay = Funnel_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Project Atlas — floor software for dine-in restaurants",
+  title: "Kafei — Restaurant Billing & Floor Operations App",
   description:
-    "One system for the whole floor: QR ordering at the table, a screen for the kitchen, tablets for waiters, and split billing at the counter.",
+    "Kafei runs your entire restaurant floor on one platform: QR ordering at the table, kitchen KDS screens, waiter tablets, and fast cashier POS billing.",
 };
 
 export default function RootLayout({

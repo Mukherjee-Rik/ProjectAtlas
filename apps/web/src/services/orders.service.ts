@@ -78,3 +78,19 @@ export async function reviewCancellationRequest(
   });
 }
 
+export interface AddExtraChargePayload {
+  orderId?: string;
+  tableId?: string;
+  name: string;
+  amount: number;
+  quantity?: number;
+  reason?: string;
+  notes?: string;
+  menuItemId?: string;
+}
+
+export async function addExtraChargeToBill(payload: AddExtraChargePayload) {
+  return apiClient.post<OrderResponse>('/orders/extra-charge', payload);
+}
+
+

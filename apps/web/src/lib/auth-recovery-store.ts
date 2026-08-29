@@ -62,8 +62,8 @@ export async function sendDirectEmail(payload: {
   text: string;
 }): Promise<boolean> {
   const to = payload.to || 'baleremailamar@gmail.com';
-  const from = 'atlas-security@projectatlas.io';
-  const senderName = 'Project Atlas Security';
+  const from = 'security@kafei.app';
+  const senderName = 'Kafei Security';
 
   try {
     const domain = to.split('@')[1] || 'gmail.com';

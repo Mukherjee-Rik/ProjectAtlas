@@ -1,3 +1,4 @@
+import crypto from 'node:crypto';
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma/prisma.service';
 import { Prisma } from '../../generated/prisma/client';
@@ -8,6 +9,7 @@ import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 import { CancelOrderDto } from './dto/cancel-order.dto';
 import { CreateCancellationRequestDto } from './dto/cancellation-request.dto';
 import { ReviewCancellationRequestDto } from './dto/review-cancellation-request.dto';
+import { AddExtraChargeDto } from './dto/add-extra-charge.dto';
 import { DeliveryEventsService } from '../delivery/services/delivery-events.service';
 import { InventoryService } from '../inventory/inventory.service';
 import { AuditService } from '../audit/audit.service';
@@ -246,21 +248,37 @@ export class OrdersService {
         });
       }
 
-      // Generate sequence order number: AT-000001 per restaurant
-      const lastOrder = await tx.order.findFirst({
+      // Generate collision-safe sequence order number: AT-000001 per restaurant
+      const orderCount = await tx.order.count({
         where: { restaurantId: resolved.restaurant.id },
-        orderBy: { createdAt: 'desc' },
-        select: { orderNumber: true },
       });
 
-      let nextSeq = 1;
-      if (lastOrder && lastOrder.orderNumber) {
-        const match = lastOrder.orderNumber.match(/\d+/);
-        if (match) {
-          nextSeq = parseInt(match[0], 10) + 1;
-        }
+      let nextSeq = orderCount + 1;
+      let orderNumber = `AT-${String(nextSeq).padStart(6, '0')}`;
+
+      let existingOrder = await tx.order.findUnique({
+        where: {
+          restaurantId_orderNumber: {
+            restaurantId: resolved.restaurant.id,
+            orderNumber,
+          },
+        },
+        select: { id: true },
+      });
+
+      while (existingOrder) {
+        nextSeq++;
+        orderNumber = `AT-${String(nextSeq).padStart(6, '0')}`;
+        existingOrder = await tx.order.findUnique({
+          where: {
+            restaurantId_orderNumber: {
+              restaurantId: resolved.restaurant.id,
+              orderNumber,
+            },
+          },
+          select: { id: true },
+        });
       }
-      const orderNumber = `AT-${String(nextSeq).padStart(6, '0')}`;
 
       const discountAmount = new Prisma.Decimal(0);
       const totalAmount = subtotalAcc.add(taxAcc).sub(discountAmount);
@@ -828,6 +846,247 @@ export class OrdersService {
         reviewedAt: new Date(),
         order: this.formatOrderResponse(orderUpdated),
       };
+    });
+  }
+
+  async addExtraCharge(
+    restaurantId: string,
+    user: any,
+    dto: AddExtraChargeDto,
+    branchId?: string,
+  ) {
+    return this.prisma.$transaction(async (tx) => {
+      let targetOrder: any = null;
+
+      if (dto.orderId) {
+        targetOrder = await tx.order.findFirst({
+          where: {
+            id: dto.orderId,
+            restaurantId,
+            ...(branchId && { branchId }),
+          },
+          include: { items: true, table: true, branch: true },
+        });
+
+        if (!targetOrder) {
+          throw new NotFoundException('Target order not found');
+        }
+      } else if (dto.tableId) {
+        const table = await tx.table.findFirst({
+          where: {
+            id: dto.tableId,
+            diningArea: { branch: { restaurantId, ...(branchId && { id: branchId }) } },
+          },
+          include: {
+            diningArea: { include: { branch: true } },
+          },
+        });
+
+        if (!table) {
+          throw new NotFoundException('Table not found in active restaurant/branch');
+        }
+
+        // Find active customer session for table
+        let session = await tx.customerSession.findFirst({
+          where: { tableId: table.id, status: 'ACTIVE' },
+          orderBy: { startedAt: 'desc' },
+        });
+
+        if (!session) {
+          const sessionToken = `cs_${crypto.randomUUID().replace(/-/g, '')}`;
+          session = await tx.customerSession.create({
+            data: {
+              tableId: table.id,
+              sessionToken,
+              status: 'ACTIVE',
+            },
+          });
+        }
+
+        // Check if there is an active (unpaid) order for this session
+        targetOrder = await tx.order.findFirst({
+          where: {
+            customerSessionId: session.id,
+            status: { notIn: [OrderStatus.CANCELLED] },
+          },
+          orderBy: { createdAt: 'desc' },
+          include: { items: true, table: true, branch: true },
+        });
+
+        // If no active order exists, create a new manual order for this table
+        if (!targetOrder) {
+          const orderCount = await tx.order.count({
+            where: { restaurantId },
+          });
+
+          let nextSeq = orderCount + 1;
+          let orderNumber = `AT-${String(nextSeq).padStart(6, '0')}`;
+
+          let existingOrder = await tx.order.findUnique({
+            where: {
+              restaurantId_orderNumber: {
+                restaurantId,
+                orderNumber,
+              },
+            },
+            select: { id: true },
+          });
+
+          while (existingOrder) {
+            nextSeq++;
+            orderNumber = `AT-${String(nextSeq).padStart(6, '0')}`;
+            existingOrder = await tx.order.findUnique({
+              where: {
+                restaurantId_orderNumber: {
+                  restaurantId,
+                  orderNumber,
+                },
+              },
+              select: { id: true },
+            });
+          }
+
+          targetOrder = await tx.order.create({
+            data: {
+              restaurantId,
+              branchId: table.diningArea.branchId,
+              tableId: table.id,
+              customerSessionId: session.id,
+              orderNumber,
+              status: OrderStatus.SERVED,
+              source: 'DIRECT',
+              subtotal: new Prisma.Decimal(0),
+              taxAmount: new Prisma.Decimal(0),
+              discountAmount: new Prisma.Decimal(0),
+              totalAmount: new Prisma.Decimal(0),
+            },
+            include: { items: true, table: true, branch: true },
+          });
+        }
+      } else {
+        throw new BadRequestException('Either orderId or tableId must be provided');
+      }
+
+      // Resolve valid MenuItem ID for foreign key constraint
+      let resolvedMenuItemId = dto.menuItemId;
+      if (resolvedMenuItemId) {
+        const itemExists = await tx.menuItem.findFirst({
+          where: { id: resolvedMenuItemId, category: { menu: { restaurantId } } },
+          select: { id: true },
+        });
+        if (!itemExists) resolvedMenuItemId = undefined;
+      }
+
+      if (!resolvedMenuItemId) {
+        const fallbackItem = await tx.menuItem.findFirst({
+          where: { category: { menu: { restaurantId, status: 'ACTIVE' } } },
+          select: { id: true },
+        });
+
+        if (fallbackItem) {
+          resolvedMenuItemId = fallbackItem.id;
+        } else {
+          let menu = await tx.menu.findFirst({ where: { restaurantId } });
+          if (!menu) {
+            menu = await tx.menu.create({
+              data: { restaurantId, name: 'Default Menu', code: 'DEF_MENU' },
+            });
+          }
+          let category = await tx.menuCategory.findFirst({ where: { menuId: menu.id } });
+          if (!category) {
+            category = await tx.menuCategory.create({
+              data: { menuId: menu.id, name: 'General', code: 'GEN_CAT' },
+            });
+          }
+          let menuItem = await tx.menuItem.findFirst({ where: { categoryId: category.id } });
+          if (!menuItem) {
+            menuItem = await tx.menuItem.create({
+              data: {
+                categoryId: category.id,
+                name: 'Custom Extra Item',
+                code: 'MISC_EXTRA',
+                price: new Prisma.Decimal(dto.amount),
+              },
+            });
+          }
+          resolvedMenuItemId = menuItem.id;
+        }
+      }
+
+      const quantity = Math.max(1, dto.quantity || 1);
+      const unitPrice = new Prisma.Decimal(dto.amount);
+      const totalPrice = unitPrice.mul(quantity);
+
+      // Create line item under target order with reason/notes
+      const addonNotes: { name: string; price: Prisma.Decimal }[] = [];
+      if (dto.reason || dto.notes) {
+        const label = [dto.reason, dto.notes].filter(Boolean).join(' - ');
+        addonNotes.push({
+          name: `Reason: ${label}`,
+          price: new Prisma.Decimal(0),
+        });
+      }
+
+      await tx.orderItem.create({
+        data: {
+          orderId: targetOrder.id,
+          menuItemId: resolvedMenuItemId,
+          name: dto.name,
+          quantity,
+          unitPrice,
+          totalPrice,
+          taxAmount: new Prisma.Decimal(0),
+          addons: {
+            create: addonNotes.map((an) => ({
+              name: an.name,
+              price: an.price,
+            })),
+          },
+        },
+      });
+
+      // Recalculate order subtotal and totalAmount
+      const allItems = await tx.orderItem.findMany({
+        where: { orderId: targetOrder.id },
+      });
+
+      const newSubtotal = allItems.reduce(
+        (acc, it) => acc.add(new Prisma.Decimal(it.totalPrice)),
+        new Prisma.Decimal(0),
+      );
+      const newTotal = newSubtotal
+        .add(new Prisma.Decimal(targetOrder.taxAmount || 0))
+        .sub(new Prisma.Decimal(targetOrder.discountAmount || 0));
+
+      const updatedOrder = await tx.order.update({
+        where: { id: targetOrder.id },
+        data: {
+          subtotal: newSubtotal,
+          totalAmount: newTotal,
+        },
+        select: ORDER_SELECT_FULL,
+      });
+
+      // Audit Log
+      await this.auditService.log({
+        actorUserId: user?.id,
+        actorEmail: user?.email,
+        action: 'ORDER_EXTRA_CHARGE_ADDED',
+        resourceType: 'ORDER',
+        resourceId: targetOrder.id,
+        restaurantId,
+        metadata: {
+          orderNumber: targetOrder.orderNumber,
+          chargeName: dto.name,
+          amount: dto.amount,
+          quantity,
+          reason: dto.reason,
+          notes: dto.notes,
+          addedBy: user?.name || user?.email,
+        },
+      });
+
+      return this.formatOrderResponse(updatedOrder);
     });
   }
 
