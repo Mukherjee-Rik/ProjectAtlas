@@ -442,7 +442,7 @@ export class AuthService {
       // 2.5. Create Default Trial Subscription
       try {
         const defaultPlan = (await tx.plan.findFirst({
-          where: { name: 'Starter', status: 'ACTIVE' },
+          where: { name: 'Free', status: 'ACTIVE' },
         })) || (await tx.plan.findFirst({
           where: { status: 'ACTIVE' },
           orderBy: { price: 'asc' },

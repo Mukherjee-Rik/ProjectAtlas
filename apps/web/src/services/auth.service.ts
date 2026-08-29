@@ -1,5 +1,7 @@
 import { apiClient } from './api-client';
+import { getAccessToken } from '@/lib/auth-storage';
 import type {
+  AuthUser,
   LoginRequest,
   LoginResponse,
   RegisterRestaurantRequest,
@@ -13,6 +15,46 @@ export function login(credentials: LoginRequest) {
 
 export function registerRestaurant(payload: RegisterRestaurantRequest) {
   return apiClient.post<RegisterRestaurantResponse>('/auth/signup', payload);
+}
+
+/**
+ * Creates the first tenant and restaurant for the signed-in user.
+ *
+ * Separate from registerRestaurant because /auth/signup rejects an email that
+ * already exists, which is always the case after an OAuth sign-in: the account
+ * is created before the operator has ever named a restaurant.
+ */
+export async function createFirstRestaurant(payload: {
+  restaurantName: string;
+  phone?: string;
+  address?: string;
+}) {
+  const token = getAccessToken();
+  const res = await fetch('/api/v1/auth/onboarding/restaurant', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    credentials: 'include',
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data?.message || data?.error || 'Could not create the restaurant.');
+  }
+  return data as {
+    success: boolean;
+    alreadyOnboarded?: boolean;
+    data: {
+      accessToken?: string;
+      user: AuthUser;
+      tenant?: { id: string; name: string; slug: string };
+      restaurant?: { id: string; name: string; slug: string };
+      branch?: { id: string; name: string; code: string };
+      memberships?: RestaurantMembershipInfo[];
+    };
+  };
 }
 
 export function getMemberships() {
@@ -66,6 +108,48 @@ export async function oauthLogin(payload: { provider: string; email: string; nam
     }
     return data as LoginResponse;
   }
+}
+
+/**
+ * Persists a section of the onboarding wizard for the signed-in owner's
+ * restaurant. Each section is independent and idempotent, so the wizard can
+ * call this as each step is completed and revisiting a step rewrites rather
+ * than duplicates.
+ */
+export async function saveOnboardingSetup(payload: {
+  floor?: { diningAreaName?: string; seating: { seats: number; count: number }[] };
+  menu?: {
+    menuName?: string;
+    categoryName?: string;
+    dishName?: string;
+    dishPrice?: number;
+  };
+  staff?: { email: string; role: string };
+  payments?: Record<string, boolean>;
+}) {
+  const token = getAccessToken();
+  const res = await fetch('/api/v1/auth/onboarding/setup', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    credentials: 'include',
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data?.message || data?.error || 'Could not save your setup details.');
+  }
+  return data as {
+    success: boolean;
+    data: {
+      floor?: { tablesCreated: number; tablesTotal: number; coversTotal: number; skipped?: string };
+      menu?: { menuId: string; categoryId: string; itemId: string | null };
+      staff?: { email?: string; role?: string; skipped?: string };
+      payments?: { saved: boolean; reason: string };
+    };
+  };
 }
 
 export function verifyOtp(payload: { challengeId: string; otp: string }) {

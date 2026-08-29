@@ -1,5 +1,6 @@
 import { ProtectedRoute } from '@/components/auth/protected-route';
 import { AppShell } from '@/components/layout/app-shell';
+import { SubscriptionGate } from '@/components/auth/subscription-gate';
 
 export default function ProtectedLayout({
   children,
@@ -9,7 +10,7 @@ export default function ProtectedLayout({
   return (
     <ProtectedRoute>
       <AppShell>
-        {children}
+        <SubscriptionGate>{children}</SubscriptionGate>
       </AppShell>
     </ProtectedRoute>
   );
