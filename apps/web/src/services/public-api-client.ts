@@ -39,8 +39,12 @@ async function publicRequest<T>(endpoint: string, options: RequestInit = {}): Pr
   }
 
   if (!response.ok) {
-    const err = (body as { error?: string } | undefined)?.error ?? 'Request failed';
-    throw new Error(err);
+    const parsed = body as { error?: string; message?: string } | undefined;
+    const err = parsed?.error ?? parsed?.message ?? 'Request failed';
+    // The status rides along so callers can tell "wrong route or verb" (worth
+    // one retry with a different method) from "no such record" (retrying is
+    // pure latency, and on this flow it used to cost a second round trip).
+    throw Object.assign(new Error(err), { status: response.status });
   }
 
   return body as T;

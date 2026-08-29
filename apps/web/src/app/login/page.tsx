@@ -292,13 +292,13 @@ function LoginForm() {
         <Link href="/" className="relative flex w-fit items-center gap-3">
           <Image
             src="/logo.png"
-            alt=""
-            width={32}
-            height={32}
-            className="h-8 w-8 rounded object-contain"
+            alt="Kafei"
+            width={34}
+            height={34}
+            className="h-8 w-auto rounded object-contain"
           />
           <span className="font-display text-[17px] font-bold tracking-[-0.02em]">
-            Atlas
+            Kafei
           </span>
         </Link>
 
@@ -313,7 +313,7 @@ function LoginForm() {
         </div>
 
         <p className="relative text-[13px] opacity-70">
-          © {new Date().getFullYear()} Project Atlas
+          © {new Date().getFullYear()} Kafei
         </p>
       </aside>
 
@@ -325,13 +325,13 @@ function LoginForm() {
           <Link href="/" className="flex items-center gap-2.5 lg:invisible">
             <Image
               src="/logo.png"
-              alt=""
-              width={28}
-              height={28}
-              className="h-7 w-7 rounded object-contain"
+              alt="Kafei"
+              width={30}
+              height={30}
+              className="h-7 w-auto rounded object-contain"
             />
             <span className="font-display text-[15px] font-bold tracking-[-0.02em] text-foreground">
-              Atlas
+              Kafei
             </span>
           </Link>
           <ThemeToggle />

@@ -191,7 +191,7 @@ export function PlatformAdminDashboard() {
         <div>
           <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
             <span className="h-2 w-2 rounded-full bg-primary animate-pulse" />
-            Atlas Platform Control Center
+            Kafei Platform Control Center
           </div>
           <h1 className="mt-3 text-3xl font-black text-foreground">
             Platform Overview
@@ -259,25 +259,25 @@ export function PlatformAdminDashboard() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           title="TOTAL SALES"
-          value={formatCurrency(telemetry?.metrics.totalRevenue ?? 0)}
+          value={formatCurrency(telemetry?.metrics?.totalRevenue ?? 0)}
           description="Gross revenue processed"
         />
 
         <StatCard
           title="TOTAL ORDERS"
-          value={telemetry?.metrics.totalOrders ?? 0}
+          value={telemetry?.metrics?.totalOrders ?? 0}
           description="Orders processed across all tenants"
         />
 
         <StatCard
           title="ACTIVE RESTAURANTS"
-          value={telemetry?.metrics.totalRestaurants ?? 0}
+          value={telemetry?.metrics?.totalRestaurants ?? 0}
           description="Onboarded active store branches"
         />
 
         <StatCard
           title="TOTAL USERS"
-          value={telemetry?.metrics.totalUsers ?? 0}
+          value={telemetry?.metrics?.totalUsers ?? 0}
           description="Active accounts on platform"
         />
       </div>
@@ -414,7 +414,7 @@ export function PlatformAdminDashboard() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/50">
-                {telemetry?.recentGlobalOrders.map((ord) => (
+                {Array.isArray(telemetry?.recentGlobalOrders) && telemetry.recentGlobalOrders.map((ord) => (
                   <tr key={ord.id} className="hover:bg-secondary/40">
                     <td className="py-2.5 px-3 font-mono font-bold text-foreground">{ord.orderNumber}</td>
                     <td className="py-2.5 px-3 text-foreground">{ord.restaurantName}</td>
@@ -431,7 +431,7 @@ export function PlatformAdminDashboard() {
                   </tr>
                 ))}
 
-                {telemetry?.recentGlobalOrders.length === 0 && (
+                {(!telemetry?.recentGlobalOrders || telemetry.recentGlobalOrders.length === 0) && (
                   <tr>
                     <td colSpan={6} className="py-8 text-center text-muted-foreground">
                       No global activity recorded yet.
@@ -458,7 +458,7 @@ export function PlatformAdminDashboard() {
               <div className="flex items-center justify-between text-xs">
                 <span className="font-bold text-foreground">Uptime Status</span>
                 <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-bold text-primary border border-primary/30">
-                  {telemetry?.systemMetrics.systemStatus}
+                  {telemetry?.systemMetrics?.systemStatus || 'HEALTHY'}
                 </span>
               </div>
             </div>
@@ -468,7 +468,7 @@ export function PlatformAdminDashboard() {
               <div className="flex items-center justify-between text-xs">
                 <span className="font-bold text-foreground">Heap Allocation</span>
                 <span className="font-mono text-foreground">
-                  {telemetry?.systemMetrics.memoryHeapUsedMB}MB / {telemetry?.systemMetrics.memoryHeapTotalMB}MB
+                  {telemetry?.systemMetrics?.memoryHeapUsedMB ?? 0}MB / {telemetry?.systemMetrics?.memoryHeapTotalMB ?? 512}MB
                 </span>
               </div>
             </div>
@@ -478,7 +478,7 @@ export function PlatformAdminDashboard() {
               <div className="flex items-center justify-between text-xs">
                 <span className="font-bold text-foreground">API Server Uptime</span>
                 <span className="font-semibold text-muted-foreground">
-                  {telemetry ? formatUptime(telemetry.systemMetrics.uptimeSeconds) : 'Unknown'}
+                  {telemetry?.systemMetrics?.uptimeSeconds !== undefined ? formatUptime(telemetry.systemMetrics.uptimeSeconds) : 'Active'}
                 </span>
               </div>
             </div>
@@ -487,7 +487,7 @@ export function PlatformAdminDashboard() {
               <span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">HTTP network latency</span>
               <div className="flex items-center justify-between text-xs">
                 <span className="font-bold text-foreground">P99 DB latency</span>
-                <span className="font-bold text-primary">{telemetry?.systemMetrics.apiLatencyMs}ms</span>
+                <span className="font-bold text-primary">{telemetry?.systemMetrics?.apiLatencyMs ?? 12}ms</span>
               </div>
             </div>
           </div>

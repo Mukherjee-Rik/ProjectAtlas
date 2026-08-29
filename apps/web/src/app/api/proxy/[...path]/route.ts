@@ -365,8 +365,8 @@ async function handler(
         success: false,
         statusCode: timedOut ? 504 : 503,
         error: timedOut
-          ? 'The Atlas API did not respond in time. Please try again.'
-          : 'Unable to reach the Atlas API. Please try again shortly.',
+          ? 'The Kafei API did not respond in time. Please try again.'
+          : 'Unable to reach the Kafei API. Please try again shortly.',
       },
       { status: timedOut ? 504 : 503 },
     );

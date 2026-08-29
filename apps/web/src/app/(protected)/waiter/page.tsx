@@ -620,18 +620,30 @@ export default function WaiterDashboard() {
     activeAreaId === 'ALL' ? true : t.diningAreaId === activeAreaId,
   );
 
+  const isOrderUnpaid = (o: any) => {
+    if (!o || o.status === 'CANCELLED') return false;
+    return !o.payments?.some((p: any) => p.status === 'SUCCESS' || p.status === 'PARTIALLY_REFUNDED');
+  };
+
   // Calculate quick stats (strict occupancy: only occupied if active unsettled orders exist)
   const totalTables = tables.length;
   const occupiedCount = tables.filter((t) => {
     const session = t.customerSessions?.find((s) => s.status === 'ACTIVE');
     if (!session) return false;
     const orders = session.orders ?? [];
-    return orders.some((o) => !['COMPLETED', 'CANCELLED'].includes(o.status));
+    return orders.some(isOrderUnpaid);
   }).length;
   const availableCount = totalTables - occupiedCount;
   const readyCount = tables.filter((t) =>
     t.customerSessions?.some((s) => s.orders?.some((o) => o.status === 'READY')),
   ).length;
+  const sentToCashierCount = tables.filter((t) => {
+    const session = t.customerSessions?.find((s) => s.status === 'ACTIVE');
+    if (!session) return false;
+    const orders = session.orders ?? [];
+    const unpaid = orders.filter(isOrderUnpaid);
+    return unpaid.length > 0 && unpaid.every((o) => o.status === 'COMPLETED');
+  }).length;
 
   return (
     <div className="space-y-6">
@@ -689,7 +701,7 @@ export default function WaiterDashboard() {
         </div>
 
         {/* Quick Floor Stats Bar */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 w-full sm:w-auto">
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 w-full sm:w-auto">
           <div className="rounded-xl border border-border bg-card px-3 py-2 text-center">
             <span className="block text-[10px] font-bold uppercase text-muted-foreground">Total</span>
             <span className="text-sm font-extrabold text-foreground">{totalTables}</span>
@@ -705,6 +717,10 @@ export default function WaiterDashboard() {
           <div className="rounded-xl border border-atlas-warning/30 bg-atlas-warning/5 px-3 py-2 text-center">
             <span className="block text-[10px] font-bold uppercase text-atlas-warning">Ready</span>
             <span className="text-sm font-extrabold text-atlas-warning">{readyCount}</span>
+          </div>
+          <div className="rounded-xl border border-purple-500/30 bg-purple-500/5 px-3 py-2 text-center">
+            <span className="block text-[10px] font-bold uppercase text-purple-400">At Cashier</span>
+            <span className="text-sm font-extrabold text-purple-400">{sentToCashierCount}</span>
           </div>
         </div>
       </div>
@@ -762,21 +778,26 @@ export default function WaiterDashboard() {
               {filteredTables.map((table) => {
                 const activeSession = table.customerSessions?.find((s) => s.status === 'ACTIVE');
                 const orders = activeSession?.orders ?? [];
-                const activeOrders = orders.filter((o) => !['COMPLETED', 'CANCELLED'].includes(o.status));
-                const isOccupied = !!activeSession && (orders.length === 0 ? false : activeOrders.length > 0);
-                const hasReadyOrders = orders.some((o) => o.status === 'READY');
+                const unpaidOrders = orders.filter(isOrderUnpaid);
+                const isOccupied = !!activeSession && unpaidOrders.length > 0;
+                const hasReadyOrders = unpaidOrders.some((o) => o.status === 'READY');
+                const isSentToCashier = unpaidOrders.length > 0 && unpaidOrders.every((o) => o.status === 'COMPLETED');
                 const isSelected = selectedTable?.id === table.id;
 
                 const cardBorder = isSelected
                   ? 'border-primary bg-primary/10 shadow-[0_0_15px_rgba(42,254,183,0.15)] ring-1 ring-primary'
                   : hasReadyOrders
                   ? 'border-atlas-warning/70 bg-atlas-warning/5 hover:border-atlas-warning shadow-[0_0_10px_rgba(234,179,8,0.1)]'
+                  : isSentToCashier
+                  ? 'border-purple-500/60 bg-purple-500/5 hover:border-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.1)]'
                   : isOccupied
                   ? 'border-atlas-error/40 bg-atlas-error/5 hover:border-atlas-error'
                   : 'border-border bg-card hover:border-primary/40';
 
                 const indicatorDot = hasReadyOrders
                   ? 'bg-atlas-warning animate-ping'
+                  : isSentToCashier
+                  ? 'bg-purple-500 animate-pulse'
                   : isOccupied
                   ? 'bg-atlas-error'
                   : 'bg-atlas-success';
@@ -796,14 +817,17 @@ export default function WaiterDashboard() {
                         {hasReadyOrders && (
                           <span className="text-[10px] font-bold text-atlas-warning">READY</span>
                         )}
+                        {isSentToCashier && (
+                          <span className="text-[10px] font-bold text-purple-400">AT CASHIER</span>
+                        )}
                         <span className={`h-2.5 w-2.5 rounded-full ${indicatorDot}`} />
                       </div>
                     </div>
 
                     <div className="mt-3 pt-2 border-t border-border/40 flex items-center justify-between text-[10px] sm:text-[11px] text-muted-foreground w-full">
                       <span>👥 {table.capacity}p</span>
-                      <span className={isOccupied ? 'font-bold text-foreground' : 'text-atlas-success'}>
-                        {isOccupied ? `${activeOrders.length} active order${activeOrders.length !== 1 ? 's' : ''}` : 'Available'}
+                      <span className={isSentToCashier ? 'font-bold text-purple-400' : isOccupied ? 'font-bold text-foreground' : 'text-atlas-success'}>
+                        {isSentToCashier ? 'Sent to Cashier' : isOccupied ? `${unpaidOrders.length} active order${unpaidOrders.length !== 1 ? 's' : ''}` : 'Available'}
                       </span>
                     </div>
                   </button>
@@ -841,11 +865,40 @@ export default function WaiterDashboard() {
                   (() => {
                     const activeSession = selectedTable.customerSessions.find((s) => s.status === 'ACTIVE')!;
                     const allOrders = activeSession.orders ?? [];
-                    const activeOrders = allOrders.filter((o) => !['COMPLETED', 'CANCELLED'].includes(o.status));
+                    const unpaidOrders = allOrders.filter(isOrderUnpaid);
+                    const isSentToCashier = unpaidOrders.length > 0 && unpaidOrders.every((o) => o.status === 'COMPLETED');
 
                     return (
                       <div className="space-y-4">
-                        {activeOrders.length > 0 ? (
+                        {isSentToCashier ? (
+                          <div className="rounded-xl bg-purple-500/10 border border-purple-500/30 p-3 text-xs text-purple-300 space-y-2.5">
+                            <div className="flex items-center justify-between font-bold">
+                              <span>Sent to Cashier — Bill Pending</span>
+                              <span className="h-2 w-2 rounded-full bg-purple-500 animate-pulse" />
+                            </div>
+                            <p className="text-[11px] text-muted-foreground">
+                              Order marked completed by waiter. Awaiting cashier payment settlement.
+                            </p>
+                            <div className="flex gap-2">
+                              <button
+                                type="button"
+                                disabled={isPrinting}
+                                onClick={() => handlePrintBill(selectedTable)}
+                                className="flex-1 rounded-lg bg-secondary border border-border py-2 text-xs font-bold text-foreground hover:border-primary transition-all text-center cursor-pointer"
+                              >
+                                {isPrinting ? 'Printing...' : '🖨️ Print Bill'}
+                              </button>
+                              <button
+                                type="button"
+                                disabled={updatingTableId === selectedTable.id}
+                                onClick={() => handleClearTable(selectedTable)}
+                                className="flex-1 rounded-lg bg-atlas-error/20 py-2 text-xs font-bold text-atlas-error hover:bg-atlas-error/30 transition-all disabled:opacity-50 text-center cursor-pointer"
+                              >
+                                Clear Table
+                              </button>
+                            </div>
+                          </div>
+                        ) : unpaidOrders.length > 0 ? (
                           <div className="rounded-xl bg-atlas-error/10 border border-atlas-error/20 p-3 text-xs text-atlas-error space-y-2.5">
                             <div className="flex items-center justify-between font-bold">
                               <span>Occupied Guest Session</span>
@@ -918,6 +971,8 @@ export default function WaiterDashboard() {
                                     className={`rounded-xl p-3 text-xs border transition-all ${
                                       isReady
                                         ? 'border-atlas-warning/60 bg-atlas-warning/10 shadow-[0_0_10px_rgba(234,179,8,0.15)]'
+                                        : isCompleted && !hasPaid
+                                        ? 'border-purple-500/40 bg-purple-500/10 shadow-[0_0_10px_rgba(168,85,247,0.1)]'
                                         : isCancelled
                                         ? 'border-atlas-error/20 bg-atlas-error/5 opacity-75'
                                         : 'border-border bg-secondary'
@@ -942,7 +997,7 @@ export default function WaiterDashboard() {
                                                 : 'bg-card text-muted-foreground'
                                             }`}
                                           >
-                                            {hasPendingReview ? 'Review Pending' : o.status}
+                                            {hasPendingReview ? 'Review Pending' : isCompleted ? (hasPaid ? 'Paid' : 'Sent to Cashier') : o.status}
                                           </span>
                                         </div>
                                         {isCancelled && o.cancellationReason && (
@@ -971,10 +1026,10 @@ export default function WaiterDashboard() {
                                           <button
                                             type="button"
                                             disabled={isOrderUpdating}
-                                            onClick={() => handleUpdateOrderStatus(o.id, 'COMPLETED', 'Completed')}
-                                            className="rounded bg-[#A855F7] px-2.5 py-1.5 text-[10px] font-bold text-foreground hover:bg-[#9333EA] transition-all active:scale-[0.97] disabled:opacity-50"
+                                            onClick={() => handleUpdateOrderStatus(o.id, 'COMPLETED', 'Completed & Sent to Cashier')}
+                                            className="rounded bg-[#A855F7] px-2.5 py-1.5 text-[10px] font-bold text-foreground hover:bg-[#9333EA] transition-all active:scale-[0.97] disabled:opacity-50 shadow-md cursor-pointer"
                                           >
-                                            {isOrderUpdating ? 'Completing...' : 'Complete'}
+                                            {isOrderUpdating ? 'Sending...' : '✨ Send to Cashier'}
                                           </button>
                                         )}
                                         {!isCancelled && !isCompleted && !hasPendingReview && (

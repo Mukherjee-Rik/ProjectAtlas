@@ -10,7 +10,7 @@ export default function SettingsPage() {
           Settings
         </h1>
         <p className="mt-2 text-muted-foreground">
-          Manage your Atlas platform preferences, payments, and security.
+          Manage your Kafei platform preferences, payments, and security.
         </p>
       </div>
 
