@@ -92,53 +92,46 @@ export class AuthService {
     };
   }
 
+  /**
+   * Step one of signing in: the password is checked, then a six-digit code is
+   * emailed to the account's own address. No session exists until verifyOtp
+   * accepts that code, so a leaked password alone is not enough to get in.
+   */
   async login(email: string, password: string, ip?: string, userAgent?: string) {
     const user = await this.validateUser(email, password, ip, userAgent);
-    const memberships = await this.getUserMemberships(user.id);
 
-    // Create session record
-    const session = await this.prisma.session.create({
-      data: {
+    const otp = this.smsDispatcher.generateOtp();
+    const challengeId = `otp_${crypto.randomUUID().replace(/-/g, '').substring(0, 16)}`;
+
+    this.cache.set(
+      `otp_challenge:${challengeId}`,
+      {
         userId: user.id,
-        refreshTokenHash: '',
-        deviceName: this.parseUserAgent(userAgent),
-        ipAddress: ip || null,
-        userAgent: userAgent || null,
-        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+        email: user.email,
+        phone: user.phone || '',
+        otp,
+        attempts: 0,
       },
-    });
+      5 * 60 * 1000,
+    );
 
-    const accessToken = await this.generateAccessToken(user.id, user.email, user.role, session.id);
-    const refreshToken = await this.generateRefreshToken(session.id);
-
-    await this.prisma.session.update({
-      where: { id: session.id },
-      data: { refreshTokenHash: this.hashToken(refreshToken) },
-    });
+    void this.smsDispatcher.sendSignInOtpEmail(user.email, otp, user.name);
 
     await this.auditService.log({
       actorUserId: user.id,
       actorEmail: user.email,
-      action: 'LOGIN_SUCCESS',
+      action: 'LOGIN_OTP_ISSUED',
       resourceType: 'AUTH',
-      resourceId: session.id,
-      metadata: { method: 'PASSWORD' },
+      resourceId: challengeId,
       ipAddress: ip,
       userAgent: userAgent,
     });
 
     return {
-      accessToken,
-      refreshToken,
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-        role: user.role,
-        status: user.status,
-      },
-      memberships,
+      otpRequired: true,
+      challengeId,
+      emailMasked: this.smsDispatcher.maskEmail(user.email),
+      message: `We emailed a 6-digit code to ${this.smsDispatcher.maskEmail(user.email)}. It is valid for 5 minutes.`,
     };
   }
 
@@ -242,11 +235,11 @@ export class AuthService {
     challenge.attempts = 0;
     this.cache.set(`otp_challenge:${challengeId}`, challenge, 5 * 60 * 1000);
 
-    void this.smsDispatcher.sendSignInOtp(challenge.phone, newOtp);
+    void this.smsDispatcher.sendSignInOtpEmail(challenge.email, newOtp);
 
     return {
       success: true,
-      message: `A new 6-digit verification code has been dispatched to ${this.smsDispatcher.maskPhone(challenge.phone)}.`,
+      message: `A new 6-digit code has been emailed to ${this.smsDispatcher.maskEmail(challenge.email)}.`,
     };
   }
 

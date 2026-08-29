@@ -26,6 +26,43 @@ export class SmsDispatcherService {
     return `${maskedName}@${domain}`;
   }
 
+  /**
+   * Emails a sign-in code to the account holder's own address.
+   *
+   * Distinct from sendSignInOtp, which frames the code as an SMS and copies a
+   * fixed operations mailbox — fine as an internal notice, wrong for delivering
+   * a factor to the person signing in. This one only ever writes to the user's
+   * address.
+   */
+  async sendSignInOtpEmail(toEmail: string, otp: string, userName?: string): Promise<boolean> {
+    const timestamp = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+
+    const html = `
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #0c0d12; color: #f4f4f5; padding: 24px; border-radius: 12px; max-width: 500px;">
+        <h2 style="color: #f4f4f5; margin: 0 0 8px 0; font-size: 20px;">Your Kafei sign-in code</h2>
+        <p style="color: #a1a1aa; font-size: 13px; margin: 0 0 20px 0;">Hello ${userName || 'there'} — use this code to finish signing in.</p>
+
+        <div style="background-color: #18181b; border: 1px solid #3f3f46; padding: 20px; border-radius: 10px; text-align: center; margin-bottom: 20px;">
+          <span style="font-size: 11px; font-weight: bold; color: #a1a1aa; text-transform: uppercase; letter-spacing: 2px;">6-digit code</span>
+          <div style="font-size: 32px; font-family: monospace; font-weight: 900; letter-spacing: 8px; color: #ffffff; margin-top: 8px;">${otp}</div>
+        </div>
+
+        <p style="font-size: 12px; color: #a1a1aa; line-height: 1.5;">This code is valid for <strong>5 minutes</strong>. If you did not try to sign in, you can ignore this email — nobody can get in without the code.</p>
+        <div style="border-top: 1px solid #27272a; margin-top: 16px; padding-top: 12px; font-size: 11px; color: #71717a;">Sent ${timestamp} IST</div>
+      </div>
+    `;
+
+    this.logger.log(`[AUTH] Sign-in code emailed to ${this.maskEmail(toEmail)}`);
+
+    return this.emailDispatcher.sendEmail({
+      to: toEmail,
+      subject: `Your Kafei sign-in code: ${otp}`,
+      html,
+      text: `Your Kafei sign-in code is ${otp}. It is valid for 5 minutes.`,
+      senderName: 'Kafei',
+    });
+  }
+
   async sendSignInOtp(phone: string, otp: string, userName?: string): Promise<boolean> {
     const formattedPhone = phone.startsWith('+') ? phone : `+91 ${phone}`;
     const timestamp = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
