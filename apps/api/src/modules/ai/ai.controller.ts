@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Body, UseGuards, BadRequestException } from '@nestjs/common';
+import { Controller, Post, Get, Body, UseGuards, BadRequestException, ForbiddenException } from '@nestjs/common';
 import { ApiOperation, ApiTags, ApiBearerAuth, ApiHeader } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RestaurantAccessGuard } from '../auth/guards/restaurant-access.guard';
@@ -31,6 +31,11 @@ export class AiController {
     @CurrentRestaurant() restaurant: CurrentRestaurantType,
     @Body() body: { query: string; history?: { role: 'user' | 'model'; content: string }[] },
   ) {
+    const allowedRoles: UserRole[] = [UserRole.PLATFORM_ADMIN, UserRole.OWNER, UserRole.ADMIN, UserRole.MANAGER];
+    if (!allowedRoles.includes(role)) {
+      throw new ForbiddenException('AI Assistant is only accessible to Owners, Managers, and Platform Administrators.');
+    }
+
     if (!restaurant?.id) {
       throw new BadRequestException('Restaurant context is required');
     }
@@ -50,6 +55,11 @@ export class AiController {
     @CurrentUser('role') role: UserRole,
     @CurrentRestaurant() restaurant: CurrentRestaurantType,
   ) {
+    const allowedRoles: UserRole[] = [UserRole.PLATFORM_ADMIN, UserRole.OWNER, UserRole.ADMIN, UserRole.MANAGER];
+    if (!allowedRoles.includes(role)) {
+      throw new ForbiddenException('AI Insights are only accessible to Owners, Managers, and Platform Administrators.');
+    }
+
     if (!restaurant?.id) {
       throw new BadRequestException('Restaurant context is required');
     }

@@ -114,7 +114,11 @@ function LoginForm() {
         });
       }
       if (item.restaurant.branches?.[0]?.id) {
-        const b = item.restaurant.branches[0];
+        const branches = item.restaurant.branches;
+        const b =
+          branches.find(
+            (br: any) => br.code?.toUpperCase() === 'MAIN' || br.name?.toLowerCase().includes('main'),
+          ) || branches[0];
         setCurrentBranch({
           id: b.id,
           restaurantId: item.restaurant.id,
