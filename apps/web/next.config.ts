@@ -19,7 +19,12 @@ function getLocalNetworkIps(): string[] {
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: getLocalNetworkIps(),
-
+  env: {
+    NEXT_PUBLIC_GOOGLE_CLIENT_ID:
+      process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ||
+      process.env.GOOGLE_CLIENT_ID ||
+      '176583562252-7mos3rsvao2elm9obl55hmknphipgqq8.apps.googleusercontent.com',
+  },
 };
 
 export default nextConfig;

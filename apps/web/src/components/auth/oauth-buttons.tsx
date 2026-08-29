@@ -40,7 +40,10 @@ export function OAuthButtons({ onLoading, onError }: OAuthButtonsProps) {
   const [devProvider, setDevProvider] = useState<'google' | 'github'>('google');
   const [showCredGuide, setShowCredGuide] = useState(false);
 
-  const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+  const googleClientId =
+    process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ||
+    process.env.GOOGLE_CLIENT_ID ||
+    '176583562252-7mos3rsvao2elm9obl55hmknphipgqq8.apps.googleusercontent.com';
   const isRealGoogleConfigured =
     Boolean(googleClientId) &&
     !googleClientId?.includes('atlas-client-id') &&
