@@ -149,6 +149,9 @@ export const CacheKeys = {
   restaurant: (restaurantId: string) => `restaurant:${restaurantId}`,
   branch: (branchId: string) => `branch:${branchId}`,
   subscription: (restaurantId: string) => `subscription:${restaurantId}`,
+  tableToken: (token: string) => `table_token:${token}`,
+  tableSession: (tableId: string) => `table_session:${tableId}`,
+  menuItem: (restaurantId: string, menuItemId: string) => `menu_item:${restaurantId}:${menuItemId}`,
 } as const;
 
 /**
@@ -164,4 +167,7 @@ export const CacheTtl = {
   restaurant: 60_000,
   branch: 60_000,
   subscription: 20_000,
+  tableToken: 30_000,
+  tableSession: 15_000,
+  menuItem: 30_000,
 } as const;

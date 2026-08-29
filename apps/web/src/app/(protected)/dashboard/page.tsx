@@ -104,18 +104,39 @@ export default function DashboardPage() {
     }
   }, [startDate, endDate, currentRestaurant?.id, currentBranch?.id]);
 
+  // Redirect dedicated role users to their respective portals
+  useEffect(() => {
+    if (user?.role === 'PLATFORM_ADMIN') {
+      router.replace('/platform-admin');
+    } else if (user?.role === 'CASHIER') {
+      router.replace('/cashier');
+    } else if (user?.role === 'WAITER' || user?.role === 'STAFF') {
+      router.replace('/waiter');
+    } else if (user?.role === 'KITCHEN') {
+      router.replace('/kitchen');
+    }
+  }, [user?.role, router]);
+
   // Load dashboard and analytics when dates, active tab, restaurant, or branch change
   useEffect(() => {
+    if (user?.role === 'PLATFORM_ADMIN') return;
     void loadDashboard(false, startDate, endDate);
     if (activeTab === 'analytics') {
       void loadAnalytics(false, startDate, endDate);
     } else {
       setAnalytics(null);
     }
-  }, [startDate, endDate, activeTab, currentRestaurant?.id, currentBranch?.id, loadDashboard, loadAnalytics]);
+  }, [startDate, endDate, activeTab, currentRestaurant?.id, currentBranch?.id, user?.role, loadDashboard, loadAnalytics]);
 
   if (user?.role === 'PLATFORM_ADMIN') {
-    return <PlatformAdminDashboard />;
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+          <p className="text-sm font-semibold text-muted-foreground">Redirecting to Platform Admin Control Center...</p>
+        </div>
+      </div>
+    );
   }
 
   if (isLoading) {

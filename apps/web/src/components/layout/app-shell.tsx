@@ -233,13 +233,23 @@ export function AppShell({ children }: AppShellProps) {
             )}
 
             <Link
-              href="/dashboard"
+              href={
+                user?.role === 'PLATFORM_ADMIN'
+                  ? '/platform-admin'
+                  : user?.role === 'CASHIER'
+                  ? '/cashier'
+                  : user?.role === 'WAITER' || user?.role === 'STAFF'
+                  ? '/waiter'
+                  : user?.role === 'KITCHEN'
+                  ? '/kitchen'
+                  : '/dashboard'
+              }
               className="flex items-center gap-2 hover:opacity-90 transition-opacity"
             >
               <img
                 src="/logo.png"
-                alt="Project Atlas Logo"
-                className="h-9 w-auto object-contain"
+                alt="Kafei Logo"
+                className="h-9 w-auto object-contain rounded-md"
               />
             </Link>
 
@@ -350,12 +360,26 @@ export function AppShell({ children }: AppShellProps) {
             className="relative flex flex-col w-4/5 max-w-xs bg-card border-r border-border h-full z-10 p-4 space-y-4"
           >
             <div className="flex items-center justify-between border-b border-border pb-3">
-              <div className="flex items-center gap-2">
-                <img src="/logo.png" alt="Atlas Logo" className="h-7 w-auto" />
+              <Link
+                href={
+                  user?.role === 'PLATFORM_ADMIN'
+                    ? '/platform-admin'
+                    : user?.role === 'CASHIER'
+                    ? '/cashier'
+                    : user?.role === 'WAITER' || user?.role === 'STAFF'
+                    ? '/waiter'
+                    : user?.role === 'KITCHEN'
+                    ? '/kitchen'
+                    : '/dashboard'
+                }
+                className="flex items-center gap-2"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <img src="/logo.png" alt="Kafei Logo" className="h-7 w-auto object-contain rounded-md" />
                 <span className="rounded bg-primary/15 border border-primary/30 px-2 py-0.5 text-[10px] font-bold text-primary uppercase tracking-wider">
                   {user.role}
                 </span>
-              </div>
+              </Link>
               <button
                 type="button"
                 onClick={() => setIsMobileMenuOpen(false)}

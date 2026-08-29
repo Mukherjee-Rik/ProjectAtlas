@@ -89,7 +89,7 @@ export default function RestaurantsPage() {
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             {isPlatformAdmin
-              ? 'Comprehensive registry of all restaurants onboarded on the Atlas multi-tenant platform. Click on any restaurant to inspect deep-dive telemetry, branches, tables, staff, and sales.'
+              ? 'Comprehensive registry of all restaurants onboarded on the Kafei multi-tenant platform. Click on any restaurant to inspect deep-dive telemetry, branches, tables, staff, and sales.'
               : `Manage restaurants and branches under ${currentTenant?.name ?? 'your organization'}.`}
           </p>
         </div>

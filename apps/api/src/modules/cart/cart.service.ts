@@ -2,6 +2,7 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { PrismaService } from '../../database/prisma/prisma.service';
 import { Prisma } from '../../generated/prisma/client';
 import { PublicTablesService } from '../public-tables/public-tables.service';
+import { CacheKeys, CacheTtl, TtlCacheService } from '../../common/cache/ttl-cache.service';
 import { AddCartItemDto } from './dto/add-cart-item.dto';
 import { UpdateCartItemDto } from './dto/update-cart-item.dto';
 
@@ -14,6 +15,7 @@ export class CartService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly publicTablesService: PublicTablesService,
+    private readonly cache: TtlCacheService,
   ) {}
 
   async getCart(token: string) {
@@ -225,41 +227,47 @@ export class CartService {
     // The whole availability chain is enforced here: menu, category and item must be
     // ACTIVE, and the item must belong to this table's restaurant. A foreign or
     // deactivated item is indistinguishable from a missing one on a public endpoint.
-    const menuItem = await this.prisma.menuItem.findFirst({
-      where: {
-        id: menuItemId,
-        status: 'ACTIVE',
-        category: { status: 'ACTIVE', menu: { restaurantId, status: 'ACTIVE' } },
-      },
-      select: {
-        id: true,
-        name: true,
-        price: true,
-        variantGroups: {
-          orderBy: { position: 'asc' },
+    return this.cache.wrap(
+      CacheKeys.menuItem(restaurantId, menuItemId),
+      CacheTtl.menuItem,
+      async () => {
+        const menuItem = await this.prisma.menuItem.findFirst({
+          where: {
+            id: menuItemId,
+            status: 'ACTIVE',
+            category: { status: 'ACTIVE', menu: { restaurantId, status: 'ACTIVE' } },
+          },
           select: {
             id: true,
             name: true,
-            required: true,
-            variants: { where: { status: 'ACTIVE' }, orderBy: { position: 'asc' }, select: { id: true, name: true, price: true } },
+            price: true,
+            variantGroups: {
+              orderBy: { position: 'asc' },
+              select: {
+                id: true,
+                name: true,
+                required: true,
+                variants: { where: { status: 'ACTIVE' }, orderBy: { position: 'asc' }, select: { id: true, name: true, price: true } },
+              },
+            },
+            addonGroups: {
+              orderBy: { position: 'asc' },
+              select: {
+                id: true,
+                name: true,
+                required: true,
+                minSelect: true,
+                maxSelect: true,
+                addons: { where: { status: 'ACTIVE' }, orderBy: { position: 'asc' }, select: { id: true, name: true, price: true } },
+              },
+            },
           },
-        },
-        addonGroups: {
-          orderBy: { position: 'asc' },
-          select: {
-            id: true,
-            name: true,
-            required: true,
-            minSelect: true,
-            maxSelect: true,
-            addons: { where: { status: 'ACTIVE' }, orderBy: { position: 'asc' }, select: { id: true, name: true, price: true } },
-          },
-        },
-      },
-    });
+        });
 
-    if (!menuItem) throw new NotFoundException('Menu item not found');
-    return menuItem;
+        if (!menuItem) throw new NotFoundException('Menu item not found');
+        return menuItem;
+      },
+    );
   }
 
   private async loadOwnedCartItem(cartId: string, itemId: string) {

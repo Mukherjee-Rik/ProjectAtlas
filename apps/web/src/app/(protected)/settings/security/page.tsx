@@ -17,7 +17,7 @@ export default function SecuritySettingsPage() {
           Security
         </h1>
         <p className="mt-2 text-muted-foreground">
-          Manage your Atlas account security and session settings.
+          Manage your Kafei account security and session settings.
         </p>
       </div>
 

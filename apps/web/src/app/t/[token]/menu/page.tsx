@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { use, useCallback, useEffect, useState } from 'react';
+import { use, useCallback, useEffect, useMemo, useState } from 'react';
 import type { PublicCustomerMenu } from '@/types/menu';
 import { getPublicCustomerMenu } from '@/services/public-tables.service';
 import { getPublicOrders } from '@/services/orders.service';
@@ -9,14 +9,7 @@ import type { Order } from '@/types/order';
 import { useCart } from '@/hooks/use-cart';
 import { CartBar } from '@/components/customer/cart-bar';
 import { MenuItemSheet } from '@/components/customer/menu-item-sheet';
-import { formatCurrency } from '@/lib/currency';
-
-const DIETARY_COLOR: Record<string, string> = {
-  VEG: '#22C55E',
-  VEGAN: '#22C55E',
-  EGG: '#EAB308',
-  NON_VEG: '#EF4444',
-};
+import { MenuItemCard, type MenuCardItem } from '@/components/customer/menu-item-card';
 
 export default function CustomerMenuPage({
   params,
@@ -30,7 +23,6 @@ export default function CustomerMenuPage({
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [openItemId, setOpenItemId] = useState<string | null>(null);
-  const [mutatingItemId, setMutatingItemId] = useState<string | null>(null);
 
   const { cart, addItem, updateQuantity, removeItem } = useCart();
 
@@ -68,38 +60,64 @@ export default function CustomerMenuPage({
     setOpenItemId(null);
   }, []);
 
-  const handleQuickAdd = (item: any) => {
-    const hasCustomizations =
-      (item.variantGroups && item.variantGroups.length > 0) ||
-      (item.addonGroups && item.addonGroups.length > 0);
-
-    if (hasCustomizations) {
-      setOpenItemId(item.id);
-      return;
+  // Menu item id -> quantity on its first matching cart line. Rebuilt once per
+  // cart change so each card can take a plain number and skip re-rendering
+  // when its own quantity has not moved.
+  const quantityByMenuItemId = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const line of cart?.items ?? []) {
+      if (!map.has(line.menuItemId)) map.set(line.menuItemId, line.quantity);
     }
+    return map;
+  }, [cart]);
 
-    void addItem(
-      { menuItemId: item.id, quantity: 1 },
-      {
-        name: item.name,
-        unitPrice: item.price,
-        imageUrl: item.imageUrl,
-        dietaryType: item.dietaryType,
-      },
-    );
-  };
+  const handleOpenItem = useCallback((itemId: string) => {
+    setOpenItemId(itemId);
+  }, []);
 
-  const handleIncrement = (item: any, currentQty: number) => {
-    void updateQuantity(item.id, currentQty + 1);
-  };
+  // Referentially stable, so a re-render does not invalidate every memoised
+  // card through a fresh closure.
+  const handleQuickAdd = useCallback(
+    (item: MenuCardItem) => {
+      const hasCustomizations =
+        (item.variantGroups && item.variantGroups.length > 0) ||
+        (item.addonGroups && item.addonGroups.length > 0);
 
-  const handleDecrement = (item: any, currentQty: number) => {
-    if (currentQty <= 1) {
-      void removeItem(item.id);
-    } else {
-      void updateQuantity(item.id, currentQty - 1);
-    }
-  };
+      if (hasCustomizations) {
+        setOpenItemId(item.id);
+        return;
+      }
+
+      void addItem(
+        { menuItemId: item.id, quantity: 1 },
+        {
+          name: item.name,
+          unitPrice: item.price,
+          imageUrl: item.imageUrl,
+          dietaryType: item.dietaryType,
+        },
+      );
+    },
+    [addItem],
+  );
+
+  const handleIncrement = useCallback(
+    (item: MenuCardItem, currentQty: number) => {
+      void updateQuantity(item.id, currentQty + 1);
+    },
+    [updateQuantity],
+  );
+
+  const handleDecrement = useCallback(
+    (item: MenuCardItem, currentQty: number) => {
+      if (currentQty <= 1) {
+        void removeItem(item.id);
+      } else {
+        void updateQuantity(item.id, currentQty - 1);
+      }
+    },
+    [removeItem, updateQuantity],
+  );
 
   if (isLoading) {
     return (
@@ -206,107 +224,17 @@ export default function CustomerMenuPage({
                 No items available in this category.
               </p>
             ) : (
-              category.items.map((item) => {
-                const cartItem = cart?.items.find((ci) => ci.menuItemId === item.id);
-                const quantityInCart = cartItem?.quantity ?? 0;
-                const hasCustomizations =
-                  (item.variantGroups && item.variantGroups.length > 0) ||
-                  (item.addonGroups && item.addonGroups.length > 0);
-                const isMutating = mutatingItemId === item.id;
-
-                return (
-                  <article
-                    key={item.id}
-                    className="space-y-3 rounded-2xl border border-border bg-card p-4 transition-all hover:border-primary/30 shadow-md"
-                  >
-                    <div
-                      onClick={() => setOpenItemId(item.id)}
-                      className="cursor-pointer space-y-1.5"
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="space-y-1 flex-1">
-                          <div className="flex items-center gap-2">
-                            <span
-                              className="h-2.5 w-2.5 shrink-0 rounded-full"
-                              style={{
-                                backgroundColor: DIETARY_COLOR[item.dietaryType] ?? '#A1A1AA',
-                              }}
-                            />
-                            <h3 className="text-sm font-bold leading-tight text-foreground">
-                              {item.name}
-                            </h3>
-                          </div>
-                          {item.description && (
-                            <p className="line-clamp-2 text-[11px] leading-relaxed text-muted-foreground">
-                              {item.description}
-                            </p>
-                          )}
-                        </div>
-
-                        {item.imageUrl && (
-                          <img
-                            src={item.imageUrl}
-                            alt={item.name}
-                            className="h-16 w-16 shrink-0 rounded-xl object-cover border border-border"
-                          />
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Bottom Row: Price + Direct Inline Quantity Controls */}
-                    <div className="flex items-center justify-between pt-2 border-t border-border/40">
-                      <div className="flex flex-col">
-                        <span className="text-base font-black text-primary">
-                          {formatCurrency(item.price)}
-                        </span>
-                        {hasCustomizations && (
-                          <button
-                            type="button"
-                            onClick={() => setOpenItemId(item.id)}
-                            className="text-[10px] text-muted-foreground hover:text-primary text-left underline"
-                          >
-                            Customisable options
-                          </button>
-                        )}
-                      </div>
-
-                      {quantityInCart === 0 ? (
-                        <button
-                          type="button"
-                          onClick={() => handleQuickAdd(item)}
-                          className="flex items-center gap-1.5 rounded-xl border border-primary bg-primary/10 px-5 py-2 text-xs font-bold text-primary transition-all hover:bg-primary hover:text-background active:scale-90 shadow-sm cursor-pointer"
-                        >
-                          <span>+</span> {hasCustomizations ? 'ADD' : 'ADD'}
-                        </button>
-                      ) : (
-                        <div className="flex items-center rounded-xl border border-primary bg-secondary p-0.5 shadow-sm">
-                          <button
-                            type="button"
-                            onClick={() => handleDecrement(item, quantityInCart)}
-                            className="flex h-7 w-8 items-center justify-center rounded-lg text-base font-bold text-primary transition-all hover:bg-primary/20 active:scale-75 cursor-pointer"
-                            aria-label="Decrease quantity"
-                          >
-                            −
-                          </button>
-
-                          <span className="min-w-7 text-center text-xs font-bold font-mono text-foreground">
-                            {quantityInCart}
-                          </span>
-
-                          <button
-                            type="button"
-                            onClick={() => handleIncrement(item, quantityInCart)}
-                            className="flex h-7 w-8 items-center justify-center rounded-lg text-base font-bold text-primary transition-all hover:bg-primary/20 active:scale-75 cursor-pointer"
-                            aria-label="Increase quantity"
-                          >
-                            +
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </article>
-                );
-              })
+              category.items.map((item) => (
+                <MenuItemCard
+                  key={item.id}
+                  item={item}
+                  quantity={quantityByMenuItemId.get(item.id) ?? 0}
+                  onOpen={handleOpenItem}
+                  onQuickAdd={handleQuickAdd}
+                  onIncrement={handleIncrement}
+                  onDecrement={handleDecrement}
+                />
+              ))
             )}
           </section>
         ))}

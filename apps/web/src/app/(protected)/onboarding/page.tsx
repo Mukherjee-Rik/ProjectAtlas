@@ -104,7 +104,7 @@ export default function OnboardingPage() {
     setSuccessMessage(null);
     try {
       if (currentStep === 6) {
-        setSuccessMessage('🎉 Atlas Setup Completed! Redirecting to your Live Command Dashboard...');
+        setSuccessMessage('🎉 Kafei Setup Completed! Redirecting to your Live Command Dashboard...');
         setTimeout(() => {
           router.push('/dashboard');
         }, 1200);
@@ -129,7 +129,7 @@ export default function OnboardingPage() {
         {/* Header & Progress */}
         <div className="text-center space-y-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/30 text-primary text-xs font-semibold uppercase tracking-wider">
-            ✨ Atlas v1 Guided Onboarding
+            ✨ Kafei v1 Guided Onboarding
           </div>
           <h1 className="text-3xl font-black tracking-tight sm:text-4xl text-foreground">
             Setup {restaurantName || 'Your Restaurant'}
@@ -402,7 +402,7 @@ export default function OnboardingPage() {
               <div>
                 <h3 className="text-xl font-bold text-foreground">6. Payment Methods & Go-Live!</h3>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Select payment channels to accept and launch your live Atlas operations.
+                  Select payment channels to accept and launch your live Kafei operations.
                 </p>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">

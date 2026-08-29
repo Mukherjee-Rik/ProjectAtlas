@@ -120,8 +120,8 @@ export default function CustomerTableEntryPage({
         <div className="flex justify-center items-center">
           <img
             src="/logo.png"
-            alt="Atlas Logo"
-            className="h-14 w-auto object-contain drop-shadow-[0_0_10px_rgba(42,254,183,0.3)]"
+            alt="Kafei Logo"
+            className="h-14 w-auto object-contain drop-shadow-[0_0_10px_rgba(42,254,183,0.3)] rounded-md"
           />
         </div>
 

@@ -134,6 +134,33 @@ export class TablesService {
                 orderNumber: true,
                 status: true,
                 totalAmount: true,
+                payments: {
+                  select: {
+                    id: true,
+                    amount: true,
+                    status: true,
+                    method: true,
+                    paidAt: true,
+                    transactionReference: true,
+                  },
+                },
+                cancellationRequests: {
+                  select: {
+                    id: true,
+                    status: true,
+                    reason: true,
+                    note: true,
+                  },
+                },
+                items: {
+                  select: {
+                    id: true,
+                    name: true,
+                    quantity: true,
+                    unitPrice: true,
+                    totalPrice: true,
+                  },
+                },
               },
             },
           },
