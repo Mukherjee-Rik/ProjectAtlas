@@ -37,10 +37,10 @@ export const navigationItems: NavigationItem[] = [
   // Root Level
   { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, permission: PERMISSIONS.DASHBOARD_READ },
 
-  // Intelligence & Analytics (Manager & Owner only)
-  { label: 'Analytics Engine', href: '/analytics', icon: BarChart3, permission: PERMISSIONS.DASHBOARD_READ, group: 'Intelligence' },
-  { label: 'Custom Reports', href: '/reports', icon: FileSpreadsheet, permission: PERMISSIONS.DASHBOARD_READ, group: 'Intelligence' },
-  { label: 'Demand Forecasts', href: '/forecasts', icon: BrainCircuit, permission: PERMISSIONS.DASHBOARD_READ, group: 'Intelligence' },
+  // V2 Analytics & BI Features (Commented out for V1)
+  // { label: 'Analytics Engine', href: '/analytics', icon: BarChart3, permission: PERMISSIONS.DASHBOARD_READ, group: 'Intelligence' },
+  // { label: 'Custom Reports', href: '/reports', icon: FileSpreadsheet, permission: PERMISSIONS.DASHBOARD_READ, group: 'Intelligence' },
+  // { label: 'Demand Forecasts', href: '/forecasts', icon: BrainCircuit, permission: PERMISSIONS.DASHBOARD_READ, group: 'Intelligence' },
 
   // Operations Group
   { label: 'Orders List', href: '/orders', icon: ShoppingBag, permission: PERMISSIONS.ORDERS_READ, group: 'Operations' },
@@ -52,7 +52,8 @@ export const navigationItems: NavigationItem[] = [
 
   // Menu Catalog
   { label: 'Menus', href: '/menus', icon: BookOpen, permission: PERMISSIONS.MENUS_READ, group: 'Menu' },
-  { label: 'Inventory & Stock', href: '/inventory', icon: Package, permission: PERMISSIONS.MENUS_READ, group: 'Menu' },
+  // V2 Inventory Feature (Commented out for V1)
+  // { label: 'Inventory & Stock', href: '/inventory', icon: Package, permission: PERMISSIONS.MENUS_READ, group: 'Menu' },
 
   // Administration Group
   { label: 'Restaurants', href: '/restaurants', icon: Store, permission: PERMISSIONS.RESTAURANTS_READ, group: 'Administration' },
