@@ -1,7 +1,7 @@
 {
-  "name": "Atlas POS",
-  "short_name": "Atlas",
-  "description": "Atlas Restaurant POS and Management Platform",
+  "name": "Kafei POS",
+  "short_name": "Kafei",
+  "description": "Kafei Restaurant POS and Management Platform",
   "start_url": "/dashboard",
   "display": "standalone",
   "orientation": "portrait-primary",

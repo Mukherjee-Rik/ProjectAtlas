@@ -182,13 +182,13 @@ export default function ForgotPasswordPage() {
           <Link href="/" className="flex items-center gap-2.5 hover:opacity-90 transition-opacity">
             <Image
               src="/logo.png"
-              alt="Project Atlas"
+              alt="Kafei"
               width={36}
               height={36}
-              className="h-9 w-9 rounded object-contain"
+              className="h-9 w-auto rounded-md object-contain"
             />
-            <span className="font-display text-xl font-bold tracking-tight text-foreground">
-              Project Atlas
+            <span className="font-display text-xl font-extrabold tracking-tight text-foreground">
+              Kafei
             </span>
           </Link>
         </div>
@@ -458,7 +458,7 @@ export default function ForgotPasswordPage() {
           </Link>
           <span>•</span>
           <Link href="/" className="hover:text-foreground transition-colors">
-            Project Atlas Home
+            Kafei Home
           </Link>
         </div>
       </div>

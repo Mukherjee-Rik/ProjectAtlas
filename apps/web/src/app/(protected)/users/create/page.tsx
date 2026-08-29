@@ -41,7 +41,7 @@ export default function CreateUserPage() {
         </h1>
 
         <p className="mt-2 text-sm text-muted-foreground">
-          Create a new Atlas user.
+          Create a new Kafei user.
         </p>
       </div>
 

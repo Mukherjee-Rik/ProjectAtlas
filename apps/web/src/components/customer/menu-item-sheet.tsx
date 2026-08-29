@@ -26,7 +26,7 @@ export function MenuItemSheet({
   onClose: () => void;
   onAdded: () => void;
 }) {
-  const { addItem, isMutating, error, clearError } = useCart();
+  const { addItem, error, clearError } = useCart();
 
   const [detail, setDetail] = useState<PublicCustomerMenuItemDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -105,13 +105,32 @@ export function MenuItemSheet({
   const handleAdd = useCallback(async () => {
     if (!item) return;
     try {
-      // Only ids and quantity travel to the API — the price is the server's business.
-      await addItem({ menuItemId: item.id, quantity, variantIds, addonIds });
+      const selectedVariants = (item.variantGroups ?? [])
+        .flatMap((g) => g.variants)
+        .filter((v) => variantIds.includes(v.id))
+        .map((v) => ({ id: v.id, variantId: v.id, name: v.name, price: v.price }));
+      const selectedAddons = (item.addonGroups ?? [])
+        .flatMap((g) => g.addons)
+        .filter((a) => addonIds.includes(a.id))
+        .map((a) => ({ id: a.id, addonId: a.id, name: a.name, price: a.price }));
+
+      void addItem(
+        { menuItemId: item.id, quantity, variantIds, addonIds },
+        {
+          name: item.name,
+          unitPrice: unitPreview,
+          imageUrl: item.imageUrl,
+          dietaryType: item.dietaryType,
+          variant: selectedVariants[0] ?? null,
+          variants: selectedVariants,
+          addons: selectedAddons,
+        },
+      );
       onAdded();
     } catch {
       // The hook surfaces the message; the sheet stays open so it can be fixed.
     }
-  }, [item, quantity, variantIds, addonIds, addItem, onAdded]);
+  }, [item, quantity, variantIds, addonIds, unitPreview, addItem, onAdded]);
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 backdrop-blur-sm">
@@ -291,15 +310,13 @@ export function MenuItemSheet({
 
               <button
                 type="button"
-                disabled={isMutating || missingRequired}
+                disabled={missingRequired}
                 onClick={() => void handleAdd()}
                 className="w-full rounded-xl bg-primary py-3.5 text-sm font-bold text-background shadow-lg transition-all hover:bg-primary-hover active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40"
               >
-                {isMutating
-                  ? 'Adding…'
-                  : missingRequired
-                    ? 'Choose the required options'
-                    : `Add to Cart • ${formatCurrency(unitPreview * quantity)}`}
+                {missingRequired
+                  ? 'Choose the required options'
+                  : `Add to Cart • ${formatCurrency(unitPreview * quantity)}`}
               </button>
 
               <p className="text-center text-[10px] text-muted-foreground/70">

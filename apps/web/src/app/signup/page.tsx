@@ -184,8 +184,8 @@ export default function SignupPage() {
           <div className="flex justify-center">
             <img
               src="/logo.png"
-              alt="Atlas Logo"
-              className="h-20 w-auto object-contain drop-shadow-[0_0_12px_rgba(42,254,183,0.2)]"
+              alt="Kafei Logo"
+              className="h-20 w-auto object-contain drop-shadow-[0_0_12px_rgba(42,254,183,0.2)] rounded-lg"
             />
           </div>
           <h1 className="text-xl font-bold text-foreground pt-1">Start Your Free Trial</h1>

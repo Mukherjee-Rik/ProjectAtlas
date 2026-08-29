@@ -17,7 +17,7 @@ export function ForecastExplainabilityCard({ explanation }: ForecastExplainabili
         <div className="flex items-center gap-2.5">
           <Sparkles className="w-5 h-5 text-primary" />
           <div>
-            <h3 className="text-sm font-bold text-foreground">Why Does Atlas Expect This Forecast?</h3>
+            <h3 className="text-sm font-bold text-foreground">Why Does Kafei Expect This Forecast?</h3>
             <p className="text-xs text-muted-foreground mt-0.5">
               Transparent causal factor decomposition comparing tomorrow's projection against recent baselines
             </p>

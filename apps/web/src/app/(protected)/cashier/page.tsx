@@ -129,15 +129,19 @@ export default function CashierPage() {
     return () => clearInterval(interval);
   }, [loadData]);
 
+  const isOrderUnpaid = (o: any) => {
+    if (!o || o.status === 'CANCELLED') return false;
+    const isPaid = o.payments?.some((p: any) => p.status === 'SUCCESS' || p.status === 'PARTIALLY_REFUNDED');
+    return !isPaid;
+  };
+
   // Settle Bill
   const handleSettleBill = async () => {
     if (!selectedTable) return;
     const session = selectedTable.customerSessions?.find((s) => s.status === 'ACTIVE');
     if (!session) return;
 
-    const unpaidOrders = session.orders.filter(
-      (o) => !['COMPLETED', 'CANCELLED'].includes(o.status),
-    );
+    const unpaidOrders = session.orders.filter(isOrderUnpaid);
 
     if (unpaidOrders.length === 0) {
       setIsProcessing(true);
@@ -148,9 +152,9 @@ export default function CashierPage() {
         }
         setSelectedTable(null);
         await loadData();
-        toastSuccess('Empty table session cleared!');
+        toastSuccess('Table session cleared!');
       } catch (err: any) {
-        toastError(err?.message ?? 'Failed to clear empty table session.');
+        toastError(err?.message ?? 'Failed to clear table session.');
       } finally {
         setIsProcessing(false);
       }
@@ -279,7 +283,7 @@ export default function CashierPage() {
       setSplitUpiAmount('');
       setSelectedTable(null);
       await loadData();
-      toastSuccess('Table bill settled successfully & table cleared!');
+      toastSuccess(`Table ${selectedTable.name} bill settled for ${formatCurrency(totalAmount)} & session cleared!`);
     } catch (err: any) {
       console.error('Settlement error:', err);
       toastError(err?.message ?? 'Payment settlement failed.');
@@ -376,8 +380,7 @@ export default function CashierPage() {
     const session = t.customerSessions?.find((s) => s.status === 'ACTIVE');
     if (!session) return false;
     const orders = session.orders ?? [];
-    // Only show tables in Cashier POS if they have active unsettled orders (avoids 0 amount ghost tables)
-    return orders.some((o) => !['CANCELLED', 'COMPLETED'].includes(o.status));
+    return orders.some(isOrderUnpaid);
   });
 
   const pendingRequests = cancellationRequests.filter((r) => r.status === 'PENDING_REVIEW');
@@ -468,11 +471,16 @@ export default function CashierPage() {
                 {occupiedTables.map((t) => {
                   const session = t.customerSessions?.find((s) => s.status === 'ACTIVE');
                   const orders = session?.orders ?? [];
-                  const totalDue = orders
-                    .filter((o) => !['CANCELLED', 'COMPLETED'].includes(o.status))
-                    .reduce((acc, o) => acc + Number(o.totalAmount), 0);
-
+                  const unpaidOrders = orders.filter(isOrderUnpaid);
+                  const totalDue = unpaidOrders.reduce((acc, o) => acc + Number(o.totalAmount), 0);
+                  const isCompletedByWaiter = unpaidOrders.length > 0 && unpaidOrders.some((o) => o.status === 'COMPLETED');
                   const isSelected = selectedTable?.id === t.id;
+
+                  const cardBorder = isSelected
+                    ? 'border-primary bg-primary/10 shadow-[0_0_15px_rgba(42,254,183,0.15)] ring-1 ring-primary'
+                    : isCompletedByWaiter
+                    ? 'border-purple-500/70 bg-purple-500/5 hover:border-purple-500 shadow-[0_0_12px_rgba(168,85,247,0.15)] ring-1 ring-purple-500/30'
+                    : 'border-border bg-card hover:border-primary/30';
 
                   return (
                     <button
@@ -481,21 +489,24 @@ export default function CashierPage() {
                         setSelectedTable(t);
                         setTxReference('');
                       }}
-                      className={`flex flex-col rounded-xl border p-4 text-left transition-all cursor-pointer ${
-                        isSelected
-                          ? 'border-primary bg-primary/5 shadow-[0_0_15px_rgba(42,254,183,0.1)]'
-                          : 'border-border bg-card hover:border-primary/30'
-                      }`}
+                      className={`flex flex-col rounded-xl border p-4 text-left transition-all cursor-pointer ${cardBorder}`}
                     >
-                      <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                        {t.diningArea?.name}
-                      </span>
+                      <div className="flex items-center justify-between w-full">
+                        <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                          {t.diningArea?.name}
+                        </span>
+                        {isCompletedByWaiter && (
+                          <span className="rounded-full bg-purple-500/20 border border-purple-500/40 px-1.5 py-0.2 text-[9px] font-extrabold text-purple-300 animate-pulse">
+                            🔔 Completed
+                          </span>
+                        )}
+                      </div>
                       <span className="mt-1 text-base font-extrabold text-foreground">
                         Table {t.name}
                       </span>
                       <div className="mt-3 flex items-center justify-between border-t border-border pt-2 w-full">
                         <span className="text-[10px] text-muted-foreground">
-                          {orders.filter((o) => !['CANCELLED', 'COMPLETED'].includes(o.status)).length} Unpaid
+                          {unpaidOrders.length} Unpaid
                         </span>
                         <span className="text-xs font-black text-primary">
                           {formatCurrency(totalDue)}
@@ -519,7 +530,7 @@ export default function CashierPage() {
                 (() => {
                   const session = selectedTable.customerSessions?.find((s) => s.status === 'ACTIVE');
                   const orders = session?.orders ?? [];
-                  const unpaidOrders = orders.filter((o) => !['CANCELLED', 'COMPLETED'].includes(o.status));
+                  const unpaidOrders = orders.filter(isOrderUnpaid);
                   const totalAmount = unpaidOrders.reduce((acc, o) => acc + Number(o.totalAmount), 0);
 
                   if (unpaidOrders.length === 0) {
@@ -558,7 +569,15 @@ export default function CashierPage() {
                           >
                             <div>
                               <span className="font-mono font-bold text-primary">{o.orderNumber}</span>
-                              <span className="ml-2 text-[10px] uppercase text-muted-foreground">({o.status})</span>
+                              <span
+                                className={`ml-2 rounded px-1.5 py-0.2 text-[9px] font-bold uppercase ${
+                                  o.status === 'COMPLETED'
+                                    ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
+                                    : 'bg-card text-muted-foreground'
+                                }`}
+                              >
+                                {o.status === 'COMPLETED' ? 'Completed by Waiter' : o.status}
+                              </span>
                             </div>
                             <span className="font-bold text-foreground">{formatCurrency(o.totalAmount)}</span>
                           </div>

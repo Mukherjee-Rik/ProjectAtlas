@@ -29,7 +29,7 @@ const DOC_SECTIONS = [
         desc: 'Set up automated rules for nightly revenue summaries, stock warnings, and cancellation alerts.',
         content: `• Navigate to Automations in your dashboard.
 • Choose from preset templates: Nightly Sales Report, Low Stock Warning, AI Growth Insights.
-• Atlas monitors real-time restaurant events and dispatches notifications automatically.`,
+• Kafei monitors real-time restaurant events and dispatches notifications automatically.`,
       },
       {
         title: '4. AI Restaurant Copilot & Natural Language Queries',
@@ -78,7 +78,7 @@ const DOC_SECTIONS = [
     articles: [
       {
         title: '1. Multi-Tenant Security & Tenant Isolation',
-        desc: 'How Atlas guarantees strict tenant boundary enforcement.',
+        desc: 'How Kafei guarantees strict tenant boundary enforcement.',
         content: `• Every request is guarded by TenantAccessGuard, RestaurantAccessGuard, and BranchAccessGuard.
 • Cross-tenant querying is blocked with strict HTTP 403 Forbidden.
 • JWT access tokens carry user roles and session identifiers with automatic rotation.`,
@@ -121,7 +121,7 @@ export default function DocsPage() {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-border pb-6">
           <div className="space-y-1">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/30 text-primary text-xs font-semibold uppercase tracking-wider">
-              📖 Project Atlas v1 Documentation
+              📖 Kafei v1 Documentation
             </div>
             <h1 className="text-3xl font-black text-foreground">Knowledge Base & User Manual</h1>
             <p className="text-muted-foreground text-sm">

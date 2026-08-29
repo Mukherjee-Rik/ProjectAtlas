@@ -123,7 +123,7 @@ export default function PlatformAdminPage() {
         <div>
           <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
             <span className="h-2 w-2 rounded-full bg-primary animate-pulse" />
-            Atlas Platform Control Center
+            Kafei Platform Control Center
           </div>
           <h1 className="mt-3 text-3xl font-black text-foreground">
             Platform Overview

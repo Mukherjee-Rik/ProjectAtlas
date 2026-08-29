@@ -186,13 +186,13 @@ export default function SupportPage() {
           <Link href="/" className="flex items-center gap-2.5">
             <Image
               src="/logo.png"
-              alt="Project Atlas Logo"
-              width={26}
-              height={26}
-              className="h-6 w-6 object-contain"
+              alt="Kafei Logo"
+              width={30}
+              height={30}
+              className="h-7 w-auto object-contain rounded-md"
             />
-            <span className="font-display text-[15px] font-bold tracking-tight text-foreground">
-              Atlas Support
+            <span className="font-display text-[16px] font-extrabold tracking-tight text-foreground">
+              Kafei Support
             </span>
           </Link>
 
@@ -569,13 +569,13 @@ export default function SupportPage() {
           <div className="flex items-center gap-2.5">
             <Image
               src="/logo.png"
-              alt="Project Atlas Logo"
-              width={22}
-              height={22}
-              className="h-5 w-5 object-contain"
+              alt="Kafei Logo"
+              width={26}
+              height={26}
+              className="h-6 w-auto object-contain rounded-md"
             />
-            <span className="font-display text-[14px] font-bold text-foreground">
-              Project Atlas Support Desk
+            <span className="font-display text-[14px] font-extrabold text-foreground">
+              Kafei Support Desk
             </span>
           </div>
 
@@ -594,7 +594,7 @@ export default function SupportPage() {
           </div>
 
           <p className="text-[11px] text-muted-foreground">
-            © {new Date().getFullYear()} Project Atlas. All rights reserved.
+            © {new Date().getFullYear()} Kafei. All rights reserved.
           </p>
         </div>
       </footer>

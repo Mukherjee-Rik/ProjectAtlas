@@ -46,7 +46,7 @@ const NEXT_STATUS: Partial<Record<OrderStatus, { next: OrderStatus; label: strin
   CONFIRMED: { next: 'PREPARING', label: 'Start Prep' },
   PREPARING: { next: 'READY', label: 'Mark Ready' },
   READY: { next: 'SERVED', label: 'Serve' },
-  SERVED: { next: 'COMPLETED', label: 'Complete' },
+  SERVED: { next: 'COMPLETED', label: 'Complete & Send to Cashier' },
 };
 
 export default function AdminOrdersPage() {

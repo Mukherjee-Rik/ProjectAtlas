@@ -84,13 +84,13 @@ export default function ContactUsPage() {
           <Link href="/" className="flex items-center gap-2.5">
             <Image
               src="/logo.png"
-              alt="Project Atlas Logo"
-              width={26}
-              height={26}
-              className="h-6 w-6 object-contain"
+              alt="Kafei Logo"
+              width={30}
+              height={30}
+              className="h-7 w-auto object-contain rounded-md"
             />
-            <span className="font-display text-[15px] font-bold tracking-tight text-foreground">
-              Atlas
+            <span className="font-display text-[16px] font-extrabold tracking-tight text-foreground">
+              Kafei
             </span>
           </Link>
 
@@ -133,7 +133,7 @@ export default function ContactUsPage() {
           </div>
 
           <h1 className="font-display text-3xl font-extrabold tracking-tight text-foreground sm:text-5xl sm:leading-[1.15]">
-            Talk to the <span className="text-primary">Atlas Team</span>
+            Talk to the <span className="text-primary">Kafei Team</span>
           </h1>
 
           <p className="mx-auto max-w-2xl text-[15px] leading-relaxed text-muted-foreground sm:text-base">
@@ -239,9 +239,9 @@ export default function ContactUsPage() {
                   Headquarters & Development
                 </div>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  Project Atlas Engineering & Operations<br />
-                  Kolkata, West Bengal, India.
-                </p>
+                  Kafei Engineering & Operations<br />
+                  Kolkata, WB / Bangalore, KA<br />
+                  India</p>
               </div>
 
               <div className="flex items-center gap-2 text-xs text-muted-foreground/80 border-t border-border pt-4">
@@ -466,7 +466,7 @@ export default function ContactUsPage() {
               Frequently Asked Questions
             </h2>
             <p className="text-xs text-muted-foreground">
-              Everything you need to know about getting started with Project Atlas.
+              Everything you need to know about getting started with Kafei.
             </p>
           </div>
 
@@ -508,13 +508,13 @@ export default function ContactUsPage() {
           <div className="flex items-center gap-2.5">
             <Image
               src="/logo.png"
-              alt="Project Atlas Logo"
-              width={22}
-              height={22}
-              className="h-5 w-5 object-contain"
+              alt="Kafei Logo"
+              width={26}
+              height={26}
+              className="h-6 w-auto object-contain rounded-md"
             />
-            <span className="font-display text-[14px] font-bold text-foreground">
-              Project Atlas
+            <span className="font-display text-[14px] font-extrabold text-foreground">
+              Kafei
             </span>
           </div>
 
@@ -526,7 +526,7 @@ export default function ContactUsPage() {
           </div>
 
           <p className="text-[11px] text-muted-foreground">
-            © {new Date().getFullYear()} Project Atlas. All rights reserved.
+            © {new Date().getFullYear()} Kafei. All rights reserved.
           </p>
         </div>
       </footer>

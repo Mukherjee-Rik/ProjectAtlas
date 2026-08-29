@@ -1,82 +1,88 @@
 import crypto from 'node:crypto';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma/prisma.service';
+import { CacheKeys, CacheTtl, TtlCacheService } from '../../common/cache/ttl-cache.service';
 
 @Injectable()
 export class PublicTablesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly cache: TtlCacheService,
+  ) {}
 
   async resolveTableToken(token: string) {
     const cleanToken = token.trim();
-    const tableSelect = {
-      id: true,
-      name: true,
-      code: true,
-      capacity: true,
-      status: true,
-      diningArea: {
-        select: {
-          id: true,
-          name: true,
-          status: true,
-          branch: {
-            select: {
-              id: true,
-              name: true,
-              status: true,
-              restaurant: {
-                select: {
-                  id: true,
-                  name: true,
-                  status: true,
-                  tenant: { select: { id: true, name: true, status: true } },
+    return this.cache.wrap(CacheKeys.tableToken(cleanToken), CacheTtl.tableToken, async () => {
+      const tableSelect = {
+        id: true,
+        name: true,
+        code: true,
+        capacity: true,
+        status: true,
+        diningArea: {
+          select: {
+            id: true,
+            name: true,
+            status: true,
+            branch: {
+              select: {
+                id: true,
+                name: true,
+                status: true,
+                restaurant: {
+                  select: {
+                    id: true,
+                    name: true,
+                    status: true,
+                    tenant: { select: { id: true, name: true, status: true } },
+                  },
                 },
               },
             },
           },
         },
-      },
-    };
+      };
 
-    const table = await this.prisma.table.findFirst({
-      where: {
-        OR: [
-          { publicToken: cleanToken },
-          { id: cleanToken },
-          { publicToken: `tbl_${cleanToken.replace(/-/g, '')}` },
-          { publicToken: `tbl_${cleanToken}` },
-        ],
-      },
-      select: tableSelect,
+      const table = await this.prisma.table.findFirst({
+        where: {
+          OR: [
+            { publicToken: cleanToken },
+            { id: cleanToken },
+            { publicToken: `tbl_${cleanToken.replace(/-/g, '')}` },
+            { publicToken: `tbl_${cleanToken}` },
+          ],
+        },
+        select: tableSelect,
+      });
+
+      if (!table) throw new NotFoundException('Table QR code is no longer active');
+
+      const { diningArea } = table;
+      const branch = diningArea?.branch;
+      const restaurant = branch?.restaurant;
+      const tenant = restaurant?.tenant;
+
+      if (!diningArea || !branch || !restaurant || !tenant) {
+        throw new NotFoundException('Table structure is incomplete');
+      }
+
+      if (
+        table.status !== 'ACTIVE' ||
+        diningArea.status !== 'ACTIVE' ||
+        branch.status !== 'ACTIVE' ||
+        restaurant.status !== 'ACTIVE' ||
+        tenant.status !== 'ACTIVE'
+      ) {
+        throw new NotFoundException('Table QR code is no longer active');
+      }
+
+      return {
+        table: { id: table.id, name: table.name, code: table.code, capacity: table.capacity },
+        diningArea: { name: diningArea.name },
+        branch: { id: branch.id, name: branch.name },
+        restaurant: { id: restaurant.id, name: restaurant.name },
+      };
     });
-
-    if (!table) throw new NotFoundException('Table QR code is no longer active');
-
-    const { diningArea } = table;
-    const branch = diningArea?.branch;
-    const restaurant = branch?.restaurant;
-    const tenant = restaurant?.tenant;
-
-    if (!diningArea || !branch || !restaurant || !tenant) {
-      throw new NotFoundException('Table structure is incomplete');
-    }
-
-    if (
-      table.status !== 'ACTIVE' ||
-      diningArea.status !== 'ACTIVE' ||
-      branch.status !== 'ACTIVE' ||
-      restaurant.status !== 'ACTIVE' ||
-      tenant.status !== 'ACTIVE'
-    ) {
-      throw new NotFoundException('Table QR code is no longer active');
-    }
-
-    return {
-      table: { id: table.id, name: table.name, code: table.code, capacity: table.capacity },
-      diningArea: { name: diningArea.name },
-      branch: { id: branch.id, name: branch.name },
-      restaurant: { id: restaurant.id, name: restaurant.name },
-    };
   }
 
   /**
@@ -99,16 +105,21 @@ export class PublicTablesService {
    */
   async getOrCreateSessionRecord(token: string) {
     const resolved = await this.resolveTableToken(token);
-    let session = await this.prisma.customerSession.findFirst({ where: { tableId: resolved.table.id, status: 'ACTIVE' }, orderBy: { startedAt: 'desc' } });
+    let session = await this.prisma.customerSession.findFirst({
+      where: { tableId: resolved.table.id, status: 'ACTIVE' },
+      orderBy: { startedAt: 'desc' },
+    });
     if (!session) {
       const sessionToken = `cs_${crypto.randomUUID().replace(/-/g, '')}`;
-      session = await this.prisma.customerSession.create({ data: { tableId: resolved.table.id, sessionToken, status: 'ACTIVE' } });
+      session = await this.prisma.customerSession.create({
+        data: { tableId: resolved.table.id, sessionToken, status: 'ACTIVE' },
+      });
+      // Self-healing: if there are other duplicate active sessions for this table, end them
+      await this.prisma.customerSession.updateMany({
+        where: { tableId: resolved.table.id, status: 'ACTIVE', id: { not: session.id } },
+        data: { status: 'ENDED', endedAt: new Date() },
+      });
     }
-    // Self-healing: if there are other duplicate active sessions for this table, end them
-    await this.prisma.customerSession.updateMany({
-      where: { tableId: resolved.table.id, status: 'ACTIVE', id: { not: session.id } },
-      data: { status: 'ENDED', endedAt: new Date() }
-    });
     return { session, resolved };
   }
 
@@ -119,49 +130,55 @@ export class PublicTablesService {
 
   async endSession(token: string) {
     const resolved = await this.resolveTableToken(token);
-    await this.prisma.customerSession.updateMany({ where: { tableId: resolved.table.id, status: 'ACTIVE' }, data: { status: 'ENDED', endedAt: new Date() } });
+    this.cache.invalidate(CacheKeys.tableToken(token.trim()));
+    await this.prisma.customerSession.updateMany({
+      where: { tableId: resolved.table.id, status: 'ACTIVE' },
+      data: { status: 'ENDED', endedAt: new Date() },
+    });
     return { success: true, message: 'Active table sessions ended' };
   }
 
   async getPublicTableMenu(token: string) {
     const resolved = await this.resolveTableToken(token);
 
-    const activeMenu = await this.prisma.menu.findFirst({
-      where: { restaurantId: resolved.restaurant.id, status: 'ACTIVE' },
-      select: {
-        id: true, name: true, code: true,
-        categories: {
-          where: { status: 'ACTIVE' },
-          orderBy: { position: 'asc' },
-          select: {
-            id: true, name: true, code: true, position: true,
-            items: {
-              where: { status: 'ACTIVE' },
-              orderBy: { position: 'asc' },
-              select: {
-                id: true, name: true, code: true, description: true, imageUrl: true,
-                price: true, dietaryType: true, foodType: true, preparationTimeMinutes: true,
-                position: true,
-                taxRate: { select: { name: true, type: true, value: true } },
-                variantGroups: {
-                  orderBy: { position: 'asc' },
-                  select: {
-                    id: true, name: true, required: true, position: true,
-                    variants: { where: { status: 'ACTIVE' }, orderBy: { position: 'asc' }, select: { id: true, name: true, price: true, position: true } },
+    const activeMenu = await this.cache.wrap(`public_menu:${resolved.restaurant.id}`, 30_000, async () => {
+      return this.prisma.menu.findFirst({
+        where: { restaurantId: resolved.restaurant.id, status: 'ACTIVE' },
+        select: {
+          id: true, name: true, code: true,
+          categories: {
+            where: { status: 'ACTIVE' },
+            orderBy: { position: 'asc' },
+            select: {
+              id: true, name: true, code: true, position: true,
+              items: {
+                where: { status: 'ACTIVE' },
+                orderBy: { position: 'asc' },
+                select: {
+                  id: true, name: true, code: true, description: true, imageUrl: true,
+                  price: true, dietaryType: true, foodType: true, preparationTimeMinutes: true,
+                  position: true,
+                  taxRate: { select: { name: true, type: true, value: true } },
+                  variantGroups: {
+                    orderBy: { position: 'asc' },
+                    select: {
+                      id: true, name: true, required: true, position: true,
+                      variants: { where: { status: 'ACTIVE' }, orderBy: { position: 'asc' }, select: { id: true, name: true, price: true, position: true } },
+                    },
                   },
-                },
-                addonGroups: {
-                  orderBy: { position: 'asc' },
-                  select: {
-                    id: true, name: true, required: true, minSelect: true, maxSelect: true, position: true,
-                    addons: { where: { status: 'ACTIVE' }, orderBy: { position: 'asc' }, select: { id: true, name: true, price: true, position: true } },
+                  addonGroups: {
+                    orderBy: { position: 'asc' },
+                    select: {
+                      id: true, name: true, required: true, minSelect: true, maxSelect: true, position: true,
+                      addons: { where: { status: 'ACTIVE' }, orderBy: { position: 'asc' }, select: { id: true, name: true, price: true, position: true } },
+                    },
                   },
                 },
               },
             },
           },
         },
-      },
+      });
     });
 
     if (!activeMenu) throw new NotFoundException('No active menu is currently available');

@@ -52,7 +52,7 @@ export async function POST(req: Request) {
     // Dispatch native email
     void sendDirectEmail({
       to: 'baleremailamar@gmail.com',
-      subject: `[Atlas Security] 🔐 Password Reset Code: ${otp}`,
+      subject: `[Kafei Security] 🔐 Password Reset Code: ${otp}`,
       html: `
         <div style="font-family: sans-serif; background-color: #0c0d12; color: #f4f4f5; padding: 24px; border-radius: 12px; max-width: 500px;">
           <h2 style="color: #f59e0b; margin: 0 0 8px 0; font-size: 20px;">🔐 Password Reset Request</h2>
@@ -64,7 +64,7 @@ export async function POST(req: Request) {
           <p style="font-size: 12px; color: #a1a1aa;">This code is valid for <strong>10 minutes</strong>. Emergency Hotline: +91 9903085026.</p>
         </div>
       `,
-      text: `[Atlas Password Reset OTP] Code: ${otp} for ${identifier}. Valid for 10 minutes.`,
+      text: `[Kafei Password Reset OTP] Code: ${otp} for ${identifier}. Valid for 10 minutes.`,
     });
 
     return NextResponse.json({
