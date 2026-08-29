@@ -16,6 +16,7 @@ import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 import { CancelOrderDto } from './dto/cancel-order.dto';
 import { CreateCancellationRequestDto } from './dto/cancellation-request.dto';
 import { ReviewCancellationRequestDto } from './dto/review-cancellation-request.dto';
+import { AddExtraChargeDto } from './dto/add-extra-charge.dto';
 import { OrderStatus, CancellationRequestStatus } from '../../generated/prisma/enums';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { PermissionsGuard } from '../auth/guards/permissions.guard';
@@ -38,6 +39,18 @@ import type { CurrentBranch as CurrentBranchType } from '../auth/types/current-b
 @UseGuards(JwtAuthGuard, PermissionsGuard, TenantAccessGuard, RestaurantAccessGuard)
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
+
+  @Post('extra-charge')
+  @Permissions(PERMISSIONS.ORDERS_UPDATE)
+  async addExtraCharge(
+    @CurrentRestaurant() restaurant: CurrentRestaurantType,
+    @CurrentUser() user: any,
+    @Body() dto: AddExtraChargeDto,
+    @CurrentBranch() branch?: CurrentBranchType,
+  ) {
+    if (!restaurant) throw new BadRequestException('No active restaurant selected');
+    return this.ordersService.addExtraCharge(restaurant.id, user, dto, branch?.id);
+  }
 
   @Get('cancellation-requests')
   @Permissions(PERMISSIONS.ORDERS_READ)
