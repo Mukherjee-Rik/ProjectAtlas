@@ -84,7 +84,11 @@ export class MenuCategoriesService {
         updatedAt: true,
         _count: {
           select: {
-            items: true,
+            items: {
+              where: {
+                status: 'ACTIVE',
+              },
+            },
           },
         },
       },
@@ -112,6 +116,9 @@ export class MenuCategoriesService {
         createdAt: true,
         updatedAt: true,
         items: {
+          where: {
+            status: 'ACTIVE',
+          },
           orderBy: {
             position: 'asc',
           },
@@ -221,12 +228,48 @@ export class MenuCategoriesService {
           restaurantId,
         },
       },
+      include: {
+        items: {
+          include: {
+            orderItems: { select: { id: true }, take: 1 },
+          },
+        },
+      },
     });
 
     if (!existing) {
       throw new ForbiddenException(
         'Menu category not found or does not belong to active restaurant',
       );
+    }
+
+    // Process all items in this category
+    for (const item of existing.items) {
+      await this.prisma.cartItem.deleteMany({ where: { menuItemId: item.id } });
+      if (item.orderItems && item.orderItems.length > 0) {
+        await this.prisma.menuItem.update({
+          where: { id: item.id },
+          data: {
+            status: 'INACTIVE',
+            code: `${item.code}_deleted_${Date.now()}`,
+          },
+        });
+      } else {
+        await this.prisma.menuItem.delete({ where: { id: item.id } });
+      }
+    }
+
+    // If any historical items remain attached, mark category inactive
+    const remainingItems = await this.prisma.menuItem.count({ where: { categoryId: id } });
+    if (remainingItems > 0) {
+      await this.prisma.menuCategory.update({
+        where: { id },
+        data: {
+          status: 'INACTIVE',
+          code: `${existing.code}_deleted_${Date.now()}`,
+        },
+      });
+      return { id, name: existing.name, code: existing.code, status: 'INACTIVE', deleted: true };
     }
 
     return this.prisma.menuCategory.delete({
