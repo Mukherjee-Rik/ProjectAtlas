@@ -13,7 +13,7 @@ import { validateEmail, validatePassword } from '@/lib/validation';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { LiquidGlass } from '@/components/ui/liquid-glass';
 import { OAuthButtons } from '@/components/auth/oauth-buttons';
-import { Smartphone, ArrowLeft, RefreshCw, KeyRound } from 'lucide-react';
+import { Mail, ArrowLeft, RefreshCw, KeyRound } from 'lucide-react';
 
 export default function LoginPage() {
   return <LoginForm />;
@@ -36,7 +36,7 @@ function LoginForm() {
   // ── OTP Challenge States ──────────────────────────────────────────
   const [otpStep, setOtpStep] = useState(false);
   const [challengeId, setChallengeId] = useState('');
-  const [phoneMasked, setPhoneMasked] = useState('');
+  const [emailMasked, setEmailMasked] = useState('');
   const [otpCode, setOtpCode] = useState('');
   const [resendTimer, setResendTimer] = useState(30);
   const [resending, setResending] = useState(false);
@@ -195,10 +195,10 @@ function LoginForm() {
 
       const resData = (response as any)?.data ?? response;
 
-      // Check if Phone OTP challenge was issued
+      // The password was accepted; the code was emailed to the account.
       if (resData?.otpRequired) {
         setChallengeId(resData.challengeId);
-        setPhoneMasked(resData.phoneMasked || '+91 99030 •••••');
+        setEmailMasked(resData.emailMasked || email.trim().toLowerCase());
         setOtpStep(true);
         setOtpCode('');
         setResendTimer(30);
@@ -258,7 +258,7 @@ function LoginForm() {
     try {
       const response = await resendOtp({ challengeId });
       const resData = (response as any)?.data ?? response;
-      setResendMessage(resData?.message || 'New 6-digit verification code dispatched to your phone.');
+      setResendMessage(resData?.message || 'A new 6-digit code has been emailed to you.');
       setResendTimer(30);
     } catch (err: any) {
       setError(err?.message || 'Failed to resend code. Please try again.');
@@ -340,7 +340,7 @@ function LoginForm() {
         <div className="relative flex flex-1 items-center justify-center px-6 pb-16 lg:px-12">
           <LiquidGlass className="w-full max-w-sm rounded-[28px] p-8 sm:p-9 shadow-2xl">
             {otpStep ? (
-              /* ═══ Phone OTP Verification Step ═════════════════════════════ */
+              /* ═══ Emailed code verification step ══════════════════════════ */
               <div className="space-y-6 animate-fadeIn">
                 <button
                   type="button"
@@ -355,14 +355,15 @@ function LoginForm() {
 
                 <div>
                   <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary border border-primary/20 mb-3">
-                    <Smartphone className="h-6 w-6" />
+                    <Mail className="h-6 w-6" />
                   </div>
                   <h1 className="font-display text-2xl font-bold tracking-tight text-foreground">
                     Enter Verification Code
                   </h1>
                   <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
-                    A 6-digit sign-in OTP was dispatched to your phone{' '}
-                    <strong className="text-foreground font-mono">{phoneMasked}</strong>.
+                    We emailed a 6-digit code to{' '}
+                    <strong className="text-foreground font-mono">{emailMasked}</strong>. It
+                    expires in 5 minutes.
                   </p>
                 </div>
 
@@ -555,7 +556,7 @@ function LoginForm() {
                     disabled={loading}
                     className="w-full rounded-lg bg-primary px-4 py-3 text-[15px] font-semibold text-primary-foreground transition-colors hover:bg-primary-hover active:scale-[0.995] disabled:cursor-not-allowed disabled:opacity-60"
                   >
-                    {loading ? 'Sending Phone OTP…' : 'Continue with Password →'}
+                    {loading ? 'Emailing your code…' : 'Continue with Password →'}
                   </button>
                 </form>
 
