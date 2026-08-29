@@ -128,8 +128,9 @@ const plans = [
   },
   {
     name: 'Enterprise',
+    subheading: 'Starting from',
     price: '₹4,999',
-    period: 'onwards, per month',
+    period: '/ year',
     blurb: 'Several outlets that need to roll up into one view.',
     features: [
       'Unlimited tables, staff, menus and branches',
@@ -138,7 +139,7 @@ const plans = [
       'Priority support with an SLA',
     ],
     cta: 'Talk to us',
-    href: '/talk-to-us',
+    href: '/contact',
     featured: false,
   },
 ];
@@ -477,12 +478,19 @@ export default function Home() {
                     )}
                   </div>
 
-                  <p className="mt-6 flex items-baseline gap-2">
-                    <span className="font-display text-[2.75rem] font-semibold leading-none tracking-[-0.04em] text-foreground">
-                      {plan.price}
-                    </span>
-                    <span className="text-[13px] text-muted-foreground">{plan.period}</span>
-                  </p>
+                  <div className="mt-6">
+                    {(plan as any).subheading && (
+                      <p className="text-[11px] font-bold uppercase tracking-wider text-primary mb-1">
+                        {(plan as any).subheading}
+                      </p>
+                    )}
+                    <p className="flex items-baseline gap-2">
+                      <span className="font-display text-[2.75rem] font-semibold leading-none tracking-[-0.04em] text-foreground">
+                        {plan.price}
+                      </span>
+                      <span className="text-[13px] text-muted-foreground">{plan.period}</span>
+                    </p>
+                  </div>
 
                   <p className="mt-4 text-[14px] leading-relaxed text-muted-foreground">
                     {plan.blurb}

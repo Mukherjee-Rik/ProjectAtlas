@@ -22,8 +22,8 @@ export function RestaurantSubscriptionView() {
   } | null>(null);
 
   const formatLimit = (val?: number) => {
-    if (val === undefined) return 'No Limit';
-    if (val === -1) return 'Unlimited';
+    if (val === undefined || val === null) return 'No Limit';
+    if (val === -1 || val >= 999) return 'Unlimited';
     return val.toString();
   };
 
@@ -119,7 +119,7 @@ export function RestaurantSubscriptionView() {
   };
 
   const getMeterPercent = (current: number, limit: number) => {
-    if (limit <= 0) return 0;
+    if (limit <= 0 || limit >= 999 || limit === -1) return Math.min(100, Math.max(5, current * 5));
     if (current > limit) return 100;
     return (current / limit) * 100;
   };
@@ -201,12 +201,12 @@ export function RestaurantSubscriptionView() {
               <li className="flex items-center gap-2">
                 <span className="text-primary">✓</span> Table & Area Setup
               </li>
-              {['Starter', 'Professional', 'Enterprise'].includes(planName) && (
+              {['Starter', 'Growth', 'Professional', 'Enterprise'].includes(planName) && (
                 <li className="flex items-center gap-2">
                   <span className="text-primary">✓</span> Order Dispatch & Kitchen Screen
                 </li>
               )}
-              {['Professional', 'Enterprise'].includes(planName) && (
+              {['Growth', 'Professional', 'Enterprise'].includes(planName) && (
                 <li className="flex items-center gap-2">
                   <span className="text-primary">✓</span> Advanced Revenue Analytics
                 </li>
@@ -233,7 +233,7 @@ export function RestaurantSubscriptionView() {
               <div className="flex justify-between text-xs">
                 <span className="font-bold text-foreground">Tables Configured</span>
                 <span className="text-muted-foreground">
-                  <span className="font-bold text-foreground">{usage.tables.current}</span> / {usage.tables.limit} max
+                  <span className="font-bold text-foreground">{usage.tables.current}</span> / {usage.tables.limit === -1 || usage.tables.limit >= 999 ? 'Unlimited' : `${usage.tables.limit} max`}
                 </span>
               </div>
               <div className="h-2 w-full rounded-full bg-secondary overflow-hidden">
@@ -249,7 +249,7 @@ export function RestaurantSubscriptionView() {
               <div className="flex justify-between text-xs">
                 <span className="font-bold text-foreground">Staff Members</span>
                 <span className="text-muted-foreground">
-                  <span className="font-bold text-foreground">{usage.staff.current}</span> / {usage.staff.limit} max
+                  <span className="font-bold text-foreground">{usage.staff.current}</span> / {usage.staff.limit === -1 || usage.staff.limit >= 999 ? 'Unlimited' : `${usage.staff.limit} max`}
                 </span>
               </div>
               <div className="h-2 w-full rounded-full bg-secondary overflow-hidden">
@@ -265,7 +265,7 @@ export function RestaurantSubscriptionView() {
               <div className="flex justify-between text-xs">
                 <span className="font-bold text-foreground">Active Branches</span>
                 <span className="text-muted-foreground">
-                  <span className="font-bold text-foreground">{usage.branches.current}</span> / {usage.branches.limit} max
+                  <span className="font-bold text-foreground">{usage.branches.current}</span> / {usage.branches.limit === -1 || usage.branches.limit >= 999 ? 'Unlimited' : `${usage.branches.limit} max`}
                 </span>
               </div>
               <div className="h-2 w-full rounded-full bg-secondary overflow-hidden">
@@ -281,7 +281,7 @@ export function RestaurantSubscriptionView() {
               <div className="flex justify-between text-xs">
                 <span className="font-bold text-foreground">Catalogs / Menus</span>
                 <span className="text-muted-foreground">
-                  <span className="font-bold text-foreground">{usage.menus.current}</span> / {usage.menus.limit} max
+                  <span className="font-bold text-foreground">{usage.menus.current}</span> / {usage.menus.limit === -1 || usage.menus.limit >= 999 ? 'Unlimited' : `${usage.menus.limit} max`}
                 </span>
               </div>
               <div className="h-2 w-full rounded-full bg-secondary overflow-hidden">
@@ -326,9 +326,16 @@ export function RestaurantSubscriptionView() {
                   </div>
                   <p className="text-xs text-muted-foreground line-clamp-2">{pl.description || `Atlas scaling plan for restaurants.`}</p>
                   
-                  <div className="pt-2 flex items-baseline gap-1">
-                    <span className="text-2xl font-black text-primary">{formatCurrency(pl.price)}</span>
-                    <span className="text-[10px] text-muted-foreground uppercase">/ {pl.billingCycle}</span>
+                  <div className="pt-2">
+                    {pl.name.toLowerCase() === 'enterprise' && (
+                      <span className="block text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-0.5">
+                        Starting from
+                      </span>
+                    )}
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-2xl font-black text-primary">{formatCurrency(pl.price)}</span>
+                      <span className="text-[10px] text-muted-foreground uppercase">/ {pl.billingCycle}</span>
+                    </div>
                   </div>
                 </div>
 
@@ -460,13 +467,20 @@ export function RestaurantSubscriptionView() {
             </div>
 
             {/* Price and Cycle */}
-            <div className="flex items-baseline gap-2 border-y border-border/60 py-4">
-              <span className="text-3xl font-black text-primary">
-                {formatCurrency(selectedPlanDetails.price)}
-              </span>
-              <span className="text-xs text-muted-foreground uppercase font-bold">
-                / {selectedPlanDetails.billingCycle}
-              </span>
+            <div className="border-y border-border/60 py-4">
+              {selectedPlanDetails.name.toLowerCase() === 'enterprise' && (
+                <span className="block text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">
+                  Starting from
+                </span>
+              )}
+              <div className="flex items-baseline gap-2">
+                <span className="text-3xl font-black text-primary">
+                  {formatCurrency(selectedPlanDetails.price)}
+                </span>
+                <span className="text-xs text-muted-foreground uppercase font-bold">
+                  / {selectedPlanDetails.billingCycle}
+                </span>
+              </div>
             </div>
 
             {/* Quotas & Limits */}
