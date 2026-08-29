@@ -1,6 +1,6 @@
 let rawApiUrl = (
   process.env.NEXT_PUBLIC_API_URL ||
-  'https://projectatlas-production-0c80.up.railway.app/api/v1'
+  '/api/proxy'
 ).trim().replace(/\/+$/, '');
 
 if (
@@ -12,11 +12,11 @@ if (
   rawApiUrl = `https://${rawApiUrl}`;
 }
 
-// Automatically append NestJS global prefix /api/v1 if omitted
-if (!rawApiUrl.includes('/api/v1')) {
+// Automatically append NestJS global prefix /api/v1 if pointing directly to a host without proxy
+if (!rawApiUrl.startsWith('/api/proxy') && !rawApiUrl.includes('/api/v1')) {
   if (rawApiUrl.endsWith('/api')) {
     rawApiUrl = `${rawApiUrl}/v1`;
-  } else if (!rawApiUrl.startsWith('/api/proxy')) {
+  } else {
     rawApiUrl = `${rawApiUrl}/api/v1`;
   }
 }
