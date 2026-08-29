@@ -5,15 +5,31 @@ import { PrismaService } from '../../database/prisma/prisma.service';
 export class SubscriptionUsageService {
   constructor(private readonly prisma: PrismaService) {}
 
+  /**
+   * The subscription that currently entitles a restaurant to use the app.
+   *
+   * A trial only counts while it is still running. Matching on status alone
+   * meant the trial never actually ended — the row stayed TRIALING for ever, so
+   * quota checks kept passing months past trialEnd. A null trialEnd is treated
+   * as open-ended so legacy rows are not locked out.
+   */
   async getActiveSubscription(restaurantId: string) {
+    const now = new Date();
     return this.prisma.subscription.findFirst({
       where: {
         restaurantId,
-        status: { in: ['ACTIVE', 'TRIALING'] },
+        OR: [
+          { status: 'ACTIVE' },
+          {
+            status: 'TRIALING',
+            OR: [{ trialEnd: null }, { trialEnd: { gt: now } }],
+          },
+        ],
       },
       include: {
         plan: true,
       },
+      orderBy: { createdAt: 'desc' },
     });
   }
 
