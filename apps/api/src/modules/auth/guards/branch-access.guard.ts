@@ -113,6 +113,26 @@ export class BranchAccessGuard implements CanActivate {
         throw new ForbiddenException('You do not have access to this branch');
       }
 
+      if (membership.role !== 'OWNER' && user.role !== 'OWNER') {
+        // Non-owner staff (WAITER, CASHIER, KITCHEN, MANAGER, STAFF) can only access their designated branch
+        const primaryBranch = await this.cache.wrap(
+          `primary_branch:${branch.restaurantId}`,
+          CacheTtl.branch,
+          () =>
+            this.prisma.branch.findFirst({
+              where: { restaurantId: branch.restaurantId },
+              orderBy: { createdAt: 'asc' },
+              select: { id: true },
+            }),
+        );
+
+        if (primaryBranch && primaryBranch.id !== branch.id) {
+          throw new ForbiddenException(
+            'Access denied: Staff members can only access their assigned branch. Only the restaurant owner can access all branches.',
+          );
+        }
+      }
+
       if (!request.tenant && membership.tenant) {
         request.tenant = {
           id: membership.tenant.id,

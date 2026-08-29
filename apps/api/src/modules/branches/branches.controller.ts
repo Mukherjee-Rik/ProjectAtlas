@@ -21,6 +21,7 @@ import { PermissionsGuard } from '../auth/guards/permissions.guard';
 import { TenantAccessGuard } from '../auth/guards/tenant-access.guard';
 import { Permissions } from '../auth/decorators/permissions.decorator';
 import { CurrentTenant } from '../auth/decorators/current-tenant.decorator';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { PERMISSIONS } from '../auth/permissions/permissions';
 import { TENANT_HEADER } from '../auth/constants/tenant.constants';
 import type { CurrentTenant as CurrentTenantType } from '../auth/types/current-tenant.type';
@@ -54,9 +55,10 @@ export class BranchesController {
   @ApiQuery({ name: 'restaurantId', required: false, type: String })
   async findAll(
     @CurrentTenant() tenant: CurrentTenantType,
+    @CurrentUser() user: any,
     @Query('restaurantId') restaurantId?: string,
   ) {
-    return this.branchesService.findAll(tenant.id, restaurantId);
+    return this.branchesService.findAll(tenant.id, restaurantId, user);
   }
 
   @Get(':id')
@@ -64,8 +66,9 @@ export class BranchesController {
   async findById(
     @Param('id', new ParseUUIDPipe()) id: string,
     @CurrentTenant() tenant: CurrentTenantType,
+    @CurrentUser() user: any,
   ) {
-    return this.branchesService.findById(id, tenant.id);
+    return this.branchesService.findById(id, tenant.id, user);
   }
 
   @Patch(':id')
