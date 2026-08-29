@@ -269,7 +269,7 @@ function LoginForm() {
 
   /** The landing page publishes these, so offering them here saves retyping. */
   function fillDemo() {
-    setEmail('test@atlas.com');
+    setEmail('sweta@atlas.com');
     setPassword('Atlas@12345');
     setEmailError('');
     setPasswordError('');
