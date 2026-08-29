@@ -59,7 +59,7 @@ export function AppShell({ children }: AppShellProps) {
 
   // Subscription gating for AI Copilot (Hidden for Free Trial & Starter plans)
   useEffect(() => {
-    if (!user) {
+    if (!user || !currentRestaurant?.id) {
       setCanAccessAi(false);
       return;
     }

@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { apiClient } from '@/services/api-client';
+import { useRestaurant } from '@/hooks/use-restaurant';
 
 interface Notification {
   id: string;
@@ -13,12 +14,18 @@ interface Notification {
 }
 
 export function NotificationBell() {
+  const { currentRestaurant } = useRestaurant();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   const fetchNotifications = useCallback(async () => {
+    if (!currentRestaurant?.id) {
+      setNotifications([]);
+      setUnreadCount(0);
+      return;
+    }
     try {
       const [listRes, countRes] = await Promise.all([
         apiClient.get<any>('/automations/notifications/list'),
@@ -34,13 +41,14 @@ export function NotificationBell() {
       setNotifications([]);
       setUnreadCount(0);
     }
-  }, []);
+  }, [currentRestaurant?.id]);
 
   useEffect(() => {
+    if (!currentRestaurant?.id) return;
     fetchNotifications();
     const interval = setInterval(fetchNotifications, 30000); // Poll every 30s
     return () => clearInterval(interval);
-  }, [fetchNotifications]);
+  }, [fetchNotifications, currentRestaurant?.id]);
 
   // Close on outside click
   useEffect(() => {
