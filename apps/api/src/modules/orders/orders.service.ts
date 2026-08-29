@@ -1031,7 +1031,7 @@ export class OrdersService {
         data: {
           orderId: targetOrder.id,
           menuItemId: resolvedMenuItemId,
-          name: dto.name,
+          name: dto.name || dto.reason || 'Extra Charge',
           quantity,
           unitPrice,
           totalPrice,
