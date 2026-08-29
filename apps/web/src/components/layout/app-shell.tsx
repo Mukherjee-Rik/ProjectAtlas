@@ -57,12 +57,24 @@ export function AppShell({ children }: AppShellProps) {
     setIsMobileMenuOpen(false);
   }, [pathname]);
 
-  // Subscription gating for AI Copilot (Hidden for Free Trial & Starter plans)
+  // Subscription & Role gating for AI Copilot (Only OWNER, MANAGER, PLATFORM_ADMIN)
   useEffect(() => {
     if (!user || !currentRestaurant?.id) {
       setCanAccessAi(false);
       return;
     }
+
+    const isAuthorizedRole =
+      user.role === 'OWNER' ||
+      user.role === 'MANAGER' ||
+      user.role === 'PLATFORM_ADMIN';
+
+    // Staff below manager (Waiter, Cashier, Kitchen, Staff, User) cannot access Ask AI
+    if (!isAuthorizedRole) {
+      setCanAccessAi(false);
+      return;
+    }
+
     // Platform Admins always have AI Copilot access
     if (user.role === 'PLATFORM_ADMIN') {
       setCanAccessAi(true);
