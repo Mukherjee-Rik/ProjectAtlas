@@ -33,7 +33,11 @@ export default function SelectRestaurantPage() {
         setCurrentTenant({ id: item.tenantId, name: item.restaurant.name, slug: item.tenantSlug, status: 'ACTIVE', createdAt: '', updatedAt: '' });
         setCurrentRestaurant({ id: item.restaurant.id, tenantId: item.tenantId, name: item.restaurant.name, slug: item.restaurant.slug, status: 'ACTIVE', createdAt: '', updatedAt: '' });
         if (item.restaurant.branches?.[0]?.id) {
-          const b = item.restaurant.branches[0];
+          const branches = item.restaurant.branches;
+          const b =
+            branches.find(
+              (br: any) => br.code?.toUpperCase() === 'MAIN' || br.name?.toLowerCase().includes('main'),
+            ) || branches[0];
           setCurrentBranch({ id: b.id, restaurantId: item.restaurant.id, name: b.name, code: b.code, status: 'ACTIVE', createdAt: '', updatedAt: '' });
         }
         router.push('/dashboard');
@@ -58,8 +62,14 @@ export default function SelectRestaurantPage() {
   ) => {
     setCurrentTenant({ id: tenantId, name: restaurant.name, slug: tenantSlug, status: 'ACTIVE', createdAt: '', updatedAt: '' });
     setCurrentRestaurant({ id: restaurant.id, tenantId, name: restaurant.name, slug: restaurant.slug, status: 'ACTIVE', createdAt: '', updatedAt: '' });
-    if (branch) {
-      setCurrentBranch({ id: branch.id, restaurantId: restaurant.id, name: branch.name, code: branch.code, status: 'ACTIVE', createdAt: '', updatedAt: '' });
+    const chosenBranch =
+      branch ||
+      restaurant.branches?.find(
+        (b: any) => b.code?.toUpperCase() === 'MAIN' || b.name?.toLowerCase().includes('main'),
+      ) ||
+      restaurant.branches?.[0];
+    if (chosenBranch) {
+      setCurrentBranch({ id: chosenBranch.id, restaurantId: restaurant.id, name: chosenBranch.name, code: chosenBranch.code, status: 'ACTIVE', createdAt: '', updatedAt: '' });
     }
     router.push('/dashboard');
   };

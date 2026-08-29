@@ -45,11 +45,14 @@ export function BranchProvider({ children }: { children: ReactNode }) {
       if (currentRestaurant && stored.restaurantId !== currentRestaurant.id) {
         clearCurrentBranch();
         setCurrentBranchState(null);
+      } else if (!isOwnerOrAdmin && stored.code?.toUpperCase() !== 'MAIN') {
+        clearCurrentBranch();
+        setCurrentBranchState(null);
       } else {
         setCurrentBranchState(stored);
       }
     }
-  }, [currentRestaurant?.id]);
+  }, [currentRestaurant?.id, isOwnerOrAdmin]);
 
   const clearBranch = useCallback(() => {
     setCurrentBranchState(null);
@@ -82,8 +85,16 @@ export function BranchProvider({ children }: { children: ReactNode }) {
       let loadedBranches = response.data ?? [];
 
       if (!isOwnerOrAdmin && loadedBranches.length > 0) {
-        // Non-owner staff (waiter, cashier, kitchen, manager, staff) only see their assigned branch
-        loadedBranches = loadedBranches.slice(0, 1);
+        // Non-owner staff (waiter, cashier, kitchen, manager, staff) only see their assigned Main branch
+        const mainBranch =
+          loadedBranches.find(
+            (b) => b.code.toUpperCase() === 'MAIN' || b.name.toLowerCase().includes('main'),
+          ) || loadedBranches[0];
+        const assigned = mainBranch!;
+        setBranches([assigned]);
+        saveCurrentBranch(assigned);
+        setCurrentBranchState(assigned);
+        return;
       }
 
       setBranches(loadedBranches);
@@ -93,11 +104,6 @@ export function BranchProvider({ children }: { children: ReactNode }) {
         if (loadedBranches.length === 0) {
           clearCurrentBranch();
           return null;
-        }
-
-        if (!isOwnerOrAdmin) {
-          saveCurrentBranch(loadedBranches[0]!);
-          return loadedBranches[0]!;
         }
 
         if (!prevBranch || prevBranch.restaurantId !== currentRestaurant.id) {

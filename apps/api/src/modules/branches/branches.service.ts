@@ -133,8 +133,12 @@ export class BranchesService {
     });
 
     if (user && user.role !== 'OWNER' && user.role !== 'PLATFORM_ADMIN') {
-      // Non-owner staff (waiter, cashier, kitchen, manager, staff) only have access to their own branch
-      return branches.slice(0, 1);
+      // Non-owner staff (waiter, cashier, kitchen, manager, staff) only have access to their Main branch
+      const mainBranch =
+        branches.find(
+          (b) => b.code.toUpperCase() === 'MAIN' || b.name.toLowerCase().includes('main'),
+        ) || branches[0];
+      return mainBranch ? [mainBranch] : [];
     }
 
     return branches;
@@ -177,15 +181,20 @@ export class BranchesService {
     }
 
     if (user && user.role !== 'OWNER' && user.role !== 'PLATFORM_ADMIN') {
-      const primaryBranch = await this.prisma.branch.findFirst({
+      const allBranches = await this.prisma.branch.findMany({
         where: { restaurantId: branch.restaurantId },
         orderBy: { createdAt: 'asc' },
-        select: { id: true },
+        select: { id: true, name: true, code: true },
       });
 
-      if (primaryBranch && primaryBranch.id !== branch.id) {
+      const mainBranch =
+        allBranches.find(
+          (b) => b.code.toUpperCase() === 'MAIN' || b.name.toLowerCase().includes('main'),
+        ) || allBranches[0];
+
+      if (mainBranch && mainBranch.id !== branch.id) {
         throw new ForbiddenException(
-          'Access denied: Staff members can only access their assigned branch. Only the restaurant owner has access to all branches.',
+          'Access denied: Staff members can only access their assigned branch (Main Branch). Only the restaurant owner has access to all branches.',
         );
       }
     }

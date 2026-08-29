@@ -769,15 +769,21 @@ export class AuthService {
     });
 
     if (!isOwnerOrPlatformAdmin) {
-      // Non-owner staff (waiter, cashier, kitchen, manager, staff) only see their own single assigned branch
+      // Non-owner staff (waiter, cashier, kitchen, manager, staff) only see their assigned Main branch
       return memberships.map((m) => ({
         ...m,
         tenant: {
           ...m.tenant,
-          restaurants: m.tenant.restaurants.map((r) => ({
-            ...r,
-            branches: r.branches.slice(0, 1),
-          })),
+          restaurants: m.tenant.restaurants.map((r) => {
+            const mainBranch =
+              r.branches.find(
+                (b) => b.code.toUpperCase() === 'MAIN' || b.name.toLowerCase().includes('main'),
+              ) || r.branches[0];
+            return {
+              ...r,
+              branches: mainBranch ? [mainBranch] : [],
+            };
+          }),
         },
       }));
     }

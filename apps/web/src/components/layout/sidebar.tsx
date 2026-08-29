@@ -18,10 +18,21 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
   const { user } = useAuth();
 
   const isOwnerOrPlatformAdmin = user?.role === 'OWNER' || user?.role === 'PLATFORM_ADMIN';
+  const isManagerOrHigher = user?.role === 'OWNER' || user?.role === 'MANAGER' || user?.role === 'PLATFORM_ADMIN';
 
   const filteredNavItems = navigationItems.filter((item) => {
     if (user?.role === 'PLATFORM_ADMIN') {
-      return ['/platform-admin', '/restaurants', '/subscriptions', '/support', '/profile', '/settings'].includes(item.href);
+      return [
+        '/platform-admin',
+        '/analytics',
+        '/reports',
+        '/forecasts',
+        '/restaurants',
+        '/subscriptions',
+        '/support',
+        '/profile',
+        '/settings',
+      ].includes(item.href);
     }
     if (user?.role === 'CASHIER') {
       return ['/cashier', '/kitchen', '/support', '/profile'].includes(item.href);
@@ -35,9 +46,17 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
     if (user?.role === 'KITCHEN') {
       return ['/kitchen', '/support', '/profile'].includes(item.href);
     }
+    if (user?.role === 'USER') {
+      return ['/support', '/profile'].includes(item.href);
+    }
 
     // Owner-only routes (Multi-branch administration, restaurant management, billing)
     if (!isOwnerOrPlatformAdmin && ['/branches', '/restaurants', '/subscriptions'].includes(item.href)) {
+      return false;
+    }
+
+    // Manager & Owner only routes (Analytics, Reports, Forecasts, Inventory, Staff Management)
+    if (!isManagerOrHigher && ['/analytics', '/reports', '/forecasts', '/inventory', '/users'].includes(item.href)) {
       return false;
     }
 
