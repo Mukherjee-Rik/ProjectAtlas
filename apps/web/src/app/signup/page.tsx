@@ -9,6 +9,7 @@ import { setAccessToken, getAccessToken } from '@/lib/auth-storage';
 import { setCurrentTenant } from '@/lib/tenant-storage';
 import { setCurrentRestaurant } from '@/lib/restaurant-storage';
 import { setCurrentBranch } from '@/lib/branch-storage';
+import { ShieldCheck } from 'lucide-react';
 import { ValidatedInput } from '@/components/ui/validated-input';
 import { validateText, validateEmail, validatePhone, validatePassword } from '@/lib/validation';
 import { OAuthButtons } from '@/components/auth/oauth-buttons';
@@ -25,9 +26,12 @@ export default function SignupPage() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [agreeTerms, setAgreeTerms] = useState(false);
+  // Must be ticked before the restaurant can be created.
+  const [notARobot, setNotARobot] = useState(false);
 
   const [errors, setErrors] = useState<{
     restaurantName?: string;
+    robot?: string;
     ownerName?: string;
     email?: string;
     phone?: string;
@@ -163,6 +167,7 @@ export default function SignupPage() {
     if (!confirmPassword) validationErrors.confirmPassword = 'Confirm password is required';
     else if (password !== confirmPassword) validationErrors.confirmPassword = 'Passwords do not match';
     if (!agreeTerms) validationErrors.terms = 'Please agree to the Terms of Service to continue';
+    if (!notARobot) validationErrors.robot = 'Please confirm you are not a robot';
 
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
@@ -366,10 +371,43 @@ export default function SignupPage() {
             )}
           </div>
 
+          {/* Human check. Deliberately placed last, immediately above the
+              button it gates, so the reason a disabled button is disabled is
+              the nearest thing to it on screen. */}
+          <div className="space-y-1">
+            <div className="flex items-center gap-3 rounded-xl border border-border bg-secondary/60 p-3.5">
+              <input
+                type="checkbox"
+                id="not-a-robot"
+                checked={notARobot}
+                onChange={(e) => {
+                  setNotARobot(e.target.checked);
+                  if (e.target.checked && errors.robot) {
+                    const next = { ...errors };
+                    delete next.robot;
+                    setErrors(next);
+                  }
+                }}
+                className="h-4 w-4 shrink-0 rounded border-border bg-secondary text-primary focus:ring-primary"
+              />
+              <label
+                htmlFor="not-a-robot"
+                className="flex-1 cursor-pointer text-xs font-medium text-foreground"
+              >
+                I&apos;m not a robot
+              </label>
+              <ShieldCheck
+                className={`h-4 w-4 shrink-0 ${notARobot ? 'text-primary' : 'text-subtle'}`}
+                aria-hidden="true"
+              />
+            </div>
+            {errors.robot && <p className="text-xs text-atlas-error">{errors.robot}</p>}
+          </div>
+
           <button
             type="submit"
-            disabled={isLoading}
-            className="w-full rounded-xl bg-primary py-3.5 text-sm font-bold text-background shadow-lg transition-all hover:bg-primary-hover active:scale-[0.99] disabled:opacity-50"
+            disabled={isLoading || !notARobot}
+            className="w-full rounded-xl bg-primary py-3.5 text-sm font-bold text-background shadow-lg transition-all hover:bg-primary-hover active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isLoading ? 'Creating Restaurant...' : 'Create Restaurant'}
           </button>
