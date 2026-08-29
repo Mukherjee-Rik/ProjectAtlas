@@ -4,8 +4,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useAuth } from '@/hooks/use-auth';
-import { registerRestaurant } from '@/services/auth.service';
-import { setAccessToken } from '@/lib/auth-storage';
+import { registerRestaurant, createFirstRestaurant } from '@/services/auth.service';
+import { setAccessToken, getAccessToken } from '@/lib/auth-storage';
 import { setCurrentTenant } from '@/lib/tenant-storage';
 import { setCurrentRestaurant } from '@/lib/restaurant-storage';
 import { setCurrentBranch } from '@/lib/branch-storage';
@@ -103,6 +103,50 @@ export default function SignupPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    // Already signed in — almost always straight after an OAuth sign-in,
+    // which registers the account before a restaurant has been named. Sending
+    // this through /auth/signup returns "Email address is already registered"
+    // and creates nothing, so the restaurant is made for the current user
+    // instead. Only the restaurant name is needed; the account already exists.
+    if (getAccessToken()) {
+      const nameCheck = validateText(restaurantName, 'Restaurant name', 2, 100);
+      if (!nameCheck.isValid) {
+        setErrors({ restaurantName: nameCheck.error });
+        setError('Please resolve the highlighted errors before submitting.');
+        return;
+      }
+
+      setErrors({});
+      setIsLoading(true);
+      try {
+        const response = await createFirstRestaurant({
+          restaurantName: restaurantName.trim(),
+          phone: phone.trim() || undefined,
+        });
+        const result = response.data;
+
+        if (result?.accessToken && result?.user) {
+          loginUser(result.accessToken, result.user);
+        }
+        if (result?.tenant?.id) {
+          setCurrentTenant({ id: result.tenant.id, name: result.tenant.name, slug: result.tenant.slug, status: 'ACTIVE', createdAt: '', updatedAt: '' });
+        }
+        if (result?.restaurant?.id) {
+          setCurrentRestaurant({ id: result.restaurant.id, tenantId: result.tenant?.id || '', name: result.restaurant.name, slug: result.restaurant.slug, status: 'ACTIVE', createdAt: '', updatedAt: '' });
+        }
+        if (result?.branch?.id) {
+          setCurrentBranch({ id: result.branch.id, restaurantId: result.restaurant?.id || '', name: result.branch.name, code: result.branch.code, status: 'ACTIVE', createdAt: '', updatedAt: '' });
+        }
+
+        router.push('/dashboard');
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'Could not create the restaurant.');
+      } finally {
+        setIsLoading(false);
+      }
+      return;
+    }
 
     const restRes = validateText(restaurantName, 'Restaurant name', 2, 100);
     const ownerRes = validateText(ownerName, 'Owner name', 2, 100);

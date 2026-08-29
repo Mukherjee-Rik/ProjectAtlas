@@ -71,51 +71,74 @@ const devices = [
   'A waiter’s own phone',
 ];
 
+/**
+ * The four plans, in the order a room grows through them.
+ *
+ * Every quota line here is the number the app actually enforces — they come
+ * from each plan's `limits` JSON in the database, so this page cannot quietly
+ * promise more than the software allows.
+ */
 const plans = [
   {
-    name: 'Starter',
+    name: 'Free trial',
     price: '₹0',
     period: 'for 14 days',
-    blurb: 'One café, one room, one screen in the kitchen.',
+    blurb: 'Set the room up and take real orders before you pay anything.',
     features: [
-      'Up to 10 tables',
-      'QR ordering at the table',
-      'One kitchen display',
-      'Cashier terminal',
+      '1 table',
+      '1 staff member',
+      '1 branch',
+      '1 menu',
+      'QR ordering, kitchen display and cashier terminal',
     ],
     cta: 'Start free',
     href: '/signup',
     featured: false,
   },
   {
-    name: 'Growth',
-    price: '₹1,499',
+    name: 'Starter',
+    price: '₹499',
     period: 'per month',
-    blurb: 'A full room running lunch and dinner service.',
+    blurb: 'One café or one room, running a full service.',
     features: [
-      'Unlimited tables and standees',
-      'Multi-round tokens on one table',
-      'Unlimited kitchen and waiter devices',
-      'Recipe-level stock deduction',
-      'Split billing and approval on voids',
+      'Up to 20 tables',
+      'Up to 5 staff members',
+      '5 menus, 1 branch',
+      'Orders, kitchen display and billing',
     ],
-    cta: 'Start free, then ₹1,499',
+    cta: 'Choose Starter',
+    href: '/signup',
+    featured: false,
+  },
+  {
+    name: 'Growth',
+    price: '₹999',
+    period: 'per month',
+    blurb: 'A busy floor, or a second outlet on the way.',
+    features: [
+      'Up to 100 tables',
+      'Up to 50 staff members',
+      '20 menus, 5 branches',
+      'Analytics and demand forecasting',
+      'AI copilot and automations',
+    ],
+    cta: 'Choose Growth',
     href: '/signup',
     featured: true,
   },
   {
     name: 'Enterprise',
-    price: '₹3,999',
-    period: 'per month',
+    price: '₹4,999',
+    period: 'onwards, per month',
     blurb: 'Several outlets that need to roll up into one view.',
     features: [
-      'Unlimited branches',
+      'Unlimited tables, staff, menus and branches',
       'Stock synced across outlets',
-      'Rush-hour demand forecasting',
+      'Everything in Growth',
       'Priority support with an SLA',
     ],
     cta: 'Talk to us',
-    href: '/contact',
+    href: '/talk-to-us',
     featured: false,
   },
 ];
@@ -428,12 +451,13 @@ export default function Home() {
               </div>
               <p className="text-[15px] leading-relaxed text-muted-foreground md:col-span-5">
                 We don’t sit between you and your payment provider, so there is no
-                percentage skimmed off each bill. Every plan starts with 14 free days.
+                percentage skimmed off each bill. Start on 14 free days, then pick the
+                plan that matches your floor.
               </p>
             </div>
           </ScrollReveal>
 
-          <div className="mt-16 grid gap-px overflow-hidden rounded-xl border border-border bg-secondary md:grid-cols-3">
+          <div className="mt-16 grid gap-px overflow-hidden rounded-xl border border-border bg-secondary sm:grid-cols-2 lg:grid-cols-4">
             {plans.map((plan) => (
               <div
                 key={plan.name}
