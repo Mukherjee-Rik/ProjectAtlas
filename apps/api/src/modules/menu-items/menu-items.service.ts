@@ -51,7 +51,11 @@ export class MenuItemsService {
 
   async findAll(restaurantId: string, categoryId?: string) {
     return this.prisma.menuItem.findMany({
-      where: { category: { menu: { restaurantId } }, ...(categoryId && { categoryId }) },
+      where: {
+        category: { menu: { restaurantId } },
+        ...(categoryId && { categoryId }),
+        status: 'ACTIVE',
+      },
       select: { ...ITEM_SELECT, category: { select: { id: true, name: true, code: true } } },
       orderBy: { position: 'asc' },
     });
@@ -109,8 +113,30 @@ export class MenuItemsService {
   }
 
   async remove(id: string, restaurantId: string) {
-    const existing = await this.prisma.menuItem.findFirst({ where: { id, category: { menu: { restaurantId } } } });
+    const existing = await this.prisma.menuItem.findFirst({
+      where: { id, category: { menu: { restaurantId } } },
+      include: {
+        orderItems: { select: { id: true }, take: 1 },
+      },
+    });
     if (!existing) throw new ForbiddenException('Menu item not found or does not belong to active restaurant');
+
+    // 1. Remove from all active carts
+    await this.prisma.cartItem.deleteMany({ where: { menuItemId: id } });
+
+    // 2. If historical orders exist, deactivate and randomize code to preserve accounting & bill integrity
+    if (existing.orderItems && existing.orderItems.length > 0) {
+      await this.prisma.menuItem.update({
+        where: { id },
+        data: {
+          status: 'INACTIVE',
+          code: `${existing.code}_deleted_${Date.now()}`,
+        },
+      });
+      return { id, name: existing.name, code: existing.code, status: 'INACTIVE', deleted: true };
+    }
+
+    // 3. Otherwise, hard delete cleanly (cascades variants, addons, recipes automatically)
     return this.prisma.menuItem.delete({ where: { id }, select: { id: true, name: true, code: true } });
   }
 }
