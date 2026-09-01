@@ -171,9 +171,9 @@ export default function SignupPage() {
         password,
       });
 
-      const resData = (response as any)?.data ?? response;
+      const resData = (response as any)?.data?.data || (response as any)?.data || response;
 
-      if (resData?.otpRequired) {
+      if (resData?.otpRequired || resData?.challengeId) {
         setChallengeId(resData.challengeId);
         setEmailMasked(resData.emailMasked || email.trim().toLowerCase());
         setOtpStep(true);
