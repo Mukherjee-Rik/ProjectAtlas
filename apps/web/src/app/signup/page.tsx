@@ -8,9 +8,8 @@ import {
   registerRestaurant,
   verifyRegistrationOtp,
   resendRegistrationOtp,
-  createFirstRestaurant,
 } from '@/services/auth.service';
-import { setAccessToken, getAccessToken } from '@/lib/auth-storage';
+import { clearAuthStorage } from '@/lib/auth-storage';
 import { setCurrentTenant } from '@/lib/tenant-storage';
 import { setCurrentRestaurant } from '@/lib/restaurant-storage';
 import { setCurrentBranch } from '@/lib/branch-storage';
@@ -48,7 +47,6 @@ export default function SignupPage() {
   const [error, setError] = useState('');
 
   // Step 2: OTP Verification state
-  const [otpStep, setOtpStep] = useState(false);
   const [challengeId, setChallengeId] = useState('');
   const [emailMasked, setEmailMasked] = useState('');
   const [otpCode, setOtpCode] = useState('');
@@ -56,6 +54,7 @@ export default function SignupPage() {
   const [resending, setResending] = useState(false);
   const [resendMessage, setResendMessage] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
+  const [otpStep, setOtpStep] = useState(false);
 
   // Countdown timer for OTP resend
   useEffect(() => {
@@ -134,47 +133,6 @@ export default function SignupPage() {
     setError('');
     setResendMessage('');
 
-    // Already signed in — almost always straight after an OAuth sign-in,
-    // which registers the account before a restaurant has been named.
-    if (getAccessToken()) {
-      const nameCheck = validateText(restaurantName, 'Restaurant name', 2, 100);
-      if (!nameCheck.isValid) {
-        setErrors({ restaurantName: nameCheck.error });
-        setError('Please resolve the highlighted errors before submitting.');
-        return;
-      }
-
-      setErrors({});
-      setIsLoading(true);
-      try {
-        const response = await createFirstRestaurant({
-          restaurantName: restaurantName.trim(),
-          phone: phone.trim() || undefined,
-        });
-        const result = response.data;
-
-        if (result?.accessToken && result?.user) {
-          loginUser(result.accessToken, result.user);
-        }
-        if (result?.tenant?.id) {
-          setCurrentTenant({ id: result.tenant.id, name: result.tenant.name, slug: result.tenant.slug, status: 'ACTIVE', createdAt: '', updatedAt: '' });
-        }
-        if (result?.restaurant?.id) {
-          setCurrentRestaurant({ id: result.restaurant.id, tenantId: result.tenant?.id || '', name: result.restaurant.name, slug: result.restaurant.slug, status: 'ACTIVE', createdAt: '', updatedAt: '' });
-        }
-        if (result?.branch?.id) {
-          setCurrentBranch({ id: result.branch.id, restaurantId: result.restaurant?.id || '', name: result.branch.name, code: result.branch.code, status: 'ACTIVE', createdAt: '', updatedAt: '' });
-        }
-
-        router.push('/dashboard');
-      } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : 'Could not create the restaurant.');
-      } finally {
-        setIsLoading(false);
-      }
-      return;
-    }
-
     const restRes = validateText(restaurantName, 'Restaurant name', 2, 100);
     const ownerRes = validateText(ownerName, 'Owner name', 2, 100);
     const emailRes = validateEmail(email, true);
@@ -202,6 +160,9 @@ export default function SignupPage() {
     setIsLoading(true);
 
     try {
+      // Clear any previous stale session from storage before registering a new account
+      clearAuthStorage();
+
       const response = await registerRestaurant({
         restaurantName: restaurantName.trim(),
         ownerName: ownerName.trim(),
