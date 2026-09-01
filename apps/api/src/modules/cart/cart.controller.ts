@@ -2,6 +2,7 @@ import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/commo
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CartService } from './cart.service';
 import { AddCartItemDto } from './dto/add-cart-item.dto';
+import { SetCartItemDto } from './dto/set-cart-item.dto';
 import { UpdateCartItemDto } from './dto/update-cart-item.dto';
 
 @ApiTags('Public Cart')
@@ -23,7 +24,7 @@ export class CartController {
 
   @Post('set-item')
   @ApiOperation({ summary: 'Set exact quantity of a menu item (idempotent)' })
-  async setItemQuantity(@Param('token') token: string, @Body() dto: AddCartItemDto) {
+  async setItemQuantity(@Param('token') token: string, @Body() dto: SetCartItemDto) {
     return this.cartService.setItemQuantity(token, dto);
   }
 

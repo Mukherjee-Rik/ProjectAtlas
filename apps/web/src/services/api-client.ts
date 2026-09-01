@@ -82,7 +82,9 @@ async function request<T>(
       response.status === 401 &&
       endpoint !== '/auth/refresh' &&
       endpoint !== '/auth/login' &&
-      endpoint !== '/auth/signup'
+      endpoint !== '/auth/signup' &&
+      endpoint !== '/auth/verify-registration-otp' &&
+      endpoint !== '/auth/resend-registration-otp'
     ) {
       if (!isRefreshingToken) {
         isRefreshingToken = true;
@@ -166,7 +168,9 @@ async function request<T>(
       response.status === 401 &&
       endpoint !== '/auth/refresh' &&
       endpoint !== '/auth/login' &&
-      endpoint !== '/auth/signup'
+      endpoint !== '/auth/signup' &&
+      endpoint !== '/auth/verify-registration-otp' &&
+      endpoint !== '/auth/resend-registration-otp'
     ) {
       emitUnauthorizedEvent();
     }

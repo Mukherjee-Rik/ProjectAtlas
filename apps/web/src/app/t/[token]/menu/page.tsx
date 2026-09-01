@@ -23,6 +23,8 @@ export default function CustomerMenuPage({
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [openItemId, setOpenItemId] = useState<string | null>(null);
+  const [isSessionSettled, setIsSessionSettled] = useState(false);
+  const [settledOrderId, setSettledOrderId] = useState<string | null>(null);
 
   const { cart, addItem, updateQuantity, removeItem } = useCart();
 
@@ -43,6 +45,13 @@ export default function CustomerMenuPage({
 
       if (ordersRes.status === 'fulfilled') {
         const rawOrders = ordersRes.value.data ?? [];
+        const nonCancelled = rawOrders.filter((o) => o.status !== 'CANCELLED');
+        const allCompleted =
+          nonCancelled.length > 0 && nonCancelled.every((o) => o.status === 'COMPLETED');
+        if (allCompleted) {
+          setIsSessionSettled(true);
+          setSettledOrderId(nonCancelled[0].id);
+        }
         setActiveOrders(rawOrders.filter((o) => o.status !== 'CANCELLED' && o.status !== 'COMPLETED'));
       }
     } catch {
@@ -128,6 +137,41 @@ export default function CustomerMenuPage({
           {[0, 1, 2].map((key) => (
             <div key={key} className="h-24 rounded-2xl bg-card" />
           ))}
+        </div>
+      </main>
+    );
+  }
+
+  if (isSessionSettled) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-background p-4 text-foreground">
+        <div className="w-full max-w-sm space-y-5 rounded-3xl border-2 border-primary/40 bg-gradient-to-b from-card via-card to-background p-8 text-center shadow-2xl relative overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-red-600 via-primary to-red-600" />
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/15 text-3xl shadow-lg border border-primary/30">
+            ☕
+          </div>
+          <div className="space-y-1.5">
+            <div className="inline-flex items-center gap-1.5 rounded-full bg-atlas-success/15 border border-atlas-success/30 px-3 py-1 text-xs font-bold text-atlas-success">
+              <span>✓</span> Dining Session Completed
+            </div>
+            <h2 className="text-lg font-black text-foreground pt-1">
+              Thank You for Visiting Kafei!
+            </h2>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Your dining bill for this table session has already been completed and settled. To start a new dining session, please scan the QR code at your table.
+            </p>
+          </div>
+          {settledOrderId && (
+            <Link
+              href={`/t/${token}/orders/${settledOrderId}`}
+              className="inline-block w-full rounded-xl bg-primary px-4 py-3 text-xs font-bold text-background shadow-md transition-all hover:bg-primary-hover active:scale-95"
+            >
+              View Paid Bill Receipt
+            </Link>
+          )}
+          <p className="text-[11px] font-bold text-primary">
+            ✨ Please come back again soon! ✨
+          </p>
         </div>
       </main>
     );
