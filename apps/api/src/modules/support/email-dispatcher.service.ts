@@ -54,9 +54,11 @@ export class EmailDispatcherService implements OnModuleInit {
    */
   async sendEmail(payload: Partial<EmailPayload> & { subject: string; html: string; text: string }): Promise<boolean> {
     const to = payload.to || process.env.DEFAULT_EMAIL_RECIPIENT || 'support@projectatlas.io';
-    const senderName = payload.senderName || process.env.SMTP_FROM_NAME || 'Atlas POS';
-    const senderEmail = payload.from || process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER || 'no-reply@projectatlas.io';
-    const fromAddress = `"${senderName}" <${senderEmail}>`;
+    const senderName = (payload.senderName || process.env.SMTP_FROM_NAME || 'Kafei').replace(/["']/g, '').trim();
+    const rawEmail = (payload.from || process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER || 'rikmukherjee21071999@gmail.com').trim();
+    const emailMatch = rawEmail.match(/<([^>]+)>/);
+    const cleanEmail = (emailMatch ? emailMatch[1] : rawEmail).replace(/["']/g, '').trim();
+    const fromAddress = `"${senderName}" <${cleanEmail}>`;
 
     this.logger.log(`[EmailDispatcher] Dispatching "${payload.subject}" to ${to}`);
 
