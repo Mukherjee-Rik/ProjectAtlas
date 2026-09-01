@@ -45,6 +45,22 @@ export interface LoginResponse {
   };
 }
 
+export interface InitiateRegisterResponse {
+  otpRequired: boolean;
+  challengeId: string;
+  emailMasked: string;
+  message: string;
+}
+
+export interface VerifyRegistrationOtpRequest {
+  challengeId: string;
+  otp: string;
+}
+
+export interface ResendRegistrationOtpRequest {
+  challengeId: string;
+}
+
 export interface RegisterRestaurantResponse {
   success: boolean;
   data: {
@@ -53,5 +69,6 @@ export interface RegisterRestaurantResponse {
     tenant: { id: string; name: string; slug: string };
     restaurant: { id: string; name: string; slug: string };
     branch: { id: string; name: string; code: string };
+    membership?: { id: string; role: string };
   };
 }

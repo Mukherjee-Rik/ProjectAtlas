@@ -93,45 +93,56 @@ export class AuthService {
   }
 
   /**
-   * Step one of signing in: the password is checked, then a six-digit code is
-   * emailed to the account's own address. No session exists until verifyOtp
-   * accepts that code, so a leaked password alone is not enough to get in.
+   * Logs in an active user directly with email and password, issuing session tokens.
    */
   async login(email: string, password: string, ip?: string, userAgent?: string) {
     const user = await this.validateUser(email, password, ip, userAgent);
 
-    const otp = this.smsDispatcher.generateOtp();
-    const challengeId = `otp_${crypto.randomUUID().replace(/-/g, '').substring(0, 16)}`;
+    const memberships = await this.getUserMemberships(user.id);
 
-    this.cache.set(
-      `otp_challenge:${challengeId}`,
-      {
+    // Create session record
+    const session = await this.prisma.session.create({
+      data: {
         userId: user.id,
-        email: user.email,
-        phone: user.phone || '',
-        otp,
-        attempts: 0,
+        refreshTokenHash: '',
+        deviceName: this.parseUserAgent(userAgent),
+        ipAddress: ip || null,
+        userAgent: userAgent || null,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
       },
-      5 * 60 * 1000,
-    );
+    });
 
-    void this.smsDispatcher.sendSignInOtpEmail(user.email, otp, user.name);
+    const accessToken = await this.generateAccessToken(user.id, user.email, user.role, session.id);
+    const refreshToken = await this.generateRefreshToken(session.id);
+
+    await this.prisma.session.update({
+      where: { id: session.id },
+      data: { refreshTokenHash: this.hashToken(refreshToken) },
+    });
 
     await this.auditService.log({
       actorUserId: user.id,
       actorEmail: user.email,
-      action: 'LOGIN_OTP_ISSUED',
+      action: 'LOGIN_SUCCESS',
       resourceType: 'AUTH',
-      resourceId: challengeId,
+      resourceId: session.id,
+      metadata: { method: 'PASSWORD_LOGIN' },
       ipAddress: ip,
       userAgent: userAgent,
     });
 
     return {
-      otpRequired: true,
-      challengeId,
-      emailMasked: this.smsDispatcher.maskEmail(user.email),
-      message: `We emailed a 6-digit code to ${this.smsDispatcher.maskEmail(user.email)}. It is valid for 5 minutes.`,
+      accessToken,
+      refreshToken,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+        status: user.status,
+      },
+      memberships,
     };
   }
 
@@ -400,6 +411,10 @@ export class AuthService {
   }
 
 
+  /**
+   * Step 1 of restaurant registration: validates information and sends a 6-digit OTP
+   * to the owner's email. No account or tenant is created until the OTP is verified.
+   */
   async registerRestaurant(dto: RegisterRestaurantDto, ip?: string, userAgent?: string) {
     const normalizedEmail = dto.email.trim().toLowerCase();
 
@@ -412,7 +427,90 @@ export class AuthService {
     }
 
     const passwordHash = await bcrypt.hash(dto.password, 10);
-    const baseSlug = this.slugify(dto.restaurantName);
+    const otp = this.smsDispatcher.generateOtp();
+    const challengeId = `reg_${crypto.randomUUID().replace(/-/g, '').substring(0, 16)}`;
+
+    this.cache.set(
+      `reg_challenge:${challengeId}`,
+      {
+        restaurantName: dto.restaurantName.trim(),
+        ownerName: dto.ownerName.trim(),
+        email: normalizedEmail,
+        phone: dto.phone?.trim() || null,
+        passwordHash,
+        otp,
+        attempts: 0,
+        createdAt: Date.now(),
+      },
+      10 * 60 * 1000, // 10 minutes
+    );
+
+    void this.smsDispatcher.sendRegistrationOtpEmail(
+      normalizedEmail,
+      otp,
+      dto.ownerName.trim(),
+      dto.restaurantName.trim(),
+    );
+
+    await this.auditService.log({
+      actorEmail: normalizedEmail,
+      action: 'REGISTRATION_OTP_ISSUED',
+      resourceType: 'AUTH',
+      resourceId: challengeId,
+      ipAddress: ip,
+      userAgent: userAgent,
+    });
+
+    return {
+      otpRequired: true,
+      challengeId,
+      emailMasked: this.smsDispatcher.maskEmail(normalizedEmail),
+      message: `We sent a 6-digit verification code to ${this.smsDispatcher.maskEmail(normalizedEmail)}. It is valid for 10 minutes.`,
+    };
+  }
+
+  /**
+   * Step 2 of restaurant registration: verifies the 6-digit OTP code and
+   * atomically provisions Tenant, Restaurant, Branch, Owner User, and Session.
+   */
+  async verifyRegistrationOtp(challengeId: string, otp: string, ip?: string, userAgent?: string) {
+    const challenge = this.cache.get<{
+      restaurantName: string;
+      ownerName: string;
+      email: string;
+      phone: string | null;
+      passwordHash: string;
+      otp: string;
+      attempts: number;
+      createdAt: number;
+    }>(`reg_challenge:${challengeId}`);
+
+    if (!challenge) {
+      throw new UnauthorizedException('Verification code has expired or is invalid. Please start registration again.');
+    }
+
+    if (challenge.otp !== otp.trim()) {
+      challenge.attempts += 1;
+      if (challenge.attempts >= 5) {
+        this.cache.invalidate(`reg_challenge:${challengeId}`);
+        throw new UnauthorizedException('Too many incorrect attempts. Please start registration again.');
+      }
+      this.cache.set(`reg_challenge:${challengeId}`, challenge, 10 * 60 * 1000);
+      throw new UnauthorizedException('Incorrect verification code. Please check and try again.');
+    }
+
+    // Success -> Invalidate challenge
+    this.cache.invalidate(`reg_challenge:${challengeId}`);
+
+    const existingUser = await this.prisma.user.findUnique({
+      where: { email: challenge.email },
+    });
+
+    if (existingUser) {
+      throw new ConflictException('Email address has already been registered');
+    }
+
+    const baseSlug = this.slugify(challenge.restaurantName);
 
     return this.prisma.$transaction(async (tx) => {
       // Ensure unique tenant slug
@@ -424,12 +522,12 @@ export class AuthService {
 
       // 1. Create Tenant
       const tenant = await tx.tenant.create({
-        data: { name: dto.restaurantName, slug: tenantSlug },
+        data: { name: challenge.restaurantName, slug: tenantSlug },
       });
 
       // 2. Create Restaurant under Tenant
       const restaurant = await tx.restaurant.create({
-        data: { tenantId: tenant.id, name: dto.restaurantName, slug: tenantSlug },
+        data: { tenantId: tenant.id, name: challenge.restaurantName, slug: tenantSlug },
       });
 
       // 2.5. Create Default Trial Subscription
@@ -477,10 +575,10 @@ export class AuthService {
       // 4. Create Owner User
       const user = await tx.user.create({
         data: {
-          name: dto.ownerName,
-          email: normalizedEmail,
-          phone: dto.phone || null,
-          passwordHash,
+          name: challenge.ownerName,
+          email: challenge.email,
+          phone: challenge.phone || null,
+          passwordHash: challenge.passwordHash,
           role: UserRole.OWNER,
           status: 'ACTIVE',
         },
@@ -517,7 +615,7 @@ export class AuthService {
 
       this.logger.log(
         { userId: user.id, restaurantId: restaurant.id },
-        'New restaurant onboarding successful',
+        'New restaurant onboarding & OTP verification successful',
       );
 
       // Audit logs onboarding
@@ -528,6 +626,7 @@ export class AuthService {
         resourceType: 'RESTAURANT',
         resourceId: restaurant.id,
         restaurantId: restaurant.id,
+        metadata: { method: 'REGISTRATION_OTP_VERIFIED' },
         ipAddress: ip,
         userAgent: userAgent,
       });
@@ -549,6 +648,52 @@ export class AuthService {
         membership: { id: membership.id, role: membership.role },
       };
     });
+  }
+
+  /**
+   * Resends a fresh 6-digit registration OTP code for an active challenge.
+   */
+  async resendRegistrationOtp(challengeId: string, ip?: string, userAgent?: string) {
+    const challenge = this.cache.get<{
+      restaurantName: string;
+      ownerName: string;
+      email: string;
+      phone: string | null;
+      passwordHash: string;
+      otp: string;
+      attempts: number;
+      createdAt: number;
+    }>(`reg_challenge:${challengeId}`);
+
+    if (!challenge) {
+      throw new UnauthorizedException('Registration session expired. Please fill out the registration form again.');
+    }
+
+    const newOtp = this.smsDispatcher.generateOtp();
+    challenge.otp = newOtp;
+    challenge.attempts = 0;
+    this.cache.set(`reg_challenge:${challengeId}`, challenge, 10 * 60 * 1000);
+
+    void this.smsDispatcher.sendRegistrationOtpEmail(
+      challenge.email,
+      newOtp,
+      challenge.ownerName,
+      challenge.restaurantName,
+    );
+
+    await this.auditService.log({
+      actorEmail: challenge.email,
+      action: 'REGISTRATION_OTP_RESENT',
+      resourceType: 'AUTH',
+      resourceId: challengeId,
+      ipAddress: ip,
+      userAgent: userAgent,
+    });
+
+    return {
+      success: true,
+      message: `A new 6-digit verification code has been sent to ${this.smsDispatcher.maskEmail(challenge.email)}.`,
+    };
   }
 
   async refresh(refreshToken: string, ip?: string, userAgent?: string) {

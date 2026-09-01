@@ -3,6 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { CartService } from './cart.service';
 import { PrismaService } from '../../database/prisma/prisma.service';
 import { PublicTablesService } from '../public-tables/public-tables.service';
+import { TtlCacheService } from '../../common/cache/ttl-cache.service';
 
 const RESTAURANT_A = 'restaurant-a';
 const TOKEN = 'table-04-token';
@@ -75,6 +76,7 @@ describe('CartService', () => {
       cart: { findUnique: jest.fn(), create: jest.fn() },
       cartItem: { findMany: jest.fn().mockResolvedValue([]), findFirst: jest.fn(), create: jest.fn(), update: jest.fn(), delete: jest.fn() },
       menuItem: { findFirst: jest.fn() },
+      order: { findMany: jest.fn().mockResolvedValue([]) },
     };
 
     publicTables = {
@@ -90,6 +92,7 @@ describe('CartService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         CartService,
+        TtlCacheService,
         { provide: PrismaService, useValue: prisma },
         { provide: PublicTablesService, useValue: publicTables },
       ],

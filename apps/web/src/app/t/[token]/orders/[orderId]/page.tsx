@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { use, useCallback, useEffect, useState } from 'react';
+import { use, useCallback, useEffect, useRef, useState } from 'react';
 import type { Order } from '@/types/order';
 import { getPublicOrderById, getPublicOrders } from '@/services/orders.service';
 import { formatCurrency } from '@/lib/currency';
@@ -35,6 +35,12 @@ export default function OrderSuccessPage({
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
   const [paymentConfirmed, setPaymentConfirmed] = useState(false);
   const [showAllItemsModal, setShowAllItemsModal] = useState(false);
+  const [sessionSettled, setSessionSettled] = useState(false);
+
+  const orderRef = useRef<Order | null>(null);
+  orderRef.current = order;
+  const activeOrderIdRef = useRef<string>(initialOrderId);
+  activeOrderIdRef.current = activeOrderId;
 
   const handleCallStaff = async (type: string) => {
     const backendType = type === 'Waiter' ? 'WAITER' : type === 'Water' ? 'WATER' : 'BILL';
@@ -50,44 +56,66 @@ export default function OrderSuccessPage({
     }
   };
 
+  const handleConfirmTablePayment = async () => {
+    setPaymentConfirmed(true);
+    try {
+      await apiClient.post(`/public/tables/${token}/call`, { type: 'BILL' });
+      setActiveRequest('Payment Notification');
+      setTimeout(() => {
+        setActiveRequest(null);
+      }, 8000);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const loadData = useCallback(async (showLoading = false) => {
-    if (showLoading) setIsLoading(true);
+    if (showLoading && !orderRef.current) setIsLoading(true);
     try {
       // 1. Fetch all orders for this table session
       const listRes = await getPublicOrders(token);
       const ordersList = listRes.data ?? [];
-      setSessionOrders(ordersList);
+      
+      if (ordersList.length > 0) {
+        setSessionOrders(ordersList);
 
-      // 2. Resolve active order: either user-selected, or initial, or most recent
-      const targetId = activeOrderId || initialOrderId;
-      let selected = ordersList.find((o) => o.id === targetId);
+        // 2. Resolve active order: either user-selected, or initial, or most recent
+        const targetId = activeOrderIdRef.current || initialOrderId;
+        let selected = ordersList.find((o) => o.id === targetId) || ordersList[0];
 
-      if (!selected && ordersList.length > 0) {
-        selected = ordersList[0];
-        setActiveOrderId(selected.id);
-      }
-
-      if (selected) {
-        // Fetch full order detail with variants/addons
-        const detailRes = await getPublicOrderById(token, selected.id);
-        setOrder(detailRes.data);
+        if (selected) {
+          setActiveOrderId(selected.id);
+          activeOrderIdRef.current = selected.id;
+          const detailRes = await getPublicOrderById(token, selected.id);
+          setOrder(detailRes.data);
+          orderRef.current = detailRes.data;
+        }
+      } else if (orderRef.current) {
+        // Table session was settled/cleared by cashier
+        setSessionSettled(true);
       } else if (initialOrderId) {
         const singleRes = await getPublicOrderById(token, initialOrderId);
-        setOrder(singleRes.data);
+        if (singleRes.data) {
+          setOrder(singleRes.data);
+          orderRef.current = singleRes.data;
+        }
       }
 
       setError(null);
     } catch {
-      setError('Unable to load order details');
+      // Only show error on initial load failure without any existing order
+      if (showLoading && !orderRef.current) {
+        setError('Unable to load order details');
+      }
     } finally {
       if (showLoading) setIsLoading(false);
     }
-  }, [token, activeOrderId, initialOrderId]);
+  }, [token, initialOrderId]);
 
   useEffect(() => {
     void loadData(true);
 
-    // Poll every 3 seconds for real-time order status updates and new tokens
+    // Poll every 3 seconds for real-time order status updates
     const interval = setInterval(() => {
       void loadData(false);
     }, 3000);
@@ -106,24 +134,32 @@ export default function OrderSuccessPage({
     );
   }
 
-  if (error || !order) {
+  if (error && !order) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-background p-4 text-foreground">
-        <div className="w-full max-w-sm space-y-4 rounded-2xl border border-atlas-error/30 bg-card p-8 text-center">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-atlas-error/10 text-2xl text-atlas-error">
-            ⚠️
+        <div className="w-full max-w-sm space-y-4 rounded-2xl border border-border bg-card p-8 text-center shadow-xl">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/15 text-2xl text-primary border border-primary/30">
+            ☕
           </div>
-          <p className="text-sm font-bold">Order Not Found</p>
-          <p className="text-xs text-muted-foreground">{error}</p>
+          <div className="space-y-1">
+            <h2 className="text-base font-bold text-foreground">Welcome to Kafei</h2>
+            <p className="text-xs text-muted-foreground">
+              No active order found for this table session.
+            </p>
+          </div>
           <Link
             href={`/t/${token}/menu`}
-            className="inline-block rounded-xl border border-border px-4 py-2 text-xs font-semibold text-muted-foreground"
+            className="inline-block w-full rounded-xl bg-primary px-4 py-3 text-xs font-bold text-background shadow-md transition-all hover:bg-primary-hover active:scale-95"
           >
-            Back to Menu
+            Browse Menu & Order
           </Link>
         </div>
       </main>
     );
+  }
+
+  if (!order) {
+    return null;
   }
 
   const getStepIndex = (status: string): number => {
@@ -148,6 +184,15 @@ export default function OrderSuccessPage({
   const isFoodServed = order.status === 'SERVED';
   const isOrderCompleted = order.status === 'COMPLETED';
 
+  // Anti-Spoofing: Once settled/paid, no further items can be added from this device
+  const isPaidOrSettled =
+    paymentConfirmed ||
+    sessionSettled ||
+    order.status === 'COMPLETED' ||
+    order.payments?.some((p: any) => p.status === 'SUCCESS' || p.status === 'COMPLETED') ||
+    (sessionOrders.length > 0 &&
+      sessionOrders.every((o) => o.status === 'COMPLETED' || o.status === 'CANCELLED'));
+
   const steps = [
     { label: 'Ordered', desc: 'Sent to kitchen', icon: '📝' },
     { label: 'Preparing', desc: 'Cooking your meal', icon: '🍳' },
@@ -157,6 +202,7 @@ export default function OrderSuccessPage({
 
   const getStageTip = (step: number) => {
     if (isCancelled) return 'This order was cancelled. Please contact staff if you have questions.';
+    if (isPaidOrSettled) return 'Payment completed! Thank you for dining with us at Kafei.';
     if (isOrderCompleted) return 'Dining session completed! Please scan the UPI QR below to pay your bill or visit the cashier.';
     switch (step) {
       case 0:
@@ -205,7 +251,7 @@ export default function OrderSuccessPage({
     if (!order) return;
     const activeList = sessionOrders.length > 0 ? sessionOrders : [order];
     printThermalReceipt({
-      restaurantName: restaurantName || 'CAFE RIZZ',
+      restaurantName: restaurantName || 'Kafei',
       branchName: order.branch?.name || 'Main Branch',
       tableName: order.table?.name || 'Table',
       dateTime: new Date(order.createdAt).toLocaleString(),
@@ -282,12 +328,18 @@ export default function OrderSuccessPage({
               {order.branch?.name ?? 'Restaurant'} • {order.table?.name ?? 'Table'}
             </p>
           </div>
-          <Link
-            href={`/t/${token}/menu`}
-            className="rounded-xl border border-border px-3 py-2 text-[11px] font-semibold text-primary transition-colors hover:border-primary/40 hover:bg-primary/10"
-          >
-            + Add More Items
-          </Link>
+          {!isPaidOrSettled ? (
+            <Link
+              href={`/t/${token}/menu`}
+              className="rounded-xl border border-border px-3 py-2 text-[11px] font-semibold text-primary transition-colors hover:border-primary/40 hover:bg-primary/10"
+            >
+              + Add More Items
+            </Link>
+          ) : (
+            <span className="rounded-xl border border-atlas-success/30 bg-atlas-success/15 px-3 py-1 text-[10px] font-bold text-atlas-success">
+              ✓ Paid
+            </span>
+          )}
         </div>
       </header>
 
@@ -443,7 +495,7 @@ export default function OrderSuccessPage({
         </div>
 
         {/* MEAL SERVED BANNER (Shown when food is served and customer is dining) */}
-        {isFoodServed && (
+        {isFoodServed && !isPaidOrSettled && (
           <div className="space-y-3 rounded-2xl border border-primary/30 bg-gradient-to-b from-secondary to-card p-4 text-center shadow-lg animate-fadeIn">
             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/15 text-2xl">
               🍽️
@@ -472,8 +524,57 @@ export default function OrderSuccessPage({
           </div>
         )}
 
-        {/* POST-MEAL PAYMENT SECTION (Displayed ONLY after waiter marks order COMPLETED) */}
-        {isOrderCompleted && (
+        {/* POST-MEAL COMPLETED & PAID: THANK YOU / COME BACK AGAIN BANNER */}
+        {isPaidOrSettled && (
+          <div className="space-y-4 rounded-3xl border-2 border-primary/50 bg-gradient-to-b from-card via-card to-background p-6 text-center shadow-2xl animate-fadeIn relative overflow-hidden">
+            {/* Top red accent */}
+            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-red-600 via-primary to-red-600" />
+
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/15 text-3xl shadow-lg border border-primary/30">
+              ☕
+            </div>
+
+            <div className="space-y-1.5">
+              <div className="inline-flex items-center gap-1.5 rounded-full bg-atlas-success/15 border border-atlas-success/30 px-3 py-1 text-xs font-bold text-atlas-success">
+                <span>✓</span> Payment Completed
+              </div>
+              <h2 className="text-xl font-black text-foreground pt-1">
+                Thank You for Dining With Us!
+              </h2>
+              <p className="text-xs text-muted-foreground leading-relaxed max-w-xs mx-auto">
+                We loved serving you at <strong className="text-foreground">{restaurantName || 'Kafei'}</strong>. We hope you had a wonderful time!
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-border bg-background/80 p-4 space-y-2 text-left">
+              <div className="flex justify-between items-center text-xs font-bold text-muted-foreground pb-2 border-b border-border">
+                <span>Amount Paid:</span>
+                <span className="text-base font-black text-primary">{formatCurrency(paymentAmount)}</span>
+              </div>
+              <div className="flex justify-between items-center text-[11px] text-muted-foreground">
+                <span>Table: <strong className="text-foreground">{order.table?.name || 'Table'}</strong></span>
+                <span>Orders: <strong className="text-foreground">{sessionOrders.length > 0 ? sessionOrders.length : 1} round(s)</strong></span>
+              </div>
+            </div>
+
+            <div className="pt-1">
+              <button
+                type="button"
+                onClick={handlePrintCustomerReceipt}
+                className="w-full rounded-xl bg-primary py-3.5 text-center text-xs font-bold text-background shadow-md transition-all hover:bg-primary-hover active:scale-95 cursor-pointer flex items-center justify-center gap-2"
+              >
+                <span>🖨️</span> Download / Print Bill Receipt
+              </button>
+            </div>
+
+            <p className="text-[11px] font-bold text-primary pt-1">
+              ✨ Please come back again soon! ✨
+            </p>
+          </div>
+        )}
+
+        {/* POST-MEAL PAYMENT SECTION (Displayed when order completed but not yet marked paid) */}
+        {isOrderCompleted && !isPaidOrSettled && (
           <div className="space-y-4 rounded-2xl border-2 border-primary/50 bg-gradient-to-b from-secondary to-card p-5 relative overflow-hidden animate-fadeIn">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -541,25 +642,19 @@ export default function OrderSuccessPage({
                 <button
                   type="button"
                   onClick={() => handleCallStaff('Bill')}
-                  className="flex-1 rounded-xl border border-border bg-secondary py-2 text-center text-[11px] font-bold text-foreground transition-colors hover:border-primary/40"
+                  className="flex-1 rounded-xl border border-border bg-secondary py-2 text-center text-[11px] font-bold text-foreground transition-colors hover:border-primary/40 cursor-pointer"
                 >
                   💵 Pay at Cashier
                 </button>
                 <button
                   type="button"
-                  onClick={() => setIsQrModalOpen(true)}
-                  className="flex-1 rounded-xl border border-primary/40 bg-primary/10 py-2 text-center text-[11px] font-bold text-primary transition-colors hover:bg-primary/20"
+                  onClick={handleConfirmTablePayment}
+                  className="flex-1 rounded-xl border border-atlas-success/40 bg-atlas-success/15 py-2 text-center text-[11px] font-bold text-atlas-success transition-colors hover:bg-atlas-success/25 cursor-pointer"
                 >
-                  🔍 View Full QR
+                  ✓ I Have Paid
                 </button>
               </div>
             </div>
-
-            {paymentConfirmed && (
-              <div className="rounded-xl border border-atlas-success/40 bg-atlas-success/10 p-3 text-center text-xs font-semibold text-atlas-success animate-fadeIn">
-                ✓ Thank you! Staff has been notified of your payment.
-              </div>
-            )}
           </div>
         )}
 
@@ -700,58 +795,62 @@ export default function OrderSuccessPage({
           </div>
         </div>
 
-        {/* Table Assistance Controls */}
-        <div className="rounded-2xl border border-border bg-card p-4 space-y-3 no-print">
-          <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-            Table Assistance
-          </h3>
-          <div className="grid grid-cols-3 gap-2">
-            <button
-              type="button"
-              onClick={() => handleCallStaff('Waiter')}
-              className="flex flex-col items-center justify-center rounded-xl border border-border bg-secondary py-3.5 transition-all hover:border-primary hover:bg-primary/5 active:scale-95 cursor-pointer"
-            >
-              <span className="text-lg">🙋‍♂️</span>
-              <span className="mt-1 text-[10px] font-bold text-foreground">Call Waiter</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => handleCallStaff('Water')}
-              className="flex flex-col items-center justify-center rounded-xl border border-border bg-secondary py-3.5 transition-all hover:border-primary hover:bg-primary/5 active:scale-95 cursor-pointer"
-            >
-              <span className="text-lg">💧</span>
-              <span className="mt-1 text-[10px] font-bold text-foreground">Request Water</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => handleCallStaff('Bill')}
-              className="flex flex-col items-center justify-center rounded-xl border border-border bg-secondary py-3.5 transition-all hover:border-primary hover:bg-primary/5 active:scale-95 cursor-pointer"
-            >
-              <span className="text-lg">💵</span>
-              <span className="mt-1 text-[10px] font-bold text-foreground">Request Bill</span>
-            </button>
-          </div>
-
-          {activeRequest && (
-            <div className="rounded-xl border border-primary/30 bg-primary/10 p-3 text-center animate-pulse">
-              <p className="text-xs font-bold text-primary">
-                🔔 {activeRequest} Dispatched
-              </p>
-              <p className="text-[10px] text-muted-foreground mt-0.5 leading-relaxed">
-                Staff has been notified. A server is attending to table <span className="text-foreground font-bold">{order.table?.name ?? 'your table'}</span> shortly.
-              </p>
+        {/* Table Assistance Controls (Only active during in-dining session) */}
+        {!isPaidOrSettled && (
+          <div className="rounded-2xl border border-border bg-card p-4 space-y-3 no-print">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              Table Assistance
+            </h3>
+            <div className="grid grid-cols-3 gap-2">
+              <button
+                type="button"
+                onClick={() => handleCallStaff('Waiter')}
+                className="flex flex-col items-center justify-center rounded-xl border border-border bg-secondary py-3.5 transition-all hover:border-primary hover:bg-primary/5 active:scale-95 cursor-pointer"
+              >
+                <span className="text-lg">🙋‍♂️</span>
+                <span className="mt-1 text-[10px] font-bold text-foreground">Call Waiter</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleCallStaff('Water')}
+                className="flex flex-col items-center justify-center rounded-xl border border-border bg-secondary py-3.5 transition-all hover:border-primary hover:bg-primary/5 active:scale-95 cursor-pointer"
+              >
+                <span className="text-lg">💧</span>
+                <span className="mt-1 text-[10px] font-bold text-foreground">Request Water</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleCallStaff('Bill')}
+                className="flex flex-col items-center justify-center rounded-xl border border-border bg-secondary py-3.5 transition-all hover:border-primary hover:bg-primary/5 active:scale-95 cursor-pointer"
+              >
+                <span className="text-lg">💵</span>
+                <span className="mt-1 text-[10px] font-bold text-foreground">Request Bill</span>
+              </button>
             </div>
-          )}
-        </div>
+
+            {activeRequest && (
+              <div className="rounded-xl border border-primary/30 bg-primary/10 p-3 text-center animate-pulse">
+                <p className="text-xs font-bold text-primary">
+                  🔔 {activeRequest} Dispatched
+                </p>
+                <p className="text-[10px] text-muted-foreground mt-0.5 leading-relaxed">
+                  Staff has been notified. A server is attending to table <span className="text-foreground font-bold">{order.table?.name ?? 'your table'}</span> shortly.
+                </p>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Quick Action Links */}
         <div className="flex flex-col gap-3 pt-2 no-print">
-          <Link
-            href={`/t/${token}/menu`}
-            className="w-full rounded-xl bg-primary py-3.5 text-center text-xs font-black text-background shadow-[0_0_15px_rgba(42,254,183,0.3)] transition-all hover:bg-primary-hover active:scale-[0.99] flex items-center justify-center gap-2"
-          >
-            <span>🍽️</span> + Add More Food / Order Again
-          </Link>
+          {!isPaidOrSettled && (
+            <Link
+              href={`/t/${token}/menu`}
+              className="w-full rounded-xl bg-primary py-3.5 text-center text-xs font-black text-background shadow-[0_0_15px_rgba(42,254,183,0.3)] transition-all hover:bg-primary-hover active:scale-[0.99] flex items-center justify-center gap-2"
+            >
+              <span>🍽️</span> + Add More Food / Order Again
+            </Link>
+          )}
 
           <div className="flex gap-3">
             <button
