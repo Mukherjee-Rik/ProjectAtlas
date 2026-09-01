@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma/prisma.service';
 import { Prisma } from '../../generated/prisma/client';
 import { PublicTablesService } from '../public-tables/public-tables.service';
@@ -121,6 +121,11 @@ export class CartService {
     const { cart } = await this.getOrCreateCart(token);
     const item = await this.loadOwnedCartItem(cart.id, itemId);
 
+    if (dto.quantity <= 0) {
+      await this.prisma.cartItem.delete({ where: { id: item.id } });
+      return this.buildCartResponse(cart.id);
+    }
+
     const unitPrice = new Prisma.Decimal(item.unitPrice);
     await this.prisma.cartItem.update({
       where: { id: item.id },
@@ -142,6 +147,21 @@ export class CartService {
 
   async getOrCreateCart(token: string) {
     const { session, resolved } = await this.publicTablesService.getOrCreateSessionRecord(token);
+
+    // Anti-Spoofing: If all orders for this session are COMPLETED, session is settled and cannot accept new cart items
+    const existingOrders = await this.prisma.order.findMany({
+      where: { customerSessionId: session.id },
+      select: { id: true, status: true },
+    });
+    const hasOnlyCompletedOrders =
+      existingOrders.length > 0 &&
+      existingOrders.every((o) => o.status === 'COMPLETED' || o.status === 'CANCELLED');
+
+    if (hasOnlyCompletedOrders) {
+      throw new ForbiddenException(
+        'This dining session has ended and been settled. Please scan the QR code at your table to start a new dining session.',
+      );
+    }
 
     const existing = await this.prisma.cart.findUnique({ where: { customerSessionId: session.id }, select: { id: true } });
     if (existing) return { cart: existing, restaurantId: resolved.restaurant.id, sessionId: session.id };

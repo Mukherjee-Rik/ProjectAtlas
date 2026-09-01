@@ -2,6 +2,7 @@ import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PublicTablesService } from './public-tables.service';
 import { PrismaService } from '../../database/prisma/prisma.service';
+import { TtlCacheService } from '../../common/cache/ttl-cache.service';
 
 describe('PublicTablesService', () => {
   let service: PublicTablesService;
@@ -24,6 +25,7 @@ describe('PublicTablesService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         PublicTablesService,
+        TtlCacheService,
         { provide: PrismaService, useValue: prismaService },
       ],
     }).compile();

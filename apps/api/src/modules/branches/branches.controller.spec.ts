@@ -40,9 +40,10 @@ describe('BranchesController', () => {
     expect(controller).toBeDefined();
   });
 
-  it('findAll should pass tenant.id and restaurantId query to service.findAll', async () => {
-    await controller.findAll(mockTenant, 'rest-1');
-    expect(service.findAll).toHaveBeenCalledWith('tenant-a', 'rest-1');
+  it('findAll should pass tenant.id, restaurantId query and user to service.findAll', async () => {
+    const mockUser = { id: 'user-1', role: 'OWNER' };
+    await controller.findAll(mockTenant, mockUser, 'rest-1');
+    expect(service.findAll).toHaveBeenCalledWith('tenant-a', 'rest-1', mockUser);
   });
 
   it('create should pass tenant.id and dto to service.create', async () => {

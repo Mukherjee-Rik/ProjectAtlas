@@ -75,7 +75,10 @@ describe('AuthService', () => {
           useValue: {
             generateOtp: jest.fn().mockReturnValue('123456'),
             maskPhone: jest.fn().mockReturnValue('******5026'),
+            maskEmail: jest.fn().mockReturnValue('t•••t@example.com'),
             sendSignInOtp: jest.fn().mockResolvedValue(true),
+            sendSignInOtpEmail: jest.fn().mockResolvedValue(true),
+            sendRegistrationOtpEmail: jest.fn().mockResolvedValue(true),
             dispatchDirectEmail: jest.fn().mockResolvedValue(true),
           },
         },
@@ -152,25 +155,40 @@ describe('AuthService', () => {
   });
 
   describe('login', () => {
-    it('should complete login and return accessToken directly when password matches', async () => {
+    it('should log in directly and return access tokens when credentials are valid', async () => {
       prismaService.user.findUnique.mockResolvedValue(mockUser);
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
 
       const result = await service.login('test@example.com', 'password123');
 
-      expect(result).toEqual({
-        accessToken: 'mock-access-token',
-        refreshToken: 'mock-access-token',
-        memberships: [],
-        user: {
-          id: mockUser.id,
-          name: mockUser.name,
-          email: mockUser.email,
-          phone: mockUser.phone,
-          role: mockUser.role,
-          status: mockUser.status,
-        },
+      expect(result.accessToken).toBeDefined();
+      expect(result.refreshToken).toBeDefined();
+      expect(result.user).toEqual({
+        id: mockUser.id,
+        name: mockUser.name,
+        email: mockUser.email,
+        phone: mockUser.phone,
+        role: mockUser.role,
+        status: mockUser.status,
       });
+      expect(result.memberships).toEqual([]);
+    });
+  });
+
+  describe('registerRestaurant', () => {
+    it('should issue a registration OTP challenge when email is not taken', async () => {
+      prismaService.user.findUnique.mockResolvedValue(null);
+      (bcrypt.hash as jest.Mock).mockResolvedValue('$2b$10$hashedpassword');
+
+      const result = await service.registerRestaurant({
+        restaurantName: 'The Spice Garden',
+        ownerName: 'Rik Mukherjee',
+        email: 'owner@spicegarden.com',
+        password: 'Password123!',
+      });
+
+      expect(result.otpRequired).toBe(true);
+      expect(result.challengeId).toMatch(/^reg_/);
     });
   });
 });

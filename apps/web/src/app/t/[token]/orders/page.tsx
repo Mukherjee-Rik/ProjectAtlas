@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { use, useCallback, useEffect, useState } from 'react';
+import { use, useCallback, useEffect, useRef, useState } from 'react';
 import type { Order } from '@/types/order';
 import { getPublicOrders } from '@/services/orders.service';
 import { formatCurrency } from '@/lib/currency';
@@ -27,14 +27,23 @@ export default function CustomerOrdersHistoryPage({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const ordersRef = useRef<Order[]>([]);
+  ordersRef.current = orders;
+
   const loadOrders = useCallback(async (showLoading = false) => {
-    if (showLoading) setIsLoading(true);
+    if (showLoading && ordersRef.current.length === 0) setIsLoading(true);
     try {
       const response = await getPublicOrders(token);
-      setOrders(response.data ?? []);
+      const data = response.data ?? [];
+      if (data.length > 0) {
+        setOrders(data);
+        ordersRef.current = data;
+      }
       setError(null);
     } catch {
-      setError('Unable to load order history');
+      if (showLoading && ordersRef.current.length === 0) {
+        setError('Unable to load order history');
+      }
     } finally {
       if (showLoading) setIsLoading(false);
     }
@@ -53,6 +62,8 @@ export default function CustomerOrdersHistoryPage({
 
   const activeOrders = orders.filter((o) => o.status !== 'CANCELLED');
   const grandTotal = activeOrders.reduce((acc, o) => acc + Number(o.totalAmount || 0), 0);
+  const isSessionSettled =
+    activeOrders.length > 0 && activeOrders.every((o) => o.status === 'COMPLETED');
 
   return (
     <main className="min-h-screen bg-background pb-8 text-foreground">
@@ -64,12 +75,18 @@ export default function CustomerOrdersHistoryPage({
               {orders.length} {orders.length === 1 ? 'order' : 'orders'} placed during this session
             </p>
           </div>
-          <Link
-            href={`/t/${token}/menu`}
-            className="rounded-xl border border-border px-3 py-2 text-[11px] font-semibold text-primary transition-colors hover:border-primary/40 hover:bg-primary/10"
-          >
-            + Add Items
-          </Link>
+          {!isSessionSettled ? (
+            <Link
+              href={`/t/${token}/menu`}
+              className="rounded-xl border border-border px-3 py-2 text-[11px] font-semibold text-primary transition-colors hover:border-primary/40 hover:bg-primary/10"
+            >
+              + Add Items
+            </Link>
+          ) : (
+            <span className="rounded-xl border border-atlas-success/30 bg-atlas-success/15 px-3 py-1 text-[10px] font-bold text-atlas-success">
+              ✓ Paid
+            </span>
+          )}
         </div>
       </header>
 
@@ -118,12 +135,14 @@ export default function CustomerOrdersHistoryPage({
               </p>
             </div>
 
-            <Link
-              href={`/t/${token}/menu`}
-              className="rounded-xl bg-primary px-3.5 py-2 text-xs font-bold text-background hover:bg-primary-hover transition-all"
-            >
-              + Order More
-            </Link>
+            {!isSessionSettled && (
+              <Link
+                href={`/t/${token}/menu`}
+                className="rounded-xl bg-primary px-3.5 py-2 text-xs font-bold text-background hover:bg-primary-hover transition-all"
+              >
+                + Order More
+              </Link>
+            )}
           </div>
         )}
 

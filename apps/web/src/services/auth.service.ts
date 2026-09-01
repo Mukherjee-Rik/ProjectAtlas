@@ -6,6 +6,9 @@ import type {
   LoginResponse,
   RegisterRestaurantRequest,
   RegisterRestaurantResponse,
+  InitiateRegisterResponse,
+  VerifyRegistrationOtpRequest,
+  ResendRegistrationOtpRequest,
   RestaurantMembershipInfo,
 } from '@/types/auth';
 
@@ -14,7 +17,15 @@ export function login(credentials: LoginRequest) {
 }
 
 export function registerRestaurant(payload: RegisterRestaurantRequest) {
-  return apiClient.post<RegisterRestaurantResponse>('/auth/signup', payload);
+  return apiClient.post<InitiateRegisterResponse>('/auth/signup', payload);
+}
+
+export function verifyRegistrationOtp(payload: VerifyRegistrationOtpRequest) {
+  return apiClient.post<RegisterRestaurantResponse>('/auth/verify-registration-otp', payload);
+}
+
+export function resendRegistrationOtp(payload: ResendRegistrationOtpRequest) {
+  return apiClient.post<{ success: boolean; message: string }>('/auth/resend-registration-otp', payload);
 }
 
 /**

@@ -4,6 +4,7 @@ import { validate } from 'class-validator';
 import { CartController } from './cart.controller';
 import { CartService } from './cart.service';
 import { AddCartItemDto } from './dto/add-cart-item.dto';
+import { SetCartItemDto } from './dto/set-cart-item.dto';
 import { UpdateCartItemDto } from './dto/update-cart-item.dto';
 
 const TOKEN = 'table-04-token';
@@ -115,6 +116,18 @@ describe('CartController', () => {
 
     it('requires a quantity', async () => {
       expect(await errorsFor(UpdateCartItemDto, {})).not.toHaveLength(0);
+    });
+  });
+
+  describe('SetCartItemDto validation', () => {
+    it('accepts quantity 0 (for item removal) and positive quantities up to 99', async () => {
+      expect(await errorsFor(SetCartItemDto, { menuItemId: MENU_ITEM_ID, quantity: 0 })).toHaveLength(0);
+      expect(await errorsFor(SetCartItemDto, { menuItemId: MENU_ITEM_ID, quantity: 5 })).toHaveLength(0);
+    });
+
+    it('rejects negative quantity or quantity above 99', async () => {
+      expect(await errorsFor(SetCartItemDto, { menuItemId: MENU_ITEM_ID, quantity: -1 })).not.toHaveLength(0);
+      expect(await errorsFor(SetCartItemDto, { menuItemId: MENU_ITEM_ID, quantity: 100 })).not.toHaveLength(0);
     });
   });
 });

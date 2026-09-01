@@ -30,7 +30,8 @@ describe('AuthController', () => {
     it('should call authService.login and return result', async () => {
       const loginDto = { email: 'test@example.com', password: 'password123' };
       const mockReq = { headers: { 'x-forwarded-for': '127.0.0.1', 'user-agent': 'Jest' } };
-      const res = await controller.login(loginDto, mockReq as any);
+      const mockRes = { cookie: jest.fn() };
+      const res = await controller.login(loginDto, mockReq as any, mockRes as any);
 
       expect(authService.login).toHaveBeenCalledWith(
         loginDto.email,
@@ -41,6 +42,7 @@ describe('AuthController', () => {
       expect(res).toEqual({
         accessToken: 'jwt-token',
         user: { id: 'user-1', email: 'test@example.com', role: 'USER' },
+        memberships: undefined,
       });
     });
   });

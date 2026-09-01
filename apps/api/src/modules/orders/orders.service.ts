@@ -128,6 +128,21 @@ export class OrdersService {
   async createOrderFromCart(token: string, _dto?: CreateOrderDto) {
     const { session, resolved } = await this.publicTablesService.getOrCreateSessionRecord(token);
 
+    // Anti-Spoofing: Prevent placing new orders on a settled / completed table session
+    const existingOrders = await this.prisma.order.findMany({
+      where: { customerSessionId: session.id },
+      select: { id: true, status: true },
+    });
+    const hasOnlyCompletedOrders =
+      existingOrders.length > 0 &&
+      existingOrders.every((o) => o.status === 'COMPLETED' || o.status === 'CANCELLED');
+
+    if (hasOnlyCompletedOrders) {
+      throw new ForbiddenException(
+        'This dining session has ended and been settled. Please scan the QR code at your table to start a new dining session.',
+      );
+    }
+
     const cart = await this.prisma.cart.findUnique({
       where: { customerSessionId: session.id },
       include: {
@@ -334,28 +349,44 @@ export class OrdersService {
   }
 
   async getCustomerOrders(token: string) {
+    const resolved = await this.publicTablesService.resolveTableToken(token);
     const { session } = await this.publicTablesService.getActiveSessionRecord(token);
-    if (!session) {
-      return [];
+
+    if (session) {
+      const orders = await this.prisma.order.findMany({
+        where: { customerSessionId: session.id },
+        select: ORDER_SELECT_FULL,
+        orderBy: { createdAt: 'desc' },
+      });
+      return orders.map((o) => this.formatOrderResponse(o));
     }
 
-    const orders = await this.prisma.order.findMany({
-      where: { customerSessionId: session.id },
-      select: ORDER_SELECT_FULL,
-      orderBy: { createdAt: 'desc' },
+    // If active session was recently ended/cleared by cashier, return orders from latest session so customer sees receipt
+    const recentSession = await this.prisma.customerSession.findFirst({
+      where: { tableId: resolved.table.id },
+      orderBy: { startedAt: 'desc' },
+      select: { id: true },
     });
 
-    return orders.map((o) => this.formatOrderResponse(o));
+    if (recentSession) {
+      const orders = await this.prisma.order.findMany({
+        where: { customerSessionId: recentSession.id },
+        select: ORDER_SELECT_FULL,
+        orderBy: { createdAt: 'desc' },
+      });
+      return orders.map((o) => this.formatOrderResponse(o));
+    }
+
+    return [];
   }
 
   async getCustomerOrderById(token: string, orderId: string) {
-    const { resolved, session } = await this.publicTablesService.getActiveSessionRecord(token);
+    const resolved = await this.publicTablesService.resolveTableToken(token);
 
     const order = await this.prisma.order.findFirst({
       where: {
         id: orderId,
         tableId: resolved.table.id,
-        ...(session && { customerSessionId: session.id }),
       },
       select: ORDER_SELECT_FULL,
     });

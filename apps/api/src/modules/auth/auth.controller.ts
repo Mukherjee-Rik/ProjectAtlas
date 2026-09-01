@@ -22,6 +22,7 @@ const SIGNUP_LIMIT = Number(process.env.AUTH_SIGNUP_LIMIT ?? 5);
 const REFRESH_LIMIT = Number(process.env.AUTH_REFRESH_LIMIT ?? 10);
 
 import { VerifyOtpDto, ResendOtpDto } from './dto/verify-otp.dto';
+import { VerifyRegistrationOtpDto, ResendRegistrationOtpDto } from './dto/verify-registration-otp.dto';
 import { ForgotPasswordDto, ResetPasswordDto, ResendResetOtpDto } from './dto/forgot-password.dto';
 
 @ApiTags('Auth')
@@ -87,10 +88,19 @@ export class AuthController {
 
     const result = await this.authService.login(loginDto.email, loginDto.password, ip, userAgent);
 
-    // The password is only step one: sign-in now finishes at POST /auth/verify-otp
-    // with the code emailed to the account. No cookie is set until then, because
-    // no session exists yet.
-    return result;
+    res.cookie('refreshToken', result.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+      path: '/',
+    });
+
+    return {
+      accessToken: result.accessToken,
+      user: result.user,
+      memberships: result.memberships,
+    };
   }
 
   @HttpCode(HttpStatus.OK)
@@ -181,18 +191,37 @@ export class AuthController {
       limit: SIGNUP_LIMIT,
     },
   })
-  @HttpCode(HttpStatus.CREATED)
+  @HttpCode(HttpStatus.OK)
   @Post('signup')
-  @ApiOperation({ summary: 'Onboard a new restaurant and owner account' })
+  @ApiOperation({ summary: 'Initiate restaurant registration and dispatch verification OTP' })
   async signup(
     @Body() dto: RegisterRestaurantDto,
+    @Req() req: express.Request,
+  ) {
+    const ip = (req.headers['x-forwarded-for'] as string) || req.ip || req.socket.remoteAddress;
+    const userAgent = req.headers['user-agent'] || '';
+
+    return this.authService.registerRestaurant(dto, ip, userAgent);
+  }
+
+  @Throttle({
+    default: {
+      ttl: AUTH_WINDOW_MS,
+      limit: SIGNUP_LIMIT,
+    },
+  })
+  @HttpCode(HttpStatus.CREATED)
+  @Post('verify-registration-otp')
+  @ApiOperation({ summary: 'Verify registration OTP and create restaurant, owner user, and session' })
+  async verifyRegistrationOtp(
+    @Body() dto: VerifyRegistrationOtpDto,
     @Req() req: express.Request,
     @Res({ passthrough: true }) res: express.Response,
   ) {
     const ip = (req.headers['x-forwarded-for'] as string) || req.ip || req.socket.remoteAddress;
     const userAgent = req.headers['user-agent'] || '';
 
-    const result = await this.authService.registerRestaurant(dto, ip, userAgent);
+    const result = await this.authService.verifyRegistrationOtp(dto.challengeId, dto.otp, ip, userAgent);
 
     res.cookie('refreshToken', result.refreshToken, {
       httpOnly: true,
@@ -210,6 +239,19 @@ export class AuthController {
       branch: result.branch,
       membership: result.membership,
     };
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Post('resend-registration-otp')
+  @ApiOperation({ summary: 'Resend new 6-digit registration OTP code' })
+  async resendRegistrationOtp(
+    @Body() dto: ResendRegistrationOtpDto,
+    @Req() req: express.Request,
+  ) {
+    const ip = (req.headers['x-forwarded-for'] as string) || req.ip || req.socket.remoteAddress;
+    const userAgent = req.headers['user-agent'] || '';
+
+    return this.authService.resendRegistrationOtp(dto.challengeId, ip, userAgent);
   }
 
   @Throttle({
