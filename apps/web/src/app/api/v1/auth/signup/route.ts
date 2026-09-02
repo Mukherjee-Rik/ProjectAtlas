@@ -61,7 +61,7 @@ export async function POST(req: Request) {
     console.log('=======================================================');
 
     // Dispatch branded email via authenticated SMTP
-    void sendRegistrationEmail(
+    await sendRegistrationEmail(
       normalizedEmail,
       otp,
       String(ownerName).trim(),
