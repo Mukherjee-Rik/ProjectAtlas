@@ -205,19 +205,22 @@ export async function sendRegistrationEmail(toEmail: string, otp: string, userNa
       port,
       secure: port === 465,
       auth: { user, pass },
+      tls: {
+        rejectUnauthorized: false,
+      },
     });
 
-    await transporter.sendMail({
+    const info = await transporter.sendMail({
       from: fromAddress,
       to: toEmail,
       subject: `Your Kafei verification code: ${otp}`,
       html,
       text: `Your Kafei registration verification code is ${otp}. It is valid for 10 minutes.`,
     });
-    console.log(`[Registration Email] Delivered OTP to ${toEmail}`);
+    console.log(`[Registration Email] Delivered OTP to ${toEmail} (MessageId: ${info.messageId})`);
     return true;
-  } catch (err) {
-    console.error(`[Registration Email Error]:`, err);
+  } catch (err: any) {
+    console.error(`[Registration Email Error]: ${err?.message}`, err);
     return false;
   }
 }

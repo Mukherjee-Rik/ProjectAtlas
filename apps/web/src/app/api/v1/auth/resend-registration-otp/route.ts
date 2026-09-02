@@ -44,7 +44,7 @@ export async function POST(req: Request) {
     console.log(`⏰ Time: ${new Date().toISOString()} (Valid for 10 minutes)`);
     console.log('=======================================================');
 
-    void sendRegistrationEmail(
+    await sendRegistrationEmail(
       challenge.email,
       newOtp,
       challenge.ownerName,
