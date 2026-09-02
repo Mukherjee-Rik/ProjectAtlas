@@ -353,7 +353,7 @@ async function handler(
         attempts: 0,
         expiresAt: Date.now() + 10 * 60 * 1000,
       });
-      void sendRegistrationEmail(
+      await sendRegistrationEmail(
         normalizedEmail,
         otp,
         String(ownerName).trim(),
@@ -466,7 +466,7 @@ async function handler(
       challenge.otp = newOtp;
       challenge.attempts = 0;
       challenge.expiresAt = Date.now() + 10 * 60 * 1000;
-      void sendRegistrationEmail(
+      await sendRegistrationEmail(
         challenge.email,
         newOtp,
         challenge.ownerName,
