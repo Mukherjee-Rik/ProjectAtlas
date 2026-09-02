@@ -202,62 +202,49 @@ export function resendOtp(payload: { challengeId: string }) {
 }
 
 export async function forgotPassword(payload: { identifier: string }) {
-  try {
-    return await apiClient.post<{
-      success: boolean;
-      challengeId: string;
-      phoneMasked: string;
-      emailMasked: string;
-      message: string;
-    }>('/auth/forgot-password', payload);
-  } catch (err: any) {
-    // If backend returns 404/Cannot POST (e.g. against deployed remote instance prior to rebuild), fallback to Next.js route
-    if (err?.status === 404 || String(err?.message || '').includes('Cannot POST') || String(err?.error || '').includes('Cannot POST')) {
-      const res = await fetch('/api/v1/auth/forgot-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data?.error || data?.message || 'Password reset request failed.');
-      return data;
-    }
-    throw err;
+  const res = await fetch('/api/v1/auth/forgot-password', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data?.error || data?.message || 'Password reset request failed.');
   }
+  return data as {
+    success: boolean;
+    challengeId: string;
+    phoneMasked: string;
+    emailMasked: string;
+    message: string;
+  };
 }
 
 export async function resetPassword(payload: { challengeId: string; otp: string; newPassword: string }) {
-  try {
-    return await apiClient.post<{ success: boolean; message: string }>('/auth/reset-password', payload);
-  } catch (err: any) {
-    if (err?.status === 404 || String(err?.message || '').includes('Cannot POST') || String(err?.error || '').includes('Cannot POST')) {
-      const res = await fetch('/api/v1/auth/reset-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data?.error || data?.message || 'Password reset failed.');
-      return data;
-    }
-    throw err;
+  const res = await fetch('/api/v1/auth/reset-password', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data?.error || data?.message || 'Password reset failed.');
   }
+  return data as { success: boolean; message: string };
 }
 
 export async function resendResetOtp(payload: { challengeId: string }) {
-  try {
-    return await apiClient.post<{ success: boolean; message: string }>('/auth/resend-reset-otp', payload);
-  } catch (err: any) {
-    if (err?.status === 404 || String(err?.message || '').includes('Cannot POST') || String(err?.error || '').includes('Cannot POST')) {
-      const res = await fetch('/api/v1/auth/resend-reset-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data?.error || data?.message || 'Resend code failed.');
-      return data;
-    }
-    throw err;
+  const res = await fetch('/api/v1/auth/resend-reset-otp', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data?.error || data?.message || 'Resend code failed.');
   }
+  return data as { success: boolean; message: string };
 }
