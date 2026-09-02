@@ -1,7 +1,18 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { Pool } from 'pg';
 import * as crypto from 'crypto';
+import * as bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
+import {
+  generateOtp,
+  maskEmail,
+  saveRegChallenge,
+  getRegChallenge,
+  deleteRegChallenge,
+  sendRegistrationEmail,
+  provisionRegisteredAccount,
+  getRegPool,
+} from '@/lib/auth-registration-store';
 
 // This route is a pass-through to the Atlas API; nothing about it is static.
 export const dynamic = 'force-dynamic';
@@ -306,6 +317,171 @@ async function handler(
     rawBody = await request.text();
     if (rawBody) {
       bodyBuffer = new TextEncoder().encode(rawBody).buffer as ArrayBuffer;
+    }
+  }
+
+  // Intercept registration routes to ensure 2-step OTP verification with Kafei email branding is always enforced
+  if (targetPath === 'auth/signup') {
+    try {
+      const parsedBody = rawBody ? JSON.parse(rawBody) : {};
+      const { restaurantName, ownerName, email, phone, password } = parsedBody || {};
+      if (!restaurantName || !ownerName || !email || !password) {
+        return NextResponse.json(
+          { success: false, error: 'Please provide all required registration fields.' },
+          { status: 400 },
+        );
+      }
+      const normalizedEmail = String(email).trim().toLowerCase();
+      const pool = getRegPool();
+      const existing = await pool.query('SELECT id FROM users WHERE email = $1', [normalizedEmail]);
+      if (existing.rows.length > 0) {
+        return NextResponse.json(
+          { success: false, error: 'Email address is already registered. Please sign in.' },
+          { status: 409 },
+        );
+      }
+      const passwordHash = await bcrypt.hash(password, 10);
+      const otp = generateOtp();
+      const challengeId = `reg_${crypto.randomUUID().replace(/-/g, '').substring(0, 16)}`;
+      saveRegChallenge(challengeId, {
+        restaurantName: String(restaurantName).trim(),
+        ownerName: String(ownerName).trim(),
+        email: normalizedEmail,
+        phone: phone ? String(phone).trim() : null,
+        passwordHash,
+        otp,
+        attempts: 0,
+        expiresAt: Date.now() + 10 * 60 * 1000,
+      });
+      void sendRegistrationEmail(
+        normalizedEmail,
+        otp,
+        String(ownerName).trim(),
+        String(restaurantName).trim(),
+      );
+      return NextResponse.json({
+        success: true,
+        data: {
+          otpRequired: true,
+          challengeId,
+          emailMasked: maskEmail(normalizedEmail),
+          message: `We sent a 6-digit verification code to ${maskEmail(normalizedEmail)}. It is valid for 10 minutes.`,
+        },
+      });
+    } catch (err: any) {
+      console.error('[Proxy Signup Error]:', err);
+      return NextResponse.json(
+        { success: false, error: err?.message || 'Failed to initiate registration.' },
+        { status: 500 },
+      );
+    }
+  }
+
+  if (targetPath === 'auth/verify-registration-otp') {
+    try {
+      const parsedBody = rawBody ? JSON.parse(rawBody) : {};
+      const { challengeId, otp } = parsedBody || {};
+      if (!challengeId || !otp) {
+        return NextResponse.json(
+          { success: false, error: 'Challenge ID and 6-digit OTP code are required.' },
+          { status: 400 },
+        );
+      }
+      const challenge = getRegChallenge(challengeId);
+      if (!challenge) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'Verification code has expired or is invalid. Please start registration again.',
+          },
+          { status: 401 },
+        );
+      }
+      if (challenge.otp !== String(otp).trim()) {
+        challenge.attempts += 1;
+        if (challenge.attempts >= 5) {
+          deleteRegChallenge(challengeId);
+          return NextResponse.json(
+            {
+              success: false,
+              error: 'Too many incorrect attempts. Please start registration again.',
+            },
+            { status: 401 },
+          );
+        }
+        return NextResponse.json(
+          { success: false, error: 'Incorrect verification code. Please check and try again.' },
+          { status: 401 },
+        );
+      }
+      deleteRegChallenge(challengeId);
+      const userAgent = request.headers.get('user-agent') || undefined;
+      const ip =
+        request.headers.get('x-forwarded-for') ||
+        request.headers.get('x-real-ip') ||
+        undefined;
+      const result = await provisionRegisteredAccount(challenge, userAgent, ip);
+      const response = NextResponse.json({
+        success: true,
+        data: result,
+      });
+      response.cookies.set('refreshToken', result.refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        path: '/',
+        maxAge: 7 * 24 * 60 * 60,
+      });
+      return response;
+    } catch (err: any) {
+      console.error('[Proxy Verify Registration OTP Error]:', err);
+      return NextResponse.json(
+        { success: false, error: err?.message || 'Failed to verify OTP code.' },
+        { status: 500 },
+      );
+    }
+  }
+
+  if (targetPath === 'auth/resend-registration-otp') {
+    try {
+      const parsedBody = rawBody ? JSON.parse(rawBody) : {};
+      const { challengeId } = parsedBody || {};
+      if (!challengeId) {
+        return NextResponse.json(
+          { success: false, error: 'Challenge ID is required to resend verification code.' },
+          { status: 400 },
+        );
+      }
+      const challenge = getRegChallenge(challengeId);
+      if (!challenge) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'Verification session has expired. Please start registration again.',
+          },
+          { status: 401 },
+        );
+      }
+      const newOtp = generateOtp();
+      challenge.otp = newOtp;
+      challenge.attempts = 0;
+      challenge.expiresAt = Date.now() + 10 * 60 * 1000;
+      void sendRegistrationEmail(
+        challenge.email,
+        newOtp,
+        challenge.ownerName,
+        challenge.restaurantName,
+      );
+      return NextResponse.json({
+        success: true,
+        message: `A new 6-digit verification code has been dispatched to ${maskEmail(challenge.email)}.`,
+      });
+    } catch (err: any) {
+      console.error('[Proxy Resend Registration OTP Error]:', err);
+      return NextResponse.json(
+        { success: false, error: err?.message || 'Failed to resend verification code.' },
+        { status: 500 },
+      );
     }
   }
 
