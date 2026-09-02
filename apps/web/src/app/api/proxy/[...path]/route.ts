@@ -13,6 +13,15 @@ import {
   provisionRegisteredAccount,
   getRegPool,
 } from '@/lib/auth-registration-store';
+import {
+  maskPhone,
+  saveChallenge,
+  getChallenge,
+  deleteChallenge,
+  findUserByIdentifier,
+  sendPasswordResetEmail,
+  executePasswordReset,
+} from '@/lib/auth-recovery-store';
 
 // This route is a pass-through to the Atlas API; nothing about it is static.
 export const dynamic = 'force-dynamic';
@@ -481,6 +490,117 @@ async function handler(
       return NextResponse.json(
         { success: false, error: err?.message || 'Failed to resend verification code.' },
         { status: 500 },
+      );
+    }
+  }
+
+  if (targetPath === 'auth/forgot-password') {
+    try {
+      const parsedBody = rawBody ? JSON.parse(rawBody) : {};
+      const identifier = String(parsedBody?.identifier || '').trim();
+      if (!identifier) {
+        return NextResponse.json(
+          { success: false, error: 'Please provide your registered email address or phone number.' },
+          { status: 400 },
+        );
+      }
+      const user = await findUserByIdentifier(identifier);
+      if (!user) {
+        return NextResponse.json(
+          { success: false, error: 'No account found matching the provided email or phone.' },
+          { status: 404 },
+        );
+      }
+      const otp = generateOtp();
+      const challengeId = `pwd_${crypto.randomUUID().replace(/-/g, '').substring(0, 16)}`;
+      const userPhone = user.phone || '9903085026';
+      const userEmail = user.email.toLowerCase();
+      saveChallenge(challengeId, {
+        userId: user.id,
+        userName: user.name || 'Kafei User',
+        identifier,
+        email: userEmail,
+        phone: user.phone || null,
+        phoneMasked: maskPhone(userPhone),
+        emailMasked: maskEmail(userEmail),
+        otp,
+        attempts: 0,
+        expiresAt: Date.now() + 10 * 60 * 1000,
+      });
+      await sendPasswordResetEmail(userEmail, otp, user.name);
+      return NextResponse.json({
+        success: true,
+        challengeId,
+        phoneMasked: maskPhone(userPhone),
+        emailMasked: maskEmail(userEmail),
+        message: `A 6-digit password reset code has been sent to ${maskEmail(userEmail)}.`,
+      });
+    } catch (err: any) {
+      console.error('[Proxy Forgot Password Error]:', err);
+      return NextResponse.json(
+        { success: false, error: err?.message || 'Unable to process password reset request.' },
+        { status: 500 },
+      );
+    }
+  }
+
+  if (targetPath === 'auth/resend-reset-otp') {
+    try {
+      const parsedBody = rawBody ? JSON.parse(rawBody) : {};
+      const challengeId = String(parsedBody?.challengeId || '').trim();
+      if (!challengeId) {
+        return NextResponse.json(
+          { success: false, error: 'Challenge ID is required.' },
+          { status: 400 },
+        );
+      }
+      const challenge = getChallenge(challengeId);
+      if (!challenge) {
+        return NextResponse.json(
+          { success: false, error: 'Reset session expired. Please start over.' },
+          { status: 401 },
+        );
+      }
+      const newOtp = generateOtp();
+      challenge.otp = newOtp;
+      challenge.attempts = 0;
+      challenge.expiresAt = Date.now() + 10 * 60 * 1000;
+      await sendPasswordResetEmail(challenge.email, newOtp, challenge.userName);
+      return NextResponse.json({
+        success: true,
+        message: `A new reset code has been sent to ${maskEmail(challenge.email)}.`,
+      });
+    } catch (err: any) {
+      console.error('[Proxy Resend Reset OTP Error]:', err);
+      return NextResponse.json(
+        { success: false, error: err?.message || 'Unable to resend reset code.' },
+        { status: 500 },
+      );
+    }
+  }
+
+  if (targetPath === 'auth/reset-password') {
+    try {
+      const parsedBody = rawBody ? JSON.parse(rawBody) : {};
+      const challengeId = String(parsedBody?.challengeId || '').trim();
+      const otp = String(parsedBody?.otp || '').trim();
+      const newPassword = String(parsedBody?.newPassword || '').trim();
+      if (!challengeId || !otp || !newPassword || newPassword.length < 8) {
+        return NextResponse.json(
+          { success: false, error: 'Please provide valid reset challenge, OTP code, and new password (min 8 chars).' },
+          { status: 400 },
+        );
+      }
+      const result = await executePasswordReset(challengeId, otp, newPassword);
+      return NextResponse.json({
+        success: true,
+        message: result.message,
+      });
+    } catch (err: any) {
+      console.error('[Proxy Reset Password Error]:', err);
+      return NextResponse.json(
+        { success: false, error: err?.message || 'Unable to reset password.' },
+        { status: 400 },
       );
     }
   }

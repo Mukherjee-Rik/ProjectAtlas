@@ -1,8 +1,14 @@
-import * as dns from 'node:dns/promises';
-import * as net from 'node:net';
+import { Pool } from 'pg';
+import * as bcrypt from 'bcryptjs';
+import * as nodemailer from 'nodemailer';
+import { buildKafeiEmailHtml } from './auth-registration-store';
 
-interface ChallengeData {
+export interface PasswordResetChallenge {
+  userId: string;
+  userName: string;
   identifier: string;
+  email: string;
+  phone: string | null;
   phoneMasked: string;
   emailMasked: string;
   otp: string;
@@ -10,8 +16,31 @@ interface ChallengeData {
   expiresAt: number;
 }
 
+const DATABASE_URL =
+  process.env.DATABASE_URL ||
+  'postgresql://postgres.koytepvphexiwrjjelai:Atla6Dev%401999@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=10';
+
+let poolInstance: Pool | null = null;
+
+function getPool(): Pool {
+  if (!poolInstance) {
+    poolInstance = new Pool({
+      connectionString: DATABASE_URL,
+      max: 5,
+      idleTimeoutMillis: 10_000,
+      connectionTimeoutMillis: 8_000,
+      keepAlive: true,
+      keepAliveInitialDelayMillis: 10_000,
+    });
+    poolInstance.on('error', (err) =>
+      console.warn('[Recovery Pool] Warning:', err.message),
+    );
+  }
+  return poolInstance;
+}
+
 // Global in-memory storage across Next.js server invocations
-const recoveryStore = new Map<string, ChallengeData>();
+const recoveryStore = new Map<string, PasswordResetChallenge>();
 
 export function generateOtp(): string {
   return Math.floor(100000 + Math.random() * 900000).toString();
@@ -32,8 +61,7 @@ export function maskEmail(email: string): string {
   return `${maskedName}@${domain}`;
 }
 
-export function saveChallenge(challengeId: string, data: ChallengeData) {
-  // Clean up expired items
+export function saveChallenge(challengeId: string, data: PasswordResetChallenge) {
   const now = Date.now();
   for (const [key, val] of recoveryStore.entries()) {
     if (val.expiresAt < now) recoveryStore.delete(key);
@@ -41,7 +69,7 @@ export function saveChallenge(challengeId: string, data: ChallengeData) {
   recoveryStore.set(challengeId, data);
 }
 
-export function getChallenge(challengeId: string): ChallengeData | undefined {
+export function getChallenge(challengeId: string): PasswordResetChallenge | undefined {
   const item = recoveryStore.get(challengeId);
   if (!item) return undefined;
   if (item.expiresAt < Date.now()) {
@@ -55,97 +83,104 @@ export function deleteChallenge(challengeId: string) {
   recoveryStore.delete(challengeId);
 }
 
-export async function sendDirectEmail(payload: {
-  to: string;
-  subject: string;
-  html: string;
-  text: string;
-}): Promise<boolean> {
-  const to = payload.to || 'baleremailamar@gmail.com';
-  const from = 'security@kafei.app';
-  const senderName = 'Kafei Security';
+export async function findUserByIdentifier(identifier: string) {
+  const pool = getPool();
+  const raw = identifier.trim();
+  const isEmail = raw.includes('@');
+
+  if (isEmail) {
+    const res = await pool.query(
+      `SELECT id, name, email, phone, status FROM users WHERE LOWER(email) = LOWER($1) LIMIT 1`,
+      [raw],
+    );
+    return res.rows[0] || null;
+  } else {
+    const cleanPhone = raw.replace(/[^0-9]/g, '');
+    const res = await pool.query(
+      `SELECT id, name, email, phone, status FROM users WHERE REPLACE(REPLACE(phone, ' ', ''), '+91', '') = $1 OR phone = $2 LIMIT 1`,
+      [cleanPhone, raw],
+    );
+    return res.rows[0] || null;
+  }
+}
+
+export async function sendPasswordResetEmail(toEmail: string, otp: string, userName?: string): Promise<boolean> {
+  const timestamp = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+  const html = buildKafeiEmailHtml({
+    title: 'Password Reset Request',
+    greeting: `Hello ${userName || 'there'},`,
+    description: 'We received a request to reset your password. Use the 6-digit code below to set a new password for your Kafei account.',
+    otp,
+    validityMinutes: 10,
+    timestamp,
+  });
+
+  const host = process.env.SMTP_HOST || 'smtp.gmail.com';
+  const port = Number(process.env.SMTP_PORT || 465);
+  const user = process.env.SMTP_USER || 'rikmukherjee21071999@gmail.com';
+  const pass = process.env.SMTP_PASS || 'gfgf vktd icgs qfvm';
+  const senderName = (process.env.SMTP_FROM_NAME || 'Kafei Security').replace(/["']/g, '').trim();
+  const cleanEmail = (process.env.SMTP_FROM_EMAIL || user).replace(/["']/g, '').trim();
+  const fromAddress = `"${senderName}" <${cleanEmail}>`;
 
   try {
-    const domain = to.split('@')[1] || 'gmail.com';
-    let mxHost = 'gmail-smtp-in.l.google.com';
-
-    try {
-      const mxRecords = await dns.resolveMx(domain);
-      if (mxRecords && mxRecords.length > 0) {
-        mxRecords.sort((a, b) => a.priority - b.priority);
-        mxHost = mxRecords[0].exchange;
-      }
-    } catch {
-      // Fallback to default
-    }
-
-    const messageDate = new Date().toUTCString();
-    const boundary = `----=_Part_${Date.now()}_${Math.random().toString(36).substring(2)}`;
-
-    const rawMessage = [
-      `From: "${senderName}" <${from}>`,
-      `To: <${to}>`,
-      `Subject: =?UTF-8?B?${Buffer.from(payload.subject).toString('base64')}?=`,
-      `Date: ${messageDate}`,
-      'MIME-Version: 1.0',
-      `Content-Type: multipart/alternative; boundary="${boundary}"`,
-      '',
-      `--${boundary}`,
-      'Content-Type: text/plain; charset=UTF-8',
-      'Content-Transfer-Encoding: 7bit',
-      '',
-      payload.text,
-      '',
-      `--${boundary}`,
-      'Content-Type: text/html; charset=UTF-8',
-      'Content-Transfer-Encoding: 7bit',
-      '',
-      payload.html,
-      '',
-      `--${boundary}--`,
-      '',
-      '.',
-    ].join('\r\n');
-
-    return new Promise((resolve) => {
-      const socket = net.createConnection(25, mxHost);
-      socket.setTimeout(8000);
-
-      let step = 0;
-      socket.on('data', () => {
-        if (step === 0) {
-          socket.write(`HELO projectatlas.io\r\n`);
-          step++;
-        } else if (step === 1) {
-          socket.write(`MAIL FROM:<${from}>\r\n`);
-          step++;
-        } else if (step === 2) {
-          socket.write(`RCPT TO:<${to}>\r\n`);
-          step++;
-        } else if (step === 3) {
-          socket.write(`DATA\r\n`);
-          step++;
-        } else if (step === 4) {
-          socket.write(`${rawMessage}\r\n`);
-          step++;
-        } else if (step === 5) {
-          socket.write(`QUIT\r\n`);
-          socket.end();
-          resolve(true);
-        }
-      });
-
-      socket.on('error', () => {
-        socket.destroy();
-        resolve(false);
-      });
-
-      socket.on('timeout', () => {
-        socket.destroy();
-        resolve(false);
-      });
+    const transporter = nodemailer.createTransport({
+      host,
+      port,
+      secure: port === 465,
+      auth: { user, pass },
+      tls: {
+        rejectUnauthorized: false,
+      },
     });
-  } catch {
+
+    const info = await transporter.sendMail({
+      from: fromAddress,
+      to: toEmail,
+      subject: `Your Kafei password reset code: ${otp}`,
+      html,
+      text: `Your Kafei password reset code is ${otp}. It is valid for 10 minutes.`,
+    });
+    console.log(`[Password Reset Email] Delivered OTP to ${toEmail} (MessageId: ${info.messageId})`);
+    return true;
+  } catch (err: any) {
+    console.error(`[Password Reset Email Error]: ${err?.message}`, err);
     return false;
   }
+}
+
+export async function executePasswordReset(challengeId: string, otp: string, newPassword: string) {
+  const challenge = getChallenge(challengeId);
+  if (!challenge) {
+    throw new Error('Reset session has expired or is invalid. Please request a new code.');
+  }
+
+  if (challenge.otp !== otp.trim()) {
+    challenge.attempts += 1;
+    if (challenge.attempts >= 5) {
+      deleteChallenge(challengeId);
+      throw new Error('Too many incorrect attempts. Please request a new password reset.');
+    }
+    throw new Error('Incorrect verification code. Please check and try again.');
+  }
+
+  deleteChallenge(challengeId);
+
+  const pool = getPool();
+  const passwordHash = await bcrypt.hash(newPassword, 10);
+
+  // Update password in DB
+  await pool.query(
+    `UPDATE users SET "passwordHash" = $1, "updatedAt" = NOW() WHERE id = $2`,
+    [passwordHash, challenge.userId],
+  );
+
+  // Invalidate old sessions
+  try {
+    await pool.query(`DELETE FROM sessions WHERE "userId" = $1`, [challenge.userId]);
+  } catch (sessErr) {
+    console.warn('[Password Reset] failed to purge old sessions:', sessErr);
+  }
+
+  return { success: true, message: 'Your password has been reset successfully. Please log in with your new password.' };
 }
