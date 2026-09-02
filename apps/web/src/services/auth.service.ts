@@ -16,16 +16,46 @@ export function login(credentials: LoginRequest) {
   return apiClient.post<LoginResponse>('/auth/login', credentials);
 }
 
-export function registerRestaurant(payload: RegisterRestaurantRequest) {
-  return apiClient.post<InitiateRegisterResponse>('/auth/signup', payload);
+export async function registerRestaurant(payload: RegisterRestaurantRequest) {
+  const res = await fetch('/api/v1/auth/signup', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data?.error || data?.message || 'Failed to initiate registration.');
+  }
+  return data as InitiateRegisterResponse;
 }
 
-export function verifyRegistrationOtp(payload: VerifyRegistrationOtpRequest) {
-  return apiClient.post<RegisterRestaurantResponse>('/auth/verify-registration-otp', payload);
+export async function verifyRegistrationOtp(payload: VerifyRegistrationOtpRequest) {
+  const res = await fetch('/api/v1/auth/verify-registration-otp', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data?.error || data?.message || 'Failed to verify verification code.');
+  }
+  return data as RegisterRestaurantResponse;
 }
 
-export function resendRegistrationOtp(payload: ResendRegistrationOtpRequest) {
-  return apiClient.post<{ success: boolean; message: string }>('/auth/resend-registration-otp', payload);
+export async function resendRegistrationOtp(payload: ResendRegistrationOtpRequest) {
+  const res = await fetch('/api/v1/auth/resend-registration-otp', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data?.error || data?.message || 'Failed to resend verification code.');
+  }
+  return data as { success: boolean; message: string };
 }
 
 /**

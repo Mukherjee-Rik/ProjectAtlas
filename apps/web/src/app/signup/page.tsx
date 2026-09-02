@@ -183,20 +183,7 @@ export default function SignupPage() {
         return;
       }
 
-      // If already returns full registration payload directly
-      const accessToken = resData?.accessToken;
-      const user = resData?.user;
-      const tenant = resData?.tenant;
-      const restaurant = resData?.restaurant;
-      const branch = resData?.branch;
-
-      if (accessToken && user) {
-        loginUser(accessToken, user);
-        if (tenant?.id) setCurrentTenant({ id: tenant.id, name: tenant.name, slug: tenant.slug, status: 'ACTIVE', createdAt: '', updatedAt: '' });
-        if (restaurant?.id) setCurrentRestaurant({ id: restaurant.id, tenantId: tenant?.id || '', name: restaurant.name, slug: restaurant.slug, status: 'ACTIVE', createdAt: '', updatedAt: '' });
-        if (branch?.id) setCurrentBranch({ id: branch.id, restaurantId: restaurant?.id || '', name: branch.name, code: branch.code, status: 'ACTIVE', createdAt: '', updatedAt: '' });
-        router.push('/dashboard');
-      }
+      throw new Error('No verification challenge received. Please try again.');
     } catch (err: any) {
       console.error('Signup initiate error:', err);
       const msg =
