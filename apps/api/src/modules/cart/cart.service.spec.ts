@@ -51,7 +51,11 @@ describe('CartService', () => {
 
   /** Mirrors what buildCartResponse reads back after a write. */
   function cartRows(items: any[]) {
-    prisma.cart.findUnique.mockResolvedValue({ id: 'cart-1', updatedAt: new Date('2026-08-11T10:00:00Z'), items });
+    prisma.cart.findUnique.mockResolvedValue({
+      id: 'cart-1',
+      updatedAt: new Date('2026-08-11T10:00:00Z'),
+      items,
+    });
   }
 
   function cartRow(overrides: Record<string, any> = {}) {
@@ -61,10 +65,21 @@ describe('CartService', () => {
       quantity: 1,
       unitPrice: '379.00',
       totalPrice: '379.00',
-      menuItem: { name: 'Margherita Pizza', imageUrl: null, dietaryType: 'VEG' },
-      variantSelections: [{ id: 'civ-1', variantId: 'v-medium', name: 'Medium', price: '0.00' }],
+      menuItem: {
+        name: 'Margherita Pizza',
+        imageUrl: null,
+        dietaryType: 'VEG',
+      },
+      variantSelections: [
+        { id: 'civ-1', variantId: 'v-medium', name: 'Medium', price: '0.00' },
+      ],
       addonSelections: [
-        { id: 'cia-1', addonId: 'a-cheese', name: 'Extra Cheese', price: '50.00' },
+        {
+          id: 'cia-1',
+          addonId: 'a-cheese',
+          name: 'Extra Cheese',
+          price: '50.00',
+        },
         { id: 'cia-2', addonId: 'a-olives', name: 'Olives', price: '30.00' },
       ],
       ...overrides,
@@ -74,7 +89,13 @@ describe('CartService', () => {
   beforeEach(async () => {
     prisma = {
       cart: { findUnique: jest.fn(), create: jest.fn() },
-      cartItem: { findMany: jest.fn().mockResolvedValue([]), findFirst: jest.fn(), create: jest.fn(), update: jest.fn(), delete: jest.fn() },
+      cartItem: {
+        findMany: jest.fn().mockResolvedValue([]),
+        findFirst: jest.fn(),
+        create: jest.fn(),
+        update: jest.fn(),
+        delete: jest.fn(),
+      },
       menuItem: { findFirst: jest.fn() },
       order: { findMany: jest.fn().mockResolvedValue([]) },
     };
@@ -82,7 +103,10 @@ describe('CartService', () => {
     publicTables = {
       getOrCreateSessionRecord: jest.fn().mockResolvedValue({
         session: { id: 'session-1', sessionToken: 'cs_abc', status: 'ACTIVE' },
-        resolved: { table: { id: 'table-1' }, restaurant: { id: RESTAURANT_A, name: 'Pizza House' } },
+        resolved: {
+          table: { id: 'table-1' },
+          restaurant: { id: RESTAURANT_A, name: 'Pizza House' },
+        },
       }),
     };
 
@@ -112,7 +136,10 @@ describe('CartService', () => {
 
       const result = await service.getOrCreateCart(TOKEN);
 
-      expect(prisma.cart.create).toHaveBeenCalledWith({ data: { customerSessionId: 'session-1' }, select: { id: true } });
+      expect(prisma.cart.create).toHaveBeenCalledWith({
+        data: { customerSessionId: 'session-1' },
+        select: { id: true },
+      });
       expect(result.cart.id).toBe('cart-new');
       expect(result.restaurantId).toBe(RESTAURANT_A);
     });
@@ -125,8 +152,12 @@ describe('CartService', () => {
     });
 
     it('recovers from a concurrent create losing the unique race', async () => {
-      prisma.cart.findUnique.mockResolvedValueOnce(null).mockResolvedValueOnce({ id: 'cart-raced' });
-      prisma.cart.create.mockRejectedValue(new Error('Unique constraint failed'));
+      prisma.cart.findUnique
+        .mockResolvedValueOnce(null)
+        .mockResolvedValueOnce({ id: 'cart-raced' });
+      prisma.cart.create.mockRejectedValue(
+        new Error('Unique constraint failed'),
+      );
 
       const result = await service.getOrCreateCart(TOKEN);
       expect(result.cart.id).toBe('cart-raced');
@@ -150,7 +181,9 @@ describe('CartService', () => {
     const created = prisma.cartItem.create.mock.calls[0][0].data;
     expect(created.unitPrice.toString()).toBe('379');
     expect(created.totalPrice.toString()).toBe('379');
-    expect(created.variantSelections.create).toEqual([{ variantId: 'v-medium', name: 'Medium', price: expect.anything() }]);
+    expect(created.variantSelections.create).toEqual([
+      { variantId: 'v-medium', name: 'Medium', price: expect.anything() },
+    ]);
     expect(created.addonSelections.create).toHaveLength(2);
 
     expect(cart.items).toHaveLength(1);
@@ -164,23 +197,34 @@ describe('CartService', () => {
     prisma.cartItem.create.mockResolvedValue({ id: 'ci-1' });
     cartRows([cartRow()]);
 
-    await service.addItem(TOKEN, { menuItemId: 'item-margherita', variantIds: ['v-medium'] });
+    await service.addItem(TOKEN, {
+      menuItemId: 'item-margherita',
+      variantIds: ['v-medium'],
+    });
 
     expect(prisma.cartItem.create.mock.calls[0][0].data.quantity).toBe(1);
   });
 
   // Test 2 — 1 -> 2 doubles the line total
   it('Test 2: recalculates the line total when quantity changes', async () => {
-    prisma.cartItem.findFirst.mockResolvedValue({ id: 'ci-1', quantity: 1, unitPrice: '379.00' });
+    prisma.cartItem.findFirst.mockResolvedValue({
+      id: 'ci-1',
+      quantity: 1,
+      unitPrice: '379.00',
+    });
     cartRows([cartRow({ quantity: 2, totalPrice: '758.00' })]);
 
-    const cart = await service.updateItemQuantity(TOKEN, 'ci-1', { quantity: 2 });
+    const cart = await service.updateItemQuantity(TOKEN, 'ci-1', {
+      quantity: 2,
+    });
 
     expect(prisma.cartItem.update).toHaveBeenCalledWith({
       where: { id: 'ci-1' },
       data: { quantity: 2, totalPrice: expect.anything() },
     });
-    expect(prisma.cartItem.update.mock.calls[0][0].data.totalPrice.toString()).toBe('758');
+    expect(
+      prisma.cartItem.update.mock.calls[0][0].data.totalPrice.toString(),
+    ).toBe('758');
     expect(cart.items[0].totalPrice).toBe(758);
     expect(cart.subtotal).toBe(758);
     expect(cart.totalQuantity).toBe(2);
@@ -238,7 +282,9 @@ describe('CartService', () => {
 
   it('keeps the original snapshot price when merging after a menu price change', async () => {
     // Menu price is now 349, but the existing line was snapshotted at 379.
-    prisma.menuItem.findFirst.mockResolvedValue(margherita({ price: '349.00' }));
+    prisma.menuItem.findFirst.mockResolvedValue(
+      margherita({ price: '349.00' }),
+    );
     prisma.cartItem.findMany.mockResolvedValue([
       {
         id: 'ci-1',
@@ -265,11 +311,21 @@ describe('CartService', () => {
   it('rejects a merge that would exceed the per-line quantity ceiling', async () => {
     prisma.menuItem.findFirst.mockResolvedValue(margherita());
     prisma.cartItem.findMany.mockResolvedValue([
-      { id: 'ci-1', quantity: 98, unitPrice: '379.00', variantSelections: [{ variantId: 'v-medium' }], addonSelections: [] },
+      {
+        id: 'ci-1',
+        quantity: 98,
+        unitPrice: '379.00',
+        variantSelections: [{ variantId: 'v-medium' }],
+        addonSelections: [],
+      },
     ]);
 
     await expect(
-      service.addItem(TOKEN, { menuItemId: 'item-margherita', quantity: 5, variantIds: ['v-medium'] }),
+      service.addItem(TOKEN, {
+        menuItemId: 'item-margherita',
+        quantity: 5,
+        variantIds: ['v-medium'],
+      }),
     ).rejects.toThrow(BadRequestException);
   });
 
@@ -286,7 +342,17 @@ describe('CartService', () => {
       },
     ]);
     prisma.cartItem.create.mockResolvedValue({ id: 'ci-2' });
-    cartRows([cartRow(), cartRow({ id: 'ci-2', unitPrice: '329.00', totalPrice: '329.00', addonSelections: [{ id: 'cia-3', addonId: 'a-olives', name: 'Olives', price: '30.00' }] })]);
+    cartRows([
+      cartRow(),
+      cartRow({
+        id: 'ci-2',
+        unitPrice: '329.00',
+        totalPrice: '329.00',
+        addonSelections: [
+          { id: 'cia-3', addonId: 'a-olives', name: 'Olives', price: '30.00' },
+        ],
+      }),
+    ]);
 
     const cart = await service.addItem(TOKEN, {
       menuItemId: 'item-margherita',
@@ -298,7 +364,9 @@ describe('CartService', () => {
     expect(prisma.cartItem.update).not.toHaveBeenCalled();
     expect(prisma.cartItem.create).toHaveBeenCalled();
     // 299 + 0 + 30 = 329
-    expect(prisma.cartItem.create.mock.calls[0][0].data.unitPrice.toString()).toBe('329');
+    expect(
+      prisma.cartItem.create.mock.calls[0][0].data.unitPrice.toString(),
+    ).toBe('329');
     expect(cart.items).toHaveLength(2);
     expect(cart.itemCount).toBe(2);
     expect(cart.subtotal).toBe(708);
@@ -310,7 +378,11 @@ describe('CartService', () => {
       prisma.menuItem.findFirst.mockResolvedValue(margherita());
 
       await expect(
-        service.addItem(TOKEN, { menuItemId: 'item-margherita', quantity: 1, variantIds: ['v-does-not-exist'] }),
+        service.addItem(TOKEN, {
+          menuItemId: 'item-margherita',
+          quantity: 1,
+          variantIds: ['v-does-not-exist'],
+        }),
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -318,7 +390,11 @@ describe('CartService', () => {
       prisma.menuItem.findFirst.mockResolvedValue(margherita());
 
       await expect(
-        service.addItem(TOKEN, { menuItemId: 'item-margherita', quantity: 1, variantIds: [] }),
+        service.addItem(TOKEN, {
+          menuItemId: 'item-margherita',
+          quantity: 1,
+          variantIds: [],
+        }),
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -326,7 +402,11 @@ describe('CartService', () => {
       prisma.menuItem.findFirst.mockResolvedValue(margherita());
 
       await expect(
-        service.addItem(TOKEN, { menuItemId: 'item-margherita', quantity: 1, variantIds: ['v-medium', 'v-large'] }),
+        service.addItem(TOKEN, {
+          menuItemId: 'item-margherita',
+          quantity: 1,
+          variantIds: ['v-medium', 'v-large'],
+        }),
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -334,12 +414,23 @@ describe('CartService', () => {
       // Deactivated variants are filtered out of the query, so the id resolves to nothing.
       prisma.menuItem.findFirst.mockResolvedValue(
         margherita({
-          variantGroups: [{ id: 'vg-size', name: 'Size', required: true, variants: [{ id: 'v-medium', name: 'Medium', price: '0.00' }] }],
+          variantGroups: [
+            {
+              id: 'vg-size',
+              name: 'Size',
+              required: true,
+              variants: [{ id: 'v-medium', name: 'Medium', price: '0.00' }],
+            },
+          ],
         }),
       );
 
       await expect(
-        service.addItem(TOKEN, { menuItemId: 'item-margherita', quantity: 1, variantIds: ['v-large'] }),
+        service.addItem(TOKEN, {
+          menuItemId: 'item-margherita',
+          quantity: 1,
+          variantIds: ['v-large'],
+        }),
       ).rejects.toThrow(BadRequestException);
     });
   });
@@ -375,18 +466,35 @@ describe('CartService', () => {
       );
 
       await expect(
-        service.addItem(TOKEN, { menuItemId: 'item-margherita', quantity: 1, variantIds: ['v-medium'], addonIds: [] }),
+        service.addItem(TOKEN, {
+          menuItemId: 'item-margherita',
+          quantity: 1,
+          variantIds: ['v-medium'],
+          addonIds: [],
+        }),
       ).rejects.toThrow(BadRequestException);
     });
 
     it('allows an optional add-on group to be skipped', async () => {
       prisma.menuItem.findFirst.mockResolvedValue(margherita());
       prisma.cartItem.create.mockResolvedValue({ id: 'ci-1' });
-      cartRows([cartRow({ unitPrice: '299.00', totalPrice: '299.00', addonSelections: [] })]);
+      cartRows([
+        cartRow({
+          unitPrice: '299.00',
+          totalPrice: '299.00',
+          addonSelections: [],
+        }),
+      ]);
 
-      const cart = await service.addItem(TOKEN, { menuItemId: 'item-margherita', quantity: 1, variantIds: ['v-medium'] });
+      const cart = await service.addItem(TOKEN, {
+        menuItemId: 'item-margherita',
+        quantity: 1,
+        variantIds: ['v-medium'],
+      });
 
-      expect(prisma.cartItem.create.mock.calls[0][0].data.unitPrice.toString()).toBe('299');
+      expect(
+        prisma.cartItem.create.mock.calls[0][0].data.unitPrice.toString(),
+      ).toBe('299');
       expect(cart.subtotal).toBe(299);
     });
 
@@ -409,14 +517,21 @@ describe('CartService', () => {
     prisma.menuItem.findFirst.mockResolvedValue(null);
 
     await expect(
-      service.addItem(TOKEN, { menuItemId: 'item-deactivated', quantity: 1, variantIds: [] }),
+      service.addItem(TOKEN, {
+        menuItemId: 'item-deactivated',
+        quantity: 1,
+        variantIds: [],
+      }),
     ).rejects.toThrow(NotFoundException);
 
     // The ACTIVE chain is enforced in the query itself, not in frontend state.
     expect(prisma.menuItem.findFirst.mock.calls[0][0].where).toEqual({
       id: 'item-deactivated',
       status: 'ACTIVE',
-      category: { status: 'ACTIVE', menu: { restaurantId: RESTAURANT_A, status: 'ACTIVE' } },
+      category: {
+        status: 'ACTIVE',
+        menu: { restaurantId: RESTAURANT_A, status: 'ACTIVE' },
+      },
     });
   });
 
@@ -424,11 +539,18 @@ describe('CartService', () => {
     prisma.menuItem.findFirst.mockResolvedValue(null);
 
     await expect(
-      service.addItem(TOKEN, { menuItemId: 'item-of-restaurant-b', quantity: 1, variantIds: ['v-medium'] }),
+      service.addItem(TOKEN, {
+        menuItemId: 'item-of-restaurant-b',
+        quantity: 1,
+        variantIds: ['v-medium'],
+      }),
     ).rejects.toThrow(NotFoundException);
 
     // Scoped to this table's restaurant, so a foreign item can never be located.
-    expect(prisma.menuItem.findFirst.mock.calls[0][0].where.category.menu.restaurantId).toBe(RESTAURANT_A);
+    expect(
+      prisma.menuItem.findFirst.mock.calls[0][0].where.category.menu
+        .restaurantId,
+    ).toBe(RESTAURANT_A);
     expect(prisma.cartItem.create).not.toHaveBeenCalled();
   });
 
@@ -436,7 +558,13 @@ describe('CartService', () => {
   it('Test 8: ignores any price sent by the client and uses the database price', async () => {
     prisma.menuItem.findFirst.mockResolvedValue(margherita());
     prisma.cartItem.create.mockResolvedValue({ id: 'ci-1' });
-    cartRows([cartRow({ unitPrice: '299.00', totalPrice: '299.00', addonSelections: [] })]);
+    cartRows([
+      cartRow({
+        unitPrice: '299.00',
+        totalPrice: '299.00',
+        addonSelections: [],
+      }),
+    ]);
 
     await service.addItem(TOKEN, {
       menuItemId: 'item-margherita',
@@ -457,7 +585,9 @@ describe('CartService', () => {
   it('Test 8b: ignores a client price on a variant/add-on heavy configuration', async () => {
     prisma.menuItem.findFirst.mockResolvedValue(margherita());
     prisma.cartItem.create.mockResolvedValue({ id: 'ci-1' });
-    cartRows([cartRow({ unitPrice: '429.00', totalPrice: '858.00', quantity: 2 })]);
+    cartRows([
+      cartRow({ unitPrice: '429.00', totalPrice: '858.00', quantity: 2 }),
+    ]);
 
     await service.addItem(TOKEN, {
       menuItemId: 'item-margherita',
@@ -489,20 +619,34 @@ describe('CartService', () => {
     });
 
     const created = prisma.cartItem.create.mock.calls[0][0].data;
-    expect(created.variantSelections.create[0]).toMatchObject({ variantId: 'v-medium', name: 'Medium' });
-    expect(created.addonSelections.create[0]).toMatchObject({ addonId: 'a-cheese', name: 'Extra Cheese' });
+    expect(created.variantSelections.create[0]).toMatchObject({
+      variantId: 'v-medium',
+      name: 'Medium',
+    });
+    expect(created.addonSelections.create[0]).toMatchObject({
+      addonId: 'a-cheese',
+      name: 'Extra Cheese',
+    });
     expect(created.addonSelections.create[0].price.toString()).toBe('50');
   });
 
   describe('price calculation', () => {
     it('adds base, variant and add-on prices with Decimal arithmetic', () => {
-      const unitPrice = service.calculateItemPrice('299.00', [{ price: '0.00' as any }], [{ price: '50.00' as any }, { price: '30.00' as any }]);
+      const unitPrice = service.calculateItemPrice(
+        '299.00',
+        [{ price: '0.00' as any }],
+        [{ price: '50.00' as any }, { price: '30.00' as any }],
+      );
       expect(unitPrice.toString()).toBe('379');
       expect(unitPrice.mul(2).toString()).toBe('758');
     });
 
     it('stays exact on values that float arithmetic would drift on', () => {
-      const unitPrice = service.calculateItemPrice('0.10', [{ price: '0.20' as any }], []);
+      const unitPrice = service.calculateItemPrice(
+        '0.10',
+        [{ price: '0.20' as any }],
+        [],
+      );
       expect(unitPrice.toString()).toBe('0.3');
       expect(unitPrice.mul(3).toString()).toBe('0.9');
     });
@@ -512,19 +656,27 @@ describe('CartService', () => {
     it('does not update a cart line from another session cart', async () => {
       prisma.cartItem.findFirst.mockResolvedValue(null);
 
-      await expect(service.updateItemQuantity(TOKEN, 'ci-foreign', { quantity: 2 })).rejects.toThrow(NotFoundException);
+      await expect(
+        service.updateItemQuantity(TOKEN, 'ci-foreign', { quantity: 2 }),
+      ).rejects.toThrow(NotFoundException);
       expect(prisma.cartItem.update).not.toHaveBeenCalled();
     });
 
     it('does not delete a cart line from another session cart', async () => {
       prisma.cartItem.findFirst.mockResolvedValue(null);
 
-      await expect(service.removeItem(TOKEN, 'ci-foreign')).rejects.toThrow(NotFoundException);
+      await expect(service.removeItem(TOKEN, 'ci-foreign')).rejects.toThrow(
+        NotFoundException,
+      );
       expect(prisma.cartItem.delete).not.toHaveBeenCalled();
     });
 
     it('scopes the lookup to this session cart', async () => {
-      prisma.cartItem.findFirst.mockResolvedValue({ id: 'ci-1', quantity: 1, unitPrice: '379.00' });
+      prisma.cartItem.findFirst.mockResolvedValue({
+        id: 'ci-1',
+        quantity: 1,
+        unitPrice: '379.00',
+      });
       cartRows([]);
 
       await service.removeItem(TOKEN, 'ci-1');
@@ -536,18 +688,36 @@ describe('CartService', () => {
   });
 
   it('removes a line and keeps the remaining ones', async () => {
-    prisma.cartItem.findFirst.mockResolvedValue({ id: 'ci-2', quantity: 1, unitPrice: '329.00' });
-    cartRows([cartRow(), cartRow({ id: 'ci-3', unitPrice: '299.00', totalPrice: '299.00', addonSelections: [] })]);
+    prisma.cartItem.findFirst.mockResolvedValue({
+      id: 'ci-2',
+      quantity: 1,
+      unitPrice: '329.00',
+    });
+    cartRows([
+      cartRow(),
+      cartRow({
+        id: 'ci-3',
+        unitPrice: '299.00',
+        totalPrice: '299.00',
+        addonSelections: [],
+      }),
+    ]);
 
     const cart = await service.removeItem(TOKEN, 'ci-2');
 
-    expect(prisma.cartItem.delete).toHaveBeenCalledWith({ where: { id: 'ci-2' } });
+    expect(prisma.cartItem.delete).toHaveBeenCalledWith({
+      where: { id: 'ci-2' },
+    });
     expect(cart.items.map((i) => i.id)).toEqual(['ci-1', 'ci-3']);
     expect(cart.subtotal).toBe(678);
   });
 
   it('keeps the cart alive and reports a zero subtotal once emptied', async () => {
-    prisma.cartItem.findFirst.mockResolvedValue({ id: 'ci-1', quantity: 1, unitPrice: '379.00' });
+    prisma.cartItem.findFirst.mockResolvedValue({
+      id: 'ci-1',
+      quantity: 1,
+      unitPrice: '379.00',
+    });
     cartRows([]);
 
     const cart = await service.removeItem(TOKEN, 'ci-1');
@@ -562,7 +732,13 @@ describe('CartService', () => {
   it('reports distinct lines and total units separately for the badge', async () => {
     cartRows([
       cartRow({ quantity: 2, totalPrice: '758.00' }),
-      cartRow({ id: 'ci-2', quantity: 3, unitPrice: '299.00', totalPrice: '897.00', addonSelections: [] }),
+      cartRow({
+        id: 'ci-2',
+        quantity: 3,
+        unitPrice: '299.00',
+        totalPrice: '897.00',
+        addonSelections: [],
+      }),
     ]);
 
     const cart = await service.getCart(TOKEN);

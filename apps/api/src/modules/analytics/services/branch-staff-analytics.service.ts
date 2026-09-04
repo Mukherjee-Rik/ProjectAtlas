@@ -83,9 +83,14 @@ export class BranchStaffAnalyticsService {
     });
 
     const branchComparisons = Array.from(branchStats.values()).map((b) => {
-      const aov = b.completedOrders > 0 ? b.grossRevenue / b.completedOrders : 0;
-      const cancellationRate = b.totalOrders > 0 ? (b.cancelledOrders / b.totalOrders) * 100 : 0;
-      const networkShare = totalNetworkRevenue > 0 ? (b.grossRevenue / totalNetworkRevenue) * 100 : 0;
+      const aov =
+        b.completedOrders > 0 ? b.grossRevenue / b.completedOrders : 0;
+      const cancellationRate =
+        b.totalOrders > 0 ? (b.cancelledOrders / b.totalOrders) * 100 : 0;
+      const networkShare =
+        totalNetworkRevenue > 0
+          ? (b.grossRevenue / totalNetworkRevenue) * 100
+          : 0;
 
       return {
         ...b,
@@ -100,11 +105,16 @@ export class BranchStaffAnalyticsService {
     return {
       totalBranches: branches.length,
       totalNetworkRevenue: Math.round(totalNetworkRevenue * 100) / 100,
-      branches: branchComparisons.sort((a, b) => b.grossRevenue - a.grossRevenue),
+      branches: branchComparisons.sort(
+        (a, b) => b.grossRevenue - a.grossRevenue,
+      ),
     };
   }
 
-  async getStaffOperationalAnalytics(restaurantId: string, filter: AnalyticsFilterDto) {
+  async getStaffOperationalAnalytics(
+    restaurantId: string,
+    filter: AnalyticsFilterDto,
+  ) {
     const { start, end } = parseDateBounds(filter.dateFrom, filter.dateTo, 30);
 
     const whereEvents: any = {
@@ -126,7 +136,12 @@ export class BranchStaffAnalyticsService {
 
     const userActivity = new Map<
       string,
-      { ordersHandled: number; completions: number; cancellations: number; totalActions: number }
+      {
+        ordersHandled: number;
+        completions: number;
+        cancellations: number;
+        totalActions: number;
+      }
     >();
 
     events.forEach((ev) => {
@@ -154,19 +169,21 @@ export class BranchStaffAnalyticsService {
 
     const userMap = new Map(users.map((u) => [u.id, u]));
 
-    const staffMetrics = Array.from(userActivity.entries()).map(([userId, stats]) => {
-      const u = userMap.get(userId);
-      return {
-        userId,
-        name: u?.name || 'Staff Member',
-        email: u?.email || 'N/A',
-        role: u?.role || 'STAFF',
-        ordersHandled: stats.ordersHandled,
-        completions: stats.completions,
-        cancellations: stats.cancellations,
-        totalActions: stats.totalActions,
-      };
-    });
+    const staffMetrics = Array.from(userActivity.entries()).map(
+      ([userId, stats]) => {
+        const u = userMap.get(userId);
+        return {
+          userId,
+          name: u?.name || 'Staff Member',
+          email: u?.email || 'N/A',
+          role: u?.role || 'STAFF',
+          ordersHandled: stats.ordersHandled,
+          completions: stats.completions,
+          cancellations: stats.cancellations,
+          totalActions: stats.totalActions,
+        };
+      },
+    );
 
     return {
       activeStaffCount: staffMetrics.length,

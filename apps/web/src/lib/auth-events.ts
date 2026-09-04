@@ -1,4 +1,5 @@
-export const AUTH_UNAUTHORIZED_EVENT = 'atlas:auth:unauthorized';
+export const AUTH_UNAUTHORIZED_EVENT = 'kafei:auth:unauthorized';
+export const LEGACY_AUTH_UNAUTHORIZED_EVENT = 'atlas:auth:unauthorized';
 
 export function emitUnauthorizedEvent() {
   if (typeof window === 'undefined') {
@@ -6,6 +7,7 @@ export function emitUnauthorizedEvent() {
   }
 
   window.dispatchEvent(new Event(AUTH_UNAUTHORIZED_EVENT));
+  window.dispatchEvent(new Event(LEGACY_AUTH_UNAUTHORIZED_EVENT));
 }
 
 export function onUnauthorizedEvent(callback: () => void) {
@@ -14,7 +16,9 @@ export function onUnauthorizedEvent(callback: () => void) {
   }
 
   window.addEventListener(AUTH_UNAUTHORIZED_EVENT, callback);
+  window.addEventListener(LEGACY_AUTH_UNAUTHORIZED_EVENT, callback);
   return () => {
     window.removeEventListener(AUTH_UNAUTHORIZED_EVENT, callback);
+    window.removeEventListener(LEGACY_AUTH_UNAUTHORIZED_EVENT, callback);
   };
 }

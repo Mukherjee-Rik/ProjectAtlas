@@ -69,7 +69,7 @@ describe('TenantMembershipsService', () => {
     const result = await service.create({
       userId: 'u-1',
       tenantId: 't-1',
-      role: 'USER' as any,
+      role: 'USER',
     });
 
     expect(result).toEqual(mockMembership);

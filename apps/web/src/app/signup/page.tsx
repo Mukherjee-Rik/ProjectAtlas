@@ -314,7 +314,7 @@ export default function SignupPage() {
             </div>
 
             {resendMessage && (
-              <div className="flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs text-emerald-400">
+              <div className="flex items-center gap-2 rounded-xl border border-atlas-success/30 bg-atlas-success/10 p-3 text-xs text-atlas-success">
                 <CheckCircle2 className="h-4 w-4 shrink-0" />
                 <span>{resendMessage}</span>
               </div>
@@ -511,7 +511,14 @@ export default function SignupPage() {
                   className="mt-0.5 rounded border-border bg-secondary text-primary focus:ring-primary"
                 />
                 <label htmlFor="terms" className="text-xs text-muted-foreground leading-relaxed cursor-pointer">
-                  I agree to Atlas's <span className="text-primary underline">Terms & Conditions</span> and Privacy Policy.
+                  I agree to Kafei&apos;s{' '}
+                  <Link href="/terms" target="_blank" className="text-primary underline font-medium hover:text-primary-hover">
+                    Terms of Service
+                  </Link>{' '}
+                  and{' '}
+                  <Link href="/privacy" target="_blank" className="text-primary underline font-medium hover:text-primary-hover">
+                    Privacy Policy
+                  </Link>.
                 </label>
               </div>
               {errors.terms && (

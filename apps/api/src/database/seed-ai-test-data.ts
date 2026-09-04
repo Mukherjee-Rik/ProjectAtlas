@@ -1,7 +1,12 @@
 import 'dotenv/config';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '../generated/prisma/client';
-import { OrderStatus, PaymentMethod, PaymentStatus, OrderSource } from '../generated/prisma/enums';
+import {
+  OrderStatus,
+  PaymentMethod,
+  PaymentStatus,
+  OrderSource,
+} from '../generated/prisma/enums';
 
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL,
@@ -17,11 +22,10 @@ function sample<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-async function seedOrdersForRestaurant(
-  restaurant: any,
-  daysBack: number,
-) {
-  console.log(`\n📦 Generating realistic orders (last ${daysBack} days including Today) for: ${restaurant.name} (${restaurant.slug})`);
+async function seedOrdersForRestaurant(restaurant: any, daysBack: number) {
+  console.log(
+    `\n📦 Generating realistic orders (last ${daysBack} days including Today) for: ${restaurant.name} (${restaurant.slug})`,
+  );
 
   const branch = restaurant.branches[0];
   if (!branch) {
@@ -51,7 +55,9 @@ async function seedOrdersForRestaurant(
           tableId: table.id,
           sessionToken: `sess_${restaurant.slug}_${Date.now()}_${i}_${Math.random().toString(36).substring(7)}`,
           status: 'ENDED',
-          startedAt: new Date(Date.now() - randomBetween(1, daysBack) * 86400000),
+          startedAt: new Date(
+            Date.now() - randomBetween(1, daysBack) * 86400000,
+          ),
           endedAt: new Date(),
         },
       });
@@ -77,7 +83,9 @@ async function seedOrdersForRestaurant(
 
   for (let d = 0; d <= daysBack; d++) {
     // Orders per day: Today gets 6-8 orders; recent days get 4-7; older days get 3-5
-    const isWeekend = (new Date(Date.now() - d * 86400000).getDay() === 0 || new Date(Date.now() - d * 86400000).getDay() === 6);
+    const isWeekend =
+      new Date(Date.now() - d * 86400000).getDay() === 0 ||
+      new Date(Date.now() - d * 86400000).getDay() === 6;
     let dailyCount = isWeekend ? randomBetween(5, 8) : randomBetween(3, 6);
     if (d === 0) dailyCount = randomBetween(6, 9); // Today
 
@@ -90,7 +98,8 @@ async function seedOrdersForRestaurant(
       baseDate.setHours(hour, minute, randomBetween(0, 59), 0);
 
       const table: any = tables.length > 0 ? sample(tables) : null;
-      const customerSessionId = customerSessionIds.length > 0 ? sample(customerSessionIds) : null;
+      const customerSessionId =
+        customerSessionIds.length > 0 ? sample(customerSessionIds) : null;
 
       // Status
       let status: OrderStatus = OrderStatus.COMPLETED;
@@ -139,12 +148,20 @@ async function seedOrdersForRestaurant(
 
       if (chosenItems.length === 0) continue;
 
-      const subtotal = chosenItems.reduce((sum, item) => sum + item.totalPrice, 0);
+      const subtotal = chosenItems.reduce(
+        (sum, item) => sum + item.totalPrice,
+        0,
+      );
       const taxAmount = Math.round(subtotal * 0.05 * 100) / 100;
-      const discountAmount = Math.random() < 0.15 ? Math.round(subtotal * 0.1 * 100) / 100 : 0;
-      const totalAmount = Math.round((subtotal + taxAmount - discountAmount) * 100) / 100;
+      const discountAmount =
+        Math.random() < 0.15 ? Math.round(subtotal * 0.1 * 100) / 100 : 0;
+      const totalAmount =
+        Math.round((subtotal + taxAmount - discountAmount) * 100) / 100;
 
-      const randSuffix = Math.random().toString(36).substring(2, 6).toUpperCase();
+      const randSuffix = Math.random()
+        .toString(36)
+        .substring(2, 6)
+        .toUpperCase();
       const orderNumber = `ORD-${restaurant.slug.substring(0, 3).toUpperCase()}-${String(orderIndex).padStart(4, '0')}-${randSuffix}`;
       orderIndex++;
 
@@ -222,7 +239,9 @@ async function seedOrdersForRestaurant(
 }
 
 async function main() {
-  console.log('🚀 Seeding Comprehensive AI Test Orders (Past 30 Days + Today + Yesterday)...\n');
+  console.log(
+    '🚀 Seeding Comprehensive AI Test Orders (Past 30 Days + Today + Yesterday)...\n',
+  );
 
   // Clear existing orders to avoid overlap
   await prisma.refund.deleteMany({});

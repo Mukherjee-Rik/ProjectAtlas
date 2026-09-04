@@ -21,9 +21,17 @@ export class MetricsService {
   private totalErrors5xx = 0;
   private recentRequestsInLastMinute: number[] = [];
 
-  private readonly endpointMap = new Map<string, { requests: number; errors: number; latencies: number[] }>();
+  private readonly endpointMap = new Map<
+    string,
+    { requests: number; errors: number; latencies: number[] }
+  >();
 
-  recordRequest(method: string, path: string, statusCode: number, durationMs: number) {
+  recordRequest(
+    method: string,
+    path: string,
+    statusCode: number,
+    durationMs: number,
+  ) {
     const now = Date.now();
     this.totalRequests++;
 
@@ -42,7 +50,10 @@ export class MetricsService {
     // Rolling 1-minute throughput window
     this.recentRequestsInLastMinute.push(now);
     const oneMinAgo = now - 60000;
-    while (this.recentRequestsInLastMinute.length > 0 && this.recentRequestsInLastMinute[0] < oneMinAgo) {
+    while (
+      this.recentRequestsInLastMinute.length > 0 &&
+      this.recentRequestsInLastMinute[0] < oneMinAgo
+    ) {
       this.recentRequestsInLastMinute.shift();
     }
 
@@ -70,10 +81,16 @@ export class MetricsService {
     const p50 = count > 0 ? sortedLatencies[Math.floor(count * 0.5)] : 0;
     const p95 = count > 0 ? sortedLatencies[Math.floor(count * 0.95)] : 0;
     const p99 = count > 0 ? sortedLatencies[Math.floor(count * 0.99)] : 0;
-    const avgLatency = count > 0 ? Math.round(sortedLatencies.reduce((a, b) => a + b, 0) / count) : 0;
+    const avgLatency =
+      count > 0
+        ? Math.round(sortedLatencies.reduce((a, b) => a + b, 0) / count)
+        : 0;
 
     const totalErrors = this.totalErrors4xx + this.totalErrors5xx;
-    const errorRatePercent = this.totalRequests > 0 ? ((totalErrors / this.totalRequests) * 100).toFixed(2) : '0.00';
+    const errorRatePercent =
+      this.totalRequests > 0
+        ? ((totalErrors / this.totalRequests) * 100).toFixed(2)
+        : '0.00';
     const requestsPerMinute = this.recentRequestsInLastMinute.length;
 
     return {
@@ -112,8 +129,12 @@ export class MetricsService {
     for (const [key, data] of this.endpointMap.entries()) {
       const [method, path] = key.split(' ');
       const sorted = [...data.latencies].sort((a, b) => a - b);
-      const p95 = sorted.length > 0 ? sorted[Math.floor(sorted.length * 0.95)] : 0;
-      const avg = sorted.length > 0 ? Math.round(sorted.reduce((a, b) => a + b, 0) / sorted.length) : 0;
+      const p95 =
+        sorted.length > 0 ? sorted[Math.floor(sorted.length * 0.95)] : 0;
+      const avg =
+        sorted.length > 0
+          ? Math.round(sorted.reduce((a, b) => a + b, 0) / sorted.length)
+          : 0;
 
       result.push({
         method,
@@ -125,6 +146,8 @@ export class MetricsService {
       });
     }
 
-    return result.sort((a, b) => b.totalRequests - a.totalRequests).slice(0, 10);
+    return result
+      .sort((a, b) => b.totalRequests - a.totalRequests)
+      .slice(0, 10);
   }
 }

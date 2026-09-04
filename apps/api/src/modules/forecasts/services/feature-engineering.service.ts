@@ -52,10 +52,18 @@ export class FeatureEngineeringService {
     });
 
     // Map by YYYY-MM-DD
-    const dateMap = new Map<string, { gross: number; net: number; orders: number; aov: number }>();
+    const dateMap = new Map<
+      string,
+      { gross: number; net: number; orders: number; aov: number }
+    >();
     aggregates.forEach((a) => {
       const key = a.date.toISOString().slice(0, 10);
-      const existing = dateMap.get(key) || { gross: 0, net: 0, orders: 0, aov: 0 };
+      const existing = dateMap.get(key) || {
+        gross: 0,
+        net: 0,
+        orders: 0,
+        aov: 0,
+      };
       existing.gross += Number(a.grossSales);
       existing.net += Number(a.netSales);
       existing.orders += a.totalOrders;
@@ -82,23 +90,41 @@ export class FeatureEngineeringService {
 
       orders.forEach((o) => {
         const key = o.createdAt.toISOString().slice(0, 10);
-        const existing = dateMap.get(key) || { gross: 0, net: 0, orders: 0, aov: 0 };
+        const existing = dateMap.get(key) || {
+          gross: 0,
+          net: 0,
+          orders: 0,
+          aov: 0,
+        };
         const gross = Number(o.totalAmount);
         const net = Number(o.subtotal) - Number(o.discountAmount);
         existing.gross += gross;
         existing.net += net;
         existing.orders += 1;
-        existing.aov = existing.orders > 0 ? existing.gross / existing.orders : 0;
+        existing.aov =
+          existing.orders > 0 ? existing.gross / existing.orders : 0;
         dateMap.set(key, existing);
       });
     }
 
     // Build continuous daily sequence
-    const continuousDays: Array<{ dateStr: string; dateObj: Date; gross: number; net: number; orders: number; aov: number }> = [];
+    const continuousDays: Array<{
+      dateStr: string;
+      dateObj: Date;
+      gross: number;
+      net: number;
+      orders: number;
+      aov: number;
+    }> = [];
     const cur = new Date(startDate);
     while (cur < endDate) {
       const dateStr = cur.toISOString().slice(0, 10);
-      const val = dateMap.get(dateStr) || { gross: 0, net: 0, orders: 0, aov: 0 };
+      const val = dateMap.get(dateStr) || {
+        gross: 0,
+        net: 0,
+        orders: 0,
+        aov: 0,
+      };
       continuousDays.push({
         dateStr,
         dateObj: new Date(cur),
@@ -128,12 +154,23 @@ export class FeatureEngineeringService {
       const past7Sales = past7.map((p) => p.gross);
       const past7Orders = past7.map((p) => p.orders);
 
-      const r7MeanSales = past7Sales.length > 0 ? past7Sales.reduce((a, b) => a + b, 0) / past7Sales.length : 0;
-      const r7MeanOrders = past7Orders.length > 0 ? past7Orders.reduce((a, b) => a + b, 0) / past7Orders.length : 0;
+      const r7MeanSales =
+        past7Sales.length > 0
+          ? past7Sales.reduce((a, b) => a + b, 0) / past7Sales.length
+          : 0;
+      const r7MeanOrders =
+        past7Orders.length > 0
+          ? past7Orders.reduce((a, b) => a + b, 0) / past7Orders.length
+          : 0;
 
-      const variance = past7Sales.length > 1
-        ? past7Sales.reduce((sum, val) => sum + Math.pow(val - r7MeanSales, 2), 0) / (past7Sales.length - 1)
-        : 0;
+      const variance =
+        past7Sales.length > 1
+          ? past7Sales.reduce(
+              (sum, val) => sum + Math.pow(val - r7MeanSales, 2),
+              0,
+            ) /
+            (past7Sales.length - 1)
+          : 0;
       const r7StdSales = Math.sqrt(variance);
 
       featureVectors.push({

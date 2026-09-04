@@ -9,7 +9,12 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiHeader,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import {
   SupportService,
   CreateSupportTicketDto,
@@ -34,7 +39,9 @@ export class SupportController {
   @ApiOperation({ summary: 'Submit public contact / talk-to-us inquiry' })
   async submitContactInquiry(@Body() dto: ContactInquiryDto) {
     if (!dto.name || !dto.email || !dto.phone || !dto.message) {
-      throw new BadRequestException('Name, email, phone number, and message are required');
+      throw new BadRequestException(
+        'Name, email, phone number, and message are required',
+      );
     }
     return this.supportService.handleContactInquiry(dto);
   }
@@ -88,6 +95,11 @@ export class SupportController {
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: ResolveSupportTicketDto,
   ) {
-    return this.supportService.resolveTicketForUser(ticketId, user.id, user.role, dto);
+    return this.supportService.resolveTicketForUser(
+      ticketId,
+      user.id,
+      user.role,
+      dto,
+    );
   }
 }

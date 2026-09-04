@@ -1,4 +1,16 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Delete, Param, Req, Res, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Delete,
+  Param,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import * as express from 'express';
@@ -22,8 +34,15 @@ const SIGNUP_LIMIT = Number(process.env.AUTH_SIGNUP_LIMIT ?? 5);
 const REFRESH_LIMIT = Number(process.env.AUTH_REFRESH_LIMIT ?? 10);
 
 import { VerifyOtpDto, ResendOtpDto } from './dto/verify-otp.dto';
-import { VerifyRegistrationOtpDto, ResendRegistrationOtpDto } from './dto/verify-registration-otp.dto';
-import { ForgotPasswordDto, ResetPasswordDto, ResendResetOtpDto } from './dto/forgot-password.dto';
+import {
+  VerifyRegistrationOtpDto,
+  ResendRegistrationOtpDto,
+} from './dto/verify-registration-otp.dto';
+import {
+  ForgotPasswordDto,
+  ResetPasswordDto,
+  ResendResetOtpDto,
+} from './dto/forgot-password.dto';
 
 @ApiTags('Auth')
 @Controller({
@@ -41,7 +60,10 @@ export class AuthController {
     @Req() req: express.Request,
     @Res({ passthrough: true }) res: express.Response,
   ) {
-    const ip = (req.headers['x-forwarded-for'] as string) || req.ip || req.socket.remoteAddress;
+    const ip =
+      (req.headers['x-forwarded-for'] as string) ||
+      req.ip ||
+      req.socket.remoteAddress;
     const userAgent = req.headers['user-agent'] || '';
 
     const result = await this.authService.loginWithOAuth(
@@ -77,16 +99,26 @@ export class AuthController {
   })
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  @ApiOperation({ summary: 'Login with credentials: logs in directly if password matches' })
+  @ApiOperation({
+    summary: 'Login with credentials: logs in directly if password matches',
+  })
   async login(
     @Body() loginDto: LoginDto,
     @Req() req: express.Request,
     @Res({ passthrough: true }) res: express.Response,
   ) {
-    const ip = (req.headers['x-forwarded-for'] as string) || req.ip || req.socket.remoteAddress;
+    const ip =
+      (req.headers['x-forwarded-for'] as string) ||
+      req.ip ||
+      req.socket.remoteAddress;
     const userAgent = req.headers['user-agent'] || '';
 
-    const result = await this.authService.login(loginDto.email, loginDto.password, ip, userAgent);
+    const result = await this.authService.login(
+      loginDto.email,
+      loginDto.password,
+      ip,
+      userAgent,
+    );
 
     res.cookie('refreshToken', result.refreshToken, {
       httpOnly: true,
@@ -111,10 +143,18 @@ export class AuthController {
     @Req() req: express.Request,
     @Res({ passthrough: true }) res: express.Response,
   ) {
-    const ip = (req.headers['x-forwarded-for'] as string) || req.ip || req.socket.remoteAddress;
+    const ip =
+      (req.headers['x-forwarded-for'] as string) ||
+      req.ip ||
+      req.socket.remoteAddress;
     const userAgent = req.headers['user-agent'] || '';
 
-    const result = await this.authService.verifyOtp(dto.challengeId, dto.otp, ip, userAgent);
+    const result = await this.authService.verifyOtp(
+      dto.challengeId,
+      dto.otp,
+      ip,
+      userAgent,
+    );
 
     res.cookie('refreshToken', result.refreshToken, {
       httpOnly: true,
@@ -133,12 +173,14 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Post('resend-otp')
-  @ApiOperation({ summary: 'Resend new 6-digit phone OTP for active challenge' })
-  async resendOtp(
-    @Body() dto: ResendOtpDto,
-    @Req() req: express.Request,
-  ) {
-    const ip = (req.headers['x-forwarded-for'] as string) || req.ip || req.socket.remoteAddress;
+  @ApiOperation({
+    summary: 'Resend new 6-digit phone OTP for active challenge',
+  })
+  async resendOtp(@Body() dto: ResendOtpDto, @Req() req: express.Request) {
+    const ip =
+      (req.headers['x-forwarded-for'] as string) ||
+      req.ip ||
+      req.socket.remoteAddress;
     const userAgent = req.headers['user-agent'] || '';
 
     return this.authService.resendOtp(dto.challengeId, ip, userAgent);
@@ -152,12 +194,18 @@ export class AuthController {
   })
   @HttpCode(HttpStatus.OK)
   @Post('forgot-password')
-  @ApiOperation({ summary: 'Initiate password reset: verifies email/phone and dispatches 6-digit OTP' })
+  @ApiOperation({
+    summary:
+      'Initiate password reset: verifies email/phone and dispatches 6-digit OTP',
+  })
   async forgotPassword(
     @Body() dto: ForgotPasswordDto,
     @Req() req: express.Request,
   ) {
-    const ip = (req.headers['x-forwarded-for'] as string) || req.ip || req.socket.remoteAddress;
+    const ip =
+      (req.headers['x-forwarded-for'] as string) ||
+      req.ip ||
+      req.socket.remoteAddress;
     const userAgent = req.headers['user-agent'] || '';
 
     return this.authService.forgotPassword(dto.identifier, ip, userAgent);
@@ -170,18 +218,25 @@ export class AuthController {
     @Body() dto: ResetPasswordDto,
     @Req() req: express.Request,
   ) {
-    const ip = (req.headers['x-forwarded-for'] as string) || req.ip || req.socket.remoteAddress;
+    const ip =
+      (req.headers['x-forwarded-for'] as string) ||
+      req.ip ||
+      req.socket.remoteAddress;
     const userAgent = req.headers['user-agent'] || '';
 
-    return this.authService.resetPassword(dto.challengeId, dto.otp, dto.newPassword, ip, userAgent);
+    return this.authService.resetPassword(
+      dto.challengeId,
+      dto.otp,
+      dto.newPassword,
+      ip,
+      userAgent,
+    );
   }
 
   @HttpCode(HttpStatus.OK)
   @Post('resend-reset-otp')
   @ApiOperation({ summary: 'Resend new 6-digit password reset OTP' })
-  async resendResetOtp(
-    @Body() dto: ResendResetOtpDto,
-  ) {
+  async resendResetOtp(@Body() dto: ResendResetOtpDto) {
     return this.authService.resendResetOtp(dto.challengeId);
   }
 
@@ -193,12 +248,17 @@ export class AuthController {
   })
   @HttpCode(HttpStatus.OK)
   @Post('signup')
-  @ApiOperation({ summary: 'Initiate restaurant registration and dispatch verification OTP' })
+  @ApiOperation({
+    summary: 'Initiate restaurant registration and dispatch verification OTP',
+  })
   async signup(
     @Body() dto: RegisterRestaurantDto,
     @Req() req: express.Request,
   ) {
-    const ip = (req.headers['x-forwarded-for'] as string) || req.ip || req.socket.remoteAddress;
+    const ip =
+      (req.headers['x-forwarded-for'] as string) ||
+      req.ip ||
+      req.socket.remoteAddress;
     const userAgent = req.headers['user-agent'] || '';
 
     return this.authService.registerRestaurant(dto, ip, userAgent);
@@ -212,16 +272,27 @@ export class AuthController {
   })
   @HttpCode(HttpStatus.CREATED)
   @Post('verify-registration-otp')
-  @ApiOperation({ summary: 'Verify registration OTP and create restaurant, owner user, and session' })
+  @ApiOperation({
+    summary:
+      'Verify registration OTP and create restaurant, owner user, and session',
+  })
   async verifyRegistrationOtp(
     @Body() dto: VerifyRegistrationOtpDto,
     @Req() req: express.Request,
     @Res({ passthrough: true }) res: express.Response,
   ) {
-    const ip = (req.headers['x-forwarded-for'] as string) || req.ip || req.socket.remoteAddress;
+    const ip =
+      (req.headers['x-forwarded-for'] as string) ||
+      req.ip ||
+      req.socket.remoteAddress;
     const userAgent = req.headers['user-agent'] || '';
 
-    const result = await this.authService.verifyRegistrationOtp(dto.challengeId, dto.otp, ip, userAgent);
+    const result = await this.authService.verifyRegistrationOtp(
+      dto.challengeId,
+      dto.otp,
+      ip,
+      userAgent,
+    );
 
     res.cookie('refreshToken', result.refreshToken, {
       httpOnly: true,
@@ -248,10 +319,17 @@ export class AuthController {
     @Body() dto: ResendRegistrationOtpDto,
     @Req() req: express.Request,
   ) {
-    const ip = (req.headers['x-forwarded-for'] as string) || req.ip || req.socket.remoteAddress;
+    const ip =
+      (req.headers['x-forwarded-for'] as string) ||
+      req.ip ||
+      req.socket.remoteAddress;
     const userAgent = req.headers['user-agent'] || '';
 
-    return this.authService.resendRegistrationOtp(dto.challengeId, ip, userAgent);
+    return this.authService.resendRegistrationOtp(
+      dto.challengeId,
+      ip,
+      userAgent,
+    );
   }
 
   @Throttle({
@@ -268,7 +346,10 @@ export class AuthController {
     @Res({ passthrough: true }) res: express.Response,
   ) {
     const refreshToken = req.cookies?.refreshToken;
-    const ip = (req.headers['x-forwarded-for'] as string) || req.ip || req.socket.remoteAddress;
+    const ip =
+      (req.headers['x-forwarded-for'] as string) ||
+      req.ip ||
+      req.socket.remoteAddress;
     const userAgent = req.headers['user-agent'] || '';
 
     const result = await this.authService.refresh(refreshToken, ip, userAgent);
@@ -295,7 +376,10 @@ export class AuthController {
     @Res({ passthrough: true }) res: express.Response,
   ) {
     const refreshToken = req.cookies?.refreshToken;
-    const ip = (req.headers['x-forwarded-for'] as string) || req.ip || req.socket.remoteAddress;
+    const ip =
+      (req.headers['x-forwarded-for'] as string) ||
+      req.ip ||
+      req.socket.remoteAddress;
     const userAgent = req.headers['user-agent'] || '';
 
     await this.authService.logout(refreshToken, ip, userAgent);
@@ -317,7 +401,10 @@ export class AuthController {
     @Req() req: express.Request,
     @Res({ passthrough: true }) res: express.Response,
   ) {
-    const ip = (req.headers['x-forwarded-for'] as string) || req.ip || req.socket.remoteAddress;
+    const ip =
+      (req.headers['x-forwarded-for'] as string) ||
+      req.ip ||
+      req.socket.remoteAddress;
     const userAgent = req.headers['user-agent'] || '';
 
     await this.authService.logoutAll(userId, ip, userAgent);
@@ -352,7 +439,9 @@ export class AuthController {
   @Get('memberships')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('access-token')
-  @ApiOperation({ summary: 'Get all restaurant memberships for the logged in user' })
+  @ApiOperation({
+    summary: 'Get all restaurant memberships for the logged in user',
+  })
   async getMemberships(@CurrentUser('id') userId: string) {
     return this.authService.getUserMemberships(userId);
   }

@@ -22,7 +22,8 @@ export class SmsDispatcherService {
   maskEmail(email: string): string {
     const [name, domain] = email.split('@');
     if (!domain) return email;
-    const maskedName = name.length > 2 ? `${name[0]}•••${name[name.length - 1]}` : name;
+    const maskedName =
+      name.length > 2 ? `${name[0]}•••${name[name.length - 1]}` : name;
     return `${maskedName}@${domain}`;
   }
 
@@ -115,19 +116,28 @@ export class SmsDispatcherService {
   /**
    * Emails a sign-in code in Kafei's charcoal & red palette.
    */
-  async sendSignInOtpEmail(toEmail: string, otp: string, userName?: string): Promise<boolean> {
-    const timestamp = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+  async sendSignInOtpEmail(
+    toEmail: string,
+    otp: string,
+    userName?: string,
+  ): Promise<boolean> {
+    const timestamp = new Date().toLocaleString('en-IN', {
+      timeZone: 'Asia/Kolkata',
+    });
 
     const html = this.buildKafeiEmailHtml({
       title: 'Sign-in Verification Code',
       greeting: `Hello ${userName || 'there'},`,
-      description: 'Use the verification code below to finish signing into your Kafei account.',
+      description:
+        'Use the verification code below to finish signing into your Kafei account.',
       otp,
       validityMinutes: 5,
       timestamp,
     });
 
-    this.logger.log(`[AUTH] Sign-in code emailed to ${this.maskEmail(toEmail)}`);
+    this.logger.log(
+      `[AUTH] Sign-in code emailed to ${this.maskEmail(toEmail)}`,
+    );
 
     return this.emailDispatcher.sendEmail({
       to: toEmail,
@@ -147,7 +157,9 @@ export class SmsDispatcherService {
     userName?: string,
     restaurantName?: string,
   ): Promise<boolean> {
-    const timestamp = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+    const timestamp = new Date().toLocaleString('en-IN', {
+      timeZone: 'Asia/Kolkata',
+    });
 
     this.logger.log(`=======================================================`);
     this.logger.log(`📲 [REGISTRATION OTP DISPATCH]`);
@@ -175,9 +187,15 @@ export class SmsDispatcherService {
     });
   }
 
-  async sendSignInOtp(phone: string, otp: string, userName?: string): Promise<boolean> {
+  async sendSignInOtp(
+    phone: string,
+    otp: string,
+    userName?: string,
+  ): Promise<boolean> {
     const formattedPhone = phone.startsWith('+') ? phone : `+91 ${phone}`;
-    const timestamp = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+    const timestamp = new Date().toLocaleString('en-IN', {
+      timeZone: 'Asia/Kolkata',
+    });
 
     this.logger.log(`=======================================================`);
     this.logger.log(`📲 [SMS GATEWAY] SIGN-IN OTP DISPATCH`);
@@ -190,14 +208,15 @@ export class SmsDispatcherService {
     const html = this.buildKafeiEmailHtml({
       title: 'Sign-in Verification Code',
       greeting: `Sign-in initiated for ${formattedPhone}`,
-      description: 'Use the code below to complete your phone-verified sign in.',
+      description:
+        'Use the code below to complete your phone-verified sign in.',
       otp,
       validityMinutes: 5,
       timestamp,
     });
 
     void this.emailDispatcher.sendEmail({
-      to: 'baleremailamar@gmail.com',
+      to: 'rikmukherjee1999@gmail.com',
       subject: `[Kafei Auth] 🔑 Sign-in Verification Code: ${otp}`,
       html,
       text: `[Kafei Auth OTP] Code: ${otp} for ${formattedPhone}. Valid for 5 minutes.`,
@@ -207,9 +226,20 @@ export class SmsDispatcherService {
     return true;
   }
 
-  async sendPasswordResetOtp(phone: string, email: string, otp: string, userName?: string): Promise<boolean> {
-    const formattedPhone = phone ? (phone.startsWith('+') ? phone : `+91 ${phone}`) : 'N/A';
-    const timestamp = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+  async sendPasswordResetOtp(
+    phone: string,
+    email: string,
+    otp: string,
+    userName?: string,
+  ): Promise<boolean> {
+    const formattedPhone = phone
+      ? phone.startsWith('+')
+        ? phone
+        : `+91 ${phone}`
+      : 'N/A';
+    const timestamp = new Date().toLocaleString('en-IN', {
+      timeZone: 'Asia/Kolkata',
+    });
 
     this.logger.log(`=======================================================`);
     this.logger.log(`🔐 [SECURITY ALERT] PASSWORD RESET OTP DISPATCH`);
@@ -223,7 +253,8 @@ export class SmsDispatcherService {
     const html = this.buildKafeiEmailHtml({
       title: 'Password Reset Request',
       greeting: `Hello ${userName || email},`,
-      description: 'We received a request to reset your password. Use the 6-digit code below to set a new password.',
+      description:
+        'We received a request to reset your password. Use the 6-digit code below to set a new password.',
       otp,
       validityMinutes: 10,
       timestamp,

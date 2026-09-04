@@ -277,7 +277,7 @@ export default function TableQrsDashboard() {
                             dangerouslySetInnerHTML={{ __html: table.qrCodeSvg }}
                           />
                         ) : (
-                          <div className="text-[10px] text-gray-400 animate-pulse">
+                          <div className="text-[10px] text-muted-foreground animate-pulse">
                             Loading QR…
                           </div>
                         )}

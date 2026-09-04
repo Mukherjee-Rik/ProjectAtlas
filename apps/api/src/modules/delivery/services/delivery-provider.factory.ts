@@ -17,7 +17,9 @@ export class DeliveryProviderFactory {
       case 'PROVIDER_B':
         return this.providerB;
       default:
-        throw new BadRequestException(`Unsupported delivery provider: ${providerName}`);
+        throw new BadRequestException(
+          `Unsupported delivery provider: ${providerName}`,
+        );
     }
   }
 }

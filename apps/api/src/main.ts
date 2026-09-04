@@ -106,10 +106,20 @@ async function bootstrap() {
 
   // Fast root & health routes for platform healthchecks
   const httpAdapter = app.getHttpAdapter().getInstance();
-  httpAdapter.get('/health', (_req: any, res: any) => res.status(200).json({ status: 'ok', uptime: process.uptime() }));
-  httpAdapter.get('/api/health', (_req: any, res: any) => res.status(200).json({ status: 'ok', uptime: process.uptime() }));
-  httpAdapter.get('/api', (_req: any, res: any) => res.status(200).json({ status: 'ok', message: 'Project Atlas API is live' }));
-  httpAdapter.get('/', (_req: any, res: any) => res.status(200).send('Project Atlas API is running'));
+  httpAdapter.get('/health', (_req: any, res: any) =>
+    res.status(200).json({ status: 'ok', uptime: process.uptime() }),
+  );
+  httpAdapter.get('/api/health', (_req: any, res: any) =>
+    res.status(200).json({ status: 'ok', uptime: process.uptime() }),
+  );
+  httpAdapter.get('/api', (_req: any, res: any) =>
+    res
+      .status(200)
+      .json({ status: 'ok', message: 'Project Atlas API is live' }),
+  );
+  httpAdapter.get('/', (_req: any, res: any) =>
+    res.status(200).send('Project Atlas API is running'),
+  );
 
   await app.listen(port, '0.0.0.0');
   console.log(`Atlas API running on port ${port}`);

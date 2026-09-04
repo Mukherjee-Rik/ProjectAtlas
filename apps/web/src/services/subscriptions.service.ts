@@ -87,3 +87,10 @@ export async function updateSubscriptionStatus(
 export async function upgradeSubscription(planId: string) {
   return apiClient.post<ApiResponse<Subscription>>('/subscriptions/upgrade', { planId });
 }
+
+export async function cancelSubscription(reason?: string) {
+  return apiClient.post<ApiResponse<{ subscription: Subscription; message: string; effectiveUntil: string }>>(
+    '/subscriptions/cancel',
+    { reason },
+  );
+}

@@ -1,4 +1,8 @@
-import { ConflictException, ForbiddenException, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { BranchesService } from './branches.service';
 import { PrismaService } from '../../database/prisma/prisma.service';
@@ -32,7 +36,10 @@ describe('BranchesService', () => {
       providers: [
         BranchesService,
         { provide: PrismaService, useValue: prismaService },
-        { provide: SubscriptionUsageService, useValue: mockSubscriptionUsageService },
+        {
+          provide: SubscriptionUsageService,
+          useValue: mockSubscriptionUsageService,
+        },
       ],
     }).compile();
 
@@ -56,8 +63,14 @@ describe('BranchesService', () => {
   });
 
   it('create should throw ConflictException if duplicate code for same restaurant', async () => {
-    prismaService.restaurant.findFirst.mockResolvedValue({ id: 'rest-a', tenantId: 'tenant-a' });
-    prismaService.branch.findUnique.mockResolvedValue({ id: 'b-1', code: 'AGT-01' });
+    prismaService.restaurant.findFirst.mockResolvedValue({
+      id: 'rest-a',
+      tenantId: 'tenant-a',
+    });
+    prismaService.branch.findUnique.mockResolvedValue({
+      id: 'b-1',
+      code: 'AGT-01',
+    });
 
     await expect(
       service.create('tenant-a', {
@@ -69,7 +82,10 @@ describe('BranchesService', () => {
   });
 
   it('create should create branch when valid', async () => {
-    prismaService.restaurant.findFirst.mockResolvedValue({ id: 'rest-a', tenantId: 'tenant-a' });
+    prismaService.restaurant.findFirst.mockResolvedValue({
+      id: 'rest-a',
+      tenantId: 'tenant-a',
+    });
     prismaService.branch.findUnique.mockResolvedValue(null);
     const mockBranch = {
       id: 'b-1',

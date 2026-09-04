@@ -106,6 +106,7 @@
   --color-surface: var(--surface);
   --color-elevated: var(--surface-elevated);
   --color-atlas-border: var(--border-color);
+  --color-kafei-border: var(--border-color);
   --color-mint: var(--primary-mint);
   --color-mint-hover: var(--primary-mint-hover);
   --color-text-muted: var(--text-muted);
@@ -113,6 +114,10 @@
   --color-atlas-warning: var(--color-warning);
   --color-atlas-error: var(--color-error);
   --color-atlas-info: var(--color-info);
+  --color-kafei-success: var(--color-success);
+  --color-kafei-warning: var(--color-warning);
+  --color-kafei-error: var(--color-error);
+  --color-kafei-info: var(--color-info);
 
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
@@ -195,7 +200,13 @@ body {
   100% { background-position: 200% 0; }
 }
 
-.atlas-skeleton {
+@keyframes kafei-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.atlas-skeleton,
+.kafei-skeleton {
   background-image: linear-gradient(
     90deg,
     var(--surface-elevated) 25%,
@@ -203,7 +214,7 @@ body {
     var(--surface-elevated) 75%
   );
   background-size: 200% 100%;
-  animation: atlas-shimmer 1.4s ease-in-out infinite;
+  animation: kafei-shimmer 1.4s ease-in-out infinite;
 }
 
 /* ---------------------------------------------------------------------------
@@ -413,33 +424,39 @@ select:disabled,
 .atlas-theme-icon,
 .atlas-theme-cut,
 .atlas-theme-disc,
-.atlas-theme-rays {
+.atlas-theme-rays,
+.kafei-theme-icon,
+.kafei-theme-cut,
+.kafei-theme-disc,
+.kafei-theme-rays {
   transform-box: view-box;
   transition:
     transform 0.5s cubic-bezier(0.32, 0.72, 0, 1),
     opacity 0.35s ease;
 }
 
-.atlas-theme-icon { transform-origin: 12px 12px; }
-.atlas-theme-disc { transform-origin: 12px 12px; }
-.atlas-theme-rays { transform-origin: 12px 12px; }
+.atlas-theme-icon, .kafei-theme-icon { transform-origin: 12px 12px; }
+.atlas-theme-disc, .kafei-theme-disc { transform-origin: 12px 12px; }
+.atlas-theme-rays, .kafei-theme-rays { transform-origin: 12px 12px; }
 
 /* ── Sun (light mode) ── */
 /* Mask circle pushed clear of the disc, so nothing is cut out. */
-.atlas-theme-cut  { transform: translate(11px, -12px); }
+.atlas-theme-cut, .kafei-theme-cut  { transform: translate(11px, -12px); }
 /* Disc shrunk to a sun core — the rays carry the rest of the visual weight. */
-.atlas-theme-disc { transform: scale(0.6); }
-.atlas-theme-rays { opacity: 1; transform: scale(1) rotate(0deg); }
+.atlas-theme-disc, .kafei-theme-disc { transform: scale(0.6); }
+.atlas-theme-rays, .kafei-theme-rays { opacity: 1; transform: scale(1) rotate(0deg); }
 
 /* ── Moon (dark mode) ── */
-.dark .atlas-theme-icon { transform: rotate(-18deg); }
-.dark .atlas-theme-cut  { transform: translate(0, 0); }
-.dark .atlas-theme-disc { transform: scale(1); }
-.dark .atlas-theme-rays { opacity: 0; transform: scale(0.4) rotate(-45deg); }
+.dark .atlas-theme-icon, .dark .kafei-theme-icon { transform: rotate(-18deg); }
+.dark .atlas-theme-cut, .dark .kafei-theme-cut  { transform: translate(0, 0); }
+.dark .atlas-theme-disc, .dark .kafei-theme-disc { transform: scale(1); }
+.dark .atlas-theme-rays, .dark .kafei-theme-rays { opacity: 0; transform: scale(0.4) rotate(-45deg); }
 
 /* Press feedback. */
-.atlas-theme-toggle:active .atlas-theme-icon { transform: scale(0.88); }
-.dark .atlas-theme-toggle:active .atlas-theme-icon { transform: rotate(-18deg) scale(0.88); }
+.atlas-theme-toggle:active .atlas-theme-icon,
+.kafei-theme-toggle:active .kafei-theme-icon { transform: scale(0.88); }
+.dark .atlas-theme-toggle:active .atlas-theme-icon,
+.dark .kafei-theme-toggle:active .kafei-theme-icon { transform: rotate(-18deg) scale(0.88); }
 
 /* ---------------------------------------------------------------------------
    Glass
@@ -604,7 +621,7 @@ select:disabled,
   -webkit-backdrop-filter: blur(16px) saturate(190%);
   backdrop-filter: blur(16px) saturate(190%);
   /* Progressive enhancement: adds edge refraction where url() is honoured. */
-  backdrop-filter: url(#atlas-lens) blur(16px) saturate(190%);
+  backdrop-filter: url(#kafei-lens) url(#atlas-lens) blur(16px) saturate(190%);
   box-shadow:
     var(--lg-shadow),
     inset 0 1px 1px 0 var(--lg-rim),
@@ -655,12 +672,12 @@ select:disabled,
 .liquid-glass-sm {
   -webkit-backdrop-filter: blur(12px) saturate(175%);
   backdrop-filter: blur(12px) saturate(175%);
-  backdrop-filter: url(#atlas-lens-sm) blur(12px) saturate(175%);
+  backdrop-filter: url(#kafei-lens-sm) url(#atlas-lens-sm) blur(12px) saturate(175%);
 }
 
 /* No SVG-filter support in backdrop-filter (Safari today): fall back to the
    frosted material, which still looks intentional. */
-@supports not (backdrop-filter: url(#atlas-lens)) {
+@supports not ((backdrop-filter: url(#kafei-lens)) or (backdrop-filter: url(#atlas-lens))) {
   .liquid-glass,
   .liquid-glass-sm {
     backdrop-filter: blur(22px) saturate(180%);
@@ -683,28 +700,4 @@ select:disabled,
 select option {
   background-color: var(--popover);
   color: var(--popover-foreground);
-}
-
-/* ---------------------------------------------------------------------------
-   .loader
-   Used by the Suspense fallback in components/ui/splite.tsx. The Spline
-   component references this class but ships no styles for it, so without this
-   the loading state renders an empty span while a multi-megabyte scene
-   downloads.
---------------------------------------------------------------------------- */
-.loader {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  border: 2px solid var(--border);
-  border-top-color: var(--primary);
-  animation: loader-spin 0.7s linear infinite;
-}
-
-@keyframes loader-spin {
-  to { transform: rotate(360deg); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .loader { animation-duration: 2s; }
 }

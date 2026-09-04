@@ -1,4 +1,9 @@
-import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  OnModuleDestroy,
+  OnModuleInit,
+} from '@nestjs/common';
 import { Pool } from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '../../generated/prisma/client';
@@ -21,12 +26,17 @@ export class PrismaService
       connectionTimeoutMillis: 10_000,
       keepAlive: true,
       keepAliveInitialDelayMillis: 10_000,
-      statement_timeout: Number(process.env.DATABASE_STATEMENT_TIMEOUT_MS ?? 15_000),
+      statement_timeout: Number(
+        process.env.DATABASE_STATEMENT_TIMEOUT_MS ?? 15_000,
+      ),
     });
 
     pool.on('error', (err) => {
       // Supabase / PgBouncer can drop idle sockets. Logging prevents unhandled errors and lets pg-pool create new clients on next query.
-      console.warn('[PrismaService] Idle database connection dropped by server:', err.message);
+      console.warn(
+        '[PrismaService] Idle database connection dropped by server:',
+        err.message,
+      );
     });
 
     const adapter = new PrismaPg(pool);
@@ -40,7 +50,9 @@ export class PrismaService
 
   async onModuleInit(): Promise<void> {
     if (!process.env.DATABASE_URL) {
-      this.logger.error('❌ DATABASE_URL environment variable is missing or empty!');
+      this.logger.error(
+        '❌ DATABASE_URL environment variable is missing or empty!',
+      );
       return;
     }
 
@@ -82,4 +94,3 @@ export class PrismaService
     }
   }
 }
-

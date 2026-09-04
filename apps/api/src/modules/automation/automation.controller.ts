@@ -1,5 +1,21 @@
-import { Controller, Post, Get, Patch, Delete, Body, Param, Req, UseGuards, BadRequestException } from '@nestjs/common';
-import { ApiOperation, ApiTags, ApiBearerAuth, ApiHeader } from '@nestjs/swagger';
+import {
+  Controller,
+  Post,
+  Get,
+  Patch,
+  Delete,
+  Body,
+  Param,
+  Req,
+  UseGuards,
+  BadRequestException,
+} from '@nestjs/common';
+import {
+  ApiOperation,
+  ApiTags,
+  ApiBearerAuth,
+  ApiHeader,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RestaurantAccessGuard } from '../auth/guards/restaurant-access.guard';
 import { PlatformAdminGuard } from '../auth/guards/platform-admin.guard';
@@ -35,7 +51,8 @@ export class AutomationController {
     @CurrentRestaurant() restaurant: CurrentRestaurantType,
     @Body() body: any,
   ) {
-    if (!restaurant?.id) throw new BadRequestException('Restaurant context is required');
+    if (!restaurant?.id)
+      throw new BadRequestException('Restaurant context is required');
 
     const rule = await this.ruleService.create(restaurant.id, userId, body);
 
@@ -50,7 +67,8 @@ export class AutomationController {
   @UseGuards(JwtAuthGuard, RestaurantAccessGuard)
   @ApiOperation({ summary: 'List all automation rules for the restaurant' })
   async listRules(@CurrentRestaurant() restaurant: CurrentRestaurantType) {
-    if (!restaurant?.id) throw new BadRequestException('Restaurant context is required');
+    if (!restaurant?.id)
+      throw new BadRequestException('Restaurant context is required');
     return this.ruleService.findAll(restaurant.id);
   }
 
@@ -62,7 +80,8 @@ export class AutomationController {
     @CurrentRestaurant() restaurant: CurrentRestaurantType,
     @Body() body: any,
   ) {
-    if (!restaurant?.id) throw new BadRequestException('Restaurant context is required');
+    if (!restaurant?.id)
+      throw new BadRequestException('Restaurant context is required');
 
     const updated = await this.ruleService.update(id, restaurant.id, body);
 
@@ -80,8 +99,12 @@ export class AutomationController {
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RestaurantAccessGuard)
   @ApiOperation({ summary: 'Delete an automation rule' })
-  async deleteRule(@Param('id') id: string, @CurrentRestaurant() restaurant: CurrentRestaurantType) {
-    if (!restaurant?.id) throw new BadRequestException('Restaurant context is required');
+  async deleteRule(
+    @Param('id') id: string,
+    @CurrentRestaurant() restaurant: CurrentRestaurantType,
+  ) {
+    if (!restaurant?.id)
+      throw new BadRequestException('Restaurant context is required');
 
     this.scheduler.unregisterJob(id);
     return this.ruleService.remove(id, restaurant.id);
@@ -90,16 +113,24 @@ export class AutomationController {
   @Get(':id/executions')
   @UseGuards(JwtAuthGuard, RestaurantAccessGuard)
   @ApiOperation({ summary: 'View execution history for a rule' })
-  async getExecutions(@Param('id') id: string, @CurrentRestaurant() restaurant: CurrentRestaurantType) {
-    if (!restaurant?.id) throw new BadRequestException('Restaurant context is required');
+  async getExecutions(
+    @Param('id') id: string,
+    @CurrentRestaurant() restaurant: CurrentRestaurantType,
+  ) {
+    if (!restaurant?.id)
+      throw new BadRequestException('Restaurant context is required');
     return this.ruleService.getExecutions(id, restaurant.id);
   }
 
   @Post(':id/test')
   @UseGuards(JwtAuthGuard, RestaurantAccessGuard)
   @ApiOperation({ summary: 'Manually test-run an automation rule' })
-  async testRule(@Param('id') id: string, @CurrentRestaurant() restaurant: CurrentRestaurantType) {
-    if (!restaurant?.id) throw new BadRequestException('Restaurant context is required');
+  async testRule(
+    @Param('id') id: string,
+    @CurrentRestaurant() restaurant: CurrentRestaurantType,
+  ) {
+    if (!restaurant?.id)
+      throw new BadRequestException('Restaurant context is required');
 
     await this.ruleService.findById(id, restaurant.id);
     const fired = await this.engine.evaluateRule(id);
@@ -115,7 +146,8 @@ export class AutomationController {
     @CurrentUser('id') userId: string,
     @CurrentRestaurant() restaurant: CurrentRestaurantType,
   ) {
-    if (!restaurant?.id) throw new BadRequestException('Restaurant context is required');
+    if (!restaurant?.id)
+      throw new BadRequestException('Restaurant context is required');
     return this.notificationService.getForUser(restaurant.id, userId);
   }
 
@@ -126,15 +158,25 @@ export class AutomationController {
     @CurrentUser('id') userId: string,
     @CurrentRestaurant() restaurant: CurrentRestaurantType,
   ) {
-    if (!restaurant?.id) throw new BadRequestException('Restaurant context is required');
-    return { count: await this.notificationService.getUnreadCount(restaurant.id, userId) };
+    if (!restaurant?.id)
+      throw new BadRequestException('Restaurant context is required');
+    return {
+      count: await this.notificationService.getUnreadCount(
+        restaurant.id,
+        userId,
+      ),
+    };
   }
 
   @Patch('/notifications/:id/read')
   @UseGuards(JwtAuthGuard, RestaurantAccessGuard)
   @ApiOperation({ summary: 'Mark a notification as read' })
-  async markRead(@Param('id') id: string, @CurrentRestaurant() restaurant: CurrentRestaurantType) {
-    if (!restaurant?.id) throw new BadRequestException('Restaurant context is required');
+  async markRead(
+    @Param('id') id: string,
+    @CurrentRestaurant() restaurant: CurrentRestaurantType,
+  ) {
+    if (!restaurant?.id)
+      throw new BadRequestException('Restaurant context is required');
     return this.notificationService.markAsRead(id, restaurant.id);
   }
 
@@ -142,7 +184,9 @@ export class AutomationController {
 
   @Get('/admin/stats')
   @UseGuards(JwtAuthGuard, PlatformAdminGuard)
-  @ApiOperation({ summary: 'Get system-wide automation engine metrics for platform admins' })
+  @ApiOperation({
+    summary: 'Get system-wide automation engine metrics for platform admins',
+  })
   async getAdminStats() {
     return this.engine.getAdminStats();
   }
@@ -151,15 +195,22 @@ export class AutomationController {
 
   @Post('/events/trigger')
   @UseGuards(JwtAuthGuard, RestaurantAccessGuard)
-  @ApiOperation({ summary: 'Emit an event to evaluate matching event automations' })
+  @ApiOperation({
+    summary: 'Emit an event to evaluate matching event automations',
+  })
   async triggerEvent(
     @CurrentRestaurant() restaurant: CurrentRestaurantType,
     @Body() body: { eventType: string; payload?: any },
   ) {
-    if (!restaurant?.id) throw new BadRequestException('Restaurant context is required');
+    if (!restaurant?.id)
+      throw new BadRequestException('Restaurant context is required');
     if (!body.eventType) throw new BadRequestException('eventType is required');
 
-    const firedCount = await this.engine.handleEvent(body.eventType, restaurant.id, body.payload);
+    const firedCount = await this.engine.handleEvent(
+      body.eventType,
+      restaurant.id,
+      body.payload,
+    );
     return { eventType: body.eventType, firedRulesCount: firedCount };
   }
 }

@@ -21,7 +21,8 @@ export class HttpExceptionFilter implements ExceptionFilter {
       (request?.headers?.['x-request-id'] as string) ||
       (request as any)?.requestId ||
       'unknown';
-    const restaurantId = (request?.headers?.['x-restaurant-id'] as string) || undefined;
+    const restaurantId =
+      (request?.headers?.['x-restaurant-id'] as string) || undefined;
     const userId = (request as any)?.user?.id || undefined;
 
     const status =
@@ -38,12 +39,16 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
       if (typeof exceptionResponse === 'string') {
         message = exceptionResponse;
-      } else if (typeof exceptionResponse === 'object' && exceptionResponse !== null) {
+      } else if (
+        typeof exceptionResponse === 'object' &&
+        exceptionResponse !== null
+      ) {
         const responseObject = exceptionResponse as {
           message?: string | string[];
           error?: string;
         };
-        message = responseObject.message ?? responseObject.error ?? 'Request error';
+        message =
+          responseObject.message ?? responseObject.error ?? 'Request error';
       }
     } else {
       // 500 Unhandled or Database Exception - Scrub sensitive internal details
@@ -52,7 +57,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
       this.logger.error({
         level: 'error',
-        service: 'atlas-api',
+        service: 'kafei-api',
         requestId,
         restaurantId,
         userId,

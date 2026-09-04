@@ -28,8 +28,8 @@ export function levenshtein(a: string, b: string): number {
       } else {
         matrix[i][j] = Math.min(
           matrix[i - 1][j - 1] + 1, // substitution
-          matrix[i][j - 1] + 1,     // insertion
-          matrix[i - 1][j] + 1,     // deletion
+          matrix[i][j - 1] + 1, // insertion
+          matrix[i - 1][j] + 1, // deletion
         );
       }
     }
@@ -41,7 +41,11 @@ export function levenshtein(a: string, b: string): number {
 /**
  * Check if a word fuzzy-matches a target keyword within a permissible edit distance
  */
-export function isFuzzyMatch(word: string, target: string, maxDistance = 2): boolean {
+export function isFuzzyMatch(
+  word: string,
+  target: string,
+  maxDistance = 2,
+): boolean {
   const cleanWord = word.toLowerCase().trim();
   const cleanTarget = target.toLowerCase().trim();
 
@@ -55,9 +59,11 @@ export function isFuzzyMatch(word: string, target: string, maxDistance = 2): boo
   }
 
   // Strict matching for short words (<=4 chars must match exactly to avoid 'how' matching 'hot')
-  const allowedDist = cleanTarget.length <= 4 ? 0 : cleanTarget.length <= 6 ? 1 : maxDistance;
+  const allowedDist =
+    cleanTarget.length <= 4 ? 0 : cleanTarget.length <= 6 ? 1 : maxDistance;
 
-  if (Math.abs(cleanWord.length - cleanTarget.length) > allowedDist) return false;
+  if (Math.abs(cleanWord.length - cleanTarget.length) > allowedDist)
+    return false;
 
   return levenshtein(cleanWord, cleanTarget) <= allowedDist;
 }
@@ -101,8 +107,28 @@ export const VOCABULARY = {
   ],
 
   // External / Non-restaurant topics
-  WEATHER: ['weather', 'rain', 'temperature', 'sunny', 'climate', 'forecast', 'humid', 'cold', 'hot'],
-  UNRELATED: ['president', 'joke', 'movie', 'song', 'cricket', 'football', 'politician', 'poem', 'story'],
+  WEATHER: [
+    'weather',
+    'rain',
+    'temperature',
+    'sunny',
+    'climate',
+    'forecast',
+    'humid',
+    'cold',
+    'hot',
+  ],
+  UNRELATED: [
+    'president',
+    'joke',
+    'movie',
+    'song',
+    'cricket',
+    'football',
+    'politician',
+    'poem',
+    'story',
+  ],
 
   SALES: [
     'sales',
@@ -241,17 +267,28 @@ export type AiIntent =
 /**
  * Detect primary intent from a natural language query with fuzzy typo resilience
  */
-export function detectIntent(query: string): { intent: AiIntent; confidence: number } {
+export function detectIntent(query: string): {
+  intent: AiIntent;
+  confidence: number;
+} {
   const tokens = tokenizeQuery(query);
   const queryLower = query.toLowerCase();
 
   // 0a. Small talk. Cheap exact-ish checks first so 'thanks' never gets
   //     scored against the metric vocabularies.
   const bare = queryLower.trim().replace(/[!.?]+$/, '');
-  if (/^(hi|hey|hello|yo|hola|namaste|good\s*(morning|afternoon|evening)|sup)\b/.test(bare)) {
+  if (
+    /^(hi|hey|hello|yo|hola|namaste|good\s*(morning|afternoon|evening)|sup)\b/.test(
+      bare,
+    )
+  ) {
     return { intent: 'GREETING', confidence: 10 };
   }
-  if (/^(thanks|thank you|thx|ty|great|nice|cool|awesome|perfect|ok|okay|got it)\b/.test(bare)) {
+  if (
+    /^(thanks|thank you|thx|ty|great|nice|cool|awesome|perfect|ok|okay|got it)\b/.test(
+      bare,
+    )
+  ) {
     return { intent: 'GRATITUDE', confidence: 10 };
   }
   if (
@@ -264,7 +301,11 @@ export function detectIntent(query: string): { intent: AiIntent; confidence: num
 
   // 0a2. Phrase-level stock cues. Token matching misses these because the
   //      signal is the phrase, not any single word.
-  if (/running low|low stock|out of stock|restock|re-?order|need to buy|short on|stock level/.test(queryLower)) {
+  if (
+    /running low|low stock|out of stock|restock|re-?order|need to buy|short on|stock level/.test(
+      queryLower,
+    )
+  ) {
     return { intent: 'INVENTORY_STOCK', confidence: 9 };
   }
 
@@ -273,7 +314,7 @@ export function detectIntent(query: string): { intent: AiIntent; confidence: num
   //     SALES_REVENUE and answered with TODAY's figure — the same reply no
   //     matter what was asked.
   const isFutureLooking =
-    /\b(tomorrow|tmrw|kal ka|next week|next month|upcoming|coming|future|forecast|predict|projection|projected|expect|expected|estimate|will i|going to make|outlook)\b/.test(
+    /\b(tomorrow|tomorow|tommorrow|tomorw|tommow|tmrw|tmr|2moro|2morrow|kal\s*ka|kal\s*ki|kal|next\s*week|next\s*month|upcoming|coming|future|forecast|predict|prediction|predictive|projection|projected|expect|expected|expectation|estimate|estimation|will\s*i|going\s*to\s*make|what\s*can\s*be|what\s*will\s*be|how\s*much\s*will|outlook)\b/i.test(
       queryLower,
     );
   if (isFutureLooking) {
@@ -281,7 +322,11 @@ export function detectIntent(query: string): { intent: AiIntent; confidence: num
   }
 
   // 0c. Explicit comparisons ('vs yesterday', 'compare to last week').
-  if (/\b(compare|comparison|versus|vs\.?|against|better than|worse than|difference between)\b/.test(queryLower)) {
+  if (
+    /\b(compare|comparison|versus|vs\.?|against|better than|worse than|difference between)\b/.test(
+      queryLower,
+    )
+  ) {
     return { intent: 'COMPARISON', confidence: 9 };
   }
 
@@ -311,12 +356,16 @@ export function detectIntent(query: string): { intent: AiIntent; confidence: num
   }
 
   // 3. Unrelated query
-  if (tokens.some((t) => VOCABULARY.UNRELATED.some((u) => isFuzzyMatch(t, u)))) {
+  if (
+    tokens.some((t) => VOCABULARY.UNRELATED.some((u) => isFuzzyMatch(t, u)))
+  ) {
     return { intent: 'UNRELATED_QUERY', confidence: 10 };
   }
 
   // 4. Inventory check
-  if (tokens.some((t) => VOCABULARY.INVENTORY.some((inv) => isFuzzyMatch(t, inv)))) {
+  if (
+    tokens.some((t) => VOCABULARY.INVENTORY.some((inv) => isFuzzyMatch(t, inv)))
+  ) {
     return { intent: 'INVENTORY_STOCK', confidence: 8 };
   }
 
@@ -368,7 +417,10 @@ export function detectIntent(query: string): { intent: AiIntent; confidence: num
   let maxScore = 0;
   let detectedIntent: AiIntent = 'GENERAL';
 
-  for (const [intent, score] of Object.entries(scores) as [AiIntent, number][]) {
+  for (const [intent, score] of Object.entries(scores) as [
+    AiIntent,
+    number,
+  ][]) {
     if (score > maxScore) {
       maxScore = score;
       detectedIntent = intent;
@@ -409,25 +461,49 @@ function parseNumberWords(text: string): string {
  * Format a Date object into human-readable label (e.g. "Aug 12, 2026")
  */
 function formatDateLabel(date: Date): string {
-  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
 }
 
 /**
  * Parse colloquial and precise date ranges from noisy user queries
  */
-export function extractDateRange(queryInput: string): { startDate: Date; endDate: Date; label: string } {
+export function extractDateRange(queryInput: string): {
+  startDate: Date;
+  endDate: Date;
+  label: string;
+} {
   const query = parseNumberWords(queryInput.toLowerCase());
   const tokens = tokenizeQuery(query);
   const now = new Date();
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+  const todayEnd = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+    23,
+    59,
+    59,
+    999,
+  );
 
   // 0. FUTURE ranges. Returned with a forward-looking label so the caller can
   //    tell it apart from a historical window and answer as a projection.
-  if (/\b(tomorrow|tmrw|kal ka)\b/.test(query)) {
+  if (
+    /\b(tomorrow|tomorow|tommorrow|tomorw|tommow|tmrw|tmr|2moro|2morrow|kal\s*ka|kal\s*ki|kal)\b/i.test(
+      query,
+    )
+  ) {
     const start = new Date(todayStart.getTime() + 24 * 60 * 60 * 1000);
     const end = new Date(todayEnd.getTime() + 24 * 60 * 60 * 1000);
-    return { startDate: start, endDate: end, label: `tomorrow (${formatDateLabel(start)})` };
+    return {
+      startDate: start,
+      endDate: end,
+      label: `tomorrow (${formatDateLabel(start)})`,
+    };
   }
   if (/\bnext week\b/.test(query)) {
     const start = new Date(todayStart.getTime() + 24 * 60 * 60 * 1000);
@@ -441,30 +517,64 @@ export function extractDateRange(queryInput: string): { startDate: Date; endDate
   }
 
   // 1. Specific N days ago (e.g. "3 days ago", "3days ago", "2 days back", "5 days before")
-  const daysAgoMatch = query.match(/(\d+)\s*(?:days?|d)\s*(?:ago|back|before|earlier)/);
+  const daysAgoMatch = query.match(
+    /(\d+)\s*(?:days?|d)\s*(?:ago|back|before|earlier)/,
+  );
   if (daysAgoMatch) {
     const days = parseInt(daysAgoMatch[1], 10);
-    const targetDate = new Date(todayStart.getTime() - days * 24 * 60 * 60 * 1000);
-    const start = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate(), 0, 0, 0, 0);
-    const end = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate(), 23, 59, 59, 999);
+    const targetDate = new Date(
+      todayStart.getTime() - days * 24 * 60 * 60 * 1000,
+    );
+    const start = new Date(
+      targetDate.getFullYear(),
+      targetDate.getMonth(),
+      targetDate.getDate(),
+      0,
+      0,
+      0,
+      0,
+    );
+    const end = new Date(
+      targetDate.getFullYear(),
+      targetDate.getMonth(),
+      targetDate.getDate(),
+      23,
+      59,
+      59,
+      999,
+    );
     const label = `${days} days ago (${formatDateLabel(start)})`;
     return { startDate: start, endDate: end, label };
   }
 
   // 2. Trailing N days (e.g. "last 3 days", "past 5 days", "past 7 days", "last 2 days")
-  const lastNDaysMatch = query.match(/(?:last|past|in|over)\s*(\d+)\s*(?:days?|d)/);
+  const lastNDaysMatch = query.match(
+    /(?:last|past|in|over)\s*(\d+)\s*(?:days?|d)/,
+  );
   if (lastNDaysMatch) {
     const days = parseInt(lastNDaysMatch[1], 10);
-    const start = new Date(todayStart.getTime() - (days - 1) * 24 * 60 * 60 * 1000);
-    return { startDate: start, endDate: now, label: `the last ${days} days` };
+    const start = new Date(
+      todayStart.getTime() - (days - 1) * 24 * 60 * 60 * 1000,
+    );
+    return {
+      startDate: start,
+      endDate: todayEnd,
+      label: `the last ${days} days`,
+    };
   }
 
   // 3. Yesterday / Kal / Ystrdy
   const yesterdayTokens = ['yesterday', 'ystrdy', 'yestarday', 'yday', 'kal'];
-  if (tokens.some((t) => yesterdayTokens.some((yt) => isFuzzyMatch(t, yt, 2)))) {
+  if (
+    tokens.some((t) => yesterdayTokens.some((yt) => isFuzzyMatch(t, yt, 2)))
+  ) {
     const start = new Date(todayStart.getTime() - 24 * 60 * 60 * 1000);
     const end = new Date(todayEnd.getTime() - 24 * 60 * 60 * 1000);
-    return { startDate: start, endDate: end, label: `yesterday (${formatDateLabel(start)})` };
+    return {
+      startDate: start,
+      endDate: end,
+      label: `yesterday (${formatDateLabel(start)})`,
+    };
   }
 
   // 4. Week / 7 days / Hafta
@@ -476,7 +586,7 @@ export function extractDateRange(queryInput: string): { startDate: Date; endDate
     query.includes('hafta')
   ) {
     const start = new Date(todayStart.getTime() - 6 * 24 * 60 * 60 * 1000);
-    return { startDate: start, endDate: now, label: 'this week' };
+    return { startDate: start, endDate: todayEnd, label: 'this week' };
   }
 
   // 5. Month / 30 days / Mahina
@@ -488,25 +598,59 @@ export function extractDateRange(queryInput: string): { startDate: Date; endDate
     query.includes('mahina')
   ) {
     const start = new Date(todayStart.getTime() - 29 * 24 * 60 * 60 * 1000);
-    return { startDate: start, endDate: now, label: 'this month' };
+    return { startDate: start, endDate: todayEnd, label: 'this month' };
   }
 
   // 6. Specific Days of Week (e.g. "on monday", "last tuesday", "on wednesday")
-  const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+  const dayNames = [
+    'sunday',
+    'monday',
+    'tuesday',
+    'wednesday',
+    'thursday',
+    'friday',
+    'saturday',
+  ];
   for (let i = 0; i < dayNames.length; i++) {
     const dayName = dayNames[i];
     if (query.includes(dayName)) {
       const currentDay = now.getDay();
       let diff = currentDay - i;
       if (diff <= 0) diff += 7; // Previous occurrence of this day
-      const targetDate = new Date(todayStart.getTime() - diff * 24 * 60 * 60 * 1000);
-      const start = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate(), 0, 0, 0, 0);
-      const end = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate(), 23, 59, 59, 999);
+      const targetDate = new Date(
+        todayStart.getTime() - diff * 24 * 60 * 60 * 1000,
+      );
+      const start = new Date(
+        targetDate.getFullYear(),
+        targetDate.getMonth(),
+        targetDate.getDate(),
+        0,
+        0,
+        0,
+        0,
+      );
+      const end = new Date(
+        targetDate.getFullYear(),
+        targetDate.getMonth(),
+        targetDate.getDate(),
+        23,
+        59,
+        59,
+        999,
+      );
       const capitalized = dayName.charAt(0).toUpperCase() + dayName.slice(1);
-      return { startDate: start, endDate: end, label: `last ${capitalized} (${formatDateLabel(start)})` };
+      return {
+        startDate: start,
+        endDate: end,
+        label: `last ${capitalized} (${formatDateLabel(start)})`,
+      };
     }
   }
 
-  // 7. Default to today
-  return { startDate: todayStart, endDate: now, label: `today (${formatDateLabel(todayStart)})` };
+  // 7. Default to today (spanning the full business day)
+  return {
+    startDate: todayStart,
+    endDate: todayEnd,
+    label: `today (${formatDateLabel(todayStart)})`,
+  };
 }

@@ -37,7 +37,10 @@ export class HealthService {
     const queueHealth = this.checkQueue();
     const memoryHealth = this.checkMemory();
 
-    const isReady = dbHealth.status === 'UP' && queueHealth.status === 'UP' && memoryHealth.status === 'UP';
+    const isReady =
+      dbHealth.status === 'UP' &&
+      queueHealth.status === 'UP' &&
+      memoryHealth.status === 'UP';
 
     return {
       status: isReady ? 'UP' : 'DOWN',

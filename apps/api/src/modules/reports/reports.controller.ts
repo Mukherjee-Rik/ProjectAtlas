@@ -72,7 +72,13 @@ export class ReportsController {
     @Req() req: any,
     @Body('name') customName?: string,
   ) {
-    return this.templateService.useTemplate(templateId, restaurantId, tenantId, req.user.id, customName);
+    return this.templateService.useTemplate(
+      templateId,
+      restaurantId,
+      tenantId,
+      req.user.id,
+      customName,
+    );
   }
 
   @Post('preview')
@@ -80,7 +86,12 @@ export class ReportsController {
   async previewReport(
     @Headers('x-restaurant-id') restaurantId: string,
     @Headers('x-branch-id') branchId: string | undefined,
-    @Body() body: { name: string; dataSource: string; configuration: ReportConfigurationDto },
+    @Body()
+    body: {
+      name: string;
+      dataSource: string;
+      configuration: ReportConfigurationDto;
+    },
   ) {
     return this.reportService.previewReport(
       restaurantId,
@@ -99,7 +110,12 @@ export class ReportsController {
     @Req() req: any,
     @Body() dto: CreateCustomReportDto,
   ) {
-    return this.reportService.createReport(restaurantId, tenantId, req.user.id, dto);
+    return this.reportService.createReport(
+      restaurantId,
+      tenantId,
+      req.user.id,
+      dto,
+    );
   }
 
   @Get(':id')
@@ -138,7 +154,12 @@ export class ReportsController {
     @Headers('x-tenant-id') tenantId: string,
     @Req() req: any,
   ) {
-    return this.reportService.duplicateReport(id, restaurantId, req.user.id, tenantId);
+    return this.reportService.duplicateReport(
+      id,
+      restaurantId,
+      req.user.id,
+      tenantId,
+    );
   }
 
   @Post(':id/run')
@@ -149,7 +170,12 @@ export class ReportsController {
     @Headers('x-branch-id') branchId: string | undefined,
     @Req() req: any,
   ) {
-    return this.reportService.runReport(id, restaurantId, req.user.id, branchId);
+    return this.reportService.runReport(
+      id,
+      restaurantId,
+      req.user.id,
+      branchId,
+    );
   }
 
   @Get(':id/export')
@@ -161,7 +187,12 @@ export class ReportsController {
     @Req() req: any,
     @Res() res: Response,
   ) {
-    const result = await this.reportService.runReport(id, restaurantId, req.user.id, branchId);
+    const result = await this.reportService.runReport(
+      id,
+      restaurantId,
+      req.user.id,
+      branchId,
+    );
     const csvContent = this.exportService.generateCsv(result);
     const filename = `${result.reportName.toLowerCase().replace(/[^a-z0-9]/g, '_')}_${new Date().toISOString().slice(0, 10)}.csv`;
 
@@ -188,7 +219,12 @@ export class ReportsController {
     @Headers('x-tenant-id') tenantId: string,
     @Body() dto: CreateReportScheduleDto,
   ) {
-    return this.schedulerService.createSchedule(id, restaurantId, tenantId, dto);
+    return this.schedulerService.createSchedule(
+      id,
+      restaurantId,
+      tenantId,
+      dto,
+    );
   }
 
   @Delete('schedules/:scheduleId')

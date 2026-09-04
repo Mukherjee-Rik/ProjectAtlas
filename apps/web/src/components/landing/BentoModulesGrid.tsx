@@ -136,13 +136,13 @@ export function BentoModulesGrid() {
             </p>
           </div>
 
-          <div className="rounded-xl border border-amber-500/20 bg-secondary p-4 space-y-2 text-xs">
+          <div className="rounded-xl border border-atlas-warning/20 bg-secondary p-4 space-y-2 text-xs">
             <div className="flex items-center justify-between font-mono">
               <span className="text-foreground font-semibold">#AT-1082 • Station 1</span>
-              <span className="text-amber-400 font-semibold">03:45m</span>
+              <span className="text-atlas-warning font-semibold">03:45m</span>
             </div>
             <p className="text-foreground">2x Grilled Lamb Chops (Med Rare)</p>
-            <p className="text-[11px] font-medium text-amber-400">Contains nuts — flagged</p>
+            <p className="text-[11px] font-medium text-atlas-warning">Contains nuts — flagged</p>
             <div className="pt-2">
               <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold text-primary bg-primary/10 px-2 py-1 rounded">
                 <Check className="h-3 w-3" /> Audio Alert Connected
@@ -230,8 +230,8 @@ export function BentoModulesGrid() {
                   cancellationState === 'approved'
                     ? 'bg-primary/10 text-primary border border-primary/20'
                     : cancellationState === 'rejected'
-                    ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
-                    : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                    ? 'bg-atlas-error/10 text-atlas-error border border-atlas-error/20'
+                    : 'bg-atlas-warning/10 text-atlas-warning border border-atlas-warning/20'
                 }`}
               >
                 {cancellationState === 'approved'

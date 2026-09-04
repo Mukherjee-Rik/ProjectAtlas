@@ -152,7 +152,7 @@ export function PlatformSubscriptionsView() {
         <div>
           <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
             <span className="h-2 w-2 rounded-full bg-primary animate-pulse" />
-            Atlas Platform Billing Management
+            Kafei Platform Billing Management
           </div>
           <h1 className="mt-3 text-3xl font-black text-foreground">
             SaaS Subscriptions
@@ -460,7 +460,7 @@ export function PlatformSubscriptionsView() {
                 type="button"
                 onClick={() => void handleUpdateStatus()}
                 disabled={isActionLoading}
-                className="rounded-xl bg-atlas-error px-4 py-2.5 text-xs font-bold text-foreground hover:bg-red-600 disabled:opacity-50"
+                className="rounded-xl bg-atlas-error px-4 py-2.5 text-xs font-bold text-foreground hover:bg-atlas-error disabled:opacity-50"
               >
                 {isActionLoading ? 'Executing...' : 'Confirm Action'}
               </button>

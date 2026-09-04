@@ -1,4 +1,14 @@
-import { IsOptional, IsString, IsArray, IsObject, IsEnum, IsNumber, Min, Max, IsBoolean } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  IsArray,
+  IsObject,
+  IsEnum,
+  IsNumber,
+  Min,
+  Max,
+  IsBoolean,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class ReportFilterItemDto {

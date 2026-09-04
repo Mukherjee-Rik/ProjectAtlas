@@ -273,8 +273,8 @@ function LoginForm() {
 
   /** The landing page publishes these, so offering them here saves retyping. */
   function fillDemo() {
-    setEmail('sweta@atlas.com');
-    setPassword('Atlas@12345');
+    setEmail('sweta@kafei.in');
+    setPassword('Kafei@12345');
     setEmailError('');
     setPasswordError('');
     setError('');
@@ -568,6 +568,23 @@ function LoginForm() {
                   onLoading={(l) => setLoading(l)}
                   onError={(err) => setError(err)}
                 />
+
+                <p className="mt-4 text-center text-[11px] leading-relaxed text-muted-foreground">
+                  By continuing, you agree to Kafei&apos;s{' '}
+                  <Link
+                    href="/terms"
+                    className="font-medium text-primary underline underline-offset-2 hover:text-primary-hover"
+                  >
+                    Terms of Service
+                  </Link>{' '}
+                  and{' '}
+                  <Link
+                    href="/privacy"
+                    className="font-medium text-primary underline underline-offset-2 hover:text-primary-hover"
+                  >
+                    Privacy Policy
+                  </Link>.
+                </p>
 
                 <div className="glass-soft mt-6 rounded-xl px-4 py-3">
                   <div className="flex items-center justify-between gap-3">

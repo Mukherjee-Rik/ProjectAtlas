@@ -39,7 +39,8 @@ export class CreateTableDto {
   @MinLength(1)
   @MaxLength(10)
   @Matches(/^[A-Za-z0-9-]+$/, {
-    message: 'Code can only contain alphanumeric characters and hyphens (max 10 chars)',
+    message:
+      'Code can only contain alphanumeric characters and hyphens (max 10 chars)',
   })
   code: string;
 

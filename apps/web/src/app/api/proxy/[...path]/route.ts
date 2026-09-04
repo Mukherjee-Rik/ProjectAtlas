@@ -23,7 +23,7 @@ import {
   executePasswordReset,
 } from '@/lib/auth-recovery-store';
 
-// This route is a pass-through to the Atlas API; nothing about it is static.
+// This route is a pass-through to the Kafei API; nothing about it is static.
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 

@@ -38,7 +38,11 @@ export class DataQualityService {
     const invalidTotals = await this.prisma.order.findMany({
       where: {
         restaurantId,
-        OR: [{ totalAmount: { lt: 0 } }, { subtotal: { lt: 0 } }, { taxAmount: { lt: 0 } }],
+        OR: [
+          { totalAmount: { lt: 0 } },
+          { subtotal: { lt: 0 } },
+          { taxAmount: { lt: 0 } },
+        ],
       },
       select: { id: true, orderNumber: true, totalAmount: true },
       take: 5,
@@ -88,7 +92,10 @@ export class DataQualityService {
 
     let subtotalDiscrepancies = 0;
     recentOrders.forEach((o) => {
-      const itemsSum = o.items.reduce((sum, item) => sum + Number(item.totalPrice), 0);
+      const itemsSum = o.items.reduce(
+        (sum, item) => sum + Number(item.totalPrice),
+        0,
+      );
       const diff = Math.abs(itemsSum - Number(o.subtotal));
       // Allow minor 0.05 rounding tolerance
       if (diff > 0.05) {

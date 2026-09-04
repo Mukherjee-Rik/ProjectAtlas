@@ -8,6 +8,7 @@ import { getDiningAreas } from '@/services/dining-areas.service';
 import type { RestaurantTable, TableStatus } from '@/types/table';
 import type { DiningArea } from '@/types/dining-area';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
+import { Pagination } from '@/components/ui/pagination';
 import { DataCache } from '@/lib/data-cache';
 
 export default function TablesPage() {
@@ -29,6 +30,10 @@ export default function TablesPage() {
   const [search, setSearch] = useState('');
   const [diningAreaFilter, setDiningAreaFilter] = useState('ALL');
   const [statusFilter, setStatusFilter] = useState<'ALL' | TableStatus>('ALL');
+
+  // Pagination
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   // Delete modal state
   const [deletingTable, setDeletingTable] = useState<RestaurantTable | null>(null);
@@ -111,6 +116,9 @@ export default function TablesPage() {
     return matchesSearch && matchesArea && matchesStatus;
   });
 
+  const totalPages = Math.ceil(filteredTables.length / pageSize) || 1;
+  const paginatedTables = filteredTables.slice((page - 1) * pageSize, page * pageSize);
+
   if (!currentBranch) {
     return (
       <div className="flex flex-col items-center justify-center rounded-xl border border-border bg-card p-12 text-center space-y-4">
@@ -159,13 +167,19 @@ export default function TablesPage() {
             type="search"
             placeholder="Search by name or code..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
             className="w-full rounded-lg border border-border bg-secondary px-3.5 py-2 text-sm text-foreground placeholder-muted-foreground outline-none focus:border-primary sm:max-w-xs"
           />
 
           <select
             value={diningAreaFilter}
-            onChange={(e) => setDiningAreaFilter(e.target.value)}
+            onChange={(e) => {
+              setDiningAreaFilter(e.target.value);
+              setPage(1);
+            }}
             className="rounded-lg border border-border bg-secondary px-3 py-2 text-sm text-foreground outline-none focus:border-primary"
           >
             <option value="ALL">All Dining Areas</option>
@@ -178,7 +192,10 @@ export default function TablesPage() {
 
           <select
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value as 'ALL' | TableStatus)}
+            onChange={(e) => {
+              setStatusFilter(e.target.value as 'ALL' | TableStatus);
+              setPage(1);
+            }}
             className="rounded-lg border border-border bg-secondary px-3 py-2 text-sm text-foreground outline-none focus:border-primary"
           >
             <option value="ALL">All statuses</option>
@@ -198,8 +215,9 @@ export default function TablesPage() {
           <p>{error}</p>
         </div>
       ) : (
-        <div className="table-responsive rounded-xl border border-border bg-card">
-          <table className="w-full min-w-[700px] text-left">
+        <div className="space-y-4">
+          <div className="table-responsive rounded-xl border border-border bg-card">
+            <table className="w-full min-w-[700px] text-left">
             <thead className="border-b border-border bg-secondary">
                 <tr>
                   <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
@@ -224,7 +242,7 @@ export default function TablesPage() {
               </thead>
 
               <tbody className="divide-y divide-border">
-                {filteredTables.map((t) => (
+                {paginatedTables.map((t) => (
                   <tr
                     key={t.id}
                     onClick={() => router.push(`/tables/${t.id}`)}
@@ -285,6 +303,24 @@ export default function TablesPage() {
               </div>
             )}
           </div>
+
+          {filteredTables.length > 0 && (
+            <div className="pt-2">
+              <Pagination
+                currentPage={page}
+                totalPages={totalPages}
+                onPageChange={setPage}
+                totalItems={filteredTables.length}
+                pageSize={pageSize}
+                pageSizeOptions={[10, 25, 50]}
+                onPageSizeChange={(newSize) => {
+                  setPageSize(newSize);
+                  setPage(1);
+                }}
+              />
+            </div>
+          )}
+        </div>
       )}
 
       {/* Delete Confirmation Modal */}

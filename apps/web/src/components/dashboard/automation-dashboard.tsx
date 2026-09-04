@@ -477,7 +477,7 @@ export function AutomationDashboard() {
                   <button
                     type="button"
                     onClick={() => deleteRule(rule.id)}
-                    className="text-xs text-atlas-error hover:text-red-300"
+                    className="text-xs text-atlas-error hover:text-atlas-error"
                   >
                     🗑️
                   </button>

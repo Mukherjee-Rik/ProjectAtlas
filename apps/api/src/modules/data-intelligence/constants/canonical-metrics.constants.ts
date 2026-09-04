@@ -41,19 +41,19 @@ export const OPERATIONAL_EVENT_TYPES = {
 } as const;
 
 export type OperationalEventType =
-  typeof OPERATIONAL_EVENT_TYPES[keyof typeof OPERATIONAL_EVENT_TYPES];
+  (typeof OPERATIONAL_EVENT_TYPES)[keyof typeof OPERATIONAL_EVENT_TYPES];
 
 export const CUSTOMER_SEGMENTS = {
-  NEW: 'NEW',               // 1st order
-  RETURNING: 'RETURNING',   // 2-4 orders
-  FREQUENT: 'FREQUENT',     // 5+ orders
+  NEW: 'NEW', // 1st order
+  RETURNING: 'RETURNING', // 2-4 orders
+  FREQUENT: 'FREQUENT', // 5+ orders
   HIGH_VALUE: 'HIGH_VALUE', // Top 10% spend
-  AT_RISK: 'AT_RISK',       // > 45 days since last order
-  INACTIVE: 'INACTIVE',     // > 90 days since last order
+  AT_RISK: 'AT_RISK', // > 45 days since last order
+  INACTIVE: 'INACTIVE', // > 90 days since last order
 } as const;
 
 export type CustomerSegment =
-  typeof CUSTOMER_SEGMENTS[keyof typeof CUSTOMER_SEGMENTS];
+  (typeof CUSTOMER_SEGMENTS)[keyof typeof CUSTOMER_SEGMENTS];
 
 export const CANONICAL_TIME_INTERVALS = {
   HOURLY: 'HOURLY',
@@ -65,4 +65,4 @@ export const CANONICAL_TIME_INTERVALS = {
 } as const;
 
 export type CanonicalTimeInterval =
-  typeof CANONICAL_TIME_INTERVALS[keyof typeof CANONICAL_TIME_INTERVALS];
+  (typeof CANONICAL_TIME_INTERVALS)[keyof typeof CANONICAL_TIME_INTERVALS];

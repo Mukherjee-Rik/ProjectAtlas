@@ -96,7 +96,9 @@ export class RestaurantAccessGuard implements CanActivate {
       );
 
       if (!membership) {
-        throw new ForbiddenException('You do not have access to this restaurant');
+        throw new ForbiddenException(
+          'You do not have access to this restaurant',
+        );
       }
 
       if (!request.tenant && membership.tenant) {

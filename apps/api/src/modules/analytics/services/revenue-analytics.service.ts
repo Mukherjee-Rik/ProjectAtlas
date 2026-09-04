@@ -62,8 +62,12 @@ export class RevenueAnalyticsService {
     let totalRefunds = 0;
     let cancelledRevenue = 0;
 
-    const sourceBreakdown: Record<string, { count: number; volume: number }> = {};
-    const branchBreakdown: Record<string, { branchId: string; name: string; volume: number; orders: number }> = {};
+    const sourceBreakdown: Record<string, { count: number; volume: number }> =
+      {};
+    const branchBreakdown: Record<
+      string,
+      { branchId: string; name: string; volume: number; orders: number }
+    > = {};
 
     orders.forEach((o) => {
       const isCancelled = o.status === 'CANCELLED';
@@ -91,7 +95,12 @@ export class RevenueAnalyticsService {
       // Branch distribution
       const bId = o.branch.id;
       if (!branchBreakdown[bId]) {
-        branchBreakdown[bId] = { branchId: bId, name: o.branch.name, volume: 0, orders: 0 };
+        branchBreakdown[bId] = {
+          branchId: bId,
+          name: o.branch.name,
+          volume: 0,
+          orders: 0,
+        };
       }
       branchBreakdown[bId].volume += tot;
       branchBreakdown[bId].orders += 1;
@@ -104,11 +113,13 @@ export class RevenueAnalyticsService {
     });
 
     // Payment methods breakdown
-    const paymentMethodsMap: Record<string, { count: number; volume: number }> = {};
+    const paymentMethodsMap: Record<string, { count: number; volume: number }> =
+      {};
     payments.forEach((p) => {
       if (p.status === 'SUCCESS') {
         const m = p.method || 'CASH';
-        if (!paymentMethodsMap[m]) paymentMethodsMap[m] = { count: 0, volume: 0 };
+        if (!paymentMethodsMap[m])
+          paymentMethodsMap[m] = { count: 0, volume: 0 };
         paymentMethodsMap[m].count += 1;
         paymentMethodsMap[m].volume += Number(p.amount);
       }
@@ -124,21 +135,29 @@ export class RevenueAnalyticsService {
         totalRefunds: Math.round(totalRefunds * 100) / 100,
         cancelledRevenue: Math.round(cancelledRevenue * 100) / 100,
       },
-      channelDistribution: Object.entries(sourceBreakdown).map(([source, data]) => ({
-        channel: source,
-        ordersCount: data.count,
-        revenue: Math.round(data.volume * 100) / 100,
-        sharePercentage: grossRevenue > 0 ? Math.round((data.volume / grossRevenue) * 10000) / 100 : 0,
-      })),
-      paymentMethodDistribution: Object.entries(paymentMethodsMap).map(([method, data]) => ({
-        method,
-        transactionsCount: data.count,
-        volume: Math.round(data.volume * 100) / 100,
-      })),
+      channelDistribution: Object.entries(sourceBreakdown).map(
+        ([source, data]) => ({
+          channel: source,
+          ordersCount: data.count,
+          revenue: Math.round(data.volume * 100) / 100,
+          sharePercentage:
+            grossRevenue > 0
+              ? Math.round((data.volume / grossRevenue) * 10000) / 100
+              : 0,
+        }),
+      ),
+      paymentMethodDistribution: Object.entries(paymentMethodsMap).map(
+        ([method, data]) => ({
+          method,
+          transactionsCount: data.count,
+          volume: Math.round(data.volume * 100) / 100,
+        }),
+      ),
       branchRevenueSummary: Object.values(branchBreakdown).map((b) => ({
         ...b,
         volume: Math.round(b.volume * 100) / 100,
-        averageOrderValue: b.orders > 0 ? Math.round((b.volume / b.orders) * 100) / 100 : 0,
+        averageOrderValue:
+          b.orders > 0 ? Math.round((b.volume / b.orders) * 100) / 100 : 0,
       })),
     };
   }

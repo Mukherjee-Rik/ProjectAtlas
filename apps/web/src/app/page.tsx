@@ -10,7 +10,7 @@ import { ScrollReveal, ScrollStagger, staggerItemVariants } from '@/components/l
 import { AuthenticHeroTerminal } from '@/components/landing/AuthenticHeroTerminal';
 import { BentoModulesGrid } from '@/components/landing/BentoModulesGrid';
 import { ServiceFlow } from '@/components/landing/ServiceFlow';
-import { SplineScene } from '@/components/ui/splite';
+import { InteractiveTableStandee } from '@/components/landing/InteractiveTableStandee';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 /* ---------------------------------------------------------------------------
@@ -234,9 +234,14 @@ export default function Home() {
 
       {/* ═══ Hero ════════════════════════════════════════════════════════
           Reduced gap between navbar and content for a crisp, immediate hero view */}
-      <section className="mx-auto max-w-6xl px-6 pb-14 pt-4 sm:pt-8 lg:px-8">
-        <div className="grid items-center gap-x-8 gap-y-8 md:grid-cols-12">
-          <div className="md:col-span-7">
+      {/* No hero image, deliberately. The type carries this section and the
+          floor view lands immediately below — a mockup in a narrow column
+          only ever competed with the headline. The measure is capped so the
+          space to the right reads as composition rather than a gap. */}
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 pb-20 pt-8 sm:pt-14 lg:px-8 lg:pb-24">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 xl:gap-12 items-center">
+          {/* Hero Left Column */}
+          <div className="lg:col-span-6 xl:col-span-5">
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -251,7 +256,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.55, delay: 0.05, ease: [0.22, 0.61, 0.36, 1] }}
-              className="mt-3.5 font-display text-[2.4rem] font-extrabold leading-[1.02] tracking-[-0.04em] text-foreground sm:text-[3.25rem] lg:text-[3.85rem]"
+              className="mt-5 max-w-4xl font-display text-[2.4rem] font-extrabold leading-[1.02] tracking-[-0.04em] text-foreground sm:text-[3.2rem] lg:text-[3.8rem]"
             >
               Nothing gets lost
               <br />
@@ -264,61 +269,52 @@ export default function Home() {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.55, delay: 0.15, ease: [0.22, 0.61, 0.36, 1] }}
-              className="mt-4 max-w-lg text-[14.5px] leading-[1.7] text-muted-foreground"
+              className="mt-6 max-w-xl text-[14px] sm:text-[15px] leading-[1.7] text-muted-foreground"
             >
               Kafei runs the whole floor on one system: the QR menu your guests order
               from, the screen your kitchen cooks off, the tablet your waiters carry,
               and the counter where the bill gets settled.
             </motion.p>
+
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.55, delay: 0.25, ease: [0.22, 0.61, 0.36, 1] }}
+              className="mt-8 flex flex-col items-start gap-x-8 gap-y-4 sm:flex-row sm:items-center"
+            >
+              <Link
+                href="/signup"
+                className="group inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 text-[14px] font-semibold text-background transition-colors hover:bg-primary-hover sm:w-auto"
+              >
+                Start free for 14 days
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+              </Link>
+              <a
+                href="#floor"
+                className="inline-flex items-center gap-2 border-b border-border pb-0.5 text-[14px] text-foreground transition-colors hover:border-border hover:text-foreground"
+              >
+                See the floor view
+              </a>
+            </motion.div>
+
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+              className="mt-6 font-mono text-[12px] text-subtle"
+            >
+              Or poke around the live demo —{' '}
+              <span className="text-muted-foreground">demo@kafei.app</span>
+              <span className="mx-1.5 text-subtle">/</span>
+              <span className="text-muted-foreground">Kafei@12345</span>
+            </motion.p>
           </div>
 
-          {/* Spline scene */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.9, delay: 0.3 }}
-            className="flex items-center justify-center md:col-span-5"
-            aria-hidden="true"
-          >
-            <SplineScene
-              scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
-              className="aspect-square w-full max-w-[280px] md:max-w-[440px]"
-            />
-          </motion.div>
+          {/* Hero Right Column: Interactive 3D Acrylic Table Standee */}
+          <div className="lg:col-span-6 xl:col-span-7 min-w-0">
+            <InteractiveTableStandee />
+          </div>
         </div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55, delay: 0.25, ease: [0.22, 0.61, 0.36, 1] }}
-          className="mt-4 flex flex-col items-start gap-x-8 gap-y-4 sm:flex-row sm:items-center"
-        >
-          <Link
-            href="/signup"
-            className="group inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 text-[14px] font-semibold text-background transition-colors hover:bg-primary-hover sm:w-auto"
-          >
-            Start free for 14 days
-            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-          </Link>
-          <a
-            href="#floor"
-            className="inline-flex items-center gap-2 border-b border-border pb-0.5 text-[14px] text-foreground transition-colors hover:border-border hover:text-foreground"
-          >
-            See the floor view
-          </a>
-        </motion.div>
-
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-          className="mt-6 font-mono text-[12px] text-subtle"
-        >
-          Or poke around the live demo —{' '}
-          <span className="text-muted-foreground">demo@kafei.app</span>
-          <span className="mx-1.5 text-subtle">/</span>
-          <span className="text-muted-foreground">Kafei@12345</span>
-        </motion.p>
       </section>
 
       {/* ═══ Facts strip ═════════════════════════════════════════════════
@@ -666,17 +662,52 @@ export default function Home() {
 
             <div className="md:col-span-2">
               <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-subtle">
-                Account
+                Legal & Trust
               </p>
               <ul className="mt-4 space-y-2.5 text-[13px] text-muted-foreground">
                 <li>
-                  <Link href="/login" className="transition-colors hover:text-foreground">
-                    Sign in
+                  <Link href="/privacy" className="transition-colors hover:text-foreground">
+                    Privacy Policy
                   </Link>
                 </li>
                 <li>
-                  <Link href="/signup" className="transition-colors hover:text-foreground">
-                    Create account
+                  <Link href="/terms" className="transition-colors hover:text-foreground">
+                    Terms of Service
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/cookies" className="transition-colors hover:text-foreground">
+                    Cookie Policy
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/security" className="transition-colors hover:text-foreground">
+                    Security Policy
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/ai-policy" className="transition-colors hover:text-foreground">
+                    AI Usage Policy
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/dpa" className="transition-colors hover:text-foreground">
+                    Data Processing (DPA)
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/data-deletion" className="transition-colors hover:text-foreground">
+                    Data Deletion
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/refunds" className="transition-colors hover:text-foreground">
+                    Refund & Cancellation
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/legal" className="text-primary font-medium hover:underline">
+                    All legal policies →
                   </Link>
                 </li>
               </ul>
@@ -684,7 +715,7 @@ export default function Home() {
 
             <div className="md:col-span-2">
               <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-subtle">
-                Help
+                Help & Contact
               </p>
               <ul className="mt-4 space-y-2.5 text-[13px] text-muted-foreground">
                 <li>
@@ -702,13 +733,36 @@ export default function Home() {
                     Contact & Talk to Us
                   </Link>
                 </li>
+                <li>
+                  <a href="tel:9903085026" className="text-primary font-mono text-[12px] hover:underline">
+                    +91 9903085026
+                  </a>
+                </li>
               </ul>
             </div>
           </div>
 
-          <p className="mt-14 border-t border-border pt-7 text-[12px] text-subtle">
-            © {new Date().getFullYear()} Kafei
-          </p>
+          <div className="mt-14 flex flex-col sm:flex-row items-center justify-between border-t border-border pt-7 text-[12px] text-subtle gap-4">
+            <p>© {new Date().getFullYear()} Antigravity. All rights reserved.</p>
+            <div className="flex flex-wrap items-center gap-4">
+              <Link href="/privacy" className="hover:text-foreground transition-colors">Privacy</Link>
+              <Link href="/terms" className="hover:text-foreground transition-colors">Terms</Link>
+              <Link href="/cookies" className="hover:text-foreground transition-colors">Cookies</Link>
+              <button
+                type="button"
+                onClick={() => {
+                  if (typeof window !== 'undefined') {
+                    window.dispatchEvent(new CustomEvent('kafei:open-cookie-preferences'));
+                  }
+                }}
+                className="hover:text-foreground transition-colors cursor-pointer"
+              >
+                Cookie Preferences
+              </button>
+              <Link href="/data-deletion" className="hover:text-foreground transition-colors">Data Deletion</Link>
+              <Link href="/legal" className="hover:text-foreground transition-colors">Legal Hub</Link>
+            </div>
+          </div>
         </div>
       </footer>
     </div>

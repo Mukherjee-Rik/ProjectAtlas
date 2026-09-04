@@ -37,7 +37,11 @@ describe('QueueService', () => {
       throw new Error('Timeout error');
     });
 
-    const job = queue.enqueue('REPORT', { reportId: '123' }, { maxAttempts: 3 });
+    const job = queue.enqueue(
+      'REPORT',
+      { reportId: '123' },
+      { maxAttempts: 3 },
+    );
 
     // Attempt 1 -> should fail and enter RETRYING
     await (queue as any).processNext();
@@ -52,7 +56,11 @@ describe('QueueService', () => {
       throw new Error('Fatal database constraint');
     });
 
-    const job = queue.enqueue('AUTOMATION', { ruleId: 'rule_1' }, { maxAttempts: 1 });
+    const job = queue.enqueue(
+      'AUTOMATION',
+      { ruleId: 'rule_1' },
+      { maxAttempts: 1 },
+    );
 
     // Attempt 1 (max 1) -> DEAD_LETTER
     await (queue as any).processNext();
@@ -71,7 +79,11 @@ describe('QueueService', () => {
       throw new Error('SMTP host unreachable');
     });
 
-    const job = queue.enqueue('EMAIL', { to: 'chef@atlas.com' }, { maxAttempts: 1 });
+    const job = queue.enqueue(
+      'EMAIL',
+      { to: 'chef@atlas.com' },
+      { maxAttempts: 1 },
+    );
     await (queue as any).processNext();
     expect(job.status).toBe('DEAD_LETTER');
 

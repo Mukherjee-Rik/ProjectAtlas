@@ -26,14 +26,20 @@ async function main() {
   });
 
   if (!restaurant) {
-    throw new Error('Restaurant "sweta r restaurant" not found in database. Please verify name.');
+    throw new Error(
+      'Restaurant "sweta r restaurant" not found in database. Please verify name.',
+    );
   }
 
-  console.log(`Found restaurant: ${restaurant.name} (Tenant: ${restaurant.tenant.name})`);
+  console.log(
+    `Found restaurant: ${restaurant.name} (Tenant: ${restaurant.tenant.name})`,
+  );
 
   const branch = restaurant.branches[0];
   if (!branch) {
-    throw new Error(`No branches found for restaurant ${restaurant.name}. Please configure a branch first.`);
+    throw new Error(
+      `No branches found for restaurant ${restaurant.name}. Please configure a branch first.`,
+    );
   }
   console.log(`Using branch: ${branch.name} (Code: ${branch.code})`);
 
@@ -93,7 +99,7 @@ async function main() {
 
   // 3. Create or Find Ingredients
   console.log('Ensuring Ingredients exist...');
-  
+
   // Chicken
   const chicken = await prisma.ingredient.upsert({
     where: { id: 'ing-chicken-sweta' },
@@ -105,8 +111,8 @@ async function main() {
       name: 'Chicken (Fresh)',
       unitOfMeasure: 'GRAM',
       costPerUnit: 0.35, // INR per gram
-      currentStock: 50000.00, // 50kg initial stock
-      minimumReorderLevel: 10000.00, // 10kg limit
+      currentStock: 50000.0, // 50kg initial stock
+      minimumReorderLevel: 10000.0, // 10kg limit
       supplierId: meatSupplier.id,
       locationId: coldStorage.id,
     },
@@ -123,8 +129,8 @@ async function main() {
       name: 'Mutton (Prime Cut)',
       unitOfMeasure: 'GRAM',
       costPerUnit: 0.65, // INR per gram
-      currentStock: 30000.00, // 30kg initial stock
-      minimumReorderLevel: 5000.00, // 5kg limit
+      currentStock: 30000.0, // 30kg initial stock
+      minimumReorderLevel: 5000.0, // 5kg limit
       supplierId: meatSupplier.id,
       locationId: coldStorage.id,
     },
@@ -141,8 +147,8 @@ async function main() {
       name: 'Onions',
       unitOfMeasure: 'GRAM',
       costPerUnit: 0.05, // INR per gram
-      currentStock: 100000.00, // 100kg initial stock
-      minimumReorderLevel: 20000.00, // 20kg limit
+      currentStock: 100000.0, // 100kg initial stock
+      minimumReorderLevel: 20000.0, // 20kg limit
       supplierId: vegSupplier.id,
       locationId: dryPantry.id,
     },
@@ -159,8 +165,8 @@ async function main() {
       name: 'Garlic',
       unitOfMeasure: 'GRAM',
       costPerUnit: 0.15,
-      currentStock: 10000.00, // 10kg
-      minimumReorderLevel: 2000.00, // 2kg
+      currentStock: 10000.0, // 10kg
+      minimumReorderLevel: 2000.0, // 2kg
       supplierId: vegSupplier.id,
       locationId: dryPantry.id,
     },
@@ -177,8 +183,8 @@ async function main() {
       name: 'Ginger',
       unitOfMeasure: 'GRAM',
       costPerUnit: 0.15,
-      currentStock: 10000.00, // 10kg
-      minimumReorderLevel: 2000.00, // 2kg
+      currentStock: 10000.0, // 10kg
+      minimumReorderLevel: 2000.0, // 2kg
       supplierId: vegSupplier.id,
       locationId: dryPantry.id,
     },
@@ -203,7 +209,9 @@ async function main() {
   });
 
   if (biryaniItems.length === 0) {
-    console.log('⚠️ No Biryani menu items found. Checking all menu items for the restaurant...');
+    console.log(
+      '⚠️ No Biryani menu items found. Checking all menu items for the restaurant...',
+    );
     const allItems = await prisma.menuItem.findMany({
       where: {
         category: {
@@ -213,16 +221,22 @@ async function main() {
         },
       },
     });
-    console.log(`All available items: ${allItems.map(i => i.name).join(', ')}`);
-    console.log('Writing standard Biryani recipe config for any newly added items...');
+    console.log(
+      `All available items: ${allItems.map((i) => i.name).join(', ')}`,
+    );
+    console.log(
+      'Writing standard Biryani recipe config for any newly added items...',
+    );
   } else {
-    console.log(`Found ${biryaniItems.length} Biryani item(s): ${biryaniItems.map(i => i.name).join(', ')}`);
+    console.log(
+      `Found ${biryaniItems.length} Biryani item(s): ${biryaniItems.map((i) => i.name).join(', ')}`,
+    );
   }
 
   // Create recipes
   for (const item of biryaniItems) {
     console.log(`Setting up recipe for: ${item.name}...`);
-    
+
     // Choose meat type based on name
     const isMutton = item.name.toLowerCase().includes('mutton');
     const meatIngredientId = isMutton ? mutton.id : chicken.id;
@@ -245,14 +259,32 @@ async function main() {
     // Add ingredients to recipe
     await prisma.recipeIngredient.createMany({
       data: [
-        { recipeId: recipe.id, ingredientId: meatIngredientId, quantityRequired: 250.00 }, // 250g meat
-        { recipeId: recipe.id, ingredientId: onion.id, quantityRequired: 100.00 },        // 100g onion
-        { recipeId: recipe.id, ingredientId: garlic.id, quantityRequired: 15.00 },         // 15g garlic
-        { recipeId: recipe.id, ingredientId: ginger.id, quantityRequired: 15.00 },         // 15g ginger
+        {
+          recipeId: recipe.id,
+          ingredientId: meatIngredientId,
+          quantityRequired: 250.0,
+        }, // 250g meat
+        {
+          recipeId: recipe.id,
+          ingredientId: onion.id,
+          quantityRequired: 100.0,
+        }, // 100g onion
+        {
+          recipeId: recipe.id,
+          ingredientId: garlic.id,
+          quantityRequired: 15.0,
+        }, // 15g garlic
+        {
+          recipeId: recipe.id,
+          ingredientId: ginger.id,
+          quantityRequired: 15.0,
+        }, // 15g ginger
       ],
     });
 
-    console.log(`Recipe configured: 250g of ${meatName}, 100g of Onion, 15g of Garlic, 15g of Ginger per plate of ${item.name}.`);
+    console.log(
+      `Recipe configured: 250g of ${meatName}, 100g of Onion, 15g of Garlic, 15g of Ginger per plate of ${item.name}.`,
+    );
   }
 
   console.log('Seed completed successfully!');

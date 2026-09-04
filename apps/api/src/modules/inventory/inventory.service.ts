@@ -1,6 +1,15 @@
-import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  Logger,
+} from '@nestjs/common';
 import { PrismaService } from '../../database/prisma/prisma.service';
-import { UnitOfMeasure, StockTransactionType, RecipeType } from '../../generated/prisma/enums';
+import {
+  UnitOfMeasure,
+  StockTransactionType,
+  RecipeType,
+} from '../../generated/prisma/enums';
 import { convertQuantity } from './utils/unit-converter';
 
 @Injectable()
@@ -15,10 +24,7 @@ export class InventoryService {
   async getInventoryOverview(restaurantId: string, branchId?: string) {
     const whereClause: any = { restaurantId };
     if (branchId) {
-      whereClause.OR = [
-        { location: { branchId } },
-        { locationId: null },
-      ];
+      whereClause.OR = [{ location: { branchId } }, { locationId: null }];
     }
 
     const ingredients = await this.prisma.ingredient.findMany({
@@ -63,8 +69,20 @@ export class InventoryService {
         costPerUnit: cost,
         totalValuation: Math.round(itemValuation * 100) / 100,
         status,
-        location: ing.location ? { id: ing.location.id, name: ing.location.name, code: ing.location.code } : null,
-        supplier: ing.supplier ? { id: ing.supplier.id, name: ing.supplier.name, phone: ing.supplier.phone } : null,
+        location: ing.location
+          ? {
+              id: ing.location.id,
+              name: ing.location.name,
+              code: ing.location.code,
+            }
+          : null,
+        supplier: ing.supplier
+          ? {
+              id: ing.supplier.id,
+              name: ing.supplier.name,
+              phone: ing.supplier.phone,
+            }
+          : null,
         recipesCount: ing.recipeIngredients.length,
         createdAt: ing.createdAt,
         updatedAt: ing.updatedAt,
@@ -259,7 +277,10 @@ export class InventoryService {
         where: { id: ingredient.id },
         data: {
           currentStock: newStock,
-          costPerUnit: dto.costPerUnit !== undefined ? dto.costPerUnit : ingredient.costPerUnit,
+          costPerUnit:
+            dto.costPerUnit !== undefined
+              ? dto.costPerUnit
+              : ingredient.costPerUnit,
           supplierId: dto.supplierId || ingredient.supplierId,
         },
       });
@@ -310,7 +331,10 @@ export class InventoryService {
     );
 
     const currentStock = Number(ingredient.currentStock || 0);
-    const newStock = Math.max(0, Math.round((currentStock - wastedQty) * 1000) / 1000);
+    const newStock = Math.max(
+      0,
+      Math.round((currentStock - wastedQty) * 1000) / 1000,
+    );
 
     return this.prisma.$transaction(async (tx) => {
       const branch = await tx.branch.findFirst({
@@ -413,7 +437,9 @@ export class InventoryService {
       where: { referenceOrderId: orderId, transactionType: 'RECIPE_DEDUCTION' },
     });
     if (existingDeduction) {
-      this.logger.log(`Stock for order ${orderId} has already been deducted. Skipping.`);
+      this.logger.log(
+        `Stock for order ${orderId} has already been deducted. Skipping.`,
+      );
       return;
     }
 
@@ -445,7 +471,11 @@ export class InventoryService {
 
     for (const orderItem of order.items) {
       const recipe = orderItem.menuItem?.recipe;
-      if (!recipe || !recipe.recipeIngredients || recipe.recipeIngredients.length === 0) {
+      if (
+        !recipe ||
+        !recipe.recipeIngredients ||
+        recipe.recipeIngredients.length === 0
+      ) {
         continue;
       }
 
@@ -460,7 +490,10 @@ export class InventoryService {
 
         if (preparedStock >= orderQty) {
           // Deduct directly from ready prepared portions
-          const newPreparedStock = Math.max(0, Math.round((preparedStock - orderQty) * 100) / 100);
+          const newPreparedStock = Math.max(
+            0,
+            Math.round((preparedStock - orderQty) * 100) / 100,
+          );
 
           await prismaClient.recipe.update({
             where: { id: recipe.id },
@@ -470,7 +503,11 @@ export class InventoryService {
           // FIFO deduction across active BatchProduction runs
           let qtyToDeduct = orderQty;
           const activeBatches = await prismaClient.batchProduction.findMany({
-            where: { recipeId: recipe.id, status: 'ACTIVE', portionsRemaining: { gt: 0 } },
+            where: {
+              recipeId: recipe.id,
+              status: 'ACTIVE',
+              portionsRemaining: { gt: 0 },
+            },
             orderBy: { producedAt: 'asc' },
           });
 
@@ -535,7 +572,8 @@ export class InventoryService {
 
         // Calculate consumed quantity in recipe's unit then normalize to ingredient's unit
         const yieldRatio = Number(recipe.batchYieldPortions || 1);
-        const rawQuantity = (Number(recipeIng.quantityRequired) / yieldRatio) * orderQty;
+        const rawQuantity =
+          (Number(recipeIng.quantityRequired) / yieldRatio) * orderQty;
 
         let normalizedQty = rawQuantity;
         if (ingredient.unitOfMeasure === 'KG' && rawQuantity > 5) {
@@ -545,7 +583,8 @@ export class InventoryService {
         }
 
         const currentStock = Number(ingredient.currentStock || 0);
-        const newStock = Math.round((currentStock - normalizedQty) * 1000) / 1000;
+        const newStock =
+          Math.round((currentStock - normalizedQty) * 1000) / 1000;
 
         // Decrement stock
         await prismaClient.ingredient.update({
@@ -581,7 +620,11 @@ export class InventoryService {
                 title: `⚠️ Low Stock Alert: ${ingredient.name}`,
                 message: `Current stock of ${ingredient.name} has dropped to ${newStock} ${ingredient.unitOfMeasure}. Minimum threshold is ${ingredient.minimumReorderLevel}.`,
                 type: 'ALERT',
-                metadata: { alertType: 'LOW_STOCK', priority: 'HIGH', ingredientId: ingredient.id },
+                metadata: {
+                  alertType: 'LOW_STOCK',
+                  priority: 'HIGH',
+                  ingredientId: ingredient.id,
+                },
               },
             });
           } catch (notifErr) {
@@ -618,7 +661,8 @@ export class InventoryService {
 
       const returnQty = Math.abs(Number(entry.quantityDelta));
       const currentStock = Number(ingredient.currentStock || 0);
-      const restoredStock = Math.round((currentStock + returnQty) * 1000) / 1000;
+      const restoredStock =
+        Math.round((currentStock + returnQty) * 1000) / 1000;
 
       await prismaClient.ingredient.update({
         where: { id: ingredient.id },
@@ -659,7 +703,8 @@ export class InventoryService {
     notes?: string;
     expiresAt?: Date;
   }) {
-    const { tenantId, branchId, recipeId, portionsProduced, notes, expiresAt } = dto;
+    const { tenantId, branchId, recipeId, portionsProduced, notes, expiresAt } =
+      dto;
     if (portionsProduced <= 0) {
       throw new BadRequestException('Portions produced must be greater than 0');
     }
@@ -694,7 +739,10 @@ export class InventoryService {
         }
 
         const currentStock = Number(ing.currentStock || 0);
-        const newStock = Math.max(0, Math.round((currentStock - normalizedQty) * 1000) / 1000);
+        const newStock = Math.max(
+          0,
+          Math.round((currentStock - normalizedQty) * 1000) / 1000,
+        );
 
         await tx.ingredient.update({
           where: { id: ing.id },
@@ -717,7 +765,8 @@ export class InventoryService {
 
       // 2. Increment prepared ready stock on Recipe
       const currentPrepared = Number(recipe.preparedStock || 0);
-      const newPreparedStock = Math.round((currentPrepared + portionsProduced) * 100) / 100;
+      const newPreparedStock =
+        Math.round((currentPrepared + portionsProduced) * 100) / 100;
 
       await tx.recipe.update({
         where: { id: recipe.id },
@@ -735,7 +784,8 @@ export class InventoryService {
           recipeId: recipe.id,
           portionsProduced,
           portionsRemaining: portionsProduced,
-          notes: notes || `Cooked batch of ${portionsProduced} portions for service`,
+          notes:
+            notes || `Cooked batch of ${portionsProduced} portions for service`,
           expiresAt,
           status: 'ACTIVE',
         },
@@ -769,12 +819,18 @@ export class InventoryService {
 
     const recipe = await this.prisma.recipe.findUnique({
       where: { id: recipeId },
-      include: { menuItem: true, recipeIngredients: { include: { ingredient: true } } },
+      include: {
+        menuItem: true,
+        recipeIngredients: { include: { ingredient: true } },
+      },
     });
     if (!recipe) throw new NotFoundException('Recipe not found');
 
     const currentPrepared = Number(recipe.preparedStock || 0);
-    const newPreparedStock = Math.max(0, Math.round((currentPrepared - portionsWasted) * 100) / 100);
+    const newPreparedStock = Math.max(
+      0,
+      Math.round((currentPrepared - portionsWasted) * 100) / 100,
+    );
 
     return this.prisma.$transaction(async (tx) => {
       // 1. Decrement prepared stock
@@ -786,7 +842,11 @@ export class InventoryService {
       // 2. Decrement remaining on active batches
       let qtyToWastage = portionsWasted;
       const batches = await tx.batchProduction.findMany({
-        where: { recipeId: recipe.id, status: 'ACTIVE', portionsRemaining: { gt: 0 } },
+        where: {
+          recipeId: recipe.id,
+          status: 'ACTIVE',
+          portionsRemaining: { gt: 0 },
+        },
         orderBy: { producedAt: 'asc' },
       });
 
@@ -801,7 +861,9 @@ export class InventoryService {
           data: {
             portionsRemaining: remAfter,
             status: remAfter <= 0 ? 'DISCARDED' : 'ACTIVE',
-            notes: notes ? `${batch.notes || ''} [Wastage: ${reason}]` : batch.notes,
+            notes: notes
+              ? `${batch.notes || ''} [Wastage: ${reason}]`
+              : batch.notes,
           },
         });
         qtyToWastage -= deduct;
@@ -919,10 +981,17 @@ export class InventoryService {
               ingredientName: ri.ingredient.name,
               quantityRequired: Number(ri.quantityRequired),
               unitOfMeasure: ri.ingredient.unitOfMeasure,
-              costContribution: Math.round(Number(ri.quantityRequired) * Number(ri.ingredient.costPerUnit) * 100) / 100,
+              costContribution:
+                Math.round(
+                  Number(ri.quantityRequired) *
+                    Number(ri.ingredient.costPerUnit) *
+                    100,
+                ) / 100,
             })),
             totalRecipeCost: item.recipe.recipeIngredients.reduce(
-              (sum, ri) => sum + Number(ri.quantityRequired) * Number(ri.ingredient.costPerUnit),
+              (sum, ri) =>
+                sum +
+                Number(ri.quantityRequired) * Number(ri.ingredient.costPerUnit),
               0,
             ),
           }
@@ -992,7 +1061,9 @@ export class InventoryService {
         data: {
           menuItemId: dto.menuItemId,
           recipeType: dto.recipeType || 'COOKED_TO_ORDER',
-          batchYieldPortions: dto.batchYieldPortions ? Number(dto.batchYieldPortions) : 1,
+          batchYieldPortions: dto.batchYieldPortions
+            ? Number(dto.batchYieldPortions)
+            : 1,
           preparedStock: existing?.preparedStock || 0,
         },
       });
@@ -1024,7 +1095,11 @@ export class InventoryService {
   // =========================================================================
   async getMovements(
     restaurantId: string,
-    filter?: { type?: StockTransactionType; ingredientId?: string; limit?: number },
+    filter?: {
+      type?: StockTransactionType;
+      ingredientId?: string;
+      limit?: number;
+    },
     branchId?: string,
   ) {
     const where: any = {

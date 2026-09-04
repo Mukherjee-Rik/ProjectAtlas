@@ -14,7 +14,8 @@ import { RestaurantStatus } from '../../../generated/prisma/enums';
 export class CreateRestaurantDto {
   @ApiPropertyOptional({
     example: '123e4567-e89b-12d3-a456-426614174000',
-    description: 'UUID of the owning tenant (optional, inferred from X-Tenant-Id header)',
+    description:
+      'UUID of the owning tenant (optional, inferred from X-Tenant-Id header)',
   })
   @IsOptional()
   @IsUUID()

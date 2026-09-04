@@ -104,8 +104,8 @@ describe('UsersService', () => {
 
     const result = await service.findAll({
       search: 'john',
-      role: 'ADMIN' as any,
-      status: 'ACTIVE' as any,
+      role: 'ADMIN',
+      status: 'ACTIVE',
       page: 2,
       limit: 10,
     });
@@ -249,7 +249,7 @@ describe('UsersService', () => {
       name: 'Admin User',
       email: 'admin@example.com',
       password: 'Password123!',
-      role: 'ADMIN' as any,
+      role: 'ADMIN',
     });
 
     expect(result.role).toBe('ADMIN');
@@ -279,8 +279,8 @@ describe('UsersService', () => {
     });
 
     const result = await service.update('user-id', {
-      role: 'ADMIN' as any,
-      status: 'SUSPENDED' as any,
+      role: 'ADMIN',
+      status: 'SUSPENDED',
     });
 
     expect(result.role).toBe('ADMIN');
@@ -327,9 +327,7 @@ describe('UsersService', () => {
   it('should prevent an admin from deactivating their own account', async () => {
     await expect(
       service.remove('same-user-id', 'same-user-id'),
-    ).rejects.toThrow(
-      'You cannot deactivate your own account',
-    );
+    ).rejects.toThrow('You cannot deactivate your own account');
 
     expect(prismaService.user.findUnique).not.toHaveBeenCalled();
   });

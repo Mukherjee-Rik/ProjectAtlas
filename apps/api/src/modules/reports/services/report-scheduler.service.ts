@@ -14,7 +14,12 @@ export class ReportSchedulerService {
     tenantId: string,
     dto: CreateReportScheduleDto,
   ) {
-    const nextRunAt = this.calculateNextRun(dto.frequency, dto.timeOfDay || '09:00', dto.dayOfWeek, dto.dayOfMonth);
+    const nextRunAt = this.calculateNextRun(
+      dto.frequency,
+      dto.timeOfDay || '09:00',
+      dto.dayOfWeek,
+      dto.dayOfMonth,
+    );
 
     return this.prisma.reportSchedule.create({
       data: {
@@ -49,7 +54,11 @@ export class ReportSchedulerService {
     });
   }
 
-  async toggleSchedule(scheduleId: string, restaurantId: string, enabled: boolean) {
+  async toggleSchedule(
+    scheduleId: string,
+    restaurantId: string,
+    enabled: boolean,
+  ) {
     const schedule = await this.prisma.reportSchedule.findFirst({
       where: { id: scheduleId, restaurantId },
     });

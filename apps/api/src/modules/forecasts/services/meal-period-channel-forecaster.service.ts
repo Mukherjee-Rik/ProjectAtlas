@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../database/prisma/prisma.service';
-import { MEAL_PERIODS, ORDER_CHANNELS } from '../constants/meal-periods.constants';
+import {
+  MEAL_PERIODS,
+  ORDER_CHANNELS,
+} from '../constants/meal-periods.constants';
 
 export interface MealPeriodForecast {
   periodId: string;
@@ -41,7 +44,10 @@ export class MealPeriodChannelForecasterService {
     tomorrowTotalSales: number,
     tomorrowTotalOrders: number,
     branchId?: string,
-  ): Promise<{ mealPeriods: MealPeriodForecast[]; channels: ChannelForecast[] }> {
+  ): Promise<{
+    mealPeriods: MealPeriodForecast[];
+    channels: ChannelForecast[];
+  }> {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
@@ -80,7 +86,7 @@ export class MealPeriodChannelForecasterService {
     };
 
     let totalHistoricalSales = 0;
-    let totalHistoricalOrders = orders.length;
+    const totalHistoricalOrders = orders.length;
 
     orders.forEach((o) => {
       const amt = Number(o.totalAmount);
@@ -104,7 +110,7 @@ export class MealPeriodChannelForecasterService {
 
       // Categorize channel
       const isDelivery = o.source === 'PROVIDER_A' || o.source === 'PROVIDER_B';
-      const ch = o.tableId ? 'DINE_IN' : (isDelivery ? 'DELIVERY' : 'TAKEOUT');
+      const ch = o.tableId ? 'DINE_IN' : isDelivery ? 'DELIVERY' : 'TAKEOUT';
       if (channelTotals[ch]) {
         channelTotals[ch].sales += amt;
         channelTotals[ch].orders += 1;
@@ -116,52 +122,60 @@ export class MealPeriodChannelForecasterService {
 
     // Default fallbacks if new restaurant
     const getPeriodShare = (pKey: string, defaultPct: number) =>
-      totalHistoricalSales > 0 ? periodTotals[pKey].sales / totalHistoricalSales : defaultPct;
+      totalHistoricalSales > 0
+        ? periodTotals[pKey].sales / totalHistoricalSales
+        : defaultPct;
 
     const getChannelShare = (cKey: string, defaultPct: number) =>
-      totalHistoricalSales > 0 ? channelTotals[cKey].sales / totalHistoricalSales : defaultPct;
+      totalHistoricalSales > 0
+        ? channelTotals[cKey].sales / totalHistoricalSales
+        : defaultPct;
 
     const periodShares = {
-      BREAKFAST: getPeriodShare('BREAKFAST', 0.10),
+      BREAKFAST: getPeriodShare('BREAKFAST', 0.1),
       LUNCH: getPeriodShare('LUNCH', 0.35),
       AFTERNOON: getPeriodShare('AFTERNOON', 0.15),
-      DINNER: getPeriodShare('DINNER', 0.40),
+      DINNER: getPeriodShare('DINNER', 0.4),
     };
 
     const channelShares = {
       DINE_IN: getChannelShare('DINE_IN', 0.65),
-      TAKEOUT: getChannelShare('TAKEOUT', 0.20),
+      TAKEOUT: getChannelShare('TAKEOUT', 0.2),
       DELIVERY: getChannelShare('DELIVERY', 0.15),
-      ONLINE: getChannelShare('ONLINE', 0.00),
+      ONLINE: getChannelShare('ONLINE', 0.0),
     };
 
-    const mealPeriods: MealPeriodForecast[] = Object.values(MEAL_PERIODS).map((mp) => {
-      const share = periodShares[mp.id as keyof typeof periodShares] || 0.25;
-      const predSales = Math.round(tomorrowTotalSales * share);
-      const predOrders = Math.round(tomorrowTotalOrders * share);
-      return {
-        periodId: mp.id,
-        label: mp.label,
-        timeRange: mp.description,
-        predictedSales: predSales,
-        predictedOrders: predOrders,
-        sharePercentage: Math.round(share * 1000) / 10,
-        isPeakPeriod: mp.id === 'LUNCH' || mp.id === 'DINNER',
-      };
-    });
+    const mealPeriods: MealPeriodForecast[] = Object.values(MEAL_PERIODS).map(
+      (mp) => {
+        const share = periodShares[mp.id] || 0.25;
+        const predSales = Math.round(tomorrowTotalSales * share);
+        const predOrders = Math.round(tomorrowTotalOrders * share);
+        return {
+          periodId: mp.id,
+          label: mp.label,
+          timeRange: mp.description,
+          predictedSales: predSales,
+          predictedOrders: predOrders,
+          sharePercentage: Math.round(share * 1000) / 10,
+          isPeakPeriod: mp.id === 'LUNCH' || mp.id === 'DINNER',
+        };
+      },
+    );
 
-    const channels: ChannelForecast[] = Object.values(ORDER_CHANNELS).map((ch) => {
-      const share = channelShares[ch.id as keyof typeof channelShares] || 0;
-      const predSales = Math.round(tomorrowTotalSales * share);
-      const predOrders = Math.round(tomorrowTotalOrders * share);
-      return {
-        channelId: ch.id,
-        label: ch.label,
-        predictedSales: predSales,
-        predictedOrders: predOrders,
-        sharePercentage: Math.round(share * 1000) / 10,
-      };
-    }).filter((c) => c.sharePercentage > 0);
+    const channels: ChannelForecast[] = Object.values(ORDER_CHANNELS)
+      .map((ch) => {
+        const share = channelShares[ch.id] || 0;
+        const predSales = Math.round(tomorrowTotalSales * share);
+        const predOrders = Math.round(tomorrowTotalOrders * share);
+        return {
+          channelId: ch.id,
+          label: ch.label,
+          predictedSales: predSales,
+          predictedOrders: predOrders,
+          sharePercentage: Math.round(share * 1000) / 10,
+        };
+      })
+      .filter((c) => c.sharePercentage > 0);
 
     return { mealPeriods, channels };
   }
@@ -169,7 +183,10 @@ export class MealPeriodChannelForecasterService {
   /**
    * Generates the 7x24 Operational Demand Intensity Heatmap matrix.
    */
-  async generateDemandHeatmap(restaurantId: string, branchId?: string): Promise<DemandHeatmapCell[][]> {
+  async generateDemandHeatmap(
+    restaurantId: string,
+    branchId?: string,
+  ): Promise<DemandHeatmapCell[][]> {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
@@ -186,10 +203,20 @@ export class MealPeriodChannelForecasterService {
       select: { createdAt: true },
     });
 
-    const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const DAY_NAMES = [
+      'Sunday',
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+    ];
 
     // 7 rows (days 0..6) x 24 cols (hours 0..23)
-    const counts: number[][] = Array.from({ length: 7 }, () => Array(24).fill(0));
+    const counts: number[][] = Array.from({ length: 7 }, () =>
+      Array(24).fill(0),
+    );
     const dayCounts: number[] = Array(7).fill(0);
 
     orders.forEach((o) => {

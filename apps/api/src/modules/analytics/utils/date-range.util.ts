@@ -1,7 +1,11 @@
 /**
  * Parses start and end dates with full inclusive time bounds (00:00:00.000 to 23:59:59.999).
  */
-export function parseDateBounds(dateFrom?: string, dateTo?: string, defaultDays = 30) {
+export function parseDateBounds(
+  dateFrom?: string,
+  dateTo?: string,
+  defaultDays = 30,
+) {
   let end: Date;
   if (!dateTo) {
     end = new Date();

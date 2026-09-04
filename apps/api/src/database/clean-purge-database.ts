@@ -24,8 +24,12 @@ async function main() {
   console.log('🚀 Starting Clean Selective Database Purge...\n');
 
   // Step 1: Update papa@papa.com to papa@atlas.com if papa@papa.com exists and papa@atlas.com does not
-  const papaPapa = await prisma.user.findUnique({ where: { email: 'papa@papa.com' } });
-  const papaAtlas = await prisma.user.findUnique({ where: { email: 'papa@atlas.com' } });
+  const papaPapa = await prisma.user.findUnique({
+    where: { email: 'papa@papa.com' },
+  });
+  const papaAtlas = await prisma.user.findUnique({
+    where: { email: 'papa@atlas.com' },
+  });
 
   if (papaPapa && !papaAtlas) {
     await prisma.user.update({
@@ -34,7 +38,9 @@ async function main() {
     });
     console.log('✅ Updated "papa@papa.com" -> "papa@atlas.com"');
   } else if (papaPapa && papaAtlas) {
-    console.log('ℹ️ Both papa@papa.com and papa@atlas.com exist; keeping both.');
+    console.log(
+      'ℹ️ Both papa@papa.com and papa@atlas.com exist; keeping both.',
+    );
   }
 
   // Active whitelist now
@@ -98,13 +104,21 @@ async function main() {
 
   // Analytics, Forecasting, Aggregates
   const delDailySalesAggs = await prisma.dailySalesAggregate.deleteMany({});
-  console.log(`- Deleted ${delDailySalesAggs.count} DailySalesAggregate records.`);
+  console.log(
+    `- Deleted ${delDailySalesAggs.count} DailySalesAggregate records.`,
+  );
 
-  const delMenuItemDailyMetrics = await prisma.menuItemDailyMetrics.deleteMany({});
-  console.log(`- Deleted ${delMenuItemDailyMetrics.count} MenuItemDailyMetrics records.`);
+  const delMenuItemDailyMetrics = await prisma.menuItemDailyMetrics.deleteMany(
+    {},
+  );
+  console.log(
+    `- Deleted ${delMenuItemDailyMetrics.count} MenuItemDailyMetrics records.`,
+  );
 
   const delOperationalEvents = await prisma.operationalEvent.deleteMany({});
-  console.log(`- Deleted ${delOperationalEvents.count} OperationalEvent records.`);
+  console.log(
+    `- Deleted ${delOperationalEvents.count} OperationalEvent records.`,
+  );
 
   const delForecastPoints = await prisma.forecastPoint.deleteMany({});
   console.log(`- Deleted ${delForecastPoints.count} ForecastPoint records.`);
@@ -113,20 +127,28 @@ async function main() {
   console.log(`- Deleted ${delForecasts.count} Forecast records.`);
 
   const delForecastAccuracies = await prisma.forecastAccuracy.deleteMany({});
-  console.log(`- Deleted ${delForecastAccuracies.count} ForecastAccuracy records.`);
+  console.log(
+    `- Deleted ${delForecastAccuracies.count} ForecastAccuracy records.`,
+  );
 
   const delForecastRuns = await prisma.forecastRun.deleteMany({});
   console.log(`- Deleted ${delForecastRuns.count} ForecastRun records.`);
 
-  const delIntelQueryAudits = await prisma.intelligenceQueryAudit.deleteMany({});
-  console.log(`- Deleted ${delIntelQueryAudits.count} IntelligenceQueryAudit records.`);
+  const delIntelQueryAudits = await prisma.intelligenceQueryAudit.deleteMany(
+    {},
+  );
+  console.log(
+    `- Deleted ${delIntelQueryAudits.count} IntelligenceQueryAudit records.`,
+  );
 
   // Inventory transaction logs
   const delStockLedgers = await prisma.stockLedger.deleteMany({});
   console.log(`- Deleted ${delStockLedgers.count} StockLedger records.`);
 
   const delBatchProductions = await prisma.batchProduction.deleteMany({});
-  console.log(`- Deleted ${delBatchProductions.count} BatchProduction records.`);
+  console.log(
+    `- Deleted ${delBatchProductions.count} BatchProduction records.`,
+  );
 
   // Logs, Tokens & Reports
   const delAuditLogs = await prisma.auditLog.deleteMany({});
@@ -136,10 +158,14 @@ async function main() {
   console.log(`- Deleted ${delAiUsages.count} AiUsage records.`);
 
   const delSessions = await prisma.session.deleteMany({});
-  console.log(`- Deleted ${delSessions.count} Session records (clean login reset).`);
+  console.log(
+    `- Deleted ${delSessions.count} Session records (clean login reset).`,
+  );
 
   const delReportExecs = await prisma.reportExecutionHistory.deleteMany({});
-  console.log(`- Deleted ${delReportExecs.count} ReportExecutionHistory records.`);
+  console.log(
+    `- Deleted ${delReportExecs.count} ReportExecutionHistory records.`,
+  );
 
   const delReportSchedules = await prisma.reportSchedule.deleteMany({});
   console.log(`- Deleted ${delReportSchedules.count} ReportSchedule records.`);
@@ -181,11 +207,15 @@ async function main() {
   });
 
   console.log(`Found ${whitelistedUsers.length} whitelisted users:`);
-  whitelistedUsers.forEach((u) => console.log(`  * ${u.email} (${u.name}, ${u.role})`));
+  whitelistedUsers.forEach((u) =>
+    console.log(`  * ${u.email} (${u.name}, ${u.role})`),
+  );
 
   const whitelistedUserIds = whitelistedUsers.map((u) => u.id);
   const whitelistedTenantIds = Array.from(
-    new Set(whitelistedUsers.flatMap((u) => u.memberships.map((m) => m.tenantId))),
+    new Set(
+      whitelistedUsers.flatMap((u) => u.memberships.map((m) => m.tenantId)),
+    ),
   );
 
   console.log(`Associated Tenants to keep (${whitelistedTenantIds.length}):`);
@@ -246,7 +276,9 @@ async function main() {
     const tenantInfo = u.memberships.length
       ? u.memberships.map((m) => `${m.tenant.name} [${m.role}]`).join(', ')
       : 'No Tenant (Platform Admin)';
-    console.log(`  ${i + 1}. [${u.email}] ${u.name} | Role: ${u.role} | ${tenantInfo}`);
+    console.log(
+      `  ${i + 1}. [${u.email}] ${u.name} | Role: ${u.role} | ${tenantInfo}`,
+    );
   });
 
   const finalTenants = await prisma.tenant.findMany({
@@ -274,7 +306,8 @@ async function main() {
     console.log(`  🏢 Tenant: ${t.name} (${t.slug})`);
     t.restaurants.forEach((r) => {
       const totalItems = r.menus.reduce(
-        (acc, m) => acc + m.categories.reduce((cAcc, c) => cAcc + c.items.length, 0),
+        (acc, m) =>
+          acc + m.categories.reduce((cAcc, c) => cAcc + c.items.length, 0),
         0,
       );
       console.log(

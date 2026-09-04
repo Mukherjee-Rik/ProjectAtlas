@@ -1,7 +1,7 @@
 import * as Joi from 'joi';
 
 export const envValidationSchema = Joi.object({
-  APP_NAME: Joi.string().default('Atlas API'),
+  APP_NAME: Joi.string().default('Kafei API'),
 
   APP_VERSION: Joi.string().default('1.0.0'),
 

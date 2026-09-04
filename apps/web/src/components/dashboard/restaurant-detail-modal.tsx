@@ -282,7 +282,7 @@ export function RestaurantDetailModal({ restaurantId, onClose }: RestaurantDetai
                                     className={`px-1.5 py-0.5 rounded font-bold uppercase text-[9px] ${
                                       t.hasActiveSession
                                         ? 'bg-primary/20 text-primary'
-                                        : 'bg-gray-800 text-gray-400'
+                                        : 'bg-secondary text-muted-foreground'
                                     }`}
                                   >
                                     {t.hasActiveSession ? 'Occupied' : 'Vacant'}

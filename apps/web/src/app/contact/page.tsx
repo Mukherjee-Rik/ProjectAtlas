@@ -70,7 +70,7 @@ export default function ContactUsPage() {
     }
   };
 
-  const mailtoUrl = `mailto:baleremailamar@gmail.com?subject=${encodeURIComponent(
+  const mailtoUrl = `mailto:rikmukherjee1999@gmail.com?subject=${encodeURIComponent(
     form.subject || `Inquiry from ${form.name || 'Restaurant Owner'}`
   )}&body=${encodeURIComponent(
     `Name: ${form.name}\nPhone: ${form.phone}\nRestaurant: ${form.restaurantName}\nType: ${form.inquiryType}\n\nMessage:\n${form.message}`
@@ -179,7 +179,7 @@ export default function ContactUsPage() {
                         <Phone className="h-3.5 w-3.5" /> Call Now
                       </a>
                       <a
-                        href="https://wa.me/919903085026?text=Hi%20Atlas%20Team%2C%20I%20would%20like%20to%20know%20more%20about%20Project%20Atlas."
+                        href="https://wa.me/919903085026?text=Hi%20Kafei%20Team%2C%20I%20would%20like%20to%20know%20more%20about%20Kafei."
                         target="_blank"
                         rel="noreferrer"
                         className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-bold text-foreground transition-all hover:border-primary/40 hover:text-primary"
@@ -202,10 +202,10 @@ export default function ContactUsPage() {
                       Email Inquiries & Desk
                     </p>
                     <a
-                      href="mailto:baleremailamar@gmail.com"
+                      href="mailto:rikmukherjee1999@gmail.com"
                       className="text-sm font-bold text-primary underline underline-offset-4 hover:text-primary-hover"
                     >
-                      baleremailamar@gmail.com
+                      rikmukherjee1999@gmail.com
                     </a>
                     <p className="text-[12px] text-muted-foreground">
                       Detailed proposals, customized kitchen floor plans, and billing queries.
@@ -268,7 +268,7 @@ export default function ContactUsPage() {
                       Thank you for contacting us. Your reference code is{' '}
                       <strong className="font-mono text-primary font-bold">{submittedRef}</strong>.
                       An email notification has been dispatched to our engineering team at{' '}
-                      <span className="text-foreground font-semibold">baleremailamar@gmail.com</span>.
+                      <span className="text-foreground font-semibold">rikmukherjee1999@gmail.com</span>.
                     </p>
                   </div>
 
@@ -281,7 +281,7 @@ export default function ContactUsPage() {
 
                   <div className="flex flex-wrap items-center justify-center gap-3 pt-3">
                     <a
-                      href="https://wa.me/919903085026?text=Hi%20Atlas%20Team%2C%20following%20up%20on%20inquiry%20code%20"
+                      href="https://wa.me/919903085026?text=Hi%20Kafei%20Team%2C%20following%20up%20on%20inquiry%20code%20"
                       target="_blank"
                       rel="noreferrer"
                       className="rounded-xl bg-primary px-4 py-2.5 text-xs font-bold text-background transition-all hover:bg-primary-hover shadow-sm"
@@ -318,7 +318,7 @@ export default function ContactUsPage() {
                   </div>
 
                   {error && (
-                    <div className="rounded-xl border border-atlas-error/30 bg-red-950/30 p-3 text-xs text-red-300">
+                    <div className="rounded-xl border border-atlas-error/30 bg-atlas-error/30 p-3 text-xs text-atlas-error">
                       {error}
                     </div>
                   )}
@@ -495,7 +495,7 @@ export default function ContactUsPage() {
             <div className="rounded-2xl border border-border bg-card p-5 space-y-2">
               <h3 className="text-sm font-bold text-foreground">How do we get emergency support on a busy night?</h3>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Our support team is on standby 24/7 for live floor emergencies at <strong>+91 9903085026</strong> and <strong>baleremailamar@gmail.com</strong>.
+                Our support team is on standby 24/7 for live floor emergencies at <strong>+91 9903085026</strong> and <strong>rikmukherjee1999@gmail.com</strong>.
               </p>
             </div>
           </div>
@@ -518,15 +518,31 @@ export default function ContactUsPage() {
             </span>
           </div>
 
-          <div className="flex flex-wrap items-center gap-6 text-xs text-muted-foreground">
+          <div className="flex flex-wrap items-center gap-5 text-xs text-muted-foreground">
             <Link href="/" className="hover:text-foreground transition-colors">Home</Link>
             <Link href="/docs" className="hover:text-foreground transition-colors">Docs</Link>
+            <Link href="/privacy" className="hover:text-foreground transition-colors">Privacy</Link>
+            <Link href="/terms" className="hover:text-foreground transition-colors">Terms</Link>
+            <Link href="/cookies" className="hover:text-foreground transition-colors">Cookies</Link>
+            <button
+              type="button"
+              onClick={() => {
+                if (typeof window !== 'undefined') {
+                  window.dispatchEvent(new CustomEvent('kafei:open-cookie-preferences'));
+                }
+              }}
+              className="hover:text-foreground transition-colors cursor-pointer"
+            >
+              Cookie Preferences
+            </button>
+            <Link href="/data-deletion" className="hover:text-foreground transition-colors">Data Deletion</Link>
+            <Link href="/legal" className="hover:text-foreground transition-colors">Legal Hub</Link>
             <Link href="/contact" className="text-primary font-bold">Contact Us</Link>
             <a href="tel:9903085026" className="font-mono text-primary font-bold hover:underline">+91 9903085026</a>
           </div>
 
           <p className="text-[11px] text-muted-foreground">
-            © {new Date().getFullYear()} Kafei. All rights reserved.
+            © {new Date().getFullYear()} Antigravity. All rights reserved.
           </p>
         </div>
       </footer>

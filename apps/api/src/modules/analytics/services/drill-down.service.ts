@@ -35,7 +35,10 @@ export class DrillDownService {
         return {
           dimension: 'BRANCH',
           results: branches.map((b) => {
-            const rev = b.orders.reduce((sum, o) => sum + Number(o.totalAmount), 0);
+            const rev = b.orders.reduce(
+              (sum, o) => sum + Number(o.totalAmount),
+              0,
+            );
             return {
               id: b.id,
               name: b.name,
@@ -87,7 +90,9 @@ export class DrillDownService {
       case 'MENU_ITEM': {
         const whereItemOrder = { ...whereOrder };
         if (query.categoryId) {
-          whereItemOrder.items = { some: { menuItem: { categoryId: query.categoryId } } };
+          whereItemOrder.items = {
+            some: { menuItem: { categoryId: query.categoryId } },
+          };
         }
 
         const items = await this.prisma.menuItem.findMany({
@@ -109,8 +114,14 @@ export class DrillDownService {
         return {
           dimension: 'MENU_ITEM',
           results: items.map((i) => {
-            const revenue = i.orderItems.reduce((sum, oi) => sum + Number(oi.totalPrice), 0);
-            const units = i.orderItems.reduce((sum, oi) => sum + oi.quantity, 0);
+            const revenue = i.orderItems.reduce(
+              (sum, oi) => sum + Number(oi.totalPrice),
+              0,
+            );
+            const units = i.orderItems.reduce(
+              (sum, oi) => sum + oi.quantity,
+              0,
+            );
             return {
               id: i.id,
               name: i.name,
@@ -163,7 +174,9 @@ export class DrillDownService {
             discountAmount: Number(o.discountAmount),
             taxAmount: Number(o.taxAmount),
             totalAmount: Number(o.totalAmount),
-            tableName: o.table ? `${o.table.name} (${o.table.code})` : 'Direct / Takeout',
+            tableName: o.table
+              ? `${o.table.name} (${o.table.code})`
+              : 'Direct / Takeout',
             branchName: o.branch?.name || 'Branch',
             createdAt: o.createdAt.toISOString(),
             itemsCount: o.items.reduce((sum, i) => sum + i.quantity, 0),
@@ -178,7 +191,9 @@ export class DrillDownService {
       }
 
       default:
-        throw new BadRequestException(`Unsupported drill-down dimension: ${query.dimension}`);
+        throw new BadRequestException(
+          `Unsupported drill-down dimension: ${query.dimension}`,
+        );
     }
   }
 }

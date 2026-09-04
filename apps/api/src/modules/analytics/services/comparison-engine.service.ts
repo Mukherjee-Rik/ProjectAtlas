@@ -23,7 +23,9 @@ export class ComparisonEngineService {
     if (previousValue === 0) {
       percentageChange = currentValue > 0 ? 100.0 : 0.0;
     } else {
-      percentageChange = Math.round(((currentValue - previousValue) / previousValue) * 10000) / 100;
+      percentageChange =
+        Math.round(((currentValue - previousValue) / previousValue) * 10000) /
+        100;
     }
 
     let trend: 'UP' | 'DOWN' | 'FLAT' = 'FLAT';

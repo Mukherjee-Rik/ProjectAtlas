@@ -8,15 +8,16 @@ export interface PaymentSettings {
 }
 
 const DEFAULT_PAYMENT_SETTINGS: PaymentSettings = {
-  upiId: 'atlaspay@okaxis',
-  payeeName: 'Atlas Restaurant',
+  upiId: 'kafeipay@okaxis',
+  payeeName: 'Kafei Restaurant',
   customQrUrl: '',
   enablePayFromSeat: true,
   enableCashierPayment: true,
   enableTableAssistance: true,
 };
 
-const PAYMENT_STORAGE_KEY_PREFIX = 'atlas_payment_settings_';
+const PAYMENT_STORAGE_KEY_PREFIX = 'kafei_payment_settings_';
+const LEGACY_PAYMENT_STORAGE_KEY_PREFIX = 'atlas_payment_settings_';
 
 export function getPaymentSettings(branchId?: string): PaymentSettings {
   if (typeof window === 'undefined') {
@@ -27,10 +28,10 @@ export function getPaymentSettings(branchId?: string): PaymentSettings {
     const key = branchId
       ? `${PAYMENT_STORAGE_KEY_PREFIX}${branchId}`
       : `${PAYMENT_STORAGE_KEY_PREFIX}default`;
-    const stored = localStorage.getItem(key);
+    const stored = localStorage.getItem(key) || (branchId ? localStorage.getItem(`${LEGACY_PAYMENT_STORAGE_KEY_PREFIX}${branchId}`) : localStorage.getItem(`${LEGACY_PAYMENT_STORAGE_KEY_PREFIX}default`));
     if (!stored) {
       // Check default fallback
-      const defaultStored = localStorage.getItem(`${PAYMENT_STORAGE_KEY_PREFIX}default`);
+      const defaultStored = localStorage.getItem(`${PAYMENT_STORAGE_KEY_PREFIX}default`) || localStorage.getItem(`${LEGACY_PAYMENT_STORAGE_KEY_PREFIX}default`);
       return defaultStored ? { ...DEFAULT_PAYMENT_SETTINGS, ...JSON.parse(defaultStored) } : DEFAULT_PAYMENT_SETTINGS;
     }
     return { ...DEFAULT_PAYMENT_SETTINGS, ...JSON.parse(stored) };

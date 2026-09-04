@@ -1,8 +1,16 @@
 import crypto from 'node:crypto';
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../../database/prisma/prisma.service';
 import { Prisma } from '../../generated/prisma/client';
-import { OrderStatus, CancellationRequestStatus } from '../../generated/prisma/enums';
+import {
+  OrderStatus,
+  CancellationRequestStatus,
+} from '../../generated/prisma/enums';
 import { PublicTablesService } from '../public-tables/public-tables.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
@@ -15,7 +23,12 @@ import { InventoryService } from '../inventory/inventory.service';
 import { AuditService } from '../audit/audit.service';
 
 const ALLOWED_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
-  PENDING: [OrderStatus.CONFIRMED, OrderStatus.PREPARING, OrderStatus.SERVED, OrderStatus.CANCELLED],
+  PENDING: [
+    OrderStatus.CONFIRMED,
+    OrderStatus.PREPARING,
+    OrderStatus.SERVED,
+    OrderStatus.CANCELLED,
+  ],
   CONFIRMED: [OrderStatus.PREPARING, OrderStatus.SERVED, OrderStatus.CANCELLED],
   PREPARING: [OrderStatus.READY, OrderStatus.SERVED, OrderStatus.CANCELLED],
   READY: [OrderStatus.SERVED, OrderStatus.CANCELLED],
@@ -93,13 +106,17 @@ const ORDER_SELECT_FULL = {
       unitPrice: true,
       totalPrice: true,
       taxAmount: true,
-      variants: { select: { id: true, variantId: true, name: true, price: true } },
+      variants: {
+        select: { id: true, variantId: true, name: true, price: true },
+      },
       addons: { select: { id: true, addonId: true, name: true, price: true } },
     },
   },
 };
 
-type DbOrderPayload = Prisma.OrderGetPayload<{ select: typeof ORDER_SELECT_FULL }>;
+type DbOrderPayload = Prisma.OrderGetPayload<{
+  select: typeof ORDER_SELECT_FULL;
+}>;
 
 /** Covers a busy service period without loading a restaurant's whole history. */
 const DEFAULT_ORDERS_PAGE_SIZE = 50;
@@ -115,7 +132,10 @@ export class OrdersService {
     private readonly auditService: AuditService,
   ) {}
 
-  validateStatusTransition(currentStatus: OrderStatus, nextStatus: OrderStatus) {
+  validateStatusTransition(
+    currentStatus: OrderStatus,
+    nextStatus: OrderStatus,
+  ) {
     if (currentStatus === nextStatus) return;
     const allowed = ALLOWED_TRANSITIONS[currentStatus] || [];
     if (!allowed.includes(nextStatus)) {
@@ -126,7 +146,8 @@ export class OrdersService {
   }
 
   async createOrderFromCart(token: string, _dto?: CreateOrderDto) {
-    const { session, resolved } = await this.publicTablesService.getOrCreateSessionRecord(token);
+    const { session, resolved } =
+      await this.publicTablesService.getOrCreateSessionRecord(token);
 
     // Anti-Spoofing: Prevent placing new orders on a settled / completed table session
     const existingOrders = await this.prisma.order.findMany({
@@ -135,7 +156,9 @@ export class OrdersService {
     });
     const hasOnlyCompletedOrders =
       existingOrders.length > 0 &&
-      existingOrders.every((o) => o.status === 'COMPLETED' || o.status === 'CANCELLED');
+      existingOrders.every(
+        (o) => o.status === 'COMPLETED' || o.status === 'CANCELLED',
+      );
 
     if (hasOnlyCompletedOrders) {
       throw new ForbiddenException(
@@ -160,131 +183,151 @@ export class OrdersService {
     }
 
     // Execute order creation in an isolated Prisma transaction (3.26.12)
-    return this.prisma.$transaction(async (tx) => {
-      let subtotalAcc = new Prisma.Decimal(0);
-      let taxAcc = new Prisma.Decimal(0);
+    return this.prisma.$transaction(
+      async (tx) => {
+        let subtotalAcc = new Prisma.Decimal(0);
+        let taxAcc = new Prisma.Decimal(0);
 
-      const itemCreations: {
-        menuItemId: string;
-        name: string;
-        quantity: number;
-        unitPrice: Prisma.Decimal;
-        totalPrice: Prisma.Decimal;
-        taxAmount: Prisma.Decimal;
-        variants: { variantId: string | null; name: string; price: Prisma.Decimal }[];
-        addons: { addonId: string | null; name: string; price: Prisma.Decimal }[];
-      }[] = [];
+        const itemCreations: {
+          menuItemId: string;
+          name: string;
+          quantity: number;
+          unitPrice: Prisma.Decimal;
+          totalPrice: Prisma.Decimal;
+          taxAmount: Prisma.Decimal;
+          variants: {
+            variantId: string | null;
+            name: string;
+            price: Prisma.Decimal;
+          }[];
+          addons: {
+            addonId: string | null;
+            name: string;
+            price: Prisma.Decimal;
+          }[];
+        }[] = [];
 
-      for (const cartItem of cart.items) {
-        // Re-validate menu item availability & pricing against active DB records (3.26.14)
-        const menuItem = await tx.menuItem.findFirst({
-          where: {
-            id: cartItem.menuItemId,
-            status: 'ACTIVE',
-            category: { status: 'ACTIVE', menu: { restaurantId: resolved.restaurant.id, status: 'ACTIVE' } },
-          },
-          include: {
-            taxRate: true,
-            variantGroups: { include: { variants: true } },
-            addonGroups: { include: { addons: true } },
-          },
-        });
+        for (const cartItem of cart.items) {
+          // Re-validate menu item availability & pricing against active DB records (3.26.14)
+          const menuItem = await tx.menuItem.findFirst({
+            where: {
+              id: cartItem.menuItemId,
+              status: 'ACTIVE',
+              category: {
+                status: 'ACTIVE',
+                menu: {
+                  restaurantId: resolved.restaurant.id,
+                  status: 'ACTIVE',
+                },
+              },
+            },
+            include: {
+              taxRate: true,
+              variantGroups: { include: { variants: true } },
+              addonGroups: { include: { addons: true } },
+            },
+          });
 
-        if (!menuItem) {
-          throw new BadRequestException(`Item in cart is no longer available`);
-        }
-
-        let unitPrice = new Prisma.Decimal(menuItem.price);
-        const variantSnapshots: { variantId: string | null; name: string; price: Prisma.Decimal }[] = [];
-        const addonSnapshots: { addonId: string | null; name: string; price: Prisma.Decimal }[] = [];
-
-        // Validate & snapshot variants
-        for (const vSel of cartItem.variantSelections) {
-          const variant = menuItem.variantGroups
-            .flatMap((g) => g.variants)
-            .find((v) => v.id === vSel.variantId && v.status === 'ACTIVE');
-
-          if (!variant) {
-            throw new BadRequestException(`Selected variant "${vSel.name}" is no longer available`);
+          if (!menuItem) {
+            throw new BadRequestException(
+              `Item in cart is no longer available`,
+            );
           }
 
-          const vPrice = new Prisma.Decimal(variant.price);
-          unitPrice = unitPrice.add(vPrice);
-          variantSnapshots.push({
-            variantId: variant.id,
-            name: variant.name,
-            price: vPrice,
+          let unitPrice = new Prisma.Decimal(menuItem.price);
+          const variantSnapshots: {
+            variantId: string | null;
+            name: string;
+            price: Prisma.Decimal;
+          }[] = [];
+          const addonSnapshots: {
+            addonId: string | null;
+            name: string;
+            price: Prisma.Decimal;
+          }[] = [];
+
+          // Validate & snapshot variants
+          for (const vSel of cartItem.variantSelections) {
+            const variant = menuItem.variantGroups
+              .flatMap((g) => g.variants)
+              .find((v) => v.id === vSel.variantId && v.status === 'ACTIVE');
+
+            if (!variant) {
+              throw new BadRequestException(
+                `Selected variant "${vSel.name}" is no longer available`,
+              );
+            }
+
+            const vPrice = new Prisma.Decimal(variant.price);
+            unitPrice = unitPrice.add(vPrice);
+            variantSnapshots.push({
+              variantId: variant.id,
+              name: variant.name,
+              price: vPrice,
+            });
+          }
+
+          // Validate & snapshot addons
+          for (const aSel of cartItem.addonSelections) {
+            const addon = menuItem.addonGroups
+              .flatMap((g) => g.addons)
+              .find((a) => a.id === aSel.addonId && a.status === 'ACTIVE');
+
+            if (!addon) {
+              throw new BadRequestException(
+                `Selected add-on "${aSel.name}" is no longer available`,
+              );
+            }
+
+            const aPrice = new Prisma.Decimal(addon.price);
+            unitPrice = unitPrice.add(aPrice);
+            addonSnapshots.push({
+              addonId: addon.id,
+              name: addon.name,
+              price: aPrice,
+            });
+          }
+
+          const quantity = cartItem.quantity;
+          const lineTotalPrice = unitPrice.mul(quantity);
+          subtotalAcc = subtotalAcc.add(lineTotalPrice);
+
+          // Tax calculation per item (3.26.15)
+          let itemTaxAmount = new Prisma.Decimal(0);
+          if (menuItem.taxRate && menuItem.taxRate.status === 'ACTIVE') {
+            if (menuItem.taxRate.type === 'PERCENTAGE') {
+              itemTaxAmount = lineTotalPrice
+                .mul(menuItem.taxRate.value)
+                .div(100);
+            } else if (menuItem.taxRate.type === 'FIXED') {
+              itemTaxAmount = new Prisma.Decimal(menuItem.taxRate.value).mul(
+                quantity,
+              );
+            }
+          }
+          taxAcc = taxAcc.add(itemTaxAmount);
+
+          itemCreations.push({
+            menuItemId: menuItem.id,
+            name: menuItem.name,
+            quantity,
+            unitPrice,
+            totalPrice: lineTotalPrice,
+            taxAmount: itemTaxAmount,
+            variants: variantSnapshots,
+            addons: addonSnapshots,
           });
         }
 
-        // Validate & snapshot addons
-        for (const aSel of cartItem.addonSelections) {
-          const addon = menuItem.addonGroups
-            .flatMap((g) => g.addons)
-            .find((a) => a.id === aSel.addonId && a.status === 'ACTIVE');
-
-          if (!addon) {
-            throw new BadRequestException(`Selected add-on "${aSel.name}" is no longer available`);
-          }
-
-          const aPrice = new Prisma.Decimal(addon.price);
-          unitPrice = unitPrice.add(aPrice);
-          addonSnapshots.push({
-            addonId: addon.id,
-            name: addon.name,
-            price: aPrice,
-          });
-        }
-
-        const quantity = cartItem.quantity;
-        const lineTotalPrice = unitPrice.mul(quantity);
-        subtotalAcc = subtotalAcc.add(lineTotalPrice);
-
-        // Tax calculation per item (3.26.15)
-        let itemTaxAmount = new Prisma.Decimal(0);
-        if (menuItem.taxRate && menuItem.taxRate.status === 'ACTIVE') {
-          if (menuItem.taxRate.type === 'PERCENTAGE') {
-            itemTaxAmount = lineTotalPrice.mul(menuItem.taxRate.value).div(100);
-          } else if (menuItem.taxRate.type === 'FIXED') {
-            itemTaxAmount = new Prisma.Decimal(menuItem.taxRate.value).mul(quantity);
-          }
-        }
-        taxAcc = taxAcc.add(itemTaxAmount);
-
-        itemCreations.push({
-          menuItemId: menuItem.id,
-          name: menuItem.name,
-          quantity,
-          unitPrice,
-          totalPrice: lineTotalPrice,
-          taxAmount: itemTaxAmount,
-          variants: variantSnapshots,
-          addons: addonSnapshots,
+        // Generate collision-safe sequence order number: AT-000001 per restaurant
+        const orderCount = await tx.order.count({
+          where: { restaurantId: resolved.restaurant.id },
         });
-      }
 
-      // Generate collision-safe sequence order number: AT-000001 per restaurant
-      const orderCount = await tx.order.count({
-        where: { restaurantId: resolved.restaurant.id },
-      });
+        let nextSeq = orderCount + 1;
+        let orderNumber = `AT-${String(nextSeq).padStart(6, '0')}`;
 
-      let nextSeq = orderCount + 1;
-      let orderNumber = `AT-${String(nextSeq).padStart(6, '0')}`;
-
-      let existingOrder = await tx.order.findUnique({
-        where: {
-          restaurantId_orderNumber: {
-            restaurantId: resolved.restaurant.id,
-            orderNumber,
-          },
-        },
-        select: { id: true },
-      });
-
-      while (existingOrder) {
-        nextSeq++;
-        orderNumber = `AT-${String(nextSeq).padStart(6, '0')}`;
-        existingOrder = await tx.order.findUnique({
+        let existingOrder = await tx.order.findUnique({
           where: {
             restaurantId_orderNumber: {
               restaurantId: resolved.restaurant.id,
@@ -293,64 +336,80 @@ export class OrdersService {
           },
           select: { id: true },
         });
-      }
 
-      const discountAmount = new Prisma.Decimal(0);
-      const totalAmount = subtotalAcc.add(taxAcc).sub(discountAmount);
+        while (existingOrder) {
+          nextSeq++;
+          orderNumber = `AT-${String(nextSeq).padStart(6, '0')}`;
+          existingOrder = await tx.order.findUnique({
+            where: {
+              restaurantId_orderNumber: {
+                restaurantId: resolved.restaurant.id,
+                orderNumber,
+              },
+            },
+            select: { id: true },
+          });
+        }
 
-      // Create Order
-      const order = await tx.order.create({
-        data: {
-          restaurantId: resolved.restaurant.id,
-          branchId: resolved.branch.id,
-          tableId: resolved.table.id,
-          customerSessionId: session.id,
-          orderNumber,
-          status: OrderStatus.PENDING,
-          subtotal: subtotalAcc,
-          taxAmount: taxAcc,
-          discountAmount,
-          totalAmount,
-          items: {
-            create: itemCreations.map((ic) => ({
-              menuItemId: ic.menuItemId,
-              name: ic.name,
-              quantity: ic.quantity,
-              unitPrice: ic.unitPrice,
-              totalPrice: ic.totalPrice,
-              taxAmount: ic.taxAmount,
-              variants: {
-                create: ic.variants.map((v) => ({
-                  variantId: v.variantId,
-                  name: v.name,
-                  price: v.price,
-                })),
-              },
-              addons: {
-                create: ic.addons.map((a) => ({
-                  addonId: a.addonId,
-                  name: a.name,
-                  price: a.price,
-                })),
-              },
-            })),
+        const discountAmount = new Prisma.Decimal(0);
+        const totalAmount = subtotalAcc.add(taxAcc).sub(discountAmount);
+
+        // Create Order
+        const order = await tx.order.create({
+          data: {
+            restaurantId: resolved.restaurant.id,
+            branchId: resolved.branch.id,
+            tableId: resolved.table.id,
+            customerSessionId: session.id,
+            orderNumber,
+            status: OrderStatus.PENDING,
+            subtotal: subtotalAcc,
+            taxAmount: taxAcc,
+            discountAmount,
+            totalAmount,
+            items: {
+              create: itemCreations.map((ic) => ({
+                menuItemId: ic.menuItemId,
+                name: ic.name,
+                quantity: ic.quantity,
+                unitPrice: ic.unitPrice,
+                totalPrice: ic.totalPrice,
+                taxAmount: ic.taxAmount,
+                variants: {
+                  create: ic.variants.map((v) => ({
+                    variantId: v.variantId,
+                    name: v.name,
+                    price: v.price,
+                  })),
+                },
+                addons: {
+                  create: ic.addons.map((a) => ({
+                    addonId: a.addonId,
+                    name: a.name,
+                    price: a.price,
+                  })),
+                },
+              })),
+            },
           },
-        },
-        select: ORDER_SELECT_FULL,
-      });
+          select: ORDER_SELECT_FULL,
+        });
 
-      // Clear cart items after successful order creation (3.26.29)
-      await tx.cartItem.deleteMany({
-        where: { cartId: cart.id },
-      });
+        // Clear cart items after successful order creation (3.26.29)
+        await tx.cartItem.deleteMany({
+          where: { cartId: cart.id },
+        });
 
-      return this.formatOrderResponse(order);
-    }, { maxWait: 25000, timeout: 35000 });
+        return this.formatOrderResponse(order);
+      },
+      { maxWait: 25000, timeout: 35000 },
+    );
   }
 
   async getCustomerOrders(token: string) {
     const resolved = await this.publicTablesService.resolveTableToken(token);
-    const { session } = await this.publicTablesService.getActiveSessionRecord(token);
+    const { session } =
+      await this.publicTablesService.getActiveSessionRecord(token);
 
     if (session) {
       const orders = await this.prisma.order.findMany({
@@ -408,7 +467,10 @@ export class OrdersService {
     // This list used to be unbounded: every order the restaurant had ever
     // taken, each with six nested relations. It got measurably slower every
     // day of trading, so it is paginated now.
-    const safeLimit = Math.min(Math.max(Math.trunc(limit) || DEFAULT_ORDERS_PAGE_SIZE, 1), MAX_ORDERS_PAGE_SIZE);
+    const safeLimit = Math.min(
+      Math.max(Math.trunc(limit) || DEFAULT_ORDERS_PAGE_SIZE, 1),
+      MAX_ORDERS_PAGE_SIZE,
+    );
     const safePage = Math.max(Math.trunc(page) || 1, 1);
 
     const where = {
@@ -443,7 +505,11 @@ export class OrdersService {
     };
   }
 
-  async findRestaurantOrderById(id: string, restaurantId: string, branchId?: string) {
+  async findRestaurantOrderById(
+    id: string,
+    restaurantId: string,
+    branchId?: string,
+  ) {
     const order = await this.prisma.order.findFirst({
       where: {
         id,
@@ -460,7 +526,12 @@ export class OrdersService {
     return this.formatOrderResponse(order);
   }
 
-  async updateOrderStatus(id: string, restaurantId: string, dto: UpdateOrderStatusDto, branchId?: string) {
+  async updateOrderStatus(
+    id: string,
+    restaurantId: string,
+    dto: UpdateOrderStatusDto,
+    branchId?: string,
+  ) {
     const existing = await this.prisma.order.findFirst({
       where: {
         id,
@@ -471,7 +542,9 @@ export class OrdersService {
     });
 
     if (!existing) {
-      throw new ForbiddenException('Order not found or does not belong to active restaurant');
+      throw new ForbiddenException(
+        'Order not found or does not belong to active restaurant',
+      );
     }
 
     this.validateStatusTransition(existing.status, dto.status);
@@ -496,7 +569,11 @@ export class OrdersService {
     */
 
     // Emit reactive state sync event to delivery adapters
-    this.deliveryEvents.emitOrderStatusUpdated(updated.id, updated.status, updated.restaurantId);
+    this.deliveryEvents.emitOrderStatusUpdated(
+      updated.id,
+      updated.status,
+      updated.restaurantId,
+    );
 
     return this.formatOrderResponse(updated);
   }
@@ -521,7 +598,9 @@ export class OrdersService {
     });
 
     if (!existing) {
-      throw new NotFoundException('Order not found or does not belong to active restaurant');
+      throw new NotFoundException(
+        'Order not found or does not belong to active restaurant',
+      );
     }
 
     if (existing.status === OrderStatus.CANCELLED) {
@@ -534,7 +613,13 @@ export class OrdersService {
     );
 
     const isWaiter = user.role === 'WAITER' || user.role === 'STAFF';
-    const isPrivileged = ['CASHIER', 'MANAGER', 'ADMIN', 'OWNER', 'PLATFORM_ADMIN'].includes(user.role);
+    const isPrivileged = [
+      'CASHIER',
+      'MANAGER',
+      'ADMIN',
+      'OWNER',
+      'PLATFORM_ADMIN',
+    ].includes(user.role);
 
     if (hasSuccessfulPayment && isWaiter && !isPrivileged) {
       throw new BadRequestException(
@@ -546,7 +631,9 @@ export class OrdersService {
       existing.status === OrderStatus.COMPLETED &&
       !['MANAGER', 'ADMIN', 'OWNER', 'PLATFORM_ADMIN'].includes(user.role)
     ) {
-      throw new ForbiddenException('Only Managers or Admins can cancel a completed order.');
+      throw new ForbiddenException(
+        'Only Managers or Admins can cancel a completed order.',
+      );
     }
 
     const cancelledByLabel = user.name || user.email || `User (${user.id})`;
@@ -596,7 +683,11 @@ export class OrdersService {
       },
     });
 
-    this.deliveryEvents.emitOrderStatusUpdated(updated.id, updated.status, updated.restaurantId);
+    this.deliveryEvents.emitOrderStatusUpdated(
+      updated.id,
+      updated.status,
+      updated.restaurantId,
+    );
 
     return this.formatOrderResponse(updated);
   }
@@ -621,7 +712,9 @@ export class OrdersService {
     });
 
     if (!existing) {
-      throw new NotFoundException('Order not found or does not belong to active restaurant');
+      throw new NotFoundException(
+        'Order not found or does not belong to active restaurant',
+      );
     }
 
     if (existing.status === OrderStatus.CANCELLED) {
@@ -629,7 +722,9 @@ export class OrdersService {
     }
 
     if (existing.cancellationRequests.length > 0) {
-      throw new BadRequestException('A cancellation request is already pending review for this order');
+      throw new BadRequestException(
+        'A cancellation request is already pending review for this order',
+      );
     }
 
     const requesterName = user.name || user.email || 'Staff';
@@ -732,8 +827,14 @@ export class OrdersService {
     user: { id: string; name?: string; email?: string; role: string },
     dto: ReviewCancellationRequestDto,
   ) {
-    if (!['CASHIER', 'MANAGER', 'ADMIN', 'OWNER', 'PLATFORM_ADMIN'].includes(user.role)) {
-      throw new ForbiddenException('Only Cashiers, Managers, or Admins can review cancellation requests.');
+    if (
+      !['CASHIER', 'MANAGER', 'ADMIN', 'OWNER', 'PLATFORM_ADMIN'].includes(
+        user.role,
+      )
+    ) {
+      throw new ForbiddenException(
+        'Only Cashiers, Managers, or Admins can review cancellation requests.',
+      );
     }
 
     const req = await this.prisma.cancellationRequest.findFirst({
@@ -753,7 +854,9 @@ export class OrdersService {
     }
 
     if (req.status !== 'PENDING_REVIEW') {
-      throw new BadRequestException(`Request has already been reviewed (status: ${req.status})`);
+      throw new BadRequestException(
+        `Request has already been reviewed (status: ${req.status})`,
+      );
     }
 
     const reviewerName = user.name || user.email || `Staff (${user.id})`;
@@ -820,7 +923,11 @@ export class OrdersService {
       });
 
       // 3. If refund amount requested and order has paid payments, process refund
-      if (dto.refundAmount && dto.refundAmount > 0 && req.order.payments.length > 0) {
+      if (
+        dto.refundAmount &&
+        dto.refundAmount > 0 &&
+        req.order.payments.length > 0
+      ) {
         const payment = req.order.payments[0];
         const refundAmt = Math.min(dto.refundAmount, Number(payment.amount));
         const isFull = refundAmt >= Number(payment.amount);
@@ -832,7 +939,8 @@ export class OrdersService {
             paymentId: payment.id,
             amount: new Prisma.Decimal(refundAmt),
             reason: req.reason,
-            note: req.note || 'Refund generated from approved cancellation request',
+            note:
+              req.note || 'Refund generated from approved cancellation request',
             status: 'SUCCESS',
             requestedBy: req.requestedBy,
             approvedBy: reviewerName,
@@ -867,7 +975,11 @@ export class OrdersService {
         },
       });
 
-      this.deliveryEvents.emitOrderStatusUpdated(orderUpdated.id, orderUpdated.status, orderUpdated.restaurantId);
+      this.deliveryEvents.emitOrderStatusUpdated(
+        orderUpdated.id,
+        orderUpdated.status,
+        orderUpdated.restaurantId,
+      );
 
       return {
         id: req.id,
@@ -906,7 +1018,9 @@ export class OrdersService {
         const table = await tx.table.findFirst({
           where: {
             id: dto.tableId,
-            diningArea: { branch: { restaurantId, ...(branchId && { id: branchId }) } },
+            diningArea: {
+              branch: { restaurantId, ...(branchId && { id: branchId }) },
+            },
           },
           include: {
             diningArea: { include: { branch: true } },
@@ -914,7 +1028,9 @@ export class OrdersService {
         });
 
         if (!table) {
-          throw new NotFoundException('Table not found in active restaurant/branch');
+          throw new NotFoundException(
+            'Table not found in active restaurant/branch',
+          );
         }
 
         // Find active customer session for table
@@ -995,14 +1111,19 @@ export class OrdersService {
           });
         }
       } else {
-        throw new BadRequestException('Either orderId or tableId must be provided');
+        throw new BadRequestException(
+          'Either orderId or tableId must be provided',
+        );
       }
 
       // Resolve valid MenuItem ID for foreign key constraint
       let resolvedMenuItemId = dto.menuItemId;
       if (resolvedMenuItemId) {
         const itemExists = await tx.menuItem.findFirst({
-          where: { id: resolvedMenuItemId, category: { menu: { restaurantId } } },
+          where: {
+            id: resolvedMenuItemId,
+            category: { menu: { restaurantId } },
+          },
           select: { id: true },
         });
         if (!itemExists) resolvedMenuItemId = undefined;
@@ -1023,13 +1144,17 @@ export class OrdersService {
               data: { restaurantId, name: 'Default Menu', code: 'DEF_MENU' },
             });
           }
-          let category = await tx.menuCategory.findFirst({ where: { menuId: menu.id } });
+          let category = await tx.menuCategory.findFirst({
+            where: { menuId: menu.id },
+          });
           if (!category) {
             category = await tx.menuCategory.create({
               data: { menuId: menu.id, name: 'General', code: 'GEN_CAT' },
             });
           }
-          let menuItem = await tx.menuItem.findFirst({ where: { categoryId: category.id } });
+          let menuItem = await tx.menuItem.findFirst({
+            where: { categoryId: category.id },
+          });
           if (!menuItem) {
             menuItem = await tx.menuItem.create({
               data: {
@@ -1141,8 +1266,16 @@ export class OrdersService {
       cancellationNote: order.cancellationNote,
       createdAt: order.createdAt,
       updatedAt: order.updatedAt,
-      table: order.table ? { id: order.table.id, name: order.table.name, code: order.table.code } : null,
-      branch: order.branch ? { id: order.branch.id, name: order.branch.name, code: order.branch.code } : null,
+      table: order.table
+        ? { id: order.table.id, name: order.table.name, code: order.table.code }
+        : null,
+      branch: order.branch
+        ? {
+            id: order.branch.id,
+            name: order.branch.name,
+            code: order.branch.code,
+          }
+        : null,
       payments: (order.payments || []).map((p) => ({
         id: p.id,
         amount: Number(p.amount),
@@ -1183,8 +1316,18 @@ export class OrdersService {
         unitPrice: Number(item.unitPrice),
         totalPrice: Number(item.totalPrice),
         taxAmount: Number(item.taxAmount),
-        variants: item.variants.map((v) => ({ id: v.id, variantId: v.variantId, name: v.name, price: Number(v.price) })),
-        addons: item.addons.map((a) => ({ id: a.id, addonId: a.addonId, name: a.name, price: Number(a.price) })),
+        variants: item.variants.map((v) => ({
+          id: v.id,
+          variantId: v.variantId,
+          name: v.name,
+          price: Number(v.price),
+        })),
+        addons: item.addons.map((a) => ({
+          id: a.id,
+          addonId: a.addonId,
+          name: a.name,
+          price: Number(a.price),
+        })),
       })),
     };
   }

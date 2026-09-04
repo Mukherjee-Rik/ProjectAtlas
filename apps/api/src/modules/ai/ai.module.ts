@@ -9,11 +9,7 @@ import { AuditModule } from '../audit/audit.module';
 @Module({
   imports: [AuditModule],
   controllers: [AiController],
-  providers: [
-    AiProviderService,
-    AiContextService,
-    AiService,
-  ],
+  providers: [AiProviderService, AiContextService, AiService],
   exports: [AiService, AiContextService],
 })
 export class AiModule {}

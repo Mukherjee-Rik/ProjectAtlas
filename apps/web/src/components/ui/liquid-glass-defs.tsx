@@ -58,6 +58,18 @@ export function LiquidGlassDefs() {
     >
       <defs>
         {/* Panels: a generous bend, since the pane is large. */}
+        <filter id="kafei-lens" x="0%" y="0%" width="100%" height="100%">
+          <feImage href={LENS_MAP} result="map" preserveAspectRatio="none" />
+          <feDisplacementMap
+            in="SourceGraphic"
+            in2="map"
+            scale="52"
+            xChannelSelector="R"
+            yChannelSelector="G"
+          />
+          {/* Softens the seam the displacement leaves at the very edge. */}
+          <feGaussianBlur stdDeviation="0.35" />
+        </filter>
         <filter id="atlas-lens" x="0%" y="0%" width="100%" height="100%">
           <feImage href={LENS_MAP} result="map" preserveAspectRatio="none" />
           <feDisplacementMap
@@ -72,6 +84,17 @@ export function LiquidGlassDefs() {
         </filter>
 
         {/* Small controls: same lens, gentler, or the bend swamps the shape. */}
+        <filter id="kafei-lens-sm" x="0%" y="0%" width="100%" height="100%">
+          <feImage href={LENS_MAP} result="map" preserveAspectRatio="none" />
+          <feDisplacementMap
+            in="SourceGraphic"
+            in2="map"
+            scale="20"
+            xChannelSelector="R"
+            yChannelSelector="G"
+          />
+          <feGaussianBlur stdDeviation="0.3" />
+        </filter>
         <filter id="atlas-lens-sm" x="0%" y="0%" width="100%" height="100%">
           <feImage href={LENS_MAP} result="map" preserveAspectRatio="none" />
           <feDisplacementMap

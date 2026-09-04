@@ -85,16 +85,31 @@ export class SubscriptionGuard implements CanActivate {
         });
         // Drop the cached TRIALING row so the next request sees EXPIRED.
         this.cache.invalidate(CacheKeys.subscription(restaurantId));
-        throw new ForbiddenException('Your trial has expired. Please choose a paid plan to restore access.');
+        throw new ForbiddenException(
+          'Your trial has expired. Please choose a paid plan to restore access.',
+        );
       }
     }
 
     // Enforce active status
-    const allowedStatuses = ['ACTIVE', 'TRIALING'];
-    if (!allowedStatuses.includes(subscription.status)) {
-      throw new ForbiddenException(
-        `Subscription status is ${subscription.status}. Access is restricted.`,
-      );
+    if (subscription.status === 'CANCELLED') {
+      const now = new Date();
+      if (
+        !subscription.currentPeriodEnd ||
+        now > new Date(subscription.currentPeriodEnd)
+      ) {
+        throw new ForbiddenException(
+          'Your subscription has been cancelled and the billing period has ended. Please subscribe to restore access.',
+        );
+      }
+      // Still within the paid cycle: allow access
+    } else {
+      const allowedStatuses = ['ACTIVE', 'TRIALING'];
+      if (!allowedStatuses.includes(subscription.status)) {
+        throw new ForbiddenException(
+          `Subscription status is ${subscription.status}. Access is restricted.`,
+        );
+      }
     }
 
     // Check feature requirements
@@ -104,10 +119,45 @@ export class SubscriptionGuard implements CanActivate {
     );
 
     if (requiredFeature) {
-      const features = (subscription.plan.features as string[]) || [];
-      if (!features.includes(requiredFeature)) {
+      const planName = (subscription.plan?.name || '').trim().toLowerCase();
+
+      // Enterprise tier grants ALL features unconditionally
+      if (planName === 'enterprise' || planName.includes('enterprise')) {
+        return true;
+      }
+
+      // Extract and normalize features from plan (support snake_case & kebab-case)
+      const rawFeatures = (subscription.plan?.features as string[]) || [];
+      const normalizedFeatures = new Set(
+        rawFeatures.flatMap((f) => [
+          f.toLowerCase().trim(),
+          f.toLowerCase().trim().replace(/-/g, '_'),
+          f.toLowerCase().trim().replace(/_/g, '-'),
+        ]),
+      );
+
+      // Add default tier features if Growth / Professional
+      if (planName.includes('growth') || planName.includes('pro')) {
+        normalizedFeatures.add('ai_copilot');
+        normalizedFeatures.add('ai-copilot');
+        normalizedFeatures.add('analytics');
+        normalizedFeatures.add('automations');
+        normalizedFeatures.add('reports');
+        normalizedFeatures.add('forecasts');
+      }
+
+      const req = requiredFeature.toLowerCase().trim();
+      const reqSnake = req.replace(/-/g, '_');
+      const reqKebab = req.replace(/_/g, '-');
+
+      const hasAccess =
+        normalizedFeatures.has(req) ||
+        normalizedFeatures.has(reqSnake) ||
+        normalizedFeatures.has(reqKebab);
+
+      if (!hasAccess) {
         throw new ForbiddenException(
-          `Your subscription plan (${subscription.plan.name}) does not support this feature. Please upgrade to access this feature.`,
+          `Your subscription plan (${subscription.plan?.name || 'Current'}) does not support this feature (${requiredFeature}). Please upgrade your plan to access this feature.`,
         );
       }
     }

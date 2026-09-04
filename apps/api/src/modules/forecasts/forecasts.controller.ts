@@ -21,7 +21,11 @@ import { ModelSelectionService } from './services/model-selection.service';
 import { ForecastAccuracyService } from './services/forecast-accuracy.service';
 import { ForecastAiGatewayService } from './services/forecast-ai-gateway.service';
 import { ForecastJobService } from './services/forecast-job.service';
-import { ForecastQueryDto, GenerateForecastDto, ForecastAiQueryDto } from './dto/forecast-query.dto';
+import {
+  ForecastQueryDto,
+  GenerateForecastDto,
+  ForecastAiQueryDto,
+} from './dto/forecast-query.dto';
 import { MODEL_REGISTRY } from './constants/forecast-models.constants';
 
 @ApiTags('Sales & Demand Forecasting (V2.5)')
@@ -54,19 +58,41 @@ export class ForecastsController {
     @Query() query: ForecastQueryDto,
   ) {
     const branchId = query.branchId || headerBranchId;
-    const horizonDays = query.horizon === '90D' ? 90 : query.horizon === '30D' ? 30 : query.horizon === '14D' ? 14 : query.horizon === '48H' ? 2 : query.horizon === '24H' ? 1 : 7;
-    return this.forecastingEngine.generateSalesForecast(restaurantId, branchId, horizonDays);
+    const horizonDays =
+      query.horizon === '90D'
+        ? 90
+        : query.horizon === '30D'
+          ? 30
+          : query.horizon === '14D'
+            ? 14
+            : query.horizon === '48H'
+              ? 2
+              : query.horizon === '24H'
+                ? 1
+                : 7;
+    return this.forecastingEngine.generateSalesForecast(
+      restaurantId,
+      branchId,
+      horizonDays,
+    );
   }
 
   @Get('meal-channels')
-  @ApiOperation({ summary: 'Get breakdown by meal period (Lunch/Dinner) and channel (Dine-in/Delivery)' })
+  @ApiOperation({
+    summary:
+      'Get breakdown by meal period (Lunch/Dinner) and channel (Dine-in/Delivery)',
+  })
   async getMealAndChannels(
     @Headers('x-restaurant-id') restaurantId: string,
     @Headers('x-branch-id') headerBranchId: string | undefined,
     @Query('branchId') queryBranchId?: string,
   ) {
     const branchId = queryBranchId || headerBranchId;
-    const salesForecast = await this.forecastingEngine.generateSalesForecast(restaurantId, branchId, 1);
+    const salesForecast = await this.forecastingEngine.generateSalesForecast(
+      restaurantId,
+      branchId,
+      1,
+    );
     return this.mealChannelForecaster.forecastMealPeriodsAndChannels(
       restaurantId,
       salesForecast.summary.tomorrowSales,
@@ -76,30 +102,47 @@ export class ForecastsController {
   }
 
   @Get('heatmap')
-  @ApiOperation({ summary: 'Get 7x24 Day x Hour operational demand intensity heatmap' })
+  @ApiOperation({
+    summary: 'Get 7x24 Day x Hour operational demand intensity heatmap',
+  })
   async getDemandHeatmap(
     @Headers('x-restaurant-id') restaurantId: string,
     @Headers('x-branch-id') headerBranchId: string | undefined,
     @Query('branchId') queryBranchId?: string,
   ) {
     const branchId = queryBranchId || headerBranchId;
-    return this.mealChannelForecaster.generateDemandHeatmap(restaurantId, branchId);
+    return this.mealChannelForecaster.generateDemandHeatmap(
+      restaurantId,
+      branchId,
+    );
   }
 
   @Get('explain')
-  @ApiOperation({ summary: 'Explain why a forecast differs from recent baseline' })
+  @ApiOperation({
+    summary: 'Explain why a forecast differs from recent baseline',
+  })
   async explainForecast(
     @Headers('x-restaurant-id') restaurantId: string,
     @Headers('x-branch-id') headerBranchId: string | undefined,
     @Query('branchId') queryBranchId?: string,
   ) {
     const branchId = queryBranchId || headerBranchId;
-    const salesForecast = await this.forecastingEngine.generateSalesForecast(restaurantId, branchId, 1);
-    return this.explainabilityService.explainForecast(restaurantId, salesForecast.summary.tomorrowSales, branchId);
+    const salesForecast = await this.forecastingEngine.generateSalesForecast(
+      restaurantId,
+      branchId,
+      1,
+    );
+    return this.explainabilityService.explainForecast(
+      restaurantId,
+      salesForecast.summary.tomorrowSales,
+      branchId,
+    );
   }
 
   @Get('demand')
-  @ApiOperation({ summary: 'Get item-level menu demand and portion predictions' })
+  @ApiOperation({
+    summary: 'Get item-level menu demand and portion predictions',
+  })
   async getMenuDemand(
     @Headers('x-restaurant-id') restaurantId: string,
     @Headers('x-branch-id') headerBranchId: string | undefined,
@@ -110,7 +153,10 @@ export class ForecastsController {
   }
 
   @Get('accuracy')
-  @ApiOperation({ summary: 'Get forecast accuracy metrics (WAPE, MAE, RMSE, Forecast vs Actuals)' })
+  @ApiOperation({
+    summary:
+      'Get forecast accuracy metrics (WAPE, MAE, RMSE, Forecast vs Actuals)',
+  })
   async getAccuracy(
     @Headers('x-restaurant-id') restaurantId: string,
     @Headers('x-branch-id') headerBranchId: string | undefined,
@@ -138,14 +184,20 @@ export class ForecastsController {
   }
 
   @Post('ai/query')
-  @ApiOperation({ summary: 'Natural-language conversational forecast query gateway' })
+  @ApiOperation({
+    summary: 'Natural-language conversational forecast query gateway',
+  })
   async answerAiQuery(
     @Headers('x-restaurant-id') restaurantId: string,
     @Headers('x-branch-id') headerBranchId: string | undefined,
     @Body() body: ForecastAiQueryDto,
   ) {
     const branchId = body.branchId || headerBranchId;
-    return this.aiGatewayService.answerQuery(restaurantId, body.question, branchId);
+    return this.aiGatewayService.answerQuery(
+      restaurantId,
+      body.question,
+      branchId,
+    );
   }
 
   @Get('runs')
@@ -155,7 +207,9 @@ export class ForecastsController {
   }
 
   @Post('generate')
-  @ApiOperation({ summary: 'Trigger an asynchronous forecast calculation cycle' })
+  @ApiOperation({
+    summary: 'Trigger an asynchronous forecast calculation cycle',
+  })
   async triggerForecast(
     @Headers('x-restaurant-id') restaurantId: string,
     @Headers('x-tenant-id') tenantId: string,

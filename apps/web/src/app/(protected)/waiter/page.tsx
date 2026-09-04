@@ -14,6 +14,7 @@ import { CANCELLATION_REASONS } from '@/types/order';
 import { formatCurrency } from '@/lib/currency';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { useToast } from '@/components/ui/toast';
+import { SmartPairingRecommendations } from '@/components/ai/smart-pairing-recommendations';
 
 // Synthesize a calming, classical guitar arpeggio pluck sound using Web Audio API
 function playGuitarSound() {
@@ -572,6 +573,20 @@ export default function WaiterDashboard() {
     setQuantity(1);
   };
 
+  // Add recommended pairing directly to cart
+  const handleAddPairingItem = (item: any) => {
+    const itemPayload = {
+      menuItemId: item.id,
+      name: item.name,
+      price: item.price,
+      quantity: 1,
+      variantIds: item.variants?.[0]?.id ? [item.variants[0].id] : [],
+      addonIds: [],
+    };
+    setCartItems((prev) => [...prev, itemPayload]);
+    toastSuccess(`Added pairing: ${item.name}`);
+  };
+
   // Submit manual booking orders
   const handleSubmitManualOrder = async () => {
     if (!selectedTable || cartItems.length === 0) return;
@@ -687,7 +702,7 @@ export default function WaiterDashboard() {
 
         <div className="text-center text-[9px] text-gray-800 pt-1">
           <p className="font-bold">*** THANK YOU FOR DINING WITH US ***</p>
-          <p className="text-[8px] text-gray-600 mt-0.5">Please visit again</p>
+          <p className="text-[8px] text-muted-foreground mt-0.5">Please visit again</p>
         </div>
       </div>
 
@@ -1187,6 +1202,17 @@ export default function WaiterDashboard() {
               </div>
             )}
 
+            {/* AI Smart Pairing Recommendations */}
+            {activeMenu && (
+              <SmartPairingRecommendations
+                activeMenu={activeMenu}
+                cartItems={cartItems}
+                selectedItem={selectedItem}
+                onAddPairing={handleAddPairingItem}
+                compact={true}
+              />
+            )}
+
             {/* Current Cart */}
             {cartItems.length > 0 && (
               <div className="border-t border-border pt-4 space-y-3">
@@ -1344,7 +1370,7 @@ export default function WaiterDashboard() {
                 type="button"
                 disabled={isSubmittingCancel}
                 onClick={handleCancelOrderSubmit}
-                className="flex-1 rounded-lg bg-atlas-error py-2.5 text-xs font-bold text-foreground hover:bg-red-600 disabled:opacity-50 transition-all cursor-pointer"
+                className="flex-1 rounded-lg bg-atlas-error py-2.5 text-xs font-bold text-foreground hover:bg-atlas-error disabled:opacity-50 transition-all cursor-pointer"
               >
                 {isSubmittingCancel ? 'Submitting...' : 'Submit Request to Owner'}
               </button>

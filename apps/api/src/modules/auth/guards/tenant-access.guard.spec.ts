@@ -37,7 +37,11 @@ describe('TenantAccessGuard', () => {
     guard = module.get<TenantAccessGuard>(TenantAccessGuard);
   });
 
-  function createMockExecutionContext(user: any, headers: any = {}, params: any = {}): ExecutionContext {
+  function createMockExecutionContext(
+    user: any,
+    headers: any = {},
+    params: any = {},
+  ): ExecutionContext {
     const req = { user, params, query: {}, headers, body: {} };
     return {
       switchToHttp: () => ({
@@ -48,7 +52,9 @@ describe('TenantAccessGuard', () => {
 
   it('should throw BadRequestException if no tenant is selected', async () => {
     const context = createMockExecutionContext({ id: 'u-1', role: 'USER' });
-    await expect(guard.canActivate(context)).rejects.toThrow(BadRequestException);
+    await expect(guard.canActivate(context)).rejects.toThrow(
+      BadRequestException,
+    );
   });
 
   it('should throw BadRequestException if tenant ID is not a valid UUID', async () => {
@@ -56,7 +62,9 @@ describe('TenantAccessGuard', () => {
       { id: 'u-1', role: 'USER' },
       { 'x-tenant-id': invalidTenantId },
     );
-    await expect(guard.canActivate(context)).rejects.toThrow(BadRequestException);
+    await expect(guard.canActivate(context)).rejects.toThrow(
+      BadRequestException,
+    );
   });
 
   it('should allow PLATFORM_ADMIN access to any valid tenant', async () => {
@@ -146,7 +154,9 @@ describe('TenantAccessGuard', () => {
       { 'x-tenant-id': validTenantId },
     );
 
-    await expect(guard.canActivate(context)).rejects.toThrow(ForbiddenException);
+    await expect(guard.canActivate(context)).rejects.toThrow(
+      ForbiddenException,
+    );
   });
 
   it('should throw NotFoundException if the tenant does not exist at all', async () => {

@@ -107,11 +107,7 @@ export class DiningAreasService {
     return area;
   }
 
-  async update(
-    id: string,
-    branchId: string,
-    updateDto: UpdateDiningAreaDto,
-  ) {
+  async update(id: string, branchId: string, updateDto: UpdateDiningAreaDto) {
     const existing = await this.prisma.diningArea.findFirst({
       where: {
         id,

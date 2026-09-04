@@ -46,18 +46,31 @@ describe('AutomationEngineService', () => {
 
     contextService = {
       getSalesContext: jest.fn().mockResolvedValue({
-        totalSales: 5000, totalOrders: 20, averageOrderValue: 250,
-        topItem: 'Butter Chicken', topItemQty: 10, peakHours: '7 PM - 9 PM',
+        totalSales: 5000,
+        totalOrders: 20,
+        averageOrderValue: 250,
+        topItem: 'Butter Chicken',
+        topItemQty: 10,
+        peakHours: '7 PM - 9 PM',
       }),
       getOrderContext: jest.fn().mockResolvedValue({
         totalOrders: 25,
-        statusBreakdown: { PENDING: 2, CONFIRMED: 8, DELIVERED: 12, CANCELLED: 3 },
+        statusBreakdown: {
+          PENDING: 2,
+          CONFIRMED: 8,
+          DELIVERED: 12,
+          CANCELLED: 3,
+        },
       }),
       getOperationsContext: jest.fn().mockResolvedValue({
-        totalOrders: 25, cancelledOrders: 5, cancellationRate: 20, peakHours: '7 PM - 9 PM',
+        totalOrders: 25,
+        cancelledOrders: 5,
+        cancellationRate: 20,
+        peakHours: '7 PM - 9 PM',
       }),
       getCustomerContext: jest.fn().mockResolvedValue({
-        totalCustomers: 18, repeatCustomers: 4,
+        totalCustomers: 18,
+        repeatCustomers: 4,
       }),
     };
 
@@ -93,7 +106,10 @@ describe('AutomationEngineService', () => {
     });
 
     it('should return false for disabled rule', async () => {
-      prisma.automationRule.findUnique.mockResolvedValue({ ...mockRule, enabled: false });
+      prisma.automationRule.findUnique.mockResolvedValue({
+        ...mockRule,
+        enabled: false,
+      });
       expect(await engine.evaluateRule('rule-1')).toBe(false);
     });
 

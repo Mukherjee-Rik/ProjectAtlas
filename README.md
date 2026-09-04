@@ -1,6 +1,6 @@
-# Atlas — The AI Operating System for Restaurants
+# Kafei — The AI Operating System for Restaurants
 
-[![Version](https://img.shields.io/badge/version-1.0.0--alpha-blue.svg)](https://github.com/Mukherjee-Rik/ProjectAtlas)
+[![Version](https://img.shields.io/badge/version-1.0.0--alpha-blue.svg)](https://kafei.in)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Next.js](https://img.shields.io/badge/Frontend-Next.js%2014-black.svg)](https://nextjs.org/)
 [![NestJS](https://img.shields.io/badge/Backend-NestJS%2010-red.svg)](https://nestjs.com/)
@@ -9,8 +9,8 @@
 [![Docker](https://img.shields.io/badge/Infra-Docker%20Compose-blue.svg)](https://www.docker.com/)
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)]()
 
-> **Atlas is not a POS.**  
-> Atlas is an enterprise-grade, multi-tenant **AI Restaurant Operating System** that unifies billing, kitchen display systems (KDS), real-time kitchen order tickets (KOT), inventory recipes, aggregator delivery hubs (Swiggy, Zomato, ONDC), employee management, and conversational business intelligence into a single intelligent platform.
+> **Kafei is not a POS.**  
+> Kafei is an enterprise-grade, multi-tenant **AI Restaurant Operating System** that unifies billing, kitchen display systems (KDS), real-time kitchen order tickets (KOT), inventory recipes, aggregator delivery hubs (Swiggy, Zomato, ONDC), employee management, and conversational business intelligence into a single intelligent platform.
 
 ---
 
@@ -156,7 +156,7 @@ pnpm dev
 
 ## 🐋 Docker Environment
 
-To run the entire Atlas application stack inside isolated Docker containers:
+To run the entire Kafei application stack inside isolated Docker containers:
 
 ```bash
 # Build and run all production container services
@@ -173,20 +173,20 @@ docker compose -f infrastructure/compose/docker-compose.yml down -v
 
 ## 📚 Complete Project Documentation Index
 
-Atlas maintains exhaustive enterprise documentation inside the [`docs/`](file:///c:/Users/Prabhabi%20Infocom/OneDrive/Desktop/project-atlas/docs) directory:
+Kafei maintains exhaustive enterprise documentation inside the [`docs/`](docs) directory:
 
 | Document | Title | Description |
 | :--- | :--- | :--- |
-| [`01-product-vision.md`](file:///c:/Users/Prabhabi%20Infocom/OneDrive/Desktop/project-atlas/docs/01-product-vision.md) | **Product Vision & Strategy** | Mission, Problem Statement, Competitive Moats, Market Segmentation, and Business Model. |
-| [`02-requirements.md`](file:///c:/Users/Prabhabi%20Infocom/OneDrive/Desktop/project-atlas/docs/02-requirements.md) | **Software Requirements (SRS)**| Functional & NFR Specs, User Stories (Gherkin), Module Boundaries, and RBAC Matrix. |
-| [`03-database-design.md`](file:///c:/Users/Prabhabi%20Infocom/OneDrive/Desktop/project-atlas/docs/03-database-design.md)| **Database Architecture** | PostgreSQL multi-tenancy, UUIDv7 strategy, Mermaid ERD, table specs, and PGVector indexes. |
-| [`04-api-design.md`](file:///c:/Users/Prabhabi%20Infocom/OneDrive/Desktop/project-atlas/docs/04-api-design.md) | **REST API Specifications** | Versioning, RFC 7807 error envelopes, rate limiting, endpoint catalog, and request examples. |
-| [`05-ui-ux.md`](file:///c:/Users/Prabhabi%20Infocom/OneDrive/Desktop/project-atlas/docs/05-ui-ux.md) | **UI/UX Design System** | Tailwind tokens, 7 persona user flows, component specs, and ASCII wireframes. |
-| [`06-development-roadmap.md`](file:///c:/Users/Prabhabi%20Infocom/OneDrive/Desktop/project-atlas/docs/06-development-roadmap.md)| **Product Development Roadmap**| Sprints 1-24 schedule, Gantt release horizons, risk mitigation, and CI/CD pipelines. |
-| [`07-architecture.md`](file:///c:/Users/Prabhabi%20Infocom/OneDrive/Desktop/project-atlas/docs/07-architecture.md) | **Software Architecture** | Clean Architecture, DDD bounded contexts, CQRS, Socket.IO real-time, and caching. |
-| [`08-business-rules.md`](file:///c:/Users/Prabhabi%20Infocom/OneDrive/Desktop/project-atlas/docs/08-business-rules.md) | **Business Rules & Policies** | Financial invariants, KOT rules, stock deduction policies, and rule rationales ("WHY"). |
-| [`09-integrations.md`](file:///c:/Users/Prabhabi%20Infocom/OneDrive/Desktop/project-atlas/docs/09-integrations.md) | **Ecosystem Integrations** | Swiggy, Zomato, ONDC, Razorpay, Stripe, WhatsApp Cloud API, ESC/POS, and Tally XML. |
-| [`10-ai-brain.md`](file:///c:/Users/Prabhabi%20Infocom/OneDrive/Desktop/project-atlas/docs/10-ai-brain.md) | **AI Business Brain Architecture**| Dual-brain cognitive engine, PGVector RAG, multi-agent frameworks, and Text-to-SQL guards. |
+| [`01-product-vision.md`](docs/01-product-vision.md) | **Product Vision & Strategy** | Mission, Problem Statement, Competitive Moats, Market Segmentation, and Business Model. |
+| [`02-requirements.md`](docs/02-requirements.md) | **Software Requirements (SRS)**| Functional & NFR Specs, User Stories (Gherkin), Module Boundaries, and RBAC Matrix. |
+| [`03-database-design.md`](docs/03-database-design.md)| **Database Architecture** | PostgreSQL multi-tenancy, UUIDv7 strategy, Mermaid ERD, table specs, and PGVector indexes. |
+| [`04-api-design.md`](docs/04-api-design.md) | **REST API Specifications** | Versioning, RFC 7807 error envelopes, rate limiting, endpoint catalog, and request examples. |
+| [`05-ui-ux.md`](docs/05-ui-ux.md) | **UI/UX Design System** | Tailwind tokens, 7 persona user flows, component specs, and ASCII wireframes. |
+| [`06-development-roadmap.md`](docs/06-development-roadmap.md)| **Product Development Roadmap**| Sprints 1-24 schedule, Gantt release horizons, risk mitigation, and CI/CD pipelines. |
+| [`07-architecture.md`](docs/07-architecture.md) | **Software Architecture** | Clean Architecture, DDD bounded contexts, CQRS, Socket.IO real-time, and caching. |
+| [`08-business-rules.md`](docs/08-business-rules.md) | **Business Rules & Policies** | Financial invariants, KOT rules, stock deduction policies, and rule rationales ("WHY"). |
+| [`09-integrations.md`](docs/09-integrations.md) | **Ecosystem Integrations** | Swiggy, Zomato, ONDC, Razorpay, Stripe, WhatsApp Cloud API, ESC/POS, and Tally XML. |
+| [`10-ai-brain.md`](docs/10-ai-brain.md) | **AI Business Brain Architecture**| Dual-brain cognitive engine, PGVector RAG, multi-agent frameworks, and Text-to-SQL guards. |
 
 ---
 
@@ -194,7 +194,7 @@ Atlas maintains exhaustive enterprise documentation inside the [`docs/`](file://
 
 ```mermaid
 timeline
-    title Atlas Release Horizons
+    title Kafei Release Horizons
     MVP (v0.5 - Month 3) : Multi-Tenant Infrastructure : Express POS & Waiter App : Sub-Second Socket KDS : ESC/POS Printing
     Version 1.0 (Month 6) : Swiggy & Zomato Aggregators : Recipe Ledger Auto-Deduction : Split Billing & GST : Customer QR PWA
     Version 2.0 (Month 9) : Native AI Business Brain : Natural Language Queries : Demand & Waste Forecasting : Smart Staff Roster
@@ -222,5 +222,5 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 ---
 
 <p align="center">
-  <b>Atlas</b> — Built with ❤️ for the global hospitality industry.
+  <b>Kafei</b> — Built with ❤️ for the global hospitality industry.
 </p>

@@ -5,7 +5,11 @@ import { DeliveryProviderFactory } from './delivery-provider.factory';
 import { DeliveryEventsService } from './delivery-events.service';
 import { AuditService } from '../../audit/audit.service';
 import { OrderStatus, OrderSource } from '../../../generated/prisma/enums';
-import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { ProviderAAdapter } from '../adapters/provider-a/provider-a.adapter';
 import { ProviderBAdapter } from '../adapters/provider-b/provider-b.adapter';
 
@@ -101,9 +105,11 @@ describe('DeliveryService', () => {
 
   it('should ignore out-of-order status webhooks', async () => {
     mockPrismaService.webhookEvent.findUnique.mockResolvedValueOnce(null);
-    mockPrismaService.restaurantDeliveryProvider.findUnique.mockResolvedValueOnce({
-      enabled: true,
-    });
+    mockPrismaService.restaurantDeliveryProvider.findUnique.mockResolvedValueOnce(
+      {
+        enabled: true,
+      },
+    );
     mockPrismaService.externalOrder.findUnique.mockResolvedValueOnce({
       id: 'ext-m1',
       atlasOrderId: 'ord-123',
@@ -128,9 +134,11 @@ describe('DeliveryService', () => {
 
   it('should reject order cancellations if order is already served or completed', async () => {
     mockPrismaService.webhookEvent.findUnique.mockResolvedValueOnce(null);
-    mockPrismaService.restaurantDeliveryProvider.findUnique.mockResolvedValueOnce({
-      enabled: true,
-    });
+    mockPrismaService.restaurantDeliveryProvider.findUnique.mockResolvedValueOnce(
+      {
+        enabled: true,
+      },
+    );
     mockPrismaService.externalOrder.findUnique.mockResolvedValueOnce({
       id: 'ext-m1',
       atlasOrderId: 'ord-123',
@@ -154,12 +162,18 @@ describe('DeliveryService', () => {
       provider: 'PROVIDER_A',
       externalOrderId: 'ext-123',
     });
-    mockPrismaService.restaurantDeliveryProvider.findUnique.mockResolvedValueOnce({
-      enabled: true,
-    });
+    mockPrismaService.restaurantDeliveryProvider.findUnique.mockResolvedValueOnce(
+      {
+        enabled: true,
+      },
+    );
 
     // Trigger reactive RxJS event
-    eventsService.emitOrderStatusUpdated('ord-123', OrderStatus.PREPARING, 'res-1');
+    eventsService.emitOrderStatusUpdated(
+      'ord-123',
+      OrderStatus.PREPARING,
+      'res-1',
+    );
 
     // Give microtask queue time to run subscription handler
     await new Promise((resolve) => setTimeout(resolve, 10));

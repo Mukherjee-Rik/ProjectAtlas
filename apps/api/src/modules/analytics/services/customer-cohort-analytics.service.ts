@@ -54,7 +54,7 @@ export class CustomerCohortAnalyticsService {
       INACTIVE: { count: 0, totalSpend: 0 },
     };
 
-    let totalTrackedCustomers = customers.length;
+    const totalTrackedCustomers = customers.length;
     let totalLifetimeRevenue = 0;
 
     customers.forEach((c) => {
@@ -67,7 +67,10 @@ export class CustomerCohortAnalyticsService {
       segmentMap[seg].totalSpend += spend;
     });
 
-    const averageLtv = totalTrackedCustomers > 0 ? totalLifetimeRevenue / totalTrackedCustomers : 0;
+    const averageLtv =
+      totalTrackedCustomers > 0
+        ? totalLifetimeRevenue / totalTrackedCustomers
+        : 0;
 
     // 2. Cohort Retention Computation
     // Map each customer/session to their first order month and their subsequent active months
@@ -102,7 +105,10 @@ export class CustomerCohortAnalyticsService {
     const sortedCohorts = Array.from(cohortGroups.keys()).sort();
 
     // Helper: calculate month offset (Month 0, Month 1, Month 2...)
-    const getMonthOffset = (startMonthStr: string, targetMonthStr: string): number => {
+    const getMonthOffset = (
+      startMonthStr: string,
+      targetMonthStr: string,
+    ): number => {
       const [sy, sm] = startMonthStr.split('-').map(Number);
       const [ty, tm] = targetMonthStr.split('-').map(Number);
       return (ty - sy) * 12 + (tm - sm);
@@ -145,7 +151,8 @@ export class CustomerCohortAnalyticsService {
         repeatRate:
           totalTrackedCustomers > 0
             ? Math.round(
-                ((customers.filter((c) => c.totalOrders >= 2).length) / totalTrackedCustomers) *
+                (customers.filter((c) => c.totalOrders >= 2).length /
+                  totalTrackedCustomers) *
                   10000,
               ) / 100
             : 0,
