@@ -25,14 +25,14 @@ export function ScrollReveal({
   children,
   className = '',
   delay = 0,
-  distance = 16,
+  distance = 12,
 }: ScrollRevealProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: distance }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-80px' }}
-      transition={{ duration: 0.5, delay, ease: EASE }}
+      viewport={{ once: true, margin: '-20px' }}
+      transition={{ duration: 0.35, delay, ease: EASE }}
       className={className}
     >
       {children}

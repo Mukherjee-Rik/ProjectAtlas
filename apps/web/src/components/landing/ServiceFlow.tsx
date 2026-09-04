@@ -43,15 +43,38 @@ const stages: Stage[] = [
   },
 ];
 
-export function ServiceFlow() {
-  const containerRef = useRef<HTMLDivElement>(null);
+function DesktopFlowRule({ containerRef }: { containerRef: React.RefObject<HTMLDivElement | null> }) {
+  const [isDesktop, setIsDesktop] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsDesktop(window.innerWidth >= 640);
+  }, []);
+
+  if (!isDesktop) return null;
+
+  return <DesktopFlowRuleInner containerRef={containerRef} />;
+}
+
+function DesktopFlowRuleInner({ containerRef }: { containerRef: React.RefObject<HTMLDivElement | null> }) {
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ['start 65%', 'end 60%'],
   });
-  // Spring keeps the rule from twitching on trackpad scroll.
   const smooth = useSpring(scrollYProgress, { stiffness: 90, damping: 26 });
   const ruleHeight = useTransform(smooth, [0, 1], ['0%', '100%']);
+
+  return (
+    <div className="absolute bottom-2 left-[11px] top-2 hidden w-px bg-secondary sm:block">
+      <motion.div
+        style={{ height: ruleHeight }}
+        className="w-full bg-primary/60"
+      />
+    </div>
+  );
+}
+
+export function ServiceFlow() {
+  const containerRef = useRef<HTMLDivElement>(null);
 
   return (
     <section
@@ -79,21 +102,16 @@ export function ServiceFlow() {
 
         {/* Numbered stages. The rule in the gutter fills as you read down it. */}
         <div className="relative mt-16 sm:mt-20">
-          <div className="absolute bottom-2 left-[11px] top-2 hidden w-px bg-secondary sm:block">
-            <motion.div
-              style={{ height: ruleHeight }}
-              className="w-full bg-primary/60"
-            />
-          </div>
+          <DesktopFlowRule containerRef={containerRef} />
 
           <ol className="sm:pl-16">
             {stages.map((stage) => (
               <motion.li
                 key={stage.num}
-                initial={{ opacity: 0, y: 18 }}
+                initial={{ opacity: 0, y: 12 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-100px' }}
-                transition={{ duration: 0.5, ease: [0.22, 0.61, 0.36, 1] }}
+                viewport={{ once: true, margin: '-20px' }}
+                transition={{ duration: 0.4, ease: [0.22, 0.61, 0.36, 1] }}
                 className="relative grid gap-x-10 gap-y-4 border-t border-border py-10 first:border-t-0 sm:py-12 md:grid-cols-12"
               >
                 {/* Tick on the gutter rule, level with the stage number.
