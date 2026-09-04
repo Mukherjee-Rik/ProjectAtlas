@@ -1,4 +1,8 @@
-import { Injectable, BadRequestException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from '../../../database/prisma/prisma.service';
 import { AiContextService } from './ai-context.service';
 import { AiProviderService } from './ai-provider.service';
@@ -10,7 +14,10 @@ import crypto from 'node:crypto';
 @Injectable()
 export class AiService {
   // Simple in-memory token rate-limit counter (max 20 prompts per minute)
-  private readonly rateLimits = new Map<string, { count: number; resetTime: number }>();
+  private readonly rateLimits = new Map<
+    string,
+    { count: number; resetTime: number }
+  >();
 
   constructor(
     private readonly prisma: PrismaService,
@@ -35,7 +42,9 @@ export class AiService {
     }
 
     if (limit.count >= 20) {
-      throw new BadRequestException('AI request rate limit exceeded. Please wait a minute.');
+      throw new BadRequestException(
+        'AI request rate limit exceeded. Please wait a minute.',
+      );
     }
 
     limit.count++;
@@ -58,33 +67,79 @@ export class AiService {
     const isFinancialQuery = FINANCIAL_INTENTS.includes(intent);
 
     // Enforce permission checks: waiters/kitchen staff cannot query sales context
-    const allowedRoles: UserRole[] = [UserRole.PLATFORM_ADMIN, UserRole.OWNER, UserRole.ADMIN, UserRole.MANAGER];
+    const allowedRoles: UserRole[] = [
+      UserRole.PLATFORM_ADMIN,
+      UserRole.OWNER,
+      UserRole.ADMIN,
+      UserRole.MANAGER,
+    ];
     if (isFinancialQuery && !allowedRoles.includes(role)) {
       await this.audit.log({
         actorUserId: userId,
         action: 'AI_QUERY_BLOCKED',
         resourceType: 'AI_ASSISTANT',
         restaurantId,
-        metadata: { query, intent, error: 'Unauthorized financial details request' },
+        metadata: {
+          query,
+          intent,
+          error: 'Unauthorized financial details request',
+        },
       });
-      throw new ForbiddenException('You do not have access permission to view financial metrics.');
+      throw new ForbiddenException(
+        'You do not have access permission to view financial metrics.',
+      );
     }
 
     const { startDate, endDate, label } = extractDateRange(query);
+    const isFutureQuery =
+      intent === 'FORECAST' || startDate.getTime() > Date.now();
 
     // Context aggregation
-    const orders = await this.contextService.getOrderContext(restaurantId, startDate, endDate);
-    const operations = await this.contextService.getOperationsContext(restaurantId, startDate, endDate);
+    const orders = await this.contextService.getOrderContext(
+      restaurantId,
+      startDate,
+      endDate,
+    );
+    const operations = await this.contextService.getOperationsContext(
+      restaurantId,
+      startDate,
+      endDate,
+    );
 
     let sales: any = null;
     let customers: any = null;
+    let forecast: any = null;
 
     if (allowedRoles.includes(role)) {
-      sales = await this.contextService.getSalesContext(restaurantId, startDate, endDate);
-      customers = await this.contextService.getCustomerContext(restaurantId, startDate, endDate);
+      sales = await this.contextService.getSalesContext(
+        restaurantId,
+        startDate,
+        endDate,
+      );
+      customers = await this.contextService.getCustomerContext(
+        restaurantId,
+        startDate,
+        endDate,
+      );
+
+      if (isFutureQuery) {
+        forecast = await this.contextService.getForecastContext(
+          restaurantId,
+          startDate,
+        );
+        if (sales) {
+          sales.averageDailySales = forecast.trailingAverageSales;
+          sales.averageDailyOrders = Math.round(
+            forecast.trailingAverageSales / (forecast.predictedAov || 1500),
+          );
+          sales.projectedSales = forecast.predictedSales;
+          sales.projectedOrders = forecast.predictedOrders;
+        }
+      }
     }
 
-    const inventory = await this.contextService.getInventoryContext(restaurantId);
+    const inventory =
+      await this.contextService.getInventoryContext(restaurantId);
 
     const aiContext = {
       restaurantId,
@@ -94,6 +149,7 @@ export class AiService {
       sales,
       customers,
       inventory,
+      forecast,
     };
 
     const systemPrompt = `You are Atlas AI, an ultra-smart, conversational restaurant operations copilot.
@@ -120,7 +176,12 @@ NATURAL LANGUAGE UNDERSTANDING (NLU) DIRECTIVES:
 
     const fullPrompt = `${systemPrompt}\n\nHistory:\n${chatHistoryText}\n\nUser Question: ${query}`;
 
-    const { text, inputTokens, outputTokens } = await this.provider.generate(fullPrompt, aiContext, query, history);
+    const { text, inputTokens, outputTokens } = await this.provider.generate(
+      fullPrompt,
+      aiContext,
+      query,
+      history,
+    );
 
     const requestId = crypto.randomUUID();
 

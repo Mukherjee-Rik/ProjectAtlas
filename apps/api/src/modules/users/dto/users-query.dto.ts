@@ -10,10 +10,7 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
-import {
-  UserRole,
-  UserStatus,
-} from '../../../generated/prisma/enums';
+import { UserRole, UserStatus } from '../../../generated/prisma/enums';
 
 export class UsersQueryDto {
   @ApiPropertyOptional({
@@ -28,7 +25,17 @@ export class UsersQueryDto {
     example: 'CASHIER',
   })
   @IsOptional()
-  @IsIn(['PLATFORM_ADMIN', 'OWNER', 'ADMIN', 'MANAGER', 'STAFF', 'WAITER', 'KITCHEN', 'CASHIER', 'USER'])
+  @IsIn([
+    'PLATFORM_ADMIN',
+    'OWNER',
+    'ADMIN',
+    'MANAGER',
+    'STAFF',
+    'WAITER',
+    'KITCHEN',
+    'CASHIER',
+    'USER',
+  ])
   role?: UserRole;
 
   @ApiPropertyOptional({

@@ -69,6 +69,20 @@ export class UsersController {
     return this.usersService.updateMyProfile(user.id, updateMyProfileDto);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
+  @Get('me/export')
+  async getMeExport(@CurrentUser() user: AuthenticatedUser) {
+    return this.usersService.exportMyData(user.id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
+  @Delete('me')
+  async deleteMe(@CurrentUser() user: AuthenticatedUser) {
+    return this.usersService.deleteMyAccount(user.id);
+  }
+
   @UseGuards(JwtAuthGuard, PermissionsGuard, TenantAccessGuard)
   @ApiBearerAuth('access-token')
   @Get(':id')

@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Param, UseGuards, BadRequestException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  UseGuards,
+  BadRequestException,
+} from '@nestjs/common';
 import { TableCallsService } from './table-calls.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { BranchAccessGuard } from '../auth/guards/branch-access.guard';
@@ -23,7 +31,9 @@ export class TableCallsController {
     @Body() body: { type: 'WAITER' | 'WATER' | 'BILL' },
   ) {
     if (!body.type || !['WAITER', 'WATER', 'BILL'].includes(body.type)) {
-      throw new BadRequestException('Invalid call type. Must be WAITER, WATER, or BILL.');
+      throw new BadRequestException(
+        'Invalid call type. Must be WAITER, WATER, or BILL.',
+      );
     }
     return this.tableCallsService.createCall(token, body.type);
   }

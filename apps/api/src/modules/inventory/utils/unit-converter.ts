@@ -45,7 +45,10 @@ export function convertQuantity(
 /**
  * Format a quantity with its unit of measure in a human-friendly string
  */
-export function formatQuantityWithUnit(quantity: number, unit: UnitOfMeasure | string): string {
+export function formatQuantityWithUnit(
+  quantity: number,
+  unit: UnitOfMeasure | string,
+): string {
   const num = Number(quantity);
   const u = String(unit).toUpperCase();
 

@@ -214,11 +214,11 @@ export default function ForecastingDashboardPage() {
         </div>
       </div>
 
-      {/* Atlas AI Forecast Assistant Bar */}
+      {/* Kafei AI Forecast Assistant Bar */}
       <div className="bg-card border border-primary/30 rounded-2xl p-5 space-y-3">
         <div className="flex items-center gap-2 text-xs font-bold text-primary">
           <Bot className="w-4 h-4" />
-          <span>Ask Atlas AI Forecaster</span>
+          <span>Ask Kafei AI Forecaster</span>
         </div>
 
         <form onSubmit={handleAskAi} className="flex gap-2">

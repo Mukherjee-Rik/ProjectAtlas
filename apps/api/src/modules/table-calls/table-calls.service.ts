@@ -21,7 +21,7 @@ export class TableCallsService {
 
   async createCall(token: string, type: 'WAITER' | 'WATER' | 'BILL') {
     const resolved = await this.publicTablesService.resolveTableToken(token);
-    
+
     const newCall: TableCall = {
       id: crypto.randomUUID(),
       restaurantId: resolved.restaurant.id,
@@ -35,7 +35,12 @@ export class TableCallsService {
 
     // Remove duplicates of same type for the table to avoid flooding the waiter dashboard
     this.calls = this.calls.filter(
-      (c) => !(c.tableId === newCall.tableId && c.type === type && c.status === 'PENDING')
+      (c) =>
+        !(
+          c.tableId === newCall.tableId &&
+          c.type === type &&
+          c.status === 'PENDING'
+        ),
     );
 
     this.calls.push(newCall);
@@ -43,7 +48,9 @@ export class TableCallsService {
   }
 
   getPendingCalls(branchId: string): TableCall[] {
-    return this.calls.filter((c) => c.branchId === branchId && c.status === 'PENDING');
+    return this.calls.filter(
+      (c) => c.branchId === branchId && c.status === 'PENDING',
+    );
   }
 
   async resolveCallForUser(id: string, userId: string, role: string) {
@@ -51,12 +58,16 @@ export class TableCallsService {
     if (!call) throw new NotFoundException('Call request not found');
 
     if (role !== 'PLATFORM_ADMIN') {
-      const rest = await this.publicTablesService['prisma'].restaurant.findUnique({
+      const rest = await this.publicTablesService[
+        'prisma'
+      ].restaurant.findUnique({
         where: { id: call.restaurantId },
         select: { tenantId: true },
       });
       if (rest) {
-        const membership = await this.publicTablesService['prisma'].tenantMembership.findUnique({
+        const membership = await this.publicTablesService[
+          'prisma'
+        ].tenantMembership.findUnique({
           where: {
             userId_tenantId: {
               userId,
@@ -77,7 +88,7 @@ export class TableCallsService {
     const call = this.calls.find((c) => c.id === id);
     if (!call) throw new NotFoundException('Call request not found');
     call.status = 'RESOLVED';
-    
+
     // Cleanup resolved calls from memory array
     this.calls = this.calls.filter((c) => c.status === 'PENDING');
     return call;

@@ -111,10 +111,10 @@ export default function SupportPage() {
 
         const data = await res.json();
         if (data.success) {
-          const code = data.data.ticketNumber || `ATLAS-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+          const code = data.data.ticketNumber || `KAFEI-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
           setSubmittedRef(code);
         } else {
-          setSubmittedRef(`ATLAS-${Math.random().toString(36).substring(2, 6).toUpperCase()}`);
+          setSubmittedRef(`KAFEI-${Math.random().toString(36).substring(2, 6).toUpperCase()}`);
         }
       } else {
         // Public contact/incident inquiry
@@ -137,7 +137,7 @@ export default function SupportPage() {
       }
     } catch {
       // Fallback reference code
-      setSubmittedRef(`ATLAS-${Math.random().toString(36).substring(2, 6).toUpperCase()}`);
+      setSubmittedRef(`KAFEI-${Math.random().toString(36).substring(2, 6).toUpperCase()}`);
     } finally {
       setSubmitting(false);
     }
@@ -148,7 +148,7 @@ export default function SupportPage() {
       title: 'Emergency Floor & KDS Outage',
       desc: 'Immediate help for active dining service, POS freeze, or kitchen screen issues.',
       icon: Flame,
-      color: 'text-atlas-error bg-red-950/40 border-atlas-error/30',
+      color: 'text-atlas-error bg-atlas-error/40 border-atlas-error/30',
       badge: '24/7 Rapid Response',
       url: 'https://wa.me/919903085026?text=%F0%9F%9A%A8%20EMERGENCY%3A%20I%20need%20immediate%20assistance%20with%20my%20live%20restaurant%20floor.',
     },
@@ -156,7 +156,7 @@ export default function SupportPage() {
       title: 'Thermal Printer & POS Hardware',
       desc: 'Setup guidance for 80mm ESC/POS USB, Bluetooth, and network printers.',
       icon: Printer,
-      color: 'text-atlas-warning bg-amber-950/40 border-atlas-warning/30',
+      color: 'text-atlas-warning bg-atlas-warning/40 border-atlas-warning/30',
       badge: 'Hardware Support',
       url: 'https://wa.me/919903085026?text=%F0%9F%96%A8%EF%B8%8F%20Hardware%20Support%3A%20Need%20help%20setting%20up%20or%20fixing%20thermal%20printer/POS.',
     },
@@ -278,7 +278,7 @@ export default function SupportPage() {
 
               <div className="flex flex-wrap items-center gap-3">
                 <a
-                  href="https://wa.me/919903085026?text=Hi%20Atlas%20Team%2C%20I%20need%20support%20for%20my%20restaurant."
+                  href="https://wa.me/919903085026?text=Hi%20Kafei%20Team%2C%20I%20need%20support%20for%20my%20restaurant."
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-xs font-bold text-background shadow-lg transition-all hover:bg-primary-hover active:scale-95 cursor-pointer"
@@ -292,7 +292,7 @@ export default function SupportPage() {
                   <Phone className="h-4 w-4" /> Call 9903085026
                 </a>
                 <a
-                  href="mailto:baleremailamar@gmail.com"
+                  href="mailto:rikmukherjee1999@gmail.com"
                   className="inline-flex items-center gap-2 rounded-xl border border-border bg-secondary px-4 py-3 text-xs font-bold text-foreground transition-all hover:border-primary/40 hover:text-primary active:scale-95"
                 >
                   <Mail className="h-4 w-4" /> Email Desk
@@ -375,14 +375,14 @@ export default function SupportPage() {
                   <Mail className="h-4 w-4 text-primary shrink-0 mt-0.5" />
                   <div>
                     <strong className="text-foreground">Email Notifications:</strong>
-                    <p className="mt-0.5">All tickets automatically alert lead engineers at <span className="text-primary font-semibold">baleremailamar@gmail.com</span>.</p>
+                    <p className="mt-0.5">All tickets automatically alert lead engineers at <span className="text-primary font-semibold">rikmukherjee1999@gmail.com</span>.</p>
                   </div>
                 </li>
                 <li className="flex items-start gap-2.5">
                   <Sparkles className="h-4 w-4 text-primary shrink-0 mt-0.5" />
                   <div>
                     <strong className="text-foreground">Engineering Assistance:</strong>
-                    <p className="mt-0.5">Direct access to core Atlas developers for custom feature queries.</p>
+                    <p className="mt-0.5">Direct access to core Kafei developers for custom feature queries.</p>
                   </div>
                 </li>
               </ul>
@@ -412,13 +412,13 @@ export default function SupportPage() {
                     <p className="text-xs text-muted-foreground max-w-md mx-auto">
                       Your reference tracking number is{' '}
                       <strong className="font-mono text-primary font-bold">{submittedRef}</strong>.
-                      Our team and lead engineer (<span className="text-foreground font-semibold">baleremailamar@gmail.com</span>) have been notified.
+                      Our team and lead engineer (<span className="text-foreground font-semibold">rikmukherjee1999@gmail.com</span>) have been notified.
                     </p>
                   </div>
 
                   <div className="flex flex-wrap items-center justify-center gap-3 pt-3">
                     <a
-                      href={`https://wa.me/919903085026?text=Hi%20Atlas%20Team%2C%20following%20up%20on%20Support%20Ticket%20${submittedRef}`}
+                      href={`https://wa.me/919903085026?text=Hi%20Kafei%20Team%2C%20following%20up%20on%20Support%20Ticket%20${submittedRef}`}
                       target="_blank"
                       rel="noreferrer"
                       className="rounded-xl bg-primary px-4 py-2.5 text-xs font-bold text-background shadow-md hover:bg-primary-hover"
@@ -579,10 +579,26 @@ export default function SupportPage() {
             </span>
           </div>
 
-          <div className="flex flex-wrap items-center gap-6 text-xs text-muted-foreground">
+          <div className="flex flex-wrap items-center gap-5 text-xs text-muted-foreground">
             <Link href="/" className="hover:text-foreground transition-colors">Home</Link>
             <Link href="/docs" className="hover:text-foreground transition-colors">Docs</Link>
-            <Link href="/contact" className="hover:text-foreground transition-colors">Contact Us</Link>
+            <Link href="/privacy" className="hover:text-foreground transition-colors">Privacy</Link>
+            <Link href="/terms" className="hover:text-foreground transition-colors">Terms</Link>
+            <Link href="/cookies" className="hover:text-foreground transition-colors">Cookies</Link>
+            <button
+              type="button"
+              onClick={() => {
+                if (typeof window !== 'undefined') {
+                  window.dispatchEvent(new CustomEvent('kafei:open-cookie-preferences'));
+                }
+              }}
+              className="hover:text-foreground transition-colors cursor-pointer"
+            >
+              Cookie Preferences
+            </button>
+            <Link href="/data-deletion" className="hover:text-foreground transition-colors">Data Deletion</Link>
+            <Link href="/legal" className="hover:text-foreground transition-colors">Legal Hub</Link>
+            <Link href="/contact" className="hover:text-foreground transition-colors">Contact</Link>
             <a
               href="https://wa.me/919903085026"
               target="_blank"
@@ -594,7 +610,7 @@ export default function SupportPage() {
           </div>
 
           <p className="text-[11px] text-muted-foreground">
-            © {new Date().getFullYear()} Kafei. All rights reserved.
+            © {new Date().getFullYear()} Antigravity. All rights reserved.
           </p>
         </div>
       </footer>

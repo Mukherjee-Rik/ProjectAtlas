@@ -42,7 +42,9 @@ export class DataIntelligenceController {
   ) {}
 
   @Get('events')
-  @ApiOperation({ summary: 'Query operational event stream with tenant isolation' })
+  @ApiOperation({
+    summary: 'Query operational event stream with tenant isolation',
+  })
   async getEvents(
     @Headers('x-restaurant-id') restaurantId: string,
     @Query() query: OperationalEventsQueryDto,
@@ -61,13 +63,17 @@ export class DataIntelligenceController {
   }
 
   @Post('backfill')
-  @ApiOperation({ summary: 'Trigger historical data backfill routine for daily rollups' })
+  @ApiOperation({
+    summary: 'Trigger historical data backfill routine for daily rollups',
+  })
   async runBackfill(@Headers('x-restaurant-id') restaurantId: string) {
     return this.aggregationService.backfillHistoricalData(restaurantId);
   }
 
   @Get('quality-audit')
-  @ApiOperation({ summary: 'Run data quality, reconciliation and anomaly detection audit' })
+  @ApiOperation({
+    summary: 'Run data quality, reconciliation and anomaly detection audit',
+  })
   async runQualityAudit(@Headers('x-restaurant-id') restaurantId: string) {
     return this.qualityService.runAudit(restaurantId);
   }

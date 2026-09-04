@@ -1,4 +1,9 @@
-import { Injectable, BadRequestException, NotFoundException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { PrismaService } from '../../../database/prisma/prisma.service';
 import { DeliveryProviderFactory } from './delivery-provider.factory';
 import { DeliveryEventsService } from './delivery-events.service';
@@ -15,9 +20,11 @@ export class DeliveryService {
     private readonly auditService: AuditService,
   ) {
     // Subscribe to status updates from the core orders system reactively
-    this.eventsService.orderStatusUpdated$.subscribe(({ orderId, status, restaurantId }) => {
-      void this.syncStatusToProvider(orderId, status, restaurantId);
-    });
+    this.eventsService.orderStatusUpdated$.subscribe(
+      ({ orderId, status, restaurantId }) => {
+        void this.syncStatusToProvider(orderId, status, restaurantId);
+      },
+    );
   }
 
   async saveProviderConfig(
@@ -30,7 +37,9 @@ export class DeliveryService {
     const adapter = this.providerFactory.getProvider(provider);
     const isValid = await adapter.healthCheck(credentials);
     if (!isValid && enabled) {
-      throw new BadRequestException('Credentials health check failed for delivery provider');
+      throw new BadRequestException(
+        'Credentials health check failed for delivery provider',
+      );
     }
 
     const config = await this.prisma.restaurantDeliveryProvider.upsert({
@@ -75,15 +84,19 @@ export class DeliveryService {
     });
   }
 
-  async getProviderHealth(restaurantId: string, providerName: string): Promise<boolean> {
-    const configRecord = await this.prisma.restaurantDeliveryProvider.findUnique({
-      where: {
-        restaurantId_provider: {
-          restaurantId,
-          provider: providerName,
+  async getProviderHealth(
+    restaurantId: string,
+    providerName: string,
+  ): Promise<boolean> {
+    const configRecord =
+      await this.prisma.restaurantDeliveryProvider.findUnique({
+        where: {
+          restaurantId_provider: {
+            restaurantId,
+            provider: providerName,
+          },
         },
-      },
-    });
+      });
 
     if (!configRecord || !configRecord.enabled) {
       return false;
@@ -143,17 +156,20 @@ export class DeliveryService {
       }
 
       // Check integration state
-      const configRecord = await this.prisma.restaurantDeliveryProvider.findUnique({
-        where: {
-          restaurantId_provider: {
-            restaurantId,
-            provider: providerName,
+      const configRecord =
+        await this.prisma.restaurantDeliveryProvider.findUnique({
+          where: {
+            restaurantId_provider: {
+              restaurantId,
+              provider: providerName,
+            },
           },
-        },
-      });
+        });
 
       if (!configRecord || !configRecord.enabled) {
-        throw new BadRequestException('Delivery integration is disabled or not set up');
+        throw new BadRequestException(
+          'Delivery integration is disabled or not set up',
+        );
       }
 
       const eventType = payload.eventType; // 'ORDER_CREATED' | 'STATUS_UPDATED' | 'ORDER_CANCELLED'
@@ -175,7 +191,10 @@ export class DeliveryService {
             where: { provider_eventId: { provider: providerName, eventId } },
             data: { status: 'PROCESSED' },
           });
-          return { success: true, message: 'External order maps to existing database order' };
+          return {
+            success: true,
+            message: 'External order maps to existing database order',
+          };
         }
 
         // Locate restaurant active branch
@@ -184,7 +203,9 @@ export class DeliveryService {
         });
 
         if (!branch) {
-          throw new BadRequestException('No branches found for restaurant registration');
+          throw new BadRequestException(
+            'No branches found for restaurant registration',
+          );
         }
 
         // Generate custom order number
@@ -211,7 +232,10 @@ export class DeliveryService {
               branchId: branch.id,
               orderNumber,
               status: OrderStatus.PENDING,
-              source: providerName === 'PROVIDER_A' ? OrderSource.PROVIDER_A : OrderSource.PROVIDER_B,
+              source:
+                providerName === 'PROVIDER_A'
+                  ? OrderSource.PROVIDER_A
+                  : OrderSource.PROVIDER_B,
               subtotal: new Prisma.Decimal(payload.subtotal || 0),
               taxAmount: new Prisma.Decimal(payload.taxAmount || 0),
               discountAmount: new Prisma.Decimal(payload.discountAmount || 0),
@@ -222,7 +246,9 @@ export class DeliveryService {
                   name: i.name,
                   quantity: i.quantity,
                   unitPrice: new Prisma.Decimal(i.price || 0),
-                  totalPrice: new Prisma.Decimal((i.price || 0) * (i.quantity || 1)),
+                  totalPrice: new Prisma.Decimal(
+                    (i.price || 0) * (i.quantity || 1),
+                  ),
                   taxAmount: new Prisma.Decimal(0),
                 })),
               },
@@ -258,7 +284,9 @@ export class DeliveryService {
         });
 
         if (!mapping) {
-          throw new NotFoundException(`External mapping record not found for: ${extOrderId}`);
+          throw new NotFoundException(
+            `External mapping record not found for: ${extOrderId}`,
+          );
         }
 
         const extStatus = payload.externalStatus;
@@ -279,12 +307,18 @@ export class DeliveryService {
         const currentPriority = statusPriority[mapping.atlasOrder.status];
         const newPriority = statusPriority[newCanonicalStatus];
 
-        if (newPriority <= currentPriority && newCanonicalStatus !== OrderStatus.CANCELLED) {
+        if (
+          newPriority <= currentPriority &&
+          newCanonicalStatus !== OrderStatus.CANCELLED
+        ) {
           await this.prisma.webhookEvent.update({
             where: { provider_eventId: { provider: providerName, eventId } },
             data: { status: 'PROCESSED' },
           });
-          return { success: true, message: 'Stale out-of-order status update ignored' };
+          return {
+            success: true,
+            message: 'Stale out-of-order status update ignored',
+          };
         }
 
         await this.prisma.$transaction(async (tx) => {
@@ -304,7 +338,11 @@ export class DeliveryService {
           resourceType: 'ORDER',
           resourceId: mapping.atlasOrderId,
           restaurantId,
-          metadata: { provider: providerName, status: newCanonicalStatus, externalStatus: extStatus },
+          metadata: {
+            provider: providerName,
+            status: newCanonicalStatus,
+            externalStatus: extStatus,
+          },
         });
       } else if (eventType === 'ORDER_CANCELLED') {
         const mapping = await this.prisma.externalOrder.findUnique({
@@ -318,13 +356,17 @@ export class DeliveryService {
         });
 
         if (!mapping) {
-          throw new NotFoundException(`External order not found for cancellation`);
+          throw new NotFoundException(
+            `External order not found for cancellation`,
+          );
         }
 
         // Cancellation conflict checks
         const status = mapping.atlasOrder.status;
         if (status === OrderStatus.SERVED || status === OrderStatus.COMPLETED) {
-          throw new ConflictException(`Cannot cancel order in ${status} status`);
+          throw new ConflictException(
+            `Cannot cancel order in ${status} status`,
+          );
         }
 
         await this.prisma.$transaction(async (tx) => {
@@ -393,14 +435,15 @@ export class DeliveryService {
       if (!mapping) return;
 
       const providerName = mapping.provider;
-      const configRecord = await this.prisma.restaurantDeliveryProvider.findUnique({
-        where: {
-          restaurantId_provider: {
-            restaurantId,
-            provider: providerName,
+      const configRecord =
+        await this.prisma.restaurantDeliveryProvider.findUnique({
+          where: {
+            restaurantId_provider: {
+              restaurantId,
+              provider: providerName,
+            },
           },
-        },
-      });
+        });
 
       if (!configRecord || !configRecord.enabled) return;
 
@@ -412,10 +455,17 @@ export class DeliveryService {
         resourceType: 'ORDER',
         resourceId: orderId,
         restaurantId,
-        metadata: { provider: providerName, internalStatus: status, externalStatus },
+        metadata: {
+          provider: providerName,
+          internalStatus: status,
+          externalStatus,
+        },
       });
     } catch (err) {
-      console.warn(`Failed to sync status for order ${orderId} back to provider:`, err);
+      console.warn(
+        `Failed to sync status for order ${orderId} back to provider:`,
+        err,
+      );
     }
   }
 }

@@ -246,7 +246,7 @@ export default function ForgotPasswordPage() {
                         setIdentifier(e.target.value);
                         if (error) setError('');
                       }}
-                      placeholder="e.g. owner@atlas.com or 9903085026"
+                      placeholder="e.g. owner@kafei.in or 9903085026"
                       required
                       className={fieldBase}
                     />

@@ -1,6 +1,7 @@
 'use client';
 
-import { Fragment, type ReactNode } from 'react';
+import { Fragment, useState, type ReactNode } from 'react';
+import { Pagination } from './pagination';
 
 export interface Column<T> {
   /** Stable identity for the column. */
@@ -20,7 +21,7 @@ export interface Column<T> {
   cellClassName?: string;
 }
 
-interface DataTableProps<T> {
+export interface DataTableProps<T> {
   columns: Column<T>[];
   rows: T[];
   rowKey: (row: T) => string;
@@ -29,6 +30,14 @@ interface DataTableProps<T> {
   renderExpanded?: (row: T) => ReactNode;
   caption?: string;
   emptyState?: ReactNode;
+
+  /** Enable pagination. Defaults to true. */
+  enablePagination?: boolean;
+  pageSize?: number;
+  pageSizeOptions?: number[];
+  currentPage?: number;
+  onPageChange?: (page: number) => void;
+  totalItems?: number;
 }
 
 /**
@@ -47,19 +56,57 @@ export function DataTable<T>({
   renderExpanded,
   caption,
   emptyState,
+  enablePagination = true,
+  pageSize: initialPageSize = 10,
+  pageSizeOptions = [10, 25, 50],
+  currentPage,
+  onPageChange,
+  totalItems,
 }: DataTableProps<T>) {
+  const [internalPage, setInternalPage] = useState(1);
+  const [internalPageSize, setInternalPageSize] = useState(initialPageSize);
+
   if (rows.length === 0 && emptyState) {
     return <>{emptyState}</>;
   }
+
+  const activePage = currentPage !== undefined ? currentPage : internalPage;
+  const activePageSize = initialPageSize !== 10 && !pageSizeOptions.includes(internalPageSize)
+    ? initialPageSize
+    : internalPageSize;
+
+  const totalCount = totalItems !== undefined ? totalItems : rows.length;
+  const totalPages = Math.ceil(totalCount / activePageSize) || 1;
+
+  const handlePageChange = (page: number) => {
+    if (currentPage === undefined) {
+      setInternalPage(page);
+    }
+    onPageChange?.(page);
+  };
+
+  const handlePageSizeChange = (size: number) => {
+    setInternalPageSize(size);
+    if (currentPage === undefined) {
+      setInternalPage(1);
+    }
+  };
+
+  // Slice rows for client-side pagination if not already server-paginated
+  const visibleRows = !enablePagination
+    ? rows
+    : totalItems !== undefined
+      ? rows
+      : rows.slice((activePage - 1) * activePageSize, activePage * activePageSize);
 
   const mobileColumns = columns.filter((c) => !c.hideOnMobile);
   const primaryColumn = columns.find((c) => c.primary);
 
   return (
-    <>
+    <div className="space-y-4">
       {/* ---------------- Mobile / small tablet: card list ---------------- */}
       <ul className="flex flex-col gap-3 md:hidden">
-        {rows.map((row) => {
+        {visibleRows.map((row) => {
           const expanded = renderExpanded?.(row);
 
           return (
@@ -148,7 +195,7 @@ export function DataTable<T>({
           </thead>
 
           <tbody className="divide-y divide-border">
-            {rows.map((row) => {
+            {visibleRows.map((row) => {
               const expanded = renderExpanded?.(row);
 
               return (
@@ -184,6 +231,19 @@ export function DataTable<T>({
           </tbody>
         </table>
       </div>
-    </>
+
+      {/* Pagination Controls */}
+      {enablePagination && (
+        <Pagination
+          currentPage={activePage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+          totalItems={totalCount}
+          pageSize={activePageSize}
+          pageSizeOptions={pageSizeOptions}
+          onPageSizeChange={handlePageSizeChange}
+        />
+      )}
+    </div>
   );
 }

@@ -30,7 +30,11 @@ export interface DeliveryProvider {
   createOrder(
     order: NormalizedOrderPayload,
     config: any,
-  ): Promise<{ externalOrderId: string; status: OrderStatus; rawResponse: any }>;
+  ): Promise<{
+    externalOrderId: string;
+    status: OrderStatus;
+    rawResponse: any;
+  }>;
 
   cancelOrder(
     externalOrderId: string,
@@ -38,10 +42,7 @@ export interface DeliveryProvider {
     config: any,
   ): Promise<{ success: boolean; rawResponse: any }>;
 
-  getOrderStatus(
-    externalOrderId: string,
-    config: any,
-  ): Promise<OrderStatus>;
+  getOrderStatus(externalOrderId: string, config: any): Promise<OrderStatus>;
 
   healthCheck(config: any): Promise<boolean>;
 }

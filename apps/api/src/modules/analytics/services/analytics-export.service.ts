@@ -10,7 +10,10 @@ export class AnalyticsExportService {
   /**
    * Generates a sanitized CSV string for orders and financial performance.
    */
-  async exportOrdersCsv(restaurantId: string, filter: AnalyticsFilterDto): Promise<string> {
+  async exportOrdersCsv(
+    restaurantId: string,
+    filter: AnalyticsFilterDto,
+  ): Promise<string> {
     const { start, end } = parseDateBounds(filter.dateFrom, filter.dateTo, 30);
 
     const where: any = {
@@ -44,13 +47,16 @@ export class AnalyticsExportService {
       'Items Count',
     ];
 
-    const escapeCsv = (val: any) => `"${String(val ?? '').replace(/"/g, '""')}"`;
+    const escapeCsv = (val: any) =>
+      `"${String(val ?? '').replace(/"/g, '""')}"`;
 
     const rows = orders.map((o) => [
       escapeCsv(o.orderNumber),
       escapeCsv(o.createdAt.toISOString()),
       escapeCsv(o.branch?.name || 'Main Branch'),
-      escapeCsv(o.table ? `${o.table.name} (${o.table.code})` : 'Takeout/Direct'),
+      escapeCsv(
+        o.table ? `${o.table.name} (${o.table.code})` : 'Takeout/Direct',
+      ),
       escapeCsv(o.status),
       escapeCsv(o.source),
       escapeCsv(Number(o.subtotal).toFixed(2)),
@@ -66,7 +72,10 @@ export class AnalyticsExportService {
   /**
    * Generates a sanitized CSV string for menu performance.
    */
-  async exportMenuCsv(restaurantId: string, filter: AnalyticsFilterDto): Promise<string> {
+  async exportMenuCsv(
+    restaurantId: string,
+    filter: AnalyticsFilterDto,
+  ): Promise<string> {
     const { start, end } = parseDateBounds(filter.dateFrom, filter.dateTo, 30);
 
     const orderItems = await this.prisma.orderItem.findMany({
@@ -87,7 +96,13 @@ export class AnalyticsExportService {
 
     const itemMap = new Map<
       string,
-      { name: string; category: string; price: number; unitsSold: number; totalRevenue: number }
+      {
+        name: string;
+        category: string;
+        price: number;
+        unitsSold: number;
+        totalRevenue: number;
+      }
     >();
 
     orderItems.forEach((oi) => {
@@ -104,8 +119,15 @@ export class AnalyticsExportService {
       itemMap.set(oi.menuItemId, existing);
     });
 
-    const headers = ['Menu Item Name', 'Category', 'Unit Price', 'Units Sold', 'Total Revenue'];
-    const escapeCsv = (val: any) => `"${String(val ?? '').replace(/"/g, '""')}"`;
+    const headers = [
+      'Menu Item Name',
+      'Category',
+      'Unit Price',
+      'Units Sold',
+      'Total Revenue',
+    ];
+    const escapeCsv = (val: any) =>
+      `"${String(val ?? '').replace(/"/g, '""')}"`;
 
     const rows = Array.from(itemMap.values())
       .sort((a, b) => b.totalRevenue - a.totalRevenue)

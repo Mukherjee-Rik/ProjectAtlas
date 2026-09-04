@@ -17,7 +17,10 @@ import { CancelOrderDto } from './dto/cancel-order.dto';
 import { CreateCancellationRequestDto } from './dto/cancellation-request.dto';
 import { ReviewCancellationRequestDto } from './dto/review-cancellation-request.dto';
 import { AddExtraChargeDto } from './dto/add-extra-charge.dto';
-import { OrderStatus, CancellationRequestStatus } from '../../generated/prisma/enums';
+import {
+  OrderStatus,
+  CancellationRequestStatus,
+} from '../../generated/prisma/enums';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { PermissionsGuard } from '../auth/guards/permissions.guard';
 import { TenantAccessGuard } from '../auth/guards/tenant-access.guard';
@@ -27,7 +30,10 @@ import { CurrentRestaurant } from '../auth/decorators/current-restaurant.decorat
 import { CurrentBranch } from '../auth/decorators/current-branch.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { PERMISSIONS } from '../auth/permissions/permissions';
-import { RESTAURANT_HEADER, TENANT_HEADER } from '../auth/constants/tenant.constants';
+import {
+  RESTAURANT_HEADER,
+  TENANT_HEADER,
+} from '../auth/constants/tenant.constants';
 import type { CurrentRestaurant as CurrentRestaurantType } from '../auth/types/current-restaurant.type';
 import type { CurrentBranch as CurrentBranchType } from '../auth/types/current-branch.type';
 
@@ -36,7 +42,12 @@ import type { CurrentBranch as CurrentBranchType } from '../auth/types/current-b
 @ApiHeader({ name: TENANT_HEADER, required: true })
 @ApiHeader({ name: RESTAURANT_HEADER, required: true })
 @Controller({ path: 'orders', version: '1' })
-@UseGuards(JwtAuthGuard, PermissionsGuard, TenantAccessGuard, RestaurantAccessGuard)
+@UseGuards(
+  JwtAuthGuard,
+  PermissionsGuard,
+  TenantAccessGuard,
+  RestaurantAccessGuard,
+)
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
@@ -48,8 +59,14 @@ export class OrdersController {
     @Body() dto: AddExtraChargeDto,
     @CurrentBranch() branch?: CurrentBranchType,
   ) {
-    if (!restaurant) throw new BadRequestException('No active restaurant selected');
-    return this.ordersService.addExtraCharge(restaurant.id, user, dto, branch?.id);
+    if (!restaurant)
+      throw new BadRequestException('No active restaurant selected');
+    return this.ordersService.addExtraCharge(
+      restaurant.id,
+      user,
+      dto,
+      branch?.id,
+    );
   }
 
   @Get('cancellation-requests')
@@ -59,8 +76,13 @@ export class OrdersController {
     @CurrentBranch() branch?: CurrentBranchType,
     @Query('status') status?: CancellationRequestStatus,
   ) {
-    if (!restaurant) throw new BadRequestException('No active restaurant selected');
-    return this.ordersService.findCancellationRequests(restaurant.id, status, branch?.id);
+    if (!restaurant)
+      throw new BadRequestException('No active restaurant selected');
+    return this.ordersService.findCancellationRequests(
+      restaurant.id,
+      status,
+      branch?.id,
+    );
   }
 
   @Get()
@@ -72,7 +94,8 @@ export class OrdersController {
     @Query('page') page?: string,
     @Query('limit') limit?: string,
   ) {
-    if (!restaurant) throw new BadRequestException('No active restaurant selected');
+    if (!restaurant)
+      throw new BadRequestException('No active restaurant selected');
     return this.ordersService.findRestaurantOrders(
       restaurant.id,
       branch?.id,
@@ -89,8 +112,13 @@ export class OrdersController {
     @CurrentRestaurant() restaurant: CurrentRestaurantType,
     @CurrentBranch() branch?: CurrentBranchType,
   ) {
-    if (!restaurant) throw new BadRequestException('No active restaurant selected');
-    return this.ordersService.findRestaurantOrderById(id, restaurant.id, branch?.id);
+    if (!restaurant)
+      throw new BadRequestException('No active restaurant selected');
+    return this.ordersService.findRestaurantOrderById(
+      id,
+      restaurant.id,
+      branch?.id,
+    );
   }
 
   @Patch(':id/status')
@@ -101,8 +129,14 @@ export class OrdersController {
     @CurrentBranch() branch: CurrentBranchType | undefined,
     @Body() dto: UpdateOrderStatusDto,
   ) {
-    if (!restaurant) throw new BadRequestException('No active restaurant selected');
-    return this.ordersService.updateOrderStatus(id, restaurant.id, dto, branch?.id);
+    if (!restaurant)
+      throw new BadRequestException('No active restaurant selected');
+    return this.ordersService.updateOrderStatus(
+      id,
+      restaurant.id,
+      dto,
+      branch?.id,
+    );
   }
 
   @Post(':id/cancel')
@@ -114,8 +148,15 @@ export class OrdersController {
     @Body() dto: CancelOrderDto,
     @CurrentBranch() branch?: CurrentBranchType,
   ) {
-    if (!restaurant) throw new BadRequestException('No active restaurant selected');
-    return this.ordersService.cancelOrder(id, restaurant.id, user, dto, branch?.id);
+    if (!restaurant)
+      throw new BadRequestException('No active restaurant selected');
+    return this.ordersService.cancelOrder(
+      id,
+      restaurant.id,
+      user,
+      dto,
+      branch?.id,
+    );
   }
 
   @Post(':id/cancellation-request')
@@ -127,8 +168,15 @@ export class OrdersController {
     @Body() dto: CreateCancellationRequestDto,
     @CurrentBranch() branch?: CurrentBranchType,
   ) {
-    if (!restaurant) throw new BadRequestException('No active restaurant selected');
-    return this.ordersService.createCancellationRequest(id, restaurant.id, user, dto, branch?.id);
+    if (!restaurant)
+      throw new BadRequestException('No active restaurant selected');
+    return this.ordersService.createCancellationRequest(
+      id,
+      restaurant.id,
+      user,
+      dto,
+      branch?.id,
+    );
   }
 
   @Post('cancellation-requests/:id/review')
@@ -139,7 +187,13 @@ export class OrdersController {
     @CurrentUser() user: any,
     @Body() dto: ReviewCancellationRequestDto,
   ) {
-    if (!restaurant) throw new BadRequestException('No active restaurant selected');
-    return this.ordersService.reviewCancellationRequest(id, restaurant.id, user, dto);
+    if (!restaurant)
+      throw new BadRequestException('No active restaurant selected');
+    return this.ordersService.reviewCancellationRequest(
+      id,
+      restaurant.id,
+      user,
+      dto,
+    );
   }
 }

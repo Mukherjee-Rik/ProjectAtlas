@@ -1,5 +1,10 @@
 import { Controller, Get, Query, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiHeader,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RestaurantAccessGuard } from '../auth/guards/restaurant-access.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
@@ -20,7 +25,9 @@ export class SearchController {
   constructor(private readonly searchService: SearchService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Perform tenant-isolated global search across permitted resources' })
+  @ApiOperation({
+    summary: 'Perform tenant-isolated global search across permitted resources',
+  })
   async search(
     @Query('q') query: string,
     @CurrentUser('id') userId: string,

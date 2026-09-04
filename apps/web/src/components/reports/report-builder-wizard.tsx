@@ -209,7 +209,7 @@ export function ReportBuilderWizard() {
       </div>
 
       {error && (
-        <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-semibold">
+        <div className="p-4 rounded-xl bg-atlas-error/10 border border-atlas-error/30 text-atlas-error text-xs font-semibold">
           {error}
         </div>
       )}

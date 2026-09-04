@@ -11,6 +11,7 @@ import {
 import type { DiningArea } from '@/types/dining-area';
 import { DiningAreaForm, type DiningAreaFormData } from '@/components/dining-areas/dining-area-form';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
+import { Pagination } from '@/components/ui/pagination';
 
 export default function DiningAreasPage() {
   const router = useRouter();
@@ -19,6 +20,10 @@ export default function DiningAreasPage() {
   const [diningAreas, setDiningAreas] = useState<DiningArea[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+
+  // Pagination state
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   // Modal / Form state
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -101,6 +106,9 @@ export default function DiningAreasPage() {
     );
   }
 
+  const totalPages = Math.ceil(diningAreas.length / pageSize) || 1;
+  const paginatedDiningAreas = diningAreas.slice((page - 1) * pageSize, page * pageSize);
+
   return (
     <div className="space-y-8">
       {/* Header & Create CTA */}
@@ -147,67 +155,86 @@ export default function DiningAreasPage() {
           <p>{error}</p>
         </div>
       ) : (
-        <div className="table-responsive rounded-xl border border-border bg-card">
-          <table className="w-full min-w-[600px] text-left">
-            <thead className="border-b border-border bg-secondary">
-              <tr>
-                <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Dining Area
-                </th>
-                <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Code
-                </th>
-                <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Tables
-                </th>
-                <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Status
-                </th>
-                <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-
-            <tbody className="divide-y divide-border">
-              {diningAreas.map((area) => (
-                <tr key={area.id} className="transition-colors hover:bg-secondary">
-                  <td className="px-6 py-4 text-sm font-semibold text-foreground">
-                    {area.name}
-                  </td>
-
-                  <td className="px-6 py-4 text-sm font-mono text-primary">
-                    {area.code}
-                  </td>
-
-                  <td className="px-6 py-4 text-sm text-muted-foreground">
-                    {area._count?.tables ?? 0} tables
-                  </td>
-
-                  <td className="px-6 py-4 text-sm">
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-atlas-success/15 px-3 py-1 text-xs font-semibold text-atlas-success border border-atlas-success/30">
-                      <span className="h-1.5 w-1.5 rounded-full bg-atlas-success" />
-                      {area.status}
-                    </span>
-                  </td>
-
-                  <td className="px-6 py-4 text-sm">
-                    <button
-                      type="button"
-                      onClick={() => setDeletingArea(area)}
-                      className="rounded-lg border border-atlas-error/40 bg-atlas-error/10 px-2.5 py-1 text-xs text-atlas-error hover:bg-atlas-error/20"
-                    >
-                      Delete
-                    </button>
-                  </td>
+        <div className="space-y-4">
+          <div className="table-responsive rounded-xl border border-border bg-card">
+            <table className="w-full min-w-[600px] text-left">
+              <thead className="border-b border-border bg-secondary">
+                <tr>
+                  <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    Dining Area
+                  </th>
+                  <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    Code
+                  </th>
+                  <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    Tables
+                  </th>
+                  <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    Status
+                  </th>
+                  <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    Actions
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
 
-          {diningAreas.length === 0 && (
-            <div className="p-8 text-center text-muted-foreground">
-              No dining areas found. Create your first dining area to start adding tables.
+              <tbody className="divide-y divide-border">
+                {paginatedDiningAreas.map((area) => (
+                  <tr key={area.id} className="transition-colors hover:bg-secondary">
+                    <td className="px-6 py-4 text-sm font-semibold text-foreground">
+                      {area.name}
+                    </td>
+
+                    <td className="px-6 py-4 text-sm font-mono text-primary">
+                      {area.code}
+                    </td>
+
+                    <td className="px-6 py-4 text-sm text-muted-foreground">
+                      {area._count?.tables ?? 0} tables
+                    </td>
+
+                    <td className="px-6 py-4 text-sm">
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-atlas-success/15 px-3 py-1 text-xs font-semibold text-atlas-success border border-atlas-success/30">
+                        <span className="h-1.5 w-1.5 rounded-full bg-atlas-success" />
+                        {area.status}
+                      </span>
+                    </td>
+
+                    <td className="px-6 py-4 text-sm">
+                      <button
+                        type="button"
+                        onClick={() => setDeletingArea(area)}
+                        className="rounded-lg border border-atlas-error/40 bg-atlas-error/10 px-2.5 py-1 text-xs text-atlas-error hover:bg-atlas-error/20"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            {diningAreas.length === 0 && (
+              <div className="p-8 text-center text-muted-foreground">
+                No dining areas found. Create your first dining area to start adding tables.
+              </div>
+            )}
+          </div>
+
+          {diningAreas.length > 0 && (
+            <div className="pt-2">
+              <Pagination
+                currentPage={page}
+                totalPages={totalPages}
+                onPageChange={setPage}
+                totalItems={diningAreas.length}
+                pageSize={pageSize}
+                pageSizeOptions={[10, 25, 50]}
+                onPageSizeChange={(newSize) => {
+                  setPageSize(newSize);
+                  setPage(1);
+                }}
+              />
             </div>
           )}
         </div>

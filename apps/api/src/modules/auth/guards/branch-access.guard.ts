@@ -74,10 +74,7 @@ export class BranchAccessGuard implements CanActivate {
         );
       }
 
-      if (
-        request.restaurant &&
-        branch.restaurantId !== request.restaurant.id
-      ) {
+      if (request.restaurant && branch.restaurantId !== request.restaurant.id) {
         throw new ForbiddenException(
           'Target branch does not belong to current active restaurant',
         );
@@ -126,7 +123,9 @@ export class BranchAccessGuard implements CanActivate {
             });
             const main =
               allBranches.find(
-                (b) => b.code.toUpperCase() === 'MAIN' || b.name.toLowerCase().includes('main'),
+                (b) =>
+                  b.code.toUpperCase() === 'MAIN' ||
+                  b.name.toLowerCase().includes('main'),
               ) || allBranches[0];
             return main ? { id: main.id } : null;
           },

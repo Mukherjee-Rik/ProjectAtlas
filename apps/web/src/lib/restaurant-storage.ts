@@ -1,13 +1,14 @@
 import type { Restaurant } from '@/types/restaurant';
 
-const RESTAURANT_STORAGE_KEY = 'atlas_current_restaurant';
+const RESTAURANT_STORAGE_KEY = 'kafei_current_restaurant';
+const LEGACY_RESTAURANT_STORAGE_KEY = 'atlas_current_restaurant';
 
 export function getCurrentRestaurantId(): string | null {
   if (typeof window === 'undefined') {
     return null;
   }
   try {
-    const stored = localStorage.getItem(RESTAURANT_STORAGE_KEY);
+    const stored = localStorage.getItem(RESTAURANT_STORAGE_KEY) || localStorage.getItem(LEGACY_RESTAURANT_STORAGE_KEY);
     if (!stored) return null;
     const parsed = JSON.parse(stored);
     return parsed?.id ?? null;
@@ -21,7 +22,7 @@ export function getCurrentRestaurant(): Restaurant | null {
     return null;
   }
   try {
-    const stored = localStorage.getItem(RESTAURANT_STORAGE_KEY);
+    const stored = localStorage.getItem(RESTAURANT_STORAGE_KEY) || localStorage.getItem(LEGACY_RESTAURANT_STORAGE_KEY);
     return stored ? JSON.parse(stored) : null;
   } catch {
     return null;
@@ -37,5 +38,6 @@ export function setCurrentRestaurant(restaurant: Restaurant): void {
 export function clearCurrentRestaurant(): void {
   if (typeof window !== 'undefined') {
     localStorage.removeItem(RESTAURANT_STORAGE_KEY);
+    localStorage.removeItem(LEGACY_RESTAURANT_STORAGE_KEY);
   }
 }

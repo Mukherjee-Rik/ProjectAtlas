@@ -47,6 +47,7 @@ export function OAuthButtons({ onLoading, onError }: OAuthButtonsProps) {
   const isRealGoogleConfigured =
     Boolean(googleClientId) &&
     !googleClientId?.includes('atlas-client-id') &&
+    !googleClientId?.includes('kafei-client-id') &&
     !googleClientId?.startsWith('your-');
 
   const processOAuth = async (
@@ -310,6 +311,7 @@ export function OAuthButtons({ onLoading, onError }: OAuthButtonsProps) {
         {/* Google OAuth Button */}
         <button
           type="button"
+          aria-label="Continue with Google"
           disabled={!!activeProvider}
           onClick={handleGoogleClick}
           className="flex h-11 items-center justify-center gap-2.5 rounded-xl border border-border bg-secondary/70 px-4 text-xs font-bold text-foreground transition-all hover:border-primary/40 hover:bg-secondary active:scale-[0.98] disabled:opacity-50 cursor-pointer shadow-sm"
@@ -338,6 +340,7 @@ export function OAuthButtons({ onLoading, onError }: OAuthButtonsProps) {
         {/* GitHub OAuth Button */}
         <button
           type="button"
+          aria-label="Continue with GitHub"
           disabled={!!activeProvider}
           onClick={handleGitHubClick}
           className="flex h-11 items-center justify-center gap-2.5 rounded-xl border border-border bg-secondary/70 px-4 text-xs font-bold text-foreground transition-all hover:border-primary/40 hover:bg-secondary active:scale-[0.98] disabled:opacity-50 cursor-pointer shadow-sm"
@@ -386,35 +389,35 @@ export function OAuthButtons({ onLoading, onError }: OAuthButtonsProps) {
               <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"
-                  onClick={() => handlePresetSelect('sweta@atlas.com', 'Sweta Owner')}
+                  onClick={() => handlePresetSelect('sweta@kafei.in', 'Sweta Owner')}
                   className="flex flex-col items-start rounded-xl border border-border/80 bg-secondary/50 p-2.5 text-left text-xs hover:border-primary hover:bg-secondary transition-all cursor-pointer"
                 >
                   <span className="font-semibold text-foreground">Restaurant Owner</span>
-                  <span className="text-[10px] text-muted-foreground">sweta@atlas.com</span>
+                  <span className="text-[10px] text-muted-foreground">sweta@kafei.in</span>
                 </button>
                 <button
                   type="button"
-                  onClick={() => handlePresetSelect('admin@atlas.com', 'Platform Admin')}
+                  onClick={() => handlePresetSelect('admin@kafei.in', 'Platform Admin')}
                   className="flex flex-col items-start rounded-xl border border-border/80 bg-secondary/50 p-2.5 text-left text-xs hover:border-primary hover:bg-secondary transition-all cursor-pointer"
                 >
                   <span className="font-semibold text-foreground">Platform Admin</span>
-                  <span className="text-[10px] text-muted-foreground">admin@atlas.com</span>
+                  <span className="text-[10px] text-muted-foreground">admin@kafei.in</span>
                 </button>
                 <button
                   type="button"
-                  onClick={() => handlePresetSelect('waiter@atlas.com', 'Waiter Staff')}
+                  onClick={() => handlePresetSelect('waiter@kafei.in', 'Waiter Staff')}
                   className="flex flex-col items-start rounded-xl border border-border/80 bg-secondary/50 p-2.5 text-left text-xs hover:border-primary hover:bg-secondary transition-all cursor-pointer"
                 >
                   <span className="font-semibold text-foreground">Waitstaff</span>
-                  <span className="text-[10px] text-muted-foreground">waiter@atlas.com</span>
+                  <span className="text-[10px] text-muted-foreground">waiter@kafei.in</span>
                 </button>
                 <button
                   type="button"
-                  onClick={() => handlePresetSelect('chef@atlas.com', 'Head Chef')}
+                  onClick={() => handlePresetSelect('chef@kafei.in', 'Head Chef')}
                   className="flex flex-col items-start rounded-xl border border-border/80 bg-secondary/50 p-2.5 text-left text-xs hover:border-primary hover:bg-secondary transition-all cursor-pointer"
                 >
                   <span className="font-semibold text-foreground">Kitchen / Chef</span>
-                  <span className="text-[10px] text-muted-foreground">chef@atlas.com</span>
+                  <span className="text-[10px] text-muted-foreground">chef@kafei.in</span>
                 </button>
               </div>
             </div>

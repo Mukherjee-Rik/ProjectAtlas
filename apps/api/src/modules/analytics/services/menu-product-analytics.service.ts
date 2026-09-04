@@ -80,14 +80,22 @@ export class MenuProductAnalyticsService {
       itemStats.set(oi.menuItemId, existing);
     });
 
-    const averageUnitsPerItem = menuItems.length > 0 ? totalUnitsSold / menuItems.length : 0;
-    const averageRevenuePerItem = menuItems.length > 0 ? totalMenuRevenue / menuItems.length : 0;
+    const averageUnitsPerItem =
+      menuItems.length > 0 ? totalUnitsSold / menuItems.length : 0;
+    const averageRevenuePerItem =
+      menuItems.length > 0 ? totalMenuRevenue / menuItems.length : 0;
 
     // Build item performance array
     const performanceList: MenuItemPerformance[] = menuItems.map((m) => {
-      const stats = itemStats.get(m.id) || { unitsSold: 0, totalRevenue: 0, uniqueOrders: new Set() };
+      const stats = itemStats.get(m.id) || {
+        unitsSold: 0,
+        totalRevenue: 0,
+        uniqueOrders: new Set(),
+      };
       const revenueContribution =
-        totalMenuRevenue > 0 ? (stats.totalRevenue / totalMenuRevenue) * 100 : 0;
+        totalMenuRevenue > 0
+          ? (stats.totalRevenue / totalMenuRevenue) * 100
+          : 0;
 
       // Classify matrix: High/Low Popularity (Units) vs High/Low Volume (Revenue)
       const isHighPopularity = stats.unitsSold >= averageUnitsPerItem;
@@ -115,7 +123,13 @@ export class MenuProductAnalyticsService {
     // Category Level Aggregations
     const categoryStats = new Map<
       string,
-      { categoryId: string; name: string; totalRevenue: number; unitsSold: number; itemsCount: number }
+      {
+        categoryId: string;
+        name: string;
+        totalRevenue: number;
+        unitsSold: number;
+        itemsCount: number;
+      }
     >();
 
     performanceList.forEach((item) => {
@@ -137,7 +151,9 @@ export class MenuProductAnalyticsService {
       ...c,
       totalRevenue: Math.round(c.totalRevenue * 100) / 100,
       revenueContributionPercent:
-        totalMenuRevenue > 0 ? Math.round((c.totalRevenue / totalMenuRevenue) * 10000) / 100 : 0,
+        totalMenuRevenue > 0
+          ? Math.round((c.totalRevenue / totalMenuRevenue) * 10000) / 100
+          : 0,
     }));
 
     return {
@@ -146,12 +162,20 @@ export class MenuProductAnalyticsService {
         totalUnitsSold,
         totalMenuRevenue: Math.round(totalMenuRevenue * 100) / 100,
       },
-      topSellingItems: [...performanceList].sort((a, b) => b.unitsSold - a.unitsSold).slice(0, 10),
-      topRevenueItems: [...performanceList].sort((a, b) => b.totalRevenue - a.totalRevenue).slice(0, 10),
-      categoryPerformance: categoryPerformance.sort((a, b) => b.totalRevenue - a.totalRevenue),
+      topSellingItems: [...performanceList]
+        .sort((a, b) => b.unitsSold - a.unitsSold)
+        .slice(0, 10),
+      topRevenueItems: [...performanceList]
+        .sort((a, b) => b.totalRevenue - a.totalRevenue)
+        .slice(0, 10),
+      categoryPerformance: categoryPerformance.sort(
+        (a, b) => b.totalRevenue - a.totalRevenue,
+      ),
       menuMatrix: {
         stars: performanceList.filter((i) => i.classification === 'STAR'),
-        plowhorses: performanceList.filter((i) => i.classification === 'PLOWHORSE'),
+        plowhorses: performanceList.filter(
+          (i) => i.classification === 'PLOWHORSE',
+        ),
         puzzles: performanceList.filter((i) => i.classification === 'PUZZLE'),
         dogs: performanceList.filter((i) => i.classification === 'DOG'),
       },

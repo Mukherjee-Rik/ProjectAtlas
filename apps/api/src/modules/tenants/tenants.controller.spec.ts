@@ -31,7 +31,11 @@ describe('TenantsController', () => {
   });
 
   it('findAll should scope the listing to the calling user', async () => {
-    await controller.findAll({ id: 'u-1', email: 'owner@example.com', role: 'OWNER' });
+    await controller.findAll({
+      id: 'u-1',
+      email: 'owner@example.com',
+      role: 'OWNER',
+    });
 
     // Must never call the unscoped listing for a normal user — that returned
     // every tenant on the platform.
@@ -46,6 +50,9 @@ describe('TenantsController', () => {
       role: 'PLATFORM_ADMIN',
     });
 
-    expect(tenantsService.findAllForUser).toHaveBeenCalledWith('admin-1', 'PLATFORM_ADMIN');
+    expect(tenantsService.findAllForUser).toHaveBeenCalledWith(
+      'admin-1',
+      'PLATFORM_ADMIN',
+    );
   });
 });

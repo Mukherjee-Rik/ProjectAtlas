@@ -1,21 +1,29 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from '../../../database/prisma/prisma.service';
 
 @Injectable()
 export class AutomationRuleService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(restaurantId: string, userId: string, data: {
-    name: string;
-    description?: string;
-    triggerType: string;
-    schedule?: string;
-    eventType?: string;
-    conditionType?: string;
-    conditionValue?: number;
-    actionType: string;
-    cooldownMinutes?: number;
-  }) {
+  async create(
+    restaurantId: string,
+    userId: string,
+    data: {
+      name: string;
+      description?: string;
+      triggerType: string;
+      schedule?: string;
+      eventType?: string;
+      conditionType?: string;
+      conditionValue?: number;
+      actionType: string;
+      cooldownMinutes?: number;
+    },
+  ) {
     return this.prisma.automationRule.create({
       data: {
         restaurantId,
@@ -51,16 +59,20 @@ export class AutomationRuleService {
     return rule;
   }
 
-  async update(id: string, restaurantId: string, data: {
-    name?: string;
-    description?: string;
-    enabled?: boolean;
-    schedule?: string;
-    conditionType?: string;
-    conditionValue?: number;
-    actionType?: string;
-    cooldownMinutes?: number;
-  }) {
+  async update(
+    id: string,
+    restaurantId: string,
+    data: {
+      name?: string;
+      description?: string;
+      enabled?: boolean;
+      schedule?: string;
+      conditionType?: string;
+      conditionValue?: number;
+      actionType?: string;
+      cooldownMinutes?: number;
+    },
+  ) {
     await this.findById(id, restaurantId);
     return this.prisma.automationRule.update({
       where: { id },

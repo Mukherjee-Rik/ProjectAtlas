@@ -1,6 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ForecastingEngineService } from './forecasting-engine.service';
-import { FeatureEngineeringService, DailyFeatureVector } from './feature-engineering.service';
+import {
+  FeatureEngineeringService,
+  DailyFeatureVector,
+} from './feature-engineering.service';
 import { ForecastAccuracyService } from './forecast-accuracy.service';
 import { PrismaService } from '../../../database/prisma/prisma.service';
 
@@ -72,7 +75,9 @@ describe('ForecastingEngineService & Accuracy Framework', () => {
     }).compile();
 
     engine = module.get<ForecastingEngineService>(ForecastingEngineService);
-    accuracyService = module.get<ForecastAccuracyService>(ForecastAccuracyService);
+    accuracyService = module.get<ForecastAccuracyService>(
+      ForecastAccuracyService,
+    );
   });
 
   it('should generate sales forecast with valid prediction intervals and confidence', async () => {

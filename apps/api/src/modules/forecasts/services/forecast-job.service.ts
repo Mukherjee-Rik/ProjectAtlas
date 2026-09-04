@@ -1,7 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../../../database/prisma/prisma.service';
-import { ForecastingEngineService, SalesForecastResult } from './forecasting-engine.service';
-import { MenuDemandForecasterService, ItemDemandForecast } from './menu-demand-forecaster.service';
+import {
+  ForecastingEngineService,
+  SalesForecastResult,
+} from './forecasting-engine.service';
+import {
+  MenuDemandForecasterService,
+  ItemDemandForecast,
+} from './menu-demand-forecaster.service';
 import { ForecastAccuracyService } from './forecast-accuracy.service';
 
 @Injectable()
@@ -24,7 +30,10 @@ export class ForecastJobService {
     branchId?: string,
     horizon: '7D' | '14D' | '30D' = '7D',
     modelVersion = 'seasonal-dow-v1',
-  ): Promise<{ salesForecast: SalesForecastResult; menuForecast: ItemDemandForecast[] }> {
+  ): Promise<{
+    salesForecast: SalesForecastResult;
+    menuForecast: ItemDemandForecast[];
+  }> {
     const startTime = Date.now();
     const horizonDays = horizon === '30D' ? 30 : horizon === '14D' ? 14 : 7;
 
@@ -38,7 +47,10 @@ export class ForecastJobService {
       );
 
       // 2. Generate Menu Demand Forecast
-      const menuForecast = await this.menuDemandForecaster.forecastMenuDemand(restaurantId, branchId);
+      const menuForecast = await this.menuDemandForecaster.forecastMenuDemand(
+        restaurantId,
+        branchId,
+      );
 
       // 3. Persist Forecast Record
       const forecastRecord = await this.prisma.forecast.create({
@@ -85,7 +97,8 @@ export class ForecastJobService {
           restaurantId,
           branchId,
           modelVersion,
-          recordsProcessed: salesForecast.dailyProjections.length + menuForecast.length,
+          recordsProcessed:
+            salesForecast.dailyProjections.length + menuForecast.length,
           errorCount: 0,
           executionTimeMs: durationMs,
           status: 'SUCCESS',
@@ -95,7 +108,9 @@ export class ForecastJobService {
       return { salesForecast, menuForecast };
     } catch (err: any) {
       const durationMs = Date.now() - startTime;
-      this.logger.error(`Forecast cycle failed for restaurant ${restaurantId}: ${err?.message}`);
+      this.logger.error(
+        `Forecast cycle failed for restaurant ${restaurantId}: ${err?.message}`,
+      );
 
       await this.prisma.forecastRun.create({
         data: {

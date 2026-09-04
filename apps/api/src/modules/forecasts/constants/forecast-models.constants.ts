@@ -21,7 +21,8 @@ export const MODEL_REGISTRY = {
     name: 'Seasonal Day-of-Week 4W Model',
     type: 'SEASONAL_WEIGHTED',
     version: '1.0',
-    description: 'Weights identical days of the week over the previous 4 weeks (40%, 30%, 20%, 10%)',
+    description:
+      'Weights identical days of the week over the previous 4 weeks (40%, 30%, 20%, 10%)',
     status: 'ACTIVE',
   },
   WMA_SALES_V1: {
@@ -29,7 +30,8 @@ export const MODEL_REGISTRY = {
     name: 'Weighted Moving Average 7D',
     type: 'WEIGHTED_MOVING_AVERAGE',
     version: '1.0',
-    description: 'Linear decay moving average over the preceding 7 calendar days',
+    description:
+      'Linear decay moving average over the preceding 7 calendar days',
     status: 'ACTIVE',
   },
   DIURNAL_HOURLY_V1: {
@@ -37,7 +39,8 @@ export const MODEL_REGISTRY = {
     name: 'Diurnal Hour-of-Day Curve',
     type: 'HISTORICAL_CONCENTRATION',
     version: '1.0',
-    description: 'Projects lunch/dinner rush hour distributions based on historical diurnal shares',
+    description:
+      'Projects lunch/dinner rush hour distributions based on historical diurnal shares',
     status: 'ACTIVE',
   },
   ITEM_VELOCITY_V1: {
@@ -45,7 +48,8 @@ export const MODEL_REGISTRY = {
     name: 'Item Demand Moving Average',
     type: 'ITEM_LEVEL_WEIGHTED',
     version: '1.0',
-    description: 'Item portion volume projection using 14-day velocity and category trend factors',
+    description:
+      'Item portion volume projection using 14-day velocity and category trend factors',
     status: 'ACTIVE',
   },
 };

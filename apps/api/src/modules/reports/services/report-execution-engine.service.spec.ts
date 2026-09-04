@@ -47,7 +47,9 @@ describe('ReportExecutionEngineService', () => {
       ],
     }).compile();
 
-    engine = module.get<ReportExecutionEngineService>(ReportExecutionEngineService);
+    engine = module.get<ReportExecutionEngineService>(
+      ReportExecutionEngineService,
+    );
   });
 
   it('should resolve relative date range presets accurately', () => {

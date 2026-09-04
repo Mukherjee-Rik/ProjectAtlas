@@ -1,8 +1,20 @@
-import { Injectable, NotFoundException, ForbiddenException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+  Logger,
+} from '@nestjs/common';
 import { PrismaService } from '../../../database/prisma/prisma.service';
-import { ReportExecutionEngineService, ReportExecutionResult } from './report-execution-engine.service';
+import {
+  ReportExecutionEngineService,
+  ReportExecutionResult,
+} from './report-execution-engine.service';
 import { ReportValidatorService } from './report-validator.service';
-import { CreateCustomReportDto, UpdateCustomReportDto, ReportConfigurationDto } from '../dto/custom-report.dto';
+import {
+  CreateCustomReportDto,
+  UpdateCustomReportDto,
+  ReportConfigurationDto,
+} from '../dto/custom-report.dto';
 
 @Injectable()
 export class ReportService {
@@ -18,14 +30,19 @@ export class ReportService {
     return this.prisma.customReport.findMany({
       where: {
         restaurantId,
-        OR: [
-          { visibility: 'RESTAURANT' },
-          { createdById: userId },
-        ],
+        OR: [{ visibility: 'RESTAURANT' }, { createdById: userId }],
       },
       orderBy: { createdAt: 'desc' },
       include: {
-        schedules: { select: { id: true, name: true, frequency: true, enabled: true, nextRunAt: true } },
+        schedules: {
+          select: {
+            id: true,
+            name: true,
+            frequency: true,
+            enabled: true,
+            nextRunAt: true,
+          },
+        },
       },
     });
   }
@@ -38,11 +55,19 @@ export class ReportService {
         executions: { orderBy: { createdAt: 'desc' }, take: 10 },
       },
     });
-    if (!report) throw new NotFoundException('Report not found or does not belong to active restaurant');
+    if (!report)
+      throw new NotFoundException(
+        'Report not found or does not belong to active restaurant',
+      );
     return report;
   }
 
-  async createReport(restaurantId: string, tenantId: string, userId: string, dto: CreateCustomReportDto) {
+  async createReport(
+    restaurantId: string,
+    tenantId: string,
+    userId: string,
+    dto: CreateCustomReportDto,
+  ) {
     this.validator.validate(dto.dataSource, dto.configuration);
 
     return this.prisma.customReport.create({
@@ -61,7 +86,11 @@ export class ReportService {
     });
   }
 
-  async updateReport(id: string, restaurantId: string, dto: UpdateCustomReportDto) {
+  async updateReport(
+    id: string,
+    restaurantId: string,
+    dto: UpdateCustomReportDto,
+  ) {
     const existing = await this.getReportById(id, restaurantId);
 
     if (dto.configuration) {
@@ -86,7 +115,12 @@ export class ReportService {
     return this.prisma.customReport.delete({ where: { id } });
   }
 
-  async duplicateReport(id: string, restaurantId: string, userId: string, tenantId: string) {
+  async duplicateReport(
+    id: string,
+    restaurantId: string,
+    userId: string,
+    tenantId: string,
+  ) {
     const original = await this.getReportById(id, restaurantId);
 
     return this.prisma.customReport.create({
@@ -105,7 +139,12 @@ export class ReportService {
     });
   }
 
-  async runReport(id: string, restaurantId: string, userId?: string, branchOverride?: string): Promise<ReportExecutionResult> {
+  async runReport(
+    id: string,
+    restaurantId: string,
+    userId?: string,
+    branchOverride?: string,
+  ): Promise<ReportExecutionResult> {
     const report = await this.getReportById(id, restaurantId);
     const startTime = Date.now();
 
@@ -137,7 +176,9 @@ export class ReportService {
             recordsCount: result.rows.length,
           },
         })
-        .catch((e) => this.logger.error(`Failed to log execution history: ${e?.message}`));
+        .catch((e) =>
+          this.logger.error(`Failed to log execution history: ${e?.message}`),
+        );
 
       return result;
     } catch (err: any) {
@@ -168,6 +209,12 @@ export class ReportService {
     config: ReportConfigurationDto,
     branchId?: string,
   ): Promise<ReportExecutionResult> {
-    return this.executionEngine.execute(restaurantId, reportName, dataSource, config, branchId);
+    return this.executionEngine.execute(
+      restaurantId,
+      reportName,
+      dataSource,
+      config,
+      branchId,
+    );
   }
 }

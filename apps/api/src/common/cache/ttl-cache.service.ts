@@ -43,7 +43,11 @@ export class TtlCacheService implements OnModuleDestroy {
    * row created moments later is picked up immediately rather than being
    * masked by a cached miss.
    */
-  async wrap<T>(key: string, ttlMs: number, loader: () => Promise<T>): Promise<T> {
+  async wrap<T>(
+    key: string,
+    ttlMs: number,
+    loader: () => Promise<T>,
+  ): Promise<T> {
     const hit = this.store.get(key);
 
     if (hit && hit.expiresAt > Date.now()) {
@@ -151,7 +155,8 @@ export const CacheKeys = {
   subscription: (restaurantId: string) => `subscription:${restaurantId}`,
   tableToken: (token: string) => `table_token:${token}`,
   tableSession: (tableId: string) => `table_session:${tableId}`,
-  menuItem: (restaurantId: string, menuItemId: string) => `menu_item:${restaurantId}:${menuItemId}`,
+  menuItem: (restaurantId: string, menuItemId: string) =>
+    `menu_item:${restaurantId}:${menuItemId}`,
 } as const;
 
 /**

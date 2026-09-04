@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Param, UseGuards, ParseUUIDPipe, BadRequestException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  UseGuards,
+  ParseUUIDPipe,
+  BadRequestException,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { SubscriptionsService } from './subscriptions.service';
 import { SubscriptionUsageService } from './subscription-usage.service';
@@ -32,7 +41,10 @@ export class SubscriptionsController {
     if (!body.restaurantId || !body.planId) {
       throw new BadRequestException('restaurantId and planId are required');
     }
-    return this.subscriptionsService.assignSubscription(body.restaurantId, body.planId);
+    return this.subscriptionsService.assignSubscription(
+      body.restaurantId,
+      body.planId,
+    );
   }
 
   @UseGuards(JwtAuthGuard, PlatformAdminGuard)
@@ -51,7 +63,10 @@ export class SubscriptionsController {
   @Post(':id/status')
   async updateStatus(
     @Param('id', new ParseUUIDPipe()) id: string,
-    @Body() body: { status: 'ACTIVE' | 'SUSPENDED' | 'CANCELLED' | 'PAST_DUE' | 'EXPIRED' },
+    @Body()
+    body: {
+      status: 'ACTIVE' | 'SUSPENDED' | 'CANCELLED' | 'PAST_DUE' | 'EXPIRED';
+    },
   ) {
     if (!body.status) {
       throw new BadRequestException('status is required');
@@ -61,9 +76,13 @@ export class SubscriptionsController {
 
   @UseGuards(JwtAuthGuard, RestaurantAccessGuard)
   @Get('my-subscription')
-  async getMySubscription(@CurrentRestaurant() restaurant: CurrentRestaurantType) {
+  async getMySubscription(
+    @CurrentRestaurant() restaurant: CurrentRestaurantType,
+  ) {
     if (!restaurant) {
-      throw new BadRequestException('Restaurant context is required. Send x-restaurant-id header.');
+      throw new BadRequestException(
+        'Restaurant context is required. Send x-restaurant-id header.',
+      );
     }
     return this.subscriptionsService.getRestaurantSubscription(restaurant.id);
   }
@@ -72,7 +91,9 @@ export class SubscriptionsController {
   @Get('usage')
   async getMyUsage(@CurrentRestaurant() restaurant: CurrentRestaurantType) {
     if (!restaurant) {
-      throw new BadRequestException('Restaurant context is required. Send x-restaurant-id header.');
+      throw new BadRequestException(
+        'Restaurant context is required. Send x-restaurant-id header.',
+      );
     }
     return this.subscriptionUsageService.getUsageStats(restaurant.id);
   }
@@ -84,14 +105,19 @@ export class SubscriptionsController {
     @Body() body: { planId: string },
   ) {
     if (!restaurant) {
-      throw new BadRequestException('Restaurant context is required. Send x-restaurant-id header.');
+      throw new BadRequestException(
+        'Restaurant context is required. Send x-restaurant-id header.',
+      );
     }
     if (!body.planId) {
       throw new BadRequestException('planId is required');
     }
-    
-    const subscription = await this.subscriptionsService.assignSubscription(restaurant.id, body.planId);
-    
+
+    const subscription = await this.subscriptionsService.assignSubscription(
+      restaurant.id,
+      body.planId,
+    );
+
     return {
       subscription,
       paymentInfo: {
@@ -103,5 +129,22 @@ export class SubscriptionsController {
         paidAt: new Date().toISOString(),
       },
     };
+  }
+
+  @UseGuards(JwtAuthGuard, RestaurantAccessGuard)
+  @Post('cancel')
+  async selfCancel(
+    @CurrentRestaurant() restaurant: CurrentRestaurantType,
+    @Body() body?: { reason?: string },
+  ) {
+    if (!restaurant) {
+      throw new BadRequestException(
+        'Restaurant context is required. Send x-restaurant-id header.',
+      );
+    }
+    return this.subscriptionsService.cancelRestaurantSubscription(
+      restaurant.id,
+      body?.reason,
+    );
   }
 }

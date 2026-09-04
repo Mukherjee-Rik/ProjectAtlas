@@ -31,7 +31,10 @@ export class TablesService {
     }
 
     // Enforce active subscription table limit
-    await this.subscriptionUsageService.checkLimit(branch.restaurantId, 'maxTables');
+    await this.subscriptionUsageService.checkLimit(
+      branch.restaurantId,
+      'maxTables',
+    );
 
     // Security Verification: Dining Area must belong to active branchId
     const diningArea = await this.prisma.diningArea.findFirst({
@@ -243,7 +246,11 @@ export class TablesService {
       }
     }
 
-    if (code && (code !== existingTable.code || targetDiningAreaId !== existingTable.diningAreaId)) {
+    if (
+      code &&
+      (code !== existingTable.code ||
+        targetDiningAreaId !== existingTable.diningAreaId)
+    ) {
       const duplicate = await this.prisma.table.findUnique({
         where: {
           diningAreaId_code: {
@@ -316,7 +323,11 @@ export class TablesService {
     });
   }
 
-  async getQrCode(id: string, branchId: string, baseUrl = 'http://localhost:4001') {
+  async getQrCode(
+    id: string,
+    branchId: string,
+    baseUrl = 'http://localhost:4001',
+  ) {
     const table = await this.prisma.table.findFirst({
       where: {
         id,
@@ -346,7 +357,11 @@ export class TablesService {
     };
   }
 
-  async regenerateQrCode(id: string, branchId: string, baseUrl = 'http://localhost:3001') {
+  async regenerateQrCode(
+    id: string,
+    branchId: string,
+    baseUrl = 'http://localhost:3001',
+  ) {
     const table = await this.prisma.table.findFirst({
       where: {
         id,
@@ -355,7 +370,9 @@ export class TablesService {
     });
 
     if (!table) {
-      throw new ForbiddenException('Table not found or does not belong to active branch');
+      throw new ForbiddenException(
+        'Table not found or does not belong to active branch',
+      );
     }
 
     const newPublicToken = `tbl_${crypto.randomUUID().replace(/-/g, '')}`;
@@ -389,7 +406,9 @@ export class TablesService {
     });
 
     if (!table) {
-      throw new ForbiddenException('Table not found or does not belong to active branch');
+      throw new ForbiddenException(
+        'Table not found or does not belong to active branch',
+      );
     }
 
     await this.prisma.customerSession.updateMany({
@@ -397,6 +416,9 @@ export class TablesService {
       data: { status: 'ENDED', endedAt: new Date() },
     });
 
-    return { success: true, message: `Table ${table.name} session ended and cleared.` };
+    return {
+      success: true,
+      message: `Table ${table.name} session ended and cleared.`,
+    };
   }
 }

@@ -5,6 +5,7 @@ import { useRestaurant } from '@/hooks/use-restaurant';
 import { useBranch } from '@/hooks/use-branch';
 import { apiClient } from '@/services/api-client';
 import { formatCurrency } from '@/lib/currency';
+import { Pagination } from '@/components/ui/pagination';
 import {
   Ingredient,
   InventoryMetrics,
@@ -42,6 +43,16 @@ export default function InventoryPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'LOW_STOCK' | 'OUT_OF_STOCK'>('ALL');
   const [movementFilter, setMovementFilter] = useState<string>('ALL');
+
+  // Pagination states
+  const [ingredientsPage, setIngredientsPage] = useState(1);
+  const [ingredientsPageSize, setIngredientsPageSize] = useState(10);
+  const [recipesPage, setRecipesPage] = useState(1);
+  const [recipesPageSize, setRecipesPageSize] = useState(9);
+  const [batchesPage, setBatchesPage] = useState(1);
+  const [batchesPageSize, setBatchesPageSize] = useState(10);
+  const [movementsPage, setMovementsPage] = useState(1);
+  const [movementsPageSize, setMovementsPageSize] = useState(15);
 
   // Modals state
   const [showAddIngredientModal, setShowAddIngredientModal] = useState(false);
@@ -473,12 +484,45 @@ export default function InventoryPage() {
     return (movements || []).filter((m) => m.transactionType === movementFilter);
   }, [movements, movementFilter]);
 
+  // Paginated data slices
+  const ingredientsTotalPages = Math.ceil(filteredIngredients.length / ingredientsPageSize) || 1;
+  const paginatedIngredients = useMemo(() => {
+    return filteredIngredients.slice(
+      (ingredientsPage - 1) * ingredientsPageSize,
+      ingredientsPage * ingredientsPageSize,
+    );
+  }, [filteredIngredients, ingredientsPage, ingredientsPageSize]);
+
+  const recipesTotalPages = Math.ceil((recipes || []).length / recipesPageSize) || 1;
+  const paginatedRecipes = useMemo(() => {
+    return (recipes || []).slice(
+      (recipesPage - 1) * recipesPageSize,
+      recipesPage * recipesPageSize,
+    );
+  }, [recipes, recipesPage, recipesPageSize]);
+
+  const batchesTotalPages = Math.ceil((batches || []).length / batchesPageSize) || 1;
+  const paginatedBatches = useMemo(() => {
+    return (batches || []).slice(
+      (batchesPage - 1) * batchesPageSize,
+      batchesPage * batchesPageSize,
+    );
+  }, [batches, batchesPage, batchesPageSize]);
+
+  const movementsTotalPages = Math.ceil(filteredMovements.length / movementsPageSize) || 1;
+  const paginatedMovements = useMemo(() => {
+    return filteredMovements.slice(
+      (movementsPage - 1) * movementsPageSize,
+      movementsPage * movementsPageSize,
+    );
+  }, [filteredMovements, movementsPage, movementsPageSize]);
+
   if (!currentRestaurant && !isLoading) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center p-8 text-center">
         <div className="text-4xl mb-3">🥫</div>
         <h2 className="text-xl font-bold text-foreground mb-2">No Restaurant Selected</h2>
-        <p className="text-sm text-gray-400 max-w-md mb-6">
+        <p className="text-sm text-muted-foreground max-w-md mb-6">
           Please select an active restaurant from your organization dashboard to view and manage inventory.
         </p>
       </div>
@@ -493,7 +537,7 @@ export default function InventoryPage() {
           className={`fixed top-6 right-6 z-50 px-5 py-3 rounded-xl text-sm font-semibold flex items-center gap-3 transition-all ${
             feedbackMsg.type === 'success'
               ? 'bg-primary/20 text-primary border border-primary/40 backdrop-blur-md'
-              : 'bg-rose-500/20 text-rose-300 border border-rose-500/40 backdrop-blur-md'
+              : 'bg-atlas-error/20 text-atlas-error border border-atlas-error/40 backdrop-blur-md'
           }`}
         >
           <span>{feedbackMsg.type === 'success' ? '✅' : '⚠️'}</span>
@@ -502,7 +546,7 @@ export default function InventoryPage() {
       )}
 
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pb-6 border-b border-gray-800">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pb-6 border-b border-border">
         <div>
           <div className="flex items-center gap-3">
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground flex items-center gap-2">
@@ -512,7 +556,7 @@ export default function InventoryPage() {
               Auto-Deductions Active
             </span>
           </div>
-          <p className="text-gray-400 text-sm mt-1">
+          <p className="text-muted-foreground text-sm mt-1">
             Real-time stock depletion linked to customer orders, recipes, wastage, and purchasing ledgers.
           </p>
         </div>
@@ -526,7 +570,7 @@ export default function InventoryPage() {
           </button>
           <button
             onClick={loadData}
-            className="p-2.5 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-xl transition-all border border-gray-700"
+            className="p-2.5 bg-secondary hover:bg-border text-foreground rounded-xl transition-all border border-border"
             title="Refresh Data"
           >
             🔄
@@ -536,27 +580,27 @@ export default function InventoryPage() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 mb-8">
-        <div className="bg-secondary border border-gray-800 rounded-2xl p-5 shadow-sm">
+        <div className="bg-secondary border border-border rounded-2xl p-5 shadow-sm">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Total Stock Value</span>
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Total Stock Value</span>
             <span className="p-2 bg-primary/10 text-primary rounded-lg text-lg">💰</span>
           </div>
           <p className="text-2xl font-black text-foreground mt-2">{formatCurrency(metrics.totalValuation || 0)}</p>
-          <span className="text-xs text-gray-500 mt-1 block">Live inventory asset valuation</span>
+          <span className="text-xs text-muted-foreground mt-1 block">Live inventory asset valuation</span>
         </div>
 
-        <div className="bg-secondary border border-gray-800 rounded-2xl p-5 shadow-sm">
+        <div className="bg-secondary border border-border rounded-2xl p-5 shadow-sm">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Tracked Ingredients</span>
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Tracked Ingredients</span>
             <span className="p-2 bg-atlas-info/10 text-atlas-info rounded-lg text-lg">📦</span>
           </div>
           <p className="text-2xl font-black text-foreground mt-2">{metrics.totalItems || 0} Items</p>
-          <span className="text-xs text-gray-500 mt-1 block">Across all food & beverage items</span>
+          <span className="text-xs text-muted-foreground mt-1 block">Across all food & beverage items</span>
         </div>
 
         <div
           className={`bg-secondary border rounded-2xl p-5 shadow-sm cursor-pointer transition-all ${
-            metrics.lowStockCount > 0 ? 'border-atlas-warning/40 bg-atlas-warning/5' : 'border-gray-800'
+            metrics.lowStockCount > 0 ? 'border-atlas-warning/40 bg-atlas-warning/5' : 'border-border'
           }`}
           onClick={() => {
             setActiveTab('ingredients');
@@ -564,31 +608,31 @@ export default function InventoryPage() {
           }}
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Low Stock Warnings</span>
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Low Stock Warnings</span>
             <span className="p-2 bg-atlas-warning/10 text-atlas-warning rounded-lg text-lg">⚠️</span>
           </div>
           <p className="text-2xl font-black text-atlas-warning mt-2">{metrics.lowStockCount || 0} Items</p>
           <span className="text-xs text-atlas-warning/80 mt-1 block">Below minimum threshold</span>
         </div>
 
-        <div className="bg-secondary border border-gray-800 rounded-2xl p-5 shadow-sm">
+        <div className="bg-secondary border border-border rounded-2xl p-5 shadow-sm">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Monthly Wastage</span>
-            <span className="p-2 bg-rose-500/10 text-rose-400 rounded-lg text-lg">🗑️</span>
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Monthly Wastage</span>
+            <span className="p-2 bg-atlas-error/10 text-atlas-error rounded-lg text-lg">🗑️</span>
           </div>
-          <p className="text-2xl font-black text-rose-400 mt-2">{formatCurrency(metrics.monthlyWastageCost || 0)}</p>
-          <span className="text-xs text-gray-500 mt-1 block">Recorded spoilage (last 30 days)</span>
+          <p className="text-2xl font-black text-atlas-error mt-2">{formatCurrency(metrics.monthlyWastageCost || 0)}</p>
+          <span className="text-xs text-muted-foreground mt-1 block">Recorded spoilage (last 30 days)</span>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-2 border-b border-gray-800 mb-6 overflow-x-auto no-scrollbar touch-pan-x flex-nowrap shrink-0">
+      <div className="flex items-center gap-2 border-b border-border mb-6 overflow-x-auto no-scrollbar touch-pan-x flex-nowrap shrink-0">
         <button
           onClick={() => setActiveTab('ingredients')}
           className={`px-5 py-3 font-semibold text-sm border-b-2 transition-all whitespace-nowrap shrink-0 flex items-center gap-2 ${
             activeTab === 'ingredients'
               ? 'border-indigo-500 text-indigo-400 bg-indigo-500/5'
-              : 'border-transparent text-gray-400 hover:text-gray-200'
+              : 'border-transparent text-muted-foreground hover:text-foreground'
           }`}
         >
           <span>📦</span> Ingredients & Stock Ledger ({ingredients.length})
@@ -599,7 +643,7 @@ export default function InventoryPage() {
           className={`px-5 py-3 font-semibold text-sm border-b-2 transition-all whitespace-nowrap shrink-0 flex items-center gap-2 ${
             activeTab === 'recipes'
               ? 'border-indigo-500 text-indigo-400 bg-indigo-500/5'
-              : 'border-transparent text-gray-400 hover:text-gray-200'
+              : 'border-transparent text-muted-foreground hover:text-foreground'
           }`}
         >
           <span>🍔</span> Recipe Mapping ({recipes.length})
@@ -610,7 +654,7 @@ export default function InventoryPage() {
           className={`px-5 py-3 font-semibold text-sm border-b-2 transition-all whitespace-nowrap shrink-0 flex items-center gap-2 ${
             activeTab === 'batches'
               ? 'border-indigo-500 text-indigo-400 bg-indigo-500/5'
-              : 'border-transparent text-gray-400 hover:text-gray-200'
+              : 'border-transparent text-muted-foreground hover:text-foreground'
           }`}
         >
           <span>🥘</span> Kitchen Batch Prep ({batches.filter((b) => b.status === 'ACTIVE').length} Active)
@@ -621,7 +665,7 @@ export default function InventoryPage() {
           className={`px-5 py-3 font-semibold text-sm border-b-2 transition-all whitespace-nowrap shrink-0 flex items-center gap-2 ${
             activeTab === 'movements'
               ? 'border-indigo-500 text-indigo-400 bg-indigo-500/5'
-              : 'border-transparent text-gray-400 hover:text-gray-200'
+              : 'border-transparent text-muted-foreground hover:text-foreground'
           }`}
         >
           <span>📜</span> Stock Movements Audit Trail
@@ -632,7 +676,7 @@ export default function InventoryPage() {
           className={`px-5 py-3 font-semibold text-sm border-b-2 transition-all whitespace-nowrap shrink-0 flex items-center gap-2 ${
             activeTab === 'suppliers'
               ? 'border-indigo-500 text-indigo-400 bg-indigo-500/5'
-              : 'border-transparent text-gray-400 hover:text-gray-200'
+              : 'border-transparent text-muted-foreground hover:text-foreground'
           }`}
         >
           <span>🏢</span> Suppliers & Storage Zones ({suppliers.length + locations.length})
@@ -643,43 +687,55 @@ export default function InventoryPage() {
       {activeTab === 'ingredients' && (
         <div className="space-y-4">
           {/* Filter Bar */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-secondary p-4 rounded-xl border border-gray-800">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-secondary p-4 rounded-xl border border-border">
             <div className="relative w-full sm:w-80">
               <input
                 type="text"
                 placeholder="Search ingredients..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-background border border-gray-700 rounded-lg pl-9 pr-3 py-2 text-sm text-gray-200 focus:outline-none focus:border-indigo-500"
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setIngredientsPage(1);
+                }}
+                className="w-full bg-background border border-border rounded-lg pl-9 pr-3 py-2 text-sm text-foreground focus:outline-none focus:border-indigo-500"
               />
-              <span className="absolute left-3 top-2.5 text-gray-500">🔍</span>
+              <span className="absolute left-3 top-2.5 text-muted-foreground">🔍</span>
             </div>
 
             <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto no-scrollbar touch-pan-x flex-nowrap">
               <button
-                onClick={() => setStatusFilter('ALL')}
+                onClick={() => {
+                  setStatusFilter('ALL');
+                  setIngredientsPage(1);
+                }}
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap shrink-0 ${
-                  statusFilter === 'ALL' ? 'bg-indigo-600 text-foreground' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                  statusFilter === 'ALL' ? 'bg-indigo-600 text-foreground' : 'bg-secondary text-muted-foreground hover:bg-border'
                 }`}
               >
                 All ({ingredients.length})
               </button>
               <button
-                onClick={() => setStatusFilter('LOW_STOCK')}
+                onClick={() => {
+                  setStatusFilter('LOW_STOCK');
+                  setIngredientsPage(1);
+                }}
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap shrink-0 ${
                   statusFilter === 'LOW_STOCK'
-                    ? 'bg-amber-600 text-foreground'
-                    : 'bg-gray-800 text-atlas-warning hover:bg-gray-700'
+                    ? 'bg-atlas-warning text-foreground'
+                    : 'bg-secondary text-atlas-warning hover:bg-border'
                 }`}
               >
                 ⚠️ Low Stock ({metrics.lowStockCount || 0})
               </button>
               <button
-                onClick={() => setStatusFilter('OUT_OF_STOCK')}
+                onClick={() => {
+                  setStatusFilter('OUT_OF_STOCK');
+                  setIngredientsPage(1);
+                }}
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap shrink-0 ${
                   statusFilter === 'OUT_OF_STOCK'
-                    ? 'bg-rose-600 text-foreground'
-                    : 'bg-gray-800 text-rose-400 hover:bg-gray-700'
+                    ? 'bg-atlas-error text-foreground'
+                    : 'bg-secondary text-atlas-error hover:bg-border'
                 }`}
               >
                 ❌ Out of Stock ({metrics.outOfStockCount || 0})
@@ -688,10 +744,10 @@ export default function InventoryPage() {
           </div>
 
           {/* Table */}
-          <div className="bg-secondary border border-gray-800 rounded-2xl overflow-hidden shadow-sm table-responsive">
+          <div className="bg-secondary border border-border rounded-2xl overflow-hidden shadow-sm table-responsive">
             <table className="w-full min-w-[700px] text-left border-collapse">
               <thead>
-                <tr className="border-b border-gray-800 text-xs font-bold text-gray-400 uppercase tracking-wider bg-gray-900/40">
+                <tr className="border-b border-border text-xs font-bold text-muted-foreground uppercase tracking-wider bg-secondary/40">
                   <th className="py-4 px-5">Ingredient</th>
                   <th className="py-4 px-5">Current Stock</th>
                   <th className="py-4 px-5">Min Level</th>
@@ -701,25 +757,25 @@ export default function InventoryPage() {
                   <th className="py-4 px-5 text-right">Actions</th>
                 </tr>
               </thead>
-                <tbody className="divide-y divide-gray-800/60 text-sm">
+                <tbody className="divide-y divide-border/60 text-sm">
                   {filteredIngredients.length === 0 ? (
                     <tr>
-                      <td colSpan={7} className="py-12 text-center text-gray-500">
+                      <td colSpan={7} className="py-12 text-center text-muted-foreground">
                         No ingredients found matching your filter.
                       </td>
                     </tr>
                   ) : (
-                    filteredIngredients.map((ing) => {
+                    paginatedIngredients.map((ing) => {
                       const stockPercentage = Math.min(
                         100,
                         Math.round((ing.currentStock / (ing.minimumReorderLevel * 2 || 1)) * 100),
                       );
 
                       return (
-                        <tr key={ing.id} className="hover:bg-gray-800/30 transition-colors">
+                        <tr key={ing.id} className="hover:bg-secondary/30 transition-colors">
                           <td className="py-4 px-5">
                             <div className="font-semibold text-foreground">{ing.name}</div>
-                            <div className="text-xs text-gray-500 flex items-center gap-2 mt-0.5">
+                            <div className="text-xs text-muted-foreground flex items-center gap-2 mt-0.5">
                               <span>Unit: {ing.unitOfMeasure}</span>
                               {ing.location && <span>• 📍 {ing.location.name}</span>}
                               {ing.supplier && <span>• 🏢 {ing.supplier.name}</span>}
@@ -729,11 +785,11 @@ export default function InventoryPage() {
                             <div className="font-bold text-foreground">
                               {ing.currentStock} {ing.unitOfMeasure}
                             </div>
-                            <div className="w-24 bg-gray-800 h-1.5 rounded-full mt-1.5 overflow-hidden">
+                            <div className="w-24 bg-secondary h-1.5 rounded-full mt-1.5 overflow-hidden">
                               <div
                                 className={`h-full rounded-full ${
                                   ing.status === 'OUT_OF_STOCK'
-                                    ? 'bg-rose-500 w-full'
+                                    ? 'bg-atlas-error w-full'
                                     : ing.status === 'LOW_STOCK'
                                     ? 'bg-atlas-warning'
                                     : 'bg-primary'
@@ -742,10 +798,10 @@ export default function InventoryPage() {
                               />
                             </div>
                           </td>
-                          <td className="py-4 px-5 text-gray-400">
+                          <td className="py-4 px-5 text-muted-foreground">
                             {ing.minimumReorderLevel} {ing.unitOfMeasure}
                           </td>
-                          <td className="py-4 px-5 font-mono text-gray-300">
+                          <td className="py-4 px-5 font-mono text-foreground">
                             {formatCurrency(ing.costPerUnit)} / {ing.unitOfMeasure}
                           </td>
                           <td className="py-4 px-5 font-mono font-semibold text-primary">
@@ -755,7 +811,7 @@ export default function InventoryPage() {
                             <span
                               className={`px-2.5 py-1 rounded-full text-xs font-semibold ${
                                 ing.status === 'OUT_OF_STOCK'
-                                  ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                                  ? 'bg-atlas-error/10 text-atlas-error border border-atlas-error/20'
                                   : ing.status === 'LOW_STOCK'
                                   ? 'bg-atlas-warning/10 text-atlas-warning border border-atlas-warning/20'
                                   : 'bg-primary/10 text-primary border border-primary/20'
@@ -798,7 +854,7 @@ export default function InventoryPage() {
                                   });
                                   setShowWastageModal(true);
                                 }}
-                                className="px-2.5 py-1 bg-rose-600/20 hover:bg-rose-600/40 text-rose-300 rounded-lg text-xs font-medium border border-rose-500/30 transition-all"
+                                className="px-2.5 py-1 bg-atlas-error/20 hover:bg-atlas-error/40 text-atlas-error rounded-lg text-xs font-medium border border-atlas-error/30 transition-all"
                                 title="Log Wastage"
                               >
                                 🗑️ Wastage
@@ -826,30 +882,47 @@ export default function InventoryPage() {
                 </tbody>
               </table>
             </div>
+
+            {filteredIngredients.length > 0 && (
+              <div className="pt-2">
+                <Pagination
+                  currentPage={ingredientsPage}
+                  totalPages={ingredientsTotalPages}
+                  onPageChange={setIngredientsPage}
+                  totalItems={filteredIngredients.length}
+                  pageSize={ingredientsPageSize}
+                  pageSizeOptions={[10, 25, 50]}
+                  onPageSizeChange={(newSize) => {
+                    setIngredientsPageSize(newSize);
+                    setIngredientsPage(1);
+                  }}
+                />
+              </div>
+            )}
           </div>
         )}
 
       {/* TAB 2: RECIPES */}
       {activeTab === 'recipes' && (
         <div className="space-y-4">
-          <div className="bg-secondary p-4 rounded-xl border border-gray-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="bg-secondary p-4 rounded-xl border border-border flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h3 className="font-bold text-foreground text-base">Menu Item Recipe & Consumption Engine</h3>
-              <p className="text-gray-400 text-xs mt-0.5">
+              <p className="text-muted-foreground text-xs mt-0.5">
                 Every confirmed order automatically calculates ingredient deductions based on mapped recipes (Made-to-Order vs. Batch-Prepared).
               </p>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {recipes.map((item) => {
+            {paginatedRecipes.map((item) => {
               const isBatch = item.recipe?.recipeType === 'BATCH_PREPARED';
               const preparedStock = item.recipe?.preparedStock || 0;
 
               return (
                 <div
                   key={item.menuItemId}
-                  className="bg-secondary border border-gray-800 hover:border-gray-700 rounded-2xl p-5 flex flex-col justify-between shadow-sm transition-all"
+                  className="bg-secondary border border-border hover:border-border rounded-2xl p-5 flex flex-col justify-between shadow-sm transition-all"
                 >
                   <div>
                     <div className="flex items-start justify-between gap-3">
@@ -858,14 +931,14 @@ export default function InventoryPage() {
                           {item.categoryName}
                         </span>
                         <h4 className="text-lg font-bold text-foreground mt-1">{item.menuItemName}</h4>
-                        <p className="text-sm text-gray-400 font-mono mt-0.5">Menu Price: {formatCurrency(item.price)}</p>
+                        <p className="text-sm text-muted-foreground font-mono mt-0.5">Menu Price: {formatCurrency(item.price)}</p>
                       </div>
                       <div className="flex flex-col items-end gap-1.5">
                         <span
                           className={`px-2.5 py-1 rounded-full text-xs font-semibold ${
                             item.hasRecipe
                               ? 'bg-primary/10 text-primary border border-primary/20'
-                              : 'bg-gray-800 text-gray-400'
+                              : 'bg-secondary text-muted-foreground'
                           }`}
                         >
                           {item.hasRecipe ? '✅ Recipe Mapped' : '⚠️ No Recipe'}
@@ -888,15 +961,15 @@ export default function InventoryPage() {
                     {isBatch && item.hasRecipe && (
                       <div className="mt-3 p-2.5 rounded-xl bg-atlas-warning/10 border border-atlas-warning/25 flex items-center justify-between">
                         <div className="text-xs">
-                          <span className="text-gray-400 text-[11px] block">Prepared Ready Stock:</span>
-                          <span className={`font-bold ${preparedStock > 0 ? 'text-primary' : 'text-rose-400'}`}>
+                          <span className="text-muted-foreground text-[11px] block">Prepared Ready Stock:</span>
+                          <span className={`font-bold ${preparedStock > 0 ? 'text-primary' : 'text-atlas-error'}`}>
                             {preparedStock} portions available
                           </span>
                         </div>
                         <div className="flex items-center gap-1.5">
                           <button
                             onClick={() => openBatchPrepModal(item)}
-                            className="px-2.5 py-1 bg-atlas-warning/20 hover:bg-atlas-warning/30 text-amber-300 font-bold text-xs rounded-lg border border-atlas-warning/40 transition-all"
+                            className="px-2.5 py-1 bg-atlas-warning/20 hover:bg-atlas-warning/30 text-atlas-warning font-bold text-xs rounded-lg border border-atlas-warning/40 transition-all"
                             title="Log new cooked batch"
                           >
                             ➕ Cook Batch
@@ -904,7 +977,7 @@ export default function InventoryPage() {
                           {preparedStock > 0 && (
                             <button
                               onClick={() => openBatchWastageModal(item)}
-                              className="px-2 py-1 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 font-bold text-xs rounded-lg border border-rose-500/30 transition-all"
+                              className="px-2 py-1 bg-atlas-error/20 hover:bg-atlas-error/30 text-atlas-error font-bold text-xs rounded-lg border border-atlas-error/30 transition-all"
                               title="Log leftover wastage"
                             >
                               🗑️
@@ -915,8 +988,8 @@ export default function InventoryPage() {
                     )}
 
                     {item.recipe && item.recipe.ingredients && item.recipe.ingredients.length > 0 ? (
-                      <div className="mt-4 pt-4 border-t border-gray-800/80">
-                        <div className="flex items-center justify-between text-xs font-bold text-gray-400 uppercase mb-2">
+                      <div className="mt-4 pt-4 border-t border-border/80">
+                        <div className="flex items-center justify-between text-xs font-bold text-muted-foreground uppercase mb-2">
                           <span>Ingredients Required:</span>
                           {isBatch && (
                             <span className="text-[10px] text-atlas-warning font-normal">
@@ -926,8 +999,8 @@ export default function InventoryPage() {
                         </div>
                         <div className="space-y-1.5 max-h-36 overflow-y-auto pr-1">
                           {item.recipe.ingredients.map((ri) => (
-                            <div key={ri.id} className="flex items-center justify-between text-xs bg-gray-900/60 px-2.5 py-1.5 rounded-lg">
-                              <span className="text-gray-300 font-medium">{ri.ingredientName}</span>
+                            <div key={ri.id} className="flex items-center justify-between text-xs bg-secondary/60 px-2.5 py-1.5 rounded-lg">
+                              <span className="text-foreground font-medium">{ri.ingredientName}</span>
                               <span className="font-mono text-indigo-300">
                                 {ri.quantityRequired} {ri.unitOfMeasure === 'KG' ? 'g' : ri.unitOfMeasure}
                               </span>
@@ -936,14 +1009,14 @@ export default function InventoryPage() {
                         </div>
                       </div>
                     ) : (
-                      <div className="mt-4 py-6 text-center text-xs text-gray-500 bg-gray-900/40 rounded-xl">
+                      <div className="mt-4 py-6 text-center text-xs text-muted-foreground bg-secondary/40 rounded-xl">
                         No ingredients configured yet.
                       </div>
                     )}
                   </div>
 
-                  <div className="mt-5 pt-3 border-t border-gray-800 flex items-center justify-between">
-                    <span className="text-xs text-gray-400">
+                  <div className="mt-5 pt-3 border-t border-border flex items-center justify-between">
+                    <span className="text-xs text-muted-foreground">
                       {item.recipe?.ingredients?.length || 0} ingredients linked
                     </span>
                     <button
@@ -957,19 +1030,36 @@ export default function InventoryPage() {
               );
             })}
           </div>
+
+          {recipes.length > 0 && (
+            <div className="pt-2">
+              <Pagination
+                currentPage={recipesPage}
+                totalPages={recipesTotalPages}
+                onPageChange={setRecipesPage}
+                totalItems={recipes.length}
+                pageSize={recipesPageSize}
+                pageSizeOptions={[6, 9, 18, 36]}
+                onPageSizeChange={(newSize) => {
+                  setRecipesPageSize(newSize);
+                  setRecipesPage(1);
+                }}
+              />
+            </div>
+          )}
         </div>
       )}
 
       {/* TAB 3: KITCHEN BATCH PREP & PRODUCTION */}
       {activeTab === 'batches' && (
         <div className="space-y-6">
-          <div className="bg-secondary p-5 rounded-2xl border border-gray-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="bg-secondary p-5 rounded-2xl border border-border flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-xl">🥘</span>
                 <h3 className="font-bold text-foreground text-lg">Daily Kitchen Batch Production Log</h3>
               </div>
-              <p className="text-gray-400 text-xs mt-1 max-w-2xl">
+              <p className="text-muted-foreground text-xs mt-1 max-w-2xl">
                 For items cooked in bulk (Biryani, Chowmein base, Gravies, Dal, Soups). Logging a morning batch automatically consumes raw ingredients at prep time and tracks live ready portions for POS & customer orders.
               </p>
             </div>
@@ -980,7 +1070,7 @@ export default function InventoryPage() {
                   const firstBatchRecipe = recipes.find((r) => r.recipe?.recipeType === 'BATCH_PREPARED') || recipes[0];
                   if (firstBatchRecipe) openBatchPrepModal(firstBatchRecipe);
                 }}
-                className="px-4 py-2.5 bg-atlas-warning hover:bg-atlas-warning text-gray-950 font-bold rounded-xl text-xs shadow-lg shadow-amber-500/20 transition-all flex items-center gap-2"
+                className="px-4 py-2.5 bg-atlas-warning hover:bg-atlas-warning text-background font-bold rounded-xl text-xs shadow-lg shadow-amber-500/20 transition-all flex items-center gap-2"
               >
                 <span>➕</span> Log Morning / Shift Batch
               </button>
@@ -996,7 +1086,7 @@ export default function InventoryPage() {
                 return (
                   <div
                     key={r.menuItemId}
-                    className="bg-secondary border border-gray-800 rounded-2xl p-5 shadow-sm flex flex-col justify-between space-y-3"
+                    className="bg-secondary border border-border rounded-2xl p-5 shadow-sm flex flex-col justify-between space-y-3"
                   >
                     <div className="flex items-start justify-between">
                       <div>
@@ -1008,9 +1098,9 @@ export default function InventoryPage() {
                       <span className="p-2 rounded-xl bg-atlas-warning/10 text-atlas-warning text-base">🥘</span>
                     </div>
 
-                    <div className="py-2 border-y border-gray-800/60 flex items-center justify-between">
-                      <span className="text-xs text-gray-400">Live Ready Portions:</span>
-                      <span className={`text-xl font-black ${stock > 0 ? 'text-primary' : 'text-rose-400'}`}>
+                    <div className="py-2 border-y border-border/60 flex items-center justify-between">
+                      <span className="text-xs text-muted-foreground">Live Ready Portions:</span>
+                      <span className={`text-xl font-black ${stock > 0 ? 'text-primary' : 'text-atlas-error'}`}>
                         {stock} portions
                       </span>
                     </div>
@@ -1018,14 +1108,14 @@ export default function InventoryPage() {
                     <div className="flex items-center gap-2 pt-1">
                       <button
                         onClick={() => openBatchPrepModal(r)}
-                        className="flex-1 py-2 bg-atlas-warning/20 hover:bg-atlas-warning/30 text-amber-300 border border-atlas-warning/40 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5"
+                        className="flex-1 py-2 bg-atlas-warning/20 hover:bg-atlas-warning/30 text-atlas-warning border border-atlas-warning/40 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5"
                       >
                         <span>➕</span> Cook Batch
                       </button>
                       {stock > 0 && (
                         <button
                           onClick={() => openBatchWastageModal(r)}
-                          className="px-3 py-2 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 rounded-xl text-xs font-bold transition-all"
+                          className="px-3 py-2 bg-atlas-error/20 hover:bg-atlas-error/30 text-atlas-error border border-atlas-error/30 rounded-xl text-xs font-bold transition-all"
                           title="Log EOD leftover wastage"
                         >
                           🗑️ Spoilage
@@ -1038,17 +1128,17 @@ export default function InventoryPage() {
           </div>
 
           {/* Batch Production History Ledger */}
-          <div className="bg-secondary border border-gray-800 rounded-2xl overflow-hidden shadow-sm table-responsive">
-            <div className="p-4 border-b border-gray-800 flex items-center justify-between">
-              <h4 className="text-xs font-bold uppercase text-gray-400 tracking-wider">
+          <div className="bg-secondary border border-border rounded-2xl overflow-hidden shadow-sm table-responsive">
+            <div className="p-4 border-b border-border flex items-center justify-between">
+              <h4 className="text-xs font-bold uppercase text-muted-foreground tracking-wider">
                 Recent Kitchen Production Runs
               </h4>
-              <span className="text-xs text-gray-500">{batches.length} batch records</span>
+              <span className="text-xs text-muted-foreground">{batches.length} batch records</span>
             </div>
 
             <table className="w-full min-w-[700px] text-left border-collapse text-sm">
               <thead>
-                <tr className="border-b border-gray-800 bg-gray-900/60 text-xs font-bold text-gray-400 uppercase tracking-wider">
+                <tr className="border-b border-border bg-secondary/60 text-xs font-bold text-muted-foreground uppercase tracking-wider">
                   <th className="py-3.5 px-4">Dish Name</th>
                   <th className="py-3.5 px-4">Cooked Portions</th>
                   <th className="py-3.5 px-4">Portions Remaining</th>
@@ -1058,16 +1148,16 @@ export default function InventoryPage() {
                   <th className="py-3.5 px-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-800/60">
+              <tbody className="divide-y divide-border/60">
                 {batches.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="py-12 text-center text-gray-500 text-sm">
+                    <td colSpan={7} className="py-12 text-center text-muted-foreground text-sm">
                       No kitchen batch production runs logged yet. Click "Log Morning / Shift Batch" to record.
                     </td>
                   </tr>
                 ) : (
-                  batches.map((b) => (
-                    <tr key={b.id} className="hover:bg-gray-900/40 transition-colors">
+                  paginatedBatches.map((b) => (
+                    <tr key={b.id} className="hover:bg-secondary/40 transition-colors">
                       <td className="py-3.5 px-4 font-bold text-foreground flex items-center gap-2">
                         <span>🥘</span>
                         {b.menuItemName}
@@ -1076,7 +1166,7 @@ export default function InventoryPage() {
                         {b.portionsProduced} portions
                       </td>
                       <td className="py-3.5 px-4 font-mono font-bold">
-                        <span className={b.portionsRemaining > 0 ? 'text-primary' : 'text-gray-500'}>
+                        <span className={b.portionsRemaining > 0 ? 'text-primary' : 'text-muted-foreground'}>
                           {b.portionsRemaining} portions
                         </span>
                       </td>
@@ -1086,17 +1176,17 @@ export default function InventoryPage() {
                             b.status === 'ACTIVE'
                               ? 'bg-primary/15 text-primary border-primary/30'
                               : b.status === 'DEPLETED'
-                              ? 'bg-gray-800 text-gray-400 border-gray-700'
-                              : 'bg-rose-500/15 text-rose-400 border-rose-500/30'
+                              ? 'bg-secondary text-muted-foreground border-border'
+                              : 'bg-atlas-error/15 text-atlas-error border-atlas-error/30'
                           }`}
                         >
                           {b.status}
                         </span>
                       </td>
-                      <td className="py-3.5 px-4 text-xs text-gray-400">
+                      <td className="py-3.5 px-4 text-xs text-muted-foreground">
                         {new Date(b.producedAt).toLocaleString()}
                       </td>
-                      <td className="py-3.5 px-4 text-xs text-gray-400 max-w-xs truncate">
+                      <td className="py-3.5 px-4 text-xs text-muted-foreground max-w-xs truncate">
                         {b.notes || '—'}
                       </td>
                       <td className="py-3.5 px-4 text-right">
@@ -1106,7 +1196,7 @@ export default function InventoryPage() {
                               const foundRecipe = recipes.find((r) => r.menuItemId === b.menuItemId);
                               if (foundRecipe) openBatchWastageModal(foundRecipe);
                             }}
-                            className="px-2.5 py-1 bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 text-xs font-bold rounded-lg border border-rose-500/30 transition-all"
+                            className="px-2.5 py-1 bg-atlas-error/15 hover:bg-atlas-error/25 text-atlas-error text-xs font-bold rounded-lg border border-atlas-error/30 transition-all"
                           >
                             Log Wastage
                           </button>
@@ -1118,16 +1208,33 @@ export default function InventoryPage() {
               </tbody>
             </table>
           </div>
+
+          {batches.length > 0 && (
+            <div className="pt-2">
+              <Pagination
+                currentPage={batchesPage}
+                totalPages={batchesTotalPages}
+                onPageChange={setBatchesPage}
+                totalItems={batches.length}
+                pageSize={batchesPageSize}
+                pageSizeOptions={[10, 25, 50]}
+                onPageSizeChange={(newSize) => {
+                  setBatchesPageSize(newSize);
+                  setBatchesPage(1);
+                }}
+              />
+            </div>
+          )}
         </div>
       )}
 
       {/* TAB 3: MOVEMENTS AUDIT TRAIL */}
       {activeTab === 'movements' && (
         <div className="space-y-4">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-secondary p-4 rounded-xl border border-gray-800">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-secondary p-4 rounded-xl border border-border">
             <div>
               <h3 className="font-bold text-foreground text-base">Real-Time Stock Movement Ledger</h3>
-              <p className="text-gray-400 text-xs mt-0.5">
+              <p className="text-muted-foreground text-xs mt-0.5">
                 Every sale, purchase, spoilage, and adjustment is permanently recorded with complete traceability.
               </p>
             </div>
@@ -1135,8 +1242,11 @@ export default function InventoryPage() {
             <div className="flex items-center gap-2">
               <select
                 value={movementFilter}
-                onChange={(e) => setMovementFilter(e.target.value)}
-                className="bg-background border border-gray-700 rounded-lg px-3 py-2 text-xs text-gray-200 focus:outline-none focus:border-indigo-500"
+                onChange={(e) => {
+                  setMovementFilter(e.target.value);
+                  setMovementsPage(1);
+                }}
+                className="bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:outline-none focus:border-indigo-500"
               >
                 <option value="ALL">All Movement Types</option>
                 <option value="RECIPE_DEDUCTION">Recipe Deductions (Sales)</option>
@@ -1147,10 +1257,10 @@ export default function InventoryPage() {
             </div>
           </div>
 
-          <div className="bg-secondary border border-gray-800 rounded-2xl overflow-hidden shadow-sm table-responsive">
+          <div className="bg-secondary border border-border rounded-2xl overflow-hidden shadow-sm table-responsive">
             <table className="w-full min-w-[700px] text-left border-collapse text-sm">
                 <thead>
-                  <tr className="border-b border-gray-800 text-xs font-bold text-gray-400 uppercase tracking-wider bg-gray-900/40">
+                  <tr className="border-b border-border text-xs font-bold text-muted-foreground uppercase tracking-wider bg-secondary/40">
                     <th className="py-4 px-5">Timestamp</th>
                     <th className="py-4 px-5">Ingredient</th>
                     <th className="py-4 px-5">Type</th>
@@ -1159,19 +1269,19 @@ export default function InventoryPage() {
                     <th className="py-4 px-5">Reference</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-800/60">
+                <tbody className="divide-y divide-border/60">
                   {filteredMovements.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="py-12 text-center text-gray-500">
+                      <td colSpan={6} className="py-12 text-center text-muted-foreground">
                         No movement records found.
                       </td>
                     </tr>
                   ) : (
-                    filteredMovements.map((m) => {
+                    paginatedMovements.map((m) => {
                       const isPositive = m.quantityDelta > 0;
                       return (
-                        <tr key={m.id} className="hover:bg-gray-800/30 transition-colors">
-                          <td className="py-4 px-5 text-gray-400 text-xs">
+                        <tr key={m.id} className="hover:bg-secondary/30 transition-colors">
+                          <td className="py-4 px-5 text-muted-foreground text-xs">
                             {new Date(m.createdAt).toLocaleString()}
                           </td>
                           <td className="py-4 px-5 font-semibold text-foreground">
@@ -1185,7 +1295,7 @@ export default function InventoryPage() {
                                   : m.transactionType === 'MANUAL_PURCHASE'
                                   ? 'bg-primary/10 text-primary border border-primary/20'
                                   : m.transactionType === 'WASTE_SPOILAGE'
-                                  ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                                  ? 'bg-atlas-error/10 text-atlas-error border border-atlas-error/20'
                                   : 'bg-purple-500/10 text-purple-400 border border-purple-500/20'
                               }`}
                             >
@@ -1199,15 +1309,15 @@ export default function InventoryPage() {
                             </span>
                           </td>
                           <td className="py-4 px-5 font-mono font-bold">
-                            <span className={isPositive ? 'text-primary' : 'text-rose-400'}>
+                            <span className={isPositive ? 'text-primary' : 'text-atlas-error'}>
                               {isPositive ? '+' : ''}
                               {m.quantityDelta} {m.ingredient?.unitOfMeasure}
                             </span>
                           </td>
-                          <td className="py-4 px-5 font-mono text-gray-300">
+                          <td className="py-4 px-5 font-mono text-foreground">
                             {m.balanceAfter} {m.ingredient?.unitOfMeasure}
                           </td>
-                          <td className="py-4 px-5 text-xs text-gray-400">
+                          <td className="py-4 px-5 text-xs text-muted-foreground">
                             {m.order ? (
                               <span className="font-semibold text-indigo-400">Order #{m.order.orderNumber}</span>
                             ) : m.supplier ? (
@@ -1223,6 +1333,23 @@ export default function InventoryPage() {
                 </tbody>
               </table>
             </div>
+
+            {filteredMovements.length > 0 && (
+              <div className="pt-2">
+                <Pagination
+                  currentPage={movementsPage}
+                  totalPages={movementsTotalPages}
+                  onPageChange={setMovementsPage}
+                  totalItems={filteredMovements.length}
+                  pageSize={movementsPageSize}
+                  pageSizeOptions={[15, 30, 50]}
+                  onPageSizeChange={(newSize) => {
+                    setMovementsPageSize(newSize);
+                    setMovementsPage(1);
+                  }}
+                />
+              </div>
+            )}
           </div>
         )}
 
@@ -1230,12 +1357,12 @@ export default function InventoryPage() {
       {activeTab === 'suppliers' && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Suppliers list */}
-          <div className="bg-secondary border border-gray-800 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+          <div className="bg-secondary border border-border rounded-2xl p-6 shadow-sm flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <h3 className="text-lg font-bold text-foreground mb-0.5">🏢 Approved Suppliers ({suppliers.length})</h3>
-                  <p className="text-gray-400 text-xs">Vendors delivering raw ingredients and packaging.</p>
+                  <p className="text-muted-foreground text-xs">Vendors delivering raw ingredients and packaging.</p>
                 </div>
                 <button
                   onClick={() => setShowAddSupplierModal(true)}
@@ -1247,15 +1374,15 @@ export default function InventoryPage() {
 
               <div className="space-y-3">
                 {suppliers.length === 0 ? (
-                  <div className="text-sm text-gray-500 py-8 text-center border border-dashed border-gray-800 rounded-xl">
+                  <div className="text-sm text-muted-foreground py-8 text-center border border-dashed border-border rounded-xl">
                     No suppliers registered yet. Click "Add Supplier" to add vendor contact details.
                   </div>
                 ) : (
                   suppliers.map((s) => (
-                    <div key={s.id} className="p-3.5 bg-gray-900/60 rounded-xl border border-gray-800 flex items-center justify-between">
+                    <div key={s.id} className="p-3.5 bg-secondary/60 rounded-xl border border-border flex items-center justify-between">
                       <div>
                         <div className="font-semibold text-foreground">{s.name}</div>
-                        <div className="text-xs text-gray-400 flex items-center gap-2 mt-0.5">
+                        <div className="text-xs text-muted-foreground flex items-center gap-2 mt-0.5">
                           {s.contactName && <span>👤 {s.contactName}</span>}
                           {s.phone && <span>📞 {s.phone}</span>}
                           {s.email && <span>✉️ {s.email}</span>}
@@ -1272,12 +1399,12 @@ export default function InventoryPage() {
           </div>
 
           {/* Storage Locations */}
-          <div className="bg-secondary border border-gray-800 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+          <div className="bg-secondary border border-border rounded-2xl p-6 shadow-sm flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <h3 className="text-lg font-bold text-foreground mb-0.5">📍 Storage Zones ({locations.length})</h3>
-                  <p className="text-gray-400 text-xs">Kitchen stations, freezers, and pantry zones.</p>
+                  <p className="text-muted-foreground text-xs">Kitchen stations, freezers, and pantry zones.</p>
                 </div>
                 <button
                   onClick={() => setShowAddLocationModal(true)}
@@ -1289,15 +1416,15 @@ export default function InventoryPage() {
 
               <div className="space-y-3">
                 {locations.length === 0 ? (
-                  <div className="text-sm text-gray-500 py-8 text-center border border-dashed border-gray-800 rounded-xl">
+                  <div className="text-sm text-muted-foreground py-8 text-center border border-dashed border-border rounded-xl">
                     No storage zones configured yet. Click "Add Storage Zone" to define pantries and cold rooms.
                   </div>
                 ) : (
                   locations.map((loc) => (
-                    <div key={loc.id} className="p-3.5 bg-gray-900/60 rounded-xl border border-gray-800 flex items-center justify-between">
+                    <div key={loc.id} className="p-3.5 bg-secondary/60 rounded-xl border border-border flex items-center justify-between">
                       <div>
                         <div className="font-semibold text-foreground">{loc.name}</div>
-                        <div className="text-xs text-gray-400 font-mono mt-0.5">Code: {loc.code}</div>
+                        <div className="text-xs text-muted-foreground font-mono mt-0.5">Code: {loc.code}</div>
                       </div>
                       <span className="text-xs px-2.5 py-1 bg-indigo-500/15 text-indigo-300 rounded-lg border border-indigo-500/30 font-medium">
                         Storage Location
@@ -1318,69 +1445,69 @@ export default function InventoryPage() {
       {/* MODAL: ADD SUPPLIER */}
       {showAddSupplierModal && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-secondary border border-gray-700 rounded-2xl max-w-md w-full p-6 animate-in fade-in zoom-in-95">
-            <div className="flex items-center justify-between pb-4 border-b border-gray-800">
+          <div className="bg-secondary border border-border rounded-2xl max-w-md w-full p-6 animate-in fade-in zoom-in-95">
+            <div className="flex items-center justify-between pb-4 border-b border-border">
               <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
                 <span>🏢</span> Add Approved Supplier
               </h3>
-              <button onClick={() => setShowAddSupplierModal(false)} className="text-gray-400 hover:text-foreground text-lg">
+              <button onClick={() => setShowAddSupplierModal(false)} className="text-muted-foreground hover:text-foreground text-lg">
                 ✕
               </button>
             </div>
 
             <form onSubmit={handleCreateSupplier} className="space-y-4 mt-5">
               <div>
-                <label className="block text-xs font-semibold text-gray-300 mb-1.5">Supplier / Business Name *</label>
+                <label className="block text-xs font-semibold text-foreground mb-1.5">Supplier / Business Name *</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. Fresh Farm Produce Ltd, Metro Dairy"
                   value={supplierForm.name}
                   onChange={(e) => setSupplierForm({ ...supplierForm, name: e.target.value })}
-                  className="w-full bg-background border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:border-indigo-500"
+                  className="w-full bg-background border border-border rounded-xl px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:border-indigo-500"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-300 mb-1.5">Contact Person Name</label>
+                <label className="block text-xs font-semibold text-foreground mb-1.5">Contact Person Name</label>
                 <input
                   type="text"
                   placeholder="e.g. Rajesh Kumar"
                   value={supplierForm.contactName}
                   onChange={(e) => setSupplierForm({ ...supplierForm, contactName: e.target.value })}
-                  className="w-full bg-background border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:border-indigo-500"
+                  className="w-full bg-background border border-border rounded-xl px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:border-indigo-500"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-300 mb-1.5">Phone Number</label>
+                  <label className="block text-xs font-semibold text-foreground mb-1.5">Phone Number</label>
                   <input
                     type="text"
                     placeholder="+91 9876543210"
                     value={supplierForm.phone}
                     onChange={(e) => setSupplierForm({ ...supplierForm, phone: e.target.value })}
-                    className="w-full bg-background border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:border-indigo-500"
+                    className="w-full bg-background border border-border rounded-xl px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:border-indigo-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-gray-300 mb-1.5">Email Address</label>
+                  <label className="block text-xs font-semibold text-foreground mb-1.5">Email Address</label>
                   <input
                     type="email"
                     placeholder="vendor@supply.com"
                     value={supplierForm.email}
                     onChange={(e) => setSupplierForm({ ...supplierForm, email: e.target.value })}
-                    className="w-full bg-background border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:border-indigo-500"
+                    className="w-full bg-background border border-border rounded-xl px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:border-indigo-500"
                   />
                 </div>
               </div>
 
-              <div className="flex justify-end gap-3 pt-4 border-t border-gray-800">
+              <div className="flex justify-end gap-3 pt-4 border-t border-border">
                 <button
                   type="button"
                   onClick={() => setShowAddSupplierModal(false)}
-                  className="px-4 py-2.5 rounded-xl text-sm font-semibold text-gray-400 hover:text-foreground"
+                  className="px-4 py-2.5 rounded-xl text-sm font-semibold text-muted-foreground hover:text-foreground"
                 >
                   Cancel
                 </button>
@@ -1400,46 +1527,46 @@ export default function InventoryPage() {
       {/* MODAL: ADD STORAGE ZONE */}
       {showAddLocationModal && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-secondary border border-gray-700 rounded-2xl max-w-md w-full p-6 animate-in fade-in zoom-in-95">
-            <div className="flex items-center justify-between pb-4 border-b border-gray-800">
+          <div className="bg-secondary border border-border rounded-2xl max-w-md w-full p-6 animate-in fade-in zoom-in-95">
+            <div className="flex items-center justify-between pb-4 border-b border-border">
               <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
                 <span>📍</span> Add Storage Zone
               </h3>
-              <button onClick={() => setShowAddLocationModal(false)} className="text-gray-400 hover:text-foreground text-lg">
+              <button onClick={() => setShowAddLocationModal(false)} className="text-muted-foreground hover:text-foreground text-lg">
                 ✕
               </button>
             </div>
 
             <form onSubmit={handleCreateLocation} className="space-y-4 mt-5">
               <div>
-                <label className="block text-xs font-semibold text-gray-300 mb-1.5">Storage Zone Name *</label>
+                <label className="block text-xs font-semibold text-foreground mb-1.5">Storage Zone Name *</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. Walk-In Cold Freezer #1, Dry Pantry Zone"
                   value={locationForm.name}
                   onChange={(e) => setLocationForm({ ...locationForm, name: e.target.value })}
-                  className="w-full bg-background border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:border-indigo-500"
+                  className="w-full bg-background border border-border rounded-xl px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:border-indigo-500"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-300 mb-1.5">Zone Code / Identifier *</label>
+                <label className="block text-xs font-semibold text-foreground mb-1.5">Zone Code / Identifier *</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. FREEZER-01, DRY-PANTRY, BAR-STORE"
                   value={locationForm.code}
                   onChange={(e) => setLocationForm({ ...locationForm, code: e.target.value.toUpperCase() })}
-                  className="w-full bg-background border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-foreground font-mono focus:outline-none focus:border-indigo-500"
+                  className="w-full bg-background border border-border rounded-xl px-3.5 py-2.5 text-sm text-foreground font-mono focus:outline-none focus:border-indigo-500"
                 />
               </div>
 
-              <div className="flex justify-end gap-3 pt-4 border-t border-gray-800">
+              <div className="flex justify-end gap-3 pt-4 border-t border-border">
                 <button
                   type="button"
                   onClick={() => setShowAddLocationModal(false)}
-                  className="px-4 py-2.5 rounded-xl text-sm font-semibold text-gray-400 hover:text-foreground"
+                  className="px-4 py-2.5 rounded-xl text-sm font-semibold text-muted-foreground hover:text-foreground"
                 >
                   Cancel
                 </button>
@@ -1459,14 +1586,14 @@ export default function InventoryPage() {
       {/* MODAL 1: ADD INGREDIENT */}
       {showAddIngredientModal && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-secondary border border-gray-700 rounded-2xl max-w-lg w-full p-6 animate-in fade-in zoom-in-95">
-            <div className="flex items-center justify-between pb-4 border-b border-gray-800">
+          <div className="bg-secondary border border-border rounded-2xl max-w-lg w-full p-6 animate-in fade-in zoom-in-95">
+            <div className="flex items-center justify-between pb-4 border-b border-border">
               <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
                 <span>🥫</span> Add Raw Ingredient
               </h3>
               <button
                 onClick={() => setShowAddIngredientModal(false)}
-                className="text-gray-400 hover:text-foreground text-lg"
+                className="text-muted-foreground hover:text-foreground text-lg"
               >
                 ✕
               </button>
@@ -1474,26 +1601,26 @@ export default function InventoryPage() {
 
             <form onSubmit={handleCreateIngredient} className="space-y-4 mt-5">
               <div>
-                <label className="block text-xs font-semibold text-gray-300 mb-1.5">Ingredient Name *</label>
+                <label className="block text-xs font-semibold text-foreground mb-1.5">Ingredient Name *</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. Fresh Tomatoes, Chicken Breast, Olive Oil"
                   value={ingredientForm.name}
                   onChange={(e) => setIngredientForm({ ...ingredientForm, name: e.target.value })}
-                  className="w-full bg-background border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:border-indigo-500"
+                  className="w-full bg-background border border-border rounded-xl px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:border-indigo-500"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-300 mb-1.5">Unit of Measure *</label>
+                  <label className="block text-xs font-semibold text-foreground mb-1.5">Unit of Measure *</label>
                   <select
                     value={ingredientForm.unitOfMeasure}
                     onChange={(e) =>
                       setIngredientForm({ ...ingredientForm, unitOfMeasure: e.target.value as UnitOfMeasure })
                     }
-                    className="w-full bg-background border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:border-indigo-500"
+                    className="w-full bg-background border border-border rounded-xl px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:border-indigo-500"
                   >
                     <option value="KG">KG (Kilograms)</option>
                     <option value="GRAM">GRAM (Grams)</option>
@@ -1505,7 +1632,7 @@ export default function InventoryPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-gray-300 mb-1.5">Cost per Unit (₹) *</label>
+                  <label className="block text-xs font-semibold text-foreground mb-1.5">Cost per Unit (₹) *</label>
                   <input
                     type="number"
                     min="0"
@@ -1515,14 +1642,14 @@ export default function InventoryPage() {
                     onChange={(e) =>
                       setIngredientForm({ ...ingredientForm, costPerUnit: parseFloat(e.target.value) || 0 })
                     }
-                    className="w-full bg-background border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:border-indigo-500"
+                    className="w-full bg-background border border-border rounded-xl px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:border-indigo-500"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-300 mb-1.5">Initial Stock Count</label>
+                  <label className="block text-xs font-semibold text-foreground mb-1.5">Initial Stock Count</label>
                   <input
                     type="number"
                     min="0"
@@ -1531,12 +1658,12 @@ export default function InventoryPage() {
                     onChange={(e) =>
                       setIngredientForm({ ...ingredientForm, initialStock: parseFloat(e.target.value) || 0 })
                     }
-                    className="w-full bg-background border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:border-indigo-500"
+                    className="w-full bg-background border border-border rounded-xl px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:border-indigo-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-gray-300 mb-1.5">Min Alert Threshold</label>
+                  <label className="block text-xs font-semibold text-foreground mb-1.5">Min Alert Threshold</label>
                   <input
                     type="number"
                     min="0"
@@ -1546,18 +1673,18 @@ export default function InventoryPage() {
                     onChange={(e) =>
                       setIngredientForm({ ...ingredientForm, minimumReorderLevel: parseFloat(e.target.value) || 0 })
                     }
-                    className="w-full bg-background border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:border-indigo-500"
+                    className="w-full bg-background border border-border rounded-xl px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:border-indigo-500"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-300 mb-1.5">Storage Location</label>
+                  <label className="block text-xs font-semibold text-foreground mb-1.5">Storage Location</label>
                   <select
                     value={ingredientForm.locationId}
                     onChange={(e) => setIngredientForm({ ...ingredientForm, locationId: e.target.value })}
-                    className="w-full bg-background border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:border-indigo-500"
+                    className="w-full bg-background border border-border rounded-xl px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:border-indigo-500"
                   >
                     <option value="">Select location...</option>
                     {locations.map((loc) => (
@@ -1569,11 +1696,11 @@ export default function InventoryPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-gray-300 mb-1.5">Primary Supplier</label>
+                  <label className="block text-xs font-semibold text-foreground mb-1.5">Primary Supplier</label>
                   <select
                     value={ingredientForm.supplierId}
                     onChange={(e) => setIngredientForm({ ...ingredientForm, supplierId: e.target.value })}
-                    className="w-full bg-background border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:border-indigo-500"
+                    className="w-full bg-background border border-border rounded-xl px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:border-indigo-500"
                   >
                     <option value="">Select supplier...</option>
                     {suppliers.map((s) => (
@@ -1585,11 +1712,11 @@ export default function InventoryPage() {
                 </div>
               </div>
 
-              <div className="flex justify-end gap-3 pt-4 border-t border-gray-800">
+              <div className="flex justify-end gap-3 pt-4 border-t border-border">
                 <button
                   type="button"
                   onClick={() => setShowAddIngredientModal(false)}
-                  className="px-4 py-2.5 rounded-xl text-sm font-semibold text-gray-400 hover:text-foreground"
+                  className="px-4 py-2.5 rounded-xl text-sm font-semibold text-muted-foreground hover:text-foreground"
                 >
                   Cancel
                 </button>
@@ -1609,19 +1736,19 @@ export default function InventoryPage() {
       {/* MODAL 2: STOCK IN (PURCHASE) */}
       {showStockInModal && selectedIngredient && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-secondary border border-gray-700 rounded-2xl max-w-md w-full p-6">
-            <div className="flex items-center justify-between pb-4 border-b border-gray-800">
+          <div className="bg-secondary border border-border rounded-2xl max-w-md w-full p-6">
+            <div className="flex items-center justify-between pb-4 border-b border-border">
               <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
                 <span>📦</span> Stock In: {selectedIngredient.name}
               </h3>
-              <button onClick={() => setShowStockInModal(false)} className="text-gray-400 hover:text-foreground text-lg">
+              <button onClick={() => setShowStockInModal(false)} className="text-muted-foreground hover:text-foreground text-lg">
                 ✕
               </button>
             </div>
 
             <form onSubmit={handleStockIn} className="space-y-4 mt-5">
               <div>
-                <label className="block text-xs font-semibold text-gray-300 mb-1.5">Quantity Received</label>
+                <label className="block text-xs font-semibold text-foreground mb-1.5">Quantity Received</label>
                 <div className="flex gap-2">
                   <input
                     type="number"
@@ -1630,42 +1757,42 @@ export default function InventoryPage() {
                     required
                     value={stockInForm.quantity}
                     onChange={(e) => setStockInForm({ ...stockInForm, quantity: parseFloat(e.target.value) || 0 })}
-                    className="w-full bg-background border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:border-primary"
+                    className="w-full bg-background border border-border rounded-xl px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:border-primary"
                   />
-                  <span className="px-4 py-2.5 bg-gray-800 text-gray-300 text-sm font-bold rounded-xl border border-gray-700">
+                  <span className="px-4 py-2.5 bg-secondary text-foreground text-sm font-bold rounded-xl border border-border">
                     {selectedIngredient.unitOfMeasure}
                   </span>
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-300 mb-1.5">Unit Purchase Cost (₹)</label>
+                <label className="block text-xs font-semibold text-foreground mb-1.5">Unit Purchase Cost (₹)</label>
                 <input
                   type="number"
                   min="0"
                   step="0.01"
                   value={stockInForm.costPerUnit}
                   onChange={(e) => setStockInForm({ ...stockInForm, costPerUnit: parseFloat(e.target.value) || 0 })}
-                  className="w-full bg-background border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:border-primary"
+                  className="w-full bg-background border border-border rounded-xl px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:border-primary"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-300 mb-1.5">Notes / Invoice #</label>
+                <label className="block text-xs font-semibold text-foreground mb-1.5">Notes / Invoice #</label>
                 <input
                   type="text"
                   placeholder="e.g. Weekly vendor market purchase #INV-482"
                   value={stockInForm.notes}
                   onChange={(e) => setStockInForm({ ...stockInForm, notes: e.target.value })}
-                  className="w-full bg-background border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:border-primary"
+                  className="w-full bg-background border border-border rounded-xl px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:border-primary"
                 />
               </div>
 
-              <div className="flex justify-end gap-3 pt-4 border-t border-gray-800">
+              <div className="flex justify-end gap-3 pt-4 border-t border-border">
                 <button
                   type="button"
                   onClick={() => setShowStockInModal(false)}
-                  className="px-4 py-2.5 rounded-xl text-sm font-semibold text-gray-400 hover:text-foreground"
+                  className="px-4 py-2.5 rounded-xl text-sm font-semibold text-muted-foreground hover:text-foreground"
                 >
                   Cancel
                 </button>
@@ -1685,19 +1812,19 @@ export default function InventoryPage() {
       {/* MODAL 3: WASTAGE */}
       {showWastageModal && selectedIngredient && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-secondary border border-gray-700 rounded-2xl max-w-md w-full p-6">
-            <div className="flex items-center justify-between pb-4 border-b border-gray-800">
+          <div className="bg-secondary border border-border rounded-2xl max-w-md w-full p-6">
+            <div className="flex items-center justify-between pb-4 border-b border-border">
               <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
                 <span>🗑️</span> Record Spoilage: {selectedIngredient.name}
               </h3>
-              <button onClick={() => setShowWastageModal(false)} className="text-gray-400 hover:text-foreground text-lg">
+              <button onClick={() => setShowWastageModal(false)} className="text-muted-foreground hover:text-foreground text-lg">
                 ✕
               </button>
             </div>
 
             <form onSubmit={handleRecordWastage} className="space-y-4 mt-5">
               <div>
-                <label className="block text-xs font-semibold text-gray-300 mb-1.5">Wasted Quantity</label>
+                <label className="block text-xs font-semibold text-foreground mb-1.5">Wasted Quantity</label>
                 <div className="flex gap-2">
                   <input
                     type="number"
@@ -1706,20 +1833,20 @@ export default function InventoryPage() {
                     required
                     value={wastageForm.quantity}
                     onChange={(e) => setWastageForm({ ...wastageForm, quantity: parseFloat(e.target.value) || 0 })}
-                    className="w-full bg-background border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:border-rose-500"
+                    className="w-full bg-background border border-border rounded-xl px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:border-atlas-error"
                   />
-                  <span className="px-4 py-2.5 bg-gray-800 text-gray-300 text-sm font-bold rounded-xl border border-gray-700">
+                  <span className="px-4 py-2.5 bg-secondary text-foreground text-sm font-bold rounded-xl border border-border">
                     {selectedIngredient.unitOfMeasure}
                   </span>
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-300 mb-1.5">Reason for Wastage *</label>
+                <label className="block text-xs font-semibold text-foreground mb-1.5">Reason for Wastage *</label>
                 <select
                   value={wastageForm.reason}
                   onChange={(e) => setWastageForm({ ...wastageForm, reason: e.target.value })}
-                  className="w-full bg-background border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:border-rose-500"
+                  className="w-full bg-background border border-border rounded-xl px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:border-atlas-error"
                 >
                   <option value="Spoiled in storage">Spoiled in storage / Expired</option>
                   <option value="Kitchen prep burn / drop">Kitchen prep error / Dropped</option>
@@ -1728,18 +1855,18 @@ export default function InventoryPage() {
                 </select>
               </div>
 
-              <div className="flex justify-end gap-3 pt-4 border-t border-gray-800">
+              <div className="flex justify-end gap-3 pt-4 border-t border-border">
                 <button
                   type="button"
                   onClick={() => setShowWastageModal(false)}
-                  className="px-4 py-2.5 rounded-xl text-sm font-semibold text-gray-400 hover:text-foreground"
+                  className="px-4 py-2.5 rounded-xl text-sm font-semibold text-muted-foreground hover:text-foreground"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-5 py-2.5 bg-rose-600 hover:bg-rose-500 text-foreground font-semibold rounded-xl text-sm shadow-lg shadow-rose-600/30 transition-all disabled:opacity-50"
+                  className="px-5 py-2.5 bg-atlas-error hover:bg-atlas-error text-foreground font-semibold rounded-xl text-sm shadow-lg shadow-rose-600/30 transition-all disabled:opacity-50"
                 >
                   {isSubmitting ? 'Recording...' : 'Record Spoilage'}
                 </button>
@@ -1752,18 +1879,18 @@ export default function InventoryPage() {
       {/* MODAL 4: ADJUSTMENT */}
       {showAdjustmentModal && selectedIngredient && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-secondary border border-gray-700 rounded-2xl max-w-md w-full p-6">
-            <div className="flex items-center justify-between pb-4 border-b border-gray-800">
+          <div className="bg-secondary border border-border rounded-2xl max-w-md w-full p-6">
+            <div className="flex items-center justify-between pb-4 border-b border-border">
               <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
                 <span>⚖️</span> Physical Count Audit: {selectedIngredient.name}
               </h3>
-              <button onClick={() => setShowAdjustmentModal(false)} className="text-gray-400 hover:text-foreground text-lg">
+              <button onClick={() => setShowAdjustmentModal(false)} className="text-muted-foreground hover:text-foreground text-lg">
                 ✕
               </button>
             </div>
 
             <form onSubmit={handleRecordAdjustment} className="space-y-4 mt-5">
-              <div className="p-3 bg-gray-900/60 rounded-xl text-xs text-gray-400 flex items-center justify-between">
+              <div className="p-3 bg-secondary/60 rounded-xl text-xs text-muted-foreground flex items-center justify-between">
                 <span>Current Recorded Stock:</span>
                 <span className="font-bold text-foreground">
                   {selectedIngredient.currentStock} {selectedIngredient.unitOfMeasure}
@@ -1771,7 +1898,7 @@ export default function InventoryPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-300 mb-1.5">Actual Physical Count</label>
+                <label className="block text-xs font-semibold text-foreground mb-1.5">Actual Physical Count</label>
                 <div className="flex gap-2">
                   <input
                     type="number"
@@ -1782,19 +1909,19 @@ export default function InventoryPage() {
                     onChange={(e) =>
                       setAdjustmentForm({ ...adjustmentForm, physicalCount: parseFloat(e.target.value) || 0 })
                     }
-                    className="w-full bg-background border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:border-atlas-info"
+                    className="w-full bg-background border border-border rounded-xl px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:border-atlas-info"
                   />
-                  <span className="px-4 py-2.5 bg-gray-800 text-gray-300 text-sm font-bold rounded-xl border border-gray-700">
+                  <span className="px-4 py-2.5 bg-secondary text-foreground text-sm font-bold rounded-xl border border-border">
                     {selectedIngredient.unitOfMeasure}
                   </span>
                 </div>
               </div>
 
-              <div className="flex justify-end gap-3 pt-4 border-t border-gray-800">
+              <div className="flex justify-end gap-3 pt-4 border-t border-border">
                 <button
                   type="button"
                   onClick={() => setShowAdjustmentModal(false)}
-                  className="px-4 py-2.5 rounded-xl text-sm font-semibold text-gray-400 hover:text-foreground"
+                  className="px-4 py-2.5 rounded-xl text-sm font-semibold text-muted-foreground hover:text-foreground"
                 >
                   Cancel
                 </button>
@@ -1814,17 +1941,17 @@ export default function InventoryPage() {
       {/* MODAL 5: RECIPE BUILDER */}
       {showRecipeModal && selectedMenuItem && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-secondary border border-gray-700 rounded-2xl max-w-xl w-full p-6 max-h-[90vh] flex flex-col">
-            <div className="flex items-center justify-between pb-4 border-b border-gray-800">
+          <div className="bg-secondary border border-border rounded-2xl max-w-xl w-full p-6 max-h-[90vh] flex flex-col">
+            <div className="flex items-center justify-between pb-4 border-b border-border">
               <div>
                 <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
                   <span>🍔</span> Recipe Mapping: {selectedMenuItem.menuItemName}
                 </h3>
-                <p className="text-xs text-gray-400 mt-0.5">
+                <p className="text-xs text-muted-foreground mt-0.5">
                   Configure preparation mode and ingredient consumption ratios.
                 </p>
               </div>
-              <button onClick={() => setShowRecipeModal(false)} className="text-gray-400 hover:text-foreground text-lg">
+              <button onClick={() => setShowRecipeModal(false)} className="text-muted-foreground hover:text-foreground text-lg">
                 ✕
               </button>
             </div>
@@ -1833,7 +1960,7 @@ export default function InventoryPage() {
               <div className="flex-1 overflow-y-auto space-y-4 pr-1 py-1">
                 {/* Recipe Type Selection */}
                 <div>
-                  <label className="block text-xs font-bold text-gray-300 uppercase mb-1.5">
+                  <label className="block text-xs font-bold text-foreground uppercase mb-1.5">
                     Cooking & Inventory Deduction Mode *
                   </label>
                   <div className="grid grid-cols-2 gap-2.5">
@@ -1843,13 +1970,13 @@ export default function InventoryPage() {
                       className={`p-3 rounded-xl border text-left transition-all ${
                         recipeTypeForm === 'COOKED_TO_ORDER'
                           ? 'border-indigo-500 bg-indigo-500/10 text-foreground shadow-sm'
-                          : 'border-gray-800 bg-gray-900/60 text-gray-400 hover:border-gray-700'
+                          : 'border-border bg-secondary/60 text-muted-foreground hover:border-border'
                       }`}
                     >
                       <div className="font-bold text-xs flex items-center gap-1.5 text-foreground">
                         <span>🍳</span> Cooked-to-Order
                       </div>
-                      <p className="text-[11px] text-gray-400 mt-1">
+                      <p className="text-[11px] text-muted-foreground mt-1">
                         Cooked fresh per ticket (Burgers, Steaks, Fried items). Deducts raw ingredients live.
                       </p>
                     </button>
@@ -1860,13 +1987,13 @@ export default function InventoryPage() {
                       className={`p-3 rounded-xl border text-left transition-all ${
                         recipeTypeForm === 'BATCH_PREPARED'
                           ? 'border-atlas-warning bg-atlas-warning/10 text-foreground shadow-sm'
-                          : 'border-gray-800 bg-gray-900/60 text-gray-400 hover:border-gray-700'
+                          : 'border-border bg-secondary/60 text-muted-foreground hover:border-border'
                       }`}
                     >
                       <div className="font-bold text-xs flex items-center gap-1.5 text-atlas-warning">
                         <span>🥘</span> Bulk Batch-Prepared
                       </div>
-                      <p className="text-[11px] text-gray-400 mt-1">
+                      <p className="text-[11px] text-muted-foreground mt-1">
                         Cooked in bulk (Biryani, Chowmein, Dal, Gravies). Deducts at prep time & tracks ready portions.
                       </p>
                     </button>
@@ -1876,7 +2003,7 @@ export default function InventoryPage() {
                 {/* Batch Yield Portions */}
                 {recipeTypeForm === 'BATCH_PREPARED' && (
                   <div className="p-3 bg-atlas-warning/10 border border-atlas-warning/20 rounded-xl space-y-1">
-                    <label className="block text-xs font-bold text-amber-300">
+                    <label className="block text-xs font-bold text-atlas-warning">
                       Standard Batch Yield (Portions produced by the recipe below)
                     </label>
                     <div className="flex items-center gap-3">
@@ -1889,7 +2016,7 @@ export default function InventoryPage() {
                         className="w-32 bg-background border border-atlas-warning/30 rounded-lg px-3 py-1.5 text-xs text-foreground focus:outline-none focus:border-atlas-warning font-mono font-bold"
                         required
                       />
-                      <span className="text-xs text-gray-400">
+                      <span className="text-xs text-muted-foreground">
                         e.g. 1 Handi recipe yields <strong>{batchYieldPortionsForm} portions</strong>
                       </span>
                     </div>
@@ -1898,17 +2025,17 @@ export default function InventoryPage() {
 
                 {/* Ingredients List */}
                 <div className="space-y-3">
-                  <div className="text-xs font-bold text-gray-400 uppercase">
+                  <div className="text-xs font-bold text-muted-foreground uppercase">
                     Ingredients Consumed {recipeTypeForm === 'BATCH_PREPARED' ? `(Per Batch of ${batchYieldPortionsForm} portions)` : '(Per 1 Portion)'}
                   </div>
 
                   {recipeFormIngredients.map((item, idx) => (
                     <div
                       key={idx}
-                      className="flex items-center gap-3 p-3 bg-gray-900/60 rounded-xl border border-gray-800"
+                      className="flex items-center gap-3 p-3 bg-secondary/60 rounded-xl border border-border"
                     >
                       <div className="flex-1">
-                        <label className="block text-[11px] font-bold text-gray-400 uppercase mb-1">Ingredient</label>
+                        <label className="block text-[11px] font-bold text-muted-foreground uppercase mb-1">Ingredient</label>
                         <select
                           value={item.ingredientId}
                           onChange={(e) => {
@@ -1916,7 +2043,7 @@ export default function InventoryPage() {
                             updated[idx].ingredientId = e.target.value;
                             setRecipeFormIngredients(updated);
                           }}
-                          className="w-full bg-background border border-gray-700 rounded-lg px-2.5 py-2 text-xs text-foreground focus:outline-none focus:border-indigo-500"
+                          className="w-full bg-background border border-border rounded-lg px-2.5 py-2 text-xs text-foreground focus:outline-none focus:border-indigo-500"
                           required
                         >
                           <option value="">Select ingredient...</option>
@@ -1929,7 +2056,7 @@ export default function InventoryPage() {
                       </div>
 
                       <div className="w-36">
-                        <label className="block text-[11px] font-bold text-gray-400 uppercase mb-1">Quantity</label>
+                        <label className="block text-[11px] font-bold text-muted-foreground uppercase mb-1">Quantity</label>
                         <input
                           type="number"
                           min="0.01"
@@ -1942,7 +2069,7 @@ export default function InventoryPage() {
                             updated[idx].quantityRequired = parseFloat(e.target.value) || 0;
                             setRecipeFormIngredients(updated);
                           }}
-                          className="w-full bg-background border border-gray-700 rounded-lg px-2.5 py-2 text-xs text-foreground focus:outline-none focus:border-indigo-500"
+                          className="w-full bg-background border border-border rounded-lg px-2.5 py-2 text-xs text-foreground focus:outline-none focus:border-indigo-500"
                         />
                       </div>
 
@@ -1951,7 +2078,7 @@ export default function InventoryPage() {
                         onClick={() => {
                           setRecipeFormIngredients(recipeFormIngredients.filter((_, i) => i !== idx));
                         }}
-                        className="mt-5 text-gray-500 hover:text-rose-400 text-sm p-1.5 rounded-lg hover:bg-rose-500/10 transition-all"
+                        className="mt-5 text-muted-foreground hover:text-atlas-error text-sm p-1.5 rounded-lg hover:bg-atlas-error/10 transition-all"
                         title="Remove row"
                       >
                         🗑️
@@ -1964,18 +2091,18 @@ export default function InventoryPage() {
                     onClick={() =>
                       setRecipeFormIngredients([...recipeFormIngredients, { ingredientId: '', quantityRequired: 100 }])
                     }
-                    className="w-full py-2.5 border border-dashed border-gray-700 hover:border-indigo-500/60 rounded-xl text-xs font-semibold text-gray-400 hover:text-indigo-400 transition-all flex items-center justify-center gap-1.5"
+                    className="w-full py-2.5 border border-dashed border-border hover:border-indigo-500/60 rounded-xl text-xs font-semibold text-muted-foreground hover:text-indigo-400 transition-all flex items-center justify-center gap-1.5"
                   >
                     <span>➕</span> Add Another Ingredient
                   </button>
                 </div>
               </div>
 
-              <div className="flex justify-end gap-3 pt-4 border-t border-gray-800 mt-4">
+              <div className="flex justify-end gap-3 pt-4 border-t border-border mt-4">
                 <button
                   type="button"
                   onClick={() => setShowRecipeModal(false)}
-                  className="px-4 py-2.5 rounded-xl text-sm font-semibold text-gray-400 hover:text-foreground"
+                  className="px-4 py-2.5 rounded-xl text-sm font-semibold text-muted-foreground hover:text-foreground"
                 >
                   Cancel
                 </button>
@@ -1995,24 +2122,24 @@ export default function InventoryPage() {
       {/* MODAL 6: LOG KITCHEN BATCH PREP */}
       {showBatchPrepModal && selectedRecipeForBatch && selectedRecipeForBatch.recipe && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-secondary border border-gray-700 rounded-2xl max-w-lg w-full p-6">
-            <div className="flex items-center justify-between pb-4 border-b border-gray-800">
+          <div className="bg-secondary border border-border rounded-2xl max-w-lg w-full p-6">
+            <div className="flex items-center justify-between pb-4 border-b border-border">
               <div>
                 <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
                   <span>🥘</span> Log Kitchen Batch: {selectedRecipeForBatch.menuItemName}
                 </h3>
-                <p className="text-xs text-gray-400 mt-0.5">
+                <p className="text-xs text-muted-foreground mt-0.5">
                   Records bulk cooking, deducts raw ingredients immediately, and adds ready portion stock.
                 </p>
               </div>
-              <button onClick={() => setShowBatchPrepModal(false)} className="text-gray-400 hover:text-foreground text-lg">
+              <button onClick={() => setShowBatchPrepModal(false)} className="text-muted-foreground hover:text-foreground text-lg">
                 ✕
               </button>
             </div>
 
             <form onSubmit={handleLogBatchProduction} className="space-y-4 mt-4">
               <div>
-                <label className="block text-xs font-semibold text-gray-300 mb-1.5">
+                <label className="block text-xs font-semibold text-foreground mb-1.5">
                   Portions Cooked in this Batch *
                 </label>
                 <input
@@ -2032,8 +2159,8 @@ export default function InventoryPage() {
               </div>
 
               {/* Live Preview of Raw Ingredient Consumption */}
-              <div className="p-3 bg-gray-900/80 rounded-xl border border-gray-800 space-y-2">
-                <div className="text-[11px] font-bold uppercase text-gray-400">
+              <div className="p-3 bg-secondary/80 rounded-xl border border-border space-y-2">
+                <div className="text-[11px] font-bold uppercase text-muted-foreground">
                   Raw Ingredients to be Deducted from Storage:
                 </div>
                 <div className="space-y-1 text-xs">
@@ -2042,7 +2169,7 @@ export default function InventoryPage() {
                     const calculatedQty = (ri.quantityRequired / yieldRatio) * batchPrepForm.portionsProduced;
                     const displayQty = Math.round(calculatedQty * 100) / 100;
                     return (
-                      <div key={ri.id} className="flex justify-between items-center text-gray-300">
+                      <div key={ri.id} className="flex justify-between items-center text-foreground">
                         <span>• {ri.ingredientName}</span>
                         <span className="font-mono text-atlas-warning font-bold">
                           {displayQty} {ri.unitOfMeasure === 'KG' ? 'g' : ri.unitOfMeasure}
@@ -2054,28 +2181,28 @@ export default function InventoryPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-300 mb-1.5">Notes (Optional)</label>
+                <label className="block text-xs font-semibold text-foreground mb-1.5">Notes (Optional)</label>
                 <input
                   type="text"
                   placeholder="e.g. Morning handi prep for lunch shift"
                   value={batchPrepForm.notes}
                   onChange={(e) => setBatchPrepForm({ ...batchPrepForm, notes: e.target.value })}
-                  className="w-full bg-background border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:border-atlas-warning"
+                  className="w-full bg-background border border-border rounded-xl px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:border-atlas-warning"
                 />
               </div>
 
-              <div className="flex justify-end gap-3 pt-4 border-t border-gray-800">
+              <div className="flex justify-end gap-3 pt-4 border-t border-border">
                 <button
                   type="button"
                   onClick={() => setShowBatchPrepModal(false)}
-                  className="px-4 py-2.5 rounded-xl text-sm font-semibold text-gray-400 hover:text-foreground"
+                  className="px-4 py-2.5 rounded-xl text-sm font-semibold text-muted-foreground hover:text-foreground"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-5 py-2.5 bg-atlas-warning hover:bg-atlas-warning text-gray-950 font-bold rounded-xl text-sm shadow-lg shadow-amber-500/20 transition-all disabled:opacity-50 flex items-center gap-1.5"
+                  className="px-5 py-2.5 bg-atlas-warning hover:bg-atlas-warning text-background font-bold rounded-xl text-sm shadow-lg shadow-amber-500/20 transition-all disabled:opacity-50 flex items-center gap-1.5"
                 >
                   <span>🥘</span> {isSubmitting ? 'Recording Batch...' : 'Log Batch & Deduct Raw Stock'}
                 </button>
@@ -2088,23 +2215,23 @@ export default function InventoryPage() {
       {/* MODAL 7: LOG BATCH WASTAGE */}
       {showBatchWastageModal && selectedRecipeForBatch && selectedRecipeForBatch.recipe && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-secondary border border-gray-700 rounded-2xl max-w-md w-full p-6">
-            <div className="flex items-center justify-between pb-4 border-b border-gray-800">
+          <div className="bg-secondary border border-border rounded-2xl max-w-md w-full p-6">
+            <div className="flex items-center justify-between pb-4 border-b border-border">
               <div>
                 <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
                   <span>🗑️</span> Log Prepared Spoilage: {selectedRecipeForBatch.menuItemName}
                 </h3>
-                <p className="text-xs text-gray-400 mt-0.5">
+                <p className="text-xs text-muted-foreground mt-0.5">
                   Closes out leftover prepared portions at the end of the shift / service.
                 </p>
               </div>
-              <button onClick={() => setShowBatchWastageModal(false)} className="text-gray-400 hover:text-foreground text-lg">
+              <button onClick={() => setShowBatchWastageModal(false)} className="text-muted-foreground hover:text-foreground text-lg">
                 ✕
               </button>
             </div>
 
             <form onSubmit={handleLogBatchWastage} className="space-y-4 mt-4">
-              <div className="p-3 bg-gray-900/60 rounded-xl text-xs text-gray-400 flex items-center justify-between">
+              <div className="p-3 bg-secondary/60 rounded-xl text-xs text-muted-foreground flex items-center justify-between">
                 <span>Current Ready Stock:</span>
                 <span className="font-bold text-foreground">
                   {selectedRecipeForBatch.recipe.preparedStock} portions
@@ -2112,7 +2239,7 @@ export default function InventoryPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-300 mb-1.5">
+                <label className="block text-xs font-semibold text-foreground mb-1.5">
                   Portions to Discard / Spoil *
                 </label>
                 <input
@@ -2128,16 +2255,16 @@ export default function InventoryPage() {
                       portionsWasted: parseInt(e.target.value) || 1,
                     })
                   }
-                  className="w-full bg-background border border-rose-500/40 rounded-xl px-3.5 py-2.5 text-base font-bold text-foreground focus:outline-none focus:border-rose-400"
+                  className="w-full bg-background border border-atlas-error/40 rounded-xl px-3.5 py-2.5 text-base font-bold text-foreground focus:outline-none focus:border-atlas-error"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-300 mb-1.5">Reason for Disposal *</label>
+                <label className="block text-xs font-semibold text-foreground mb-1.5">Reason for Disposal *</label>
                 <select
                   value={batchWastageForm.reason}
                   onChange={(e) => setBatchWastageForm({ ...batchWastageForm, reason: e.target.value })}
-                  className="w-full bg-background border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:border-rose-500"
+                  className="w-full bg-background border border-border rounded-xl px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:border-atlas-error"
                 >
                   <option value="Leftover at end of service / closing">Leftover at end of service / closing</option>
                   <option value="Burnt / Overcooked batch">Burnt / Overcooked batch</option>
@@ -2147,28 +2274,28 @@ export default function InventoryPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-300 mb-1.5">Notes (Optional)</label>
+                <label className="block text-xs font-semibold text-foreground mb-1.5">Notes (Optional)</label>
                 <input
                   type="text"
                   placeholder="e.g. 3 portions left over after dinner rush"
                   value={batchWastageForm.notes}
                   onChange={(e) => setBatchWastageForm({ ...batchWastageForm, notes: e.target.value })}
-                  className="w-full bg-background border border-gray-700 rounded-xl px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:border-rose-500"
+                  className="w-full bg-background border border-border rounded-xl px-3.5 py-2.5 text-sm text-foreground focus:outline-none focus:border-atlas-error"
                 />
               </div>
 
-              <div className="flex justify-end gap-3 pt-4 border-t border-gray-800">
+              <div className="flex justify-end gap-3 pt-4 border-t border-border">
                 <button
                   type="button"
                   onClick={() => setShowBatchWastageModal(false)}
-                  className="px-4 py-2.5 rounded-xl text-sm font-semibold text-gray-400 hover:text-foreground"
+                  className="px-4 py-2.5 rounded-xl text-sm font-semibold text-muted-foreground hover:text-foreground"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-5 py-2.5 bg-rose-600 hover:bg-rose-500 text-foreground font-semibold rounded-xl text-sm shadow-lg shadow-rose-600/30 transition-all disabled:opacity-50"
+                  className="px-5 py-2.5 bg-atlas-error hover:bg-atlas-error text-foreground font-semibold rounded-xl text-sm shadow-lg shadow-rose-600/30 transition-all disabled:opacity-50"
                 >
                   {isSubmitting ? 'Recording...' : 'Record Spoilage'}
                 </button>

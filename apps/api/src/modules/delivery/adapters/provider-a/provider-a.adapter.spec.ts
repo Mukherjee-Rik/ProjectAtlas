@@ -27,11 +27,21 @@ describe('ProviderAAdapter', () => {
   });
 
   it('should correctly map internal statuses back to external statuses', () => {
-    expect(adapter.mapInternalToExternalStatus(OrderStatus.PENDING)).toBe('PLACED');
-    expect(adapter.mapInternalToExternalStatus(OrderStatus.CONFIRMED)).toBe('ACCEPTED');
-    expect(adapter.mapInternalToExternalStatus(OrderStatus.PREPARING)).toBe('PREPARING');
-    expect(adapter.mapInternalToExternalStatus(OrderStatus.READY)).toBe('FOOD_READY');
-    expect(adapter.mapInternalToExternalStatus(OrderStatus.COMPLETED)).toBe('DELIVERED');
+    expect(adapter.mapInternalToExternalStatus(OrderStatus.PENDING)).toBe(
+      'PLACED',
+    );
+    expect(adapter.mapInternalToExternalStatus(OrderStatus.CONFIRMED)).toBe(
+      'ACCEPTED',
+    );
+    expect(adapter.mapInternalToExternalStatus(OrderStatus.PREPARING)).toBe(
+      'PREPARING',
+    );
+    expect(adapter.mapInternalToExternalStatus(OrderStatus.READY)).toBe(
+      'FOOD_READY',
+    );
+    expect(adapter.mapInternalToExternalStatus(OrderStatus.COMPLETED)).toBe(
+      'DELIVERED',
+    );
   });
 
   it('should reject invalid health credentials', async () => {

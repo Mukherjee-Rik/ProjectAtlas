@@ -27,9 +27,17 @@ export class DashboardController {
   constructor(private readonly dashboardService: DashboardService) {}
 
   @Get('overview')
-  @UseGuards(JwtAuthGuard, PermissionsGuard, RestaurantAccessGuard, BranchAccessGuard, SubscriptionGuard)
+  @UseGuards(
+    JwtAuthGuard,
+    PermissionsGuard,
+    RestaurantAccessGuard,
+    BranchAccessGuard,
+    SubscriptionGuard,
+  )
   @Permissions(PERMISSIONS.DASHBOARD_READ)
-  @ApiOperation({ summary: 'Get restaurant dashboard operational overview metrics' })
+  @ApiOperation({
+    summary: 'Get restaurant dashboard operational overview metrics',
+  })
   async getOverview(
     @CurrentUser() user: any,
     @CurrentRestaurant() restaurant?: CurrentRestaurantType,
@@ -37,11 +45,23 @@ export class DashboardController {
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string,
   ) {
-    return this.dashboardService.getRestaurantOverview(user, restaurant?.id, branch?.id, startDate, endDate);
+    return this.dashboardService.getRestaurantOverview(
+      user,
+      restaurant?.id,
+      branch?.id,
+      startDate,
+      endDate,
+    );
   }
 
   @Get('analytics')
-  @UseGuards(JwtAuthGuard, PermissionsGuard, RestaurantAccessGuard, BranchAccessGuard, SubscriptionGuard)
+  @UseGuards(
+    JwtAuthGuard,
+    PermissionsGuard,
+    RestaurantAccessGuard,
+    BranchAccessGuard,
+    SubscriptionGuard,
+  )
   @Permissions(PERMISSIONS.DASHBOARD_READ)
   @RequiresFeature('analytics')
   @ApiOperation({ summary: 'Get restaurant analytics metrics' })
@@ -52,7 +72,13 @@ export class DashboardController {
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string,
   ) {
-    return this.dashboardService.getRestaurantAnalytics(user, restaurant?.id, branch?.id, startDate, endDate);
+    return this.dashboardService.getRestaurantAnalytics(
+      user,
+      restaurant?.id,
+      branch?.id,
+      startDate,
+      endDate,
+    );
   }
 
   @Get('platform-overview')

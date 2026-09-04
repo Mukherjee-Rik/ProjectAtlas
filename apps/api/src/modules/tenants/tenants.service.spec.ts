@@ -42,7 +42,9 @@ describe('TenantsService.findAllForUser', () => {
     await service.findAllForUser('admin-1', 'ADMIN');
 
     const args = prisma.tenant.findMany.mock.calls[0][0];
-    expect(args.where).toEqual({ memberships: { some: { userId: 'admin-1' } } });
+    expect(args.where).toEqual({
+      memberships: { some: { userId: 'admin-1' } },
+    });
   });
 
   it('does not widen access for an unrecognised role', async () => {

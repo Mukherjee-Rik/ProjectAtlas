@@ -1,5 +1,11 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsIn, IsNotEmpty, IsOptional, IsString, ValidateIf } from 'class-validator';
+import {
+  IsIn,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  ValidateIf,
+} from 'class-validator';
 
 export const CANCELLATION_REASONS = [
   'CUSTOMER_REQUESTED',
@@ -28,7 +34,7 @@ export class CancelOrderDto {
     description: 'Predefined cancellation reason code',
   })
   @IsNotEmpty()
-  @IsIn(CANCELLATION_REASONS as unknown as string[])
+  @IsIn(CANCELLATION_REASONS)
   reason: string;
 
   @ApiPropertyOptional({

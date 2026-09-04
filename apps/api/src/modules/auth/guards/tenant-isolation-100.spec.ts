@@ -1,9 +1,18 @@
-import { BadRequestException, ExecutionContext, ForbiddenException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ExecutionContext,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
 import { TenantAccessGuard } from './tenant-access.guard';
 import { RestaurantAccessGuard } from './restaurant-access.guard';
 import { BranchAccessGuard } from './branch-access.guard';
 import { TtlCacheService } from '../../../common/cache/ttl-cache.service';
-import { TENANT_HEADER, RESTAURANT_HEADER, BRANCH_HEADER } from '../constants/tenant.constants';
+import {
+  TENANT_HEADER,
+  RESTAURANT_HEADER,
+  BRANCH_HEADER,
+} from '../constants/tenant.constants';
 
 describe('100+ Iterations Multi-Tenant Isolation & Zero-Data-Leak Test Suite', () => {
   let tenantGuard: TenantAccessGuard;
@@ -75,13 +84,22 @@ describe('100+ Iterations Multi-Tenant Isolation & Zero-Data-Leak Test Suite', (
     const userA = 'aaaa1111-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
 
     it('1. should throw ForbiddenException when request has no authenticated user', async () => {
-      const ctx = createMockContext({ headers: { [TENANT_HEADER]: validTenantA } });
-      await expect(tenantGuard.canActivate(ctx)).rejects.toThrow(ForbiddenException);
+      const ctx = createMockContext({
+        headers: { [TENANT_HEADER]: validTenantA },
+      });
+      await expect(tenantGuard.canActivate(ctx)).rejects.toThrow(
+        ForbiddenException,
+      );
     });
 
     it('2. should throw BadRequestException when non-admin has no tenant ID', async () => {
-      const ctx = createMockContext({ user: { id: userA, role: 'OWNER' }, headers: {} });
-      await expect(tenantGuard.canActivate(ctx)).rejects.toThrow(BadRequestException);
+      const ctx = createMockContext({
+        user: { id: userA, role: 'OWNER' },
+        headers: {},
+      });
+      await expect(tenantGuard.canActivate(ctx)).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('3. should throw BadRequestException for invalid non-UUID tenant ID', async () => {
@@ -89,7 +107,9 @@ describe('100+ Iterations Multi-Tenant Isolation & Zero-Data-Leak Test Suite', (
         user: { id: userA, role: 'OWNER' },
         headers: { [TENANT_HEADER]: 'invalid-uuid-123' },
       });
-      await expect(tenantGuard.canActivate(ctx)).rejects.toThrow(BadRequestException);
+      await expect(tenantGuard.canActivate(ctx)).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('4. should throw NotFoundException when tenant does not exist in DB', async () => {
@@ -100,7 +120,9 @@ describe('100+ Iterations Multi-Tenant Isolation & Zero-Data-Leak Test Suite', (
         user: { id: userA, role: 'OWNER' },
         headers: { [TENANT_HEADER]: validTenantA },
       });
-      await expect(tenantGuard.canActivate(ctx)).rejects.toThrow(NotFoundException);
+      await expect(tenantGuard.canActivate(ctx)).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     it('5. should throw ForbiddenException when user has no membership in tenant', async () => {
@@ -116,13 +138,20 @@ describe('100+ Iterations Multi-Tenant Isolation & Zero-Data-Leak Test Suite', (
         user: { id: userA, role: 'OWNER' },
         headers: { [TENANT_HEADER]: validTenantB },
       });
-      await expect(tenantGuard.canActivate(ctx)).rejects.toThrow(ForbiddenException);
+      await expect(tenantGuard.canActivate(ctx)).rejects.toThrow(
+        ForbiddenException,
+      );
     });
 
     it('6. should allow user who holds valid TenantMembership', async () => {
       mockPrisma.tenantMembership.findUnique.mockResolvedValue({
         id: 'mem-1',
-        tenant: { id: validTenantA, name: 'Tenant A', slug: 'tenant-a', status: 'ACTIVE' },
+        tenant: {
+          id: validTenantA,
+          name: 'Tenant A',
+          slug: 'tenant-a',
+          status: 'ACTIVE',
+        },
       });
 
       const req: any = {
@@ -133,11 +162,19 @@ describe('100+ Iterations Multi-Tenant Isolation & Zero-Data-Leak Test Suite', (
 
       const result = await tenantGuard.canActivate(ctx);
       expect(result).toBe(true);
-      expect(req.tenant).toEqual({ id: validTenantA, name: 'Tenant A', slug: 'tenant-a', status: 'ACTIVE' });
+      expect(req.tenant).toEqual({
+        id: validTenantA,
+        name: 'Tenant A',
+        slug: 'tenant-a',
+        status: 'ACTIVE',
+      });
     });
 
     it('7. should allow PLATFORM_ADMIN globally without active tenant header', async () => {
-      const req: any = { user: { id: 'plat-1', role: 'PLATFORM_ADMIN' }, headers: {} };
+      const req: any = {
+        user: { id: 'plat-1', role: 'PLATFORM_ADMIN' },
+        headers: {},
+      };
       const ctx = createMockContext(req);
       const result = await tenantGuard.canActivate(ctx);
       expect(result).toBe(true);
@@ -162,42 +199,72 @@ describe('100+ Iterations Multi-Tenant Isolation & Zero-Data-Leak Test Suite', (
     });
 
     // Sub-matrix of roles attempting cross-tenant access (roles 9 to 24)
-    const roles = ['OWNER', 'ADMIN', 'MANAGER', 'STAFF', 'WAITER', 'KITCHEN', 'CASHIER', 'USER'];
+    const roles = [
+      'OWNER',
+      'ADMIN',
+      'MANAGER',
+      'STAFF',
+      'WAITER',
+      'KITCHEN',
+      'CASHIER',
+      'USER',
+    ];
     roles.forEach((role, idx) => {
       it(`${9 + idx}. should block role ${role} from accessing non-member tenant via header`, async () => {
         mockPrisma.tenantMembership.findUnique.mockResolvedValue(null);
-        mockPrisma.tenant.findUnique.mockResolvedValue({ id: validTenantB, name: 'Tenant B', slug: 'b', status: 'ACTIVE' });
+        mockPrisma.tenant.findUnique.mockResolvedValue({
+          id: validTenantB,
+          name: 'Tenant B',
+          slug: 'b',
+          status: 'ACTIVE',
+        });
 
         const ctx = createMockContext({
           user: { id: `user-${role}`, role },
           headers: { [TENANT_HEADER]: validTenantB },
         });
-        await expect(tenantGuard.canActivate(ctx)).rejects.toThrow(ForbiddenException);
+        await expect(tenantGuard.canActivate(ctx)).rejects.toThrow(
+          ForbiddenException,
+        );
       });
 
       it(`${17 + idx}. should block role ${role} from accessing non-member tenant via params`, async () => {
         mockPrisma.tenantMembership.findUnique.mockResolvedValue(null);
-        mockPrisma.tenant.findUnique.mockResolvedValue({ id: validTenantB, name: 'Tenant B', slug: 'b', status: 'ACTIVE' });
+        mockPrisma.tenant.findUnique.mockResolvedValue({
+          id: validTenantB,
+          name: 'Tenant B',
+          slug: 'b',
+          status: 'ACTIVE',
+        });
 
         const ctx = createMockContext({
           user: { id: `user-${role}`, role },
           params: { tenantId: validTenantB },
           headers: {},
         });
-        await expect(tenantGuard.canActivate(ctx)).rejects.toThrow(ForbiddenException);
+        await expect(tenantGuard.canActivate(ctx)).rejects.toThrow(
+          ForbiddenException,
+        );
       });
     });
 
     it('25. should block access when tenantId is passed via body without membership', async () => {
       mockPrisma.tenantMembership.findUnique.mockResolvedValue(null);
-      mockPrisma.tenant.findUnique.mockResolvedValue({ id: validTenantB, name: 'Tenant B', slug: 'b', status: 'ACTIVE' });
+      mockPrisma.tenant.findUnique.mockResolvedValue({
+        id: validTenantB,
+        name: 'Tenant B',
+        slug: 'b',
+        status: 'ACTIVE',
+      });
 
       const ctx = createMockContext({
         user: { id: userA, role: 'OWNER' },
         body: { tenantId: validTenantB },
         headers: {},
       });
-      await expect(tenantGuard.canActivate(ctx)).rejects.toThrow(ForbiddenException);
+      await expect(tenantGuard.canActivate(ctx)).rejects.toThrow(
+        ForbiddenException,
+      );
     });
   });
 
@@ -214,44 +281,73 @@ describe('100+ Iterations Multi-Tenant Isolation & Zero-Data-Leak Test Suite', (
     const userA = 'user-a-1111-4111-8111-111111111111';
 
     it('26. should throw BadRequestException for invalid restaurant ID UUID', async () => {
-      const ctx = createMockContext({ headers: { [RESTAURANT_HEADER]: 'bad-id' } });
-      await expect(restaurantGuard.canActivate(ctx)).rejects.toThrow(BadRequestException);
+      const ctx = createMockContext({
+        headers: { [RESTAURANT_HEADER]: 'bad-id' },
+      });
+      await expect(restaurantGuard.canActivate(ctx)).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('27. should throw NotFoundException when restaurant does not exist', async () => {
       mockPrisma.restaurant.findUnique.mockResolvedValue(null);
-      const ctx = createMockContext({ headers: { [RESTAURANT_HEADER]: restA } });
-      await expect(restaurantGuard.canActivate(ctx)).rejects.toThrow(NotFoundException);
+      const ctx = createMockContext({
+        headers: { [RESTAURANT_HEADER]: restA },
+      });
+      await expect(restaurantGuard.canActivate(ctx)).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     it('28. should throw ForbiddenException when target restaurant tenant does not match active tenant', async () => {
-      mockPrisma.restaurant.findUnique.mockResolvedValue({ id: restB, name: 'Rest B', tenantId: tenantB });
+      mockPrisma.restaurant.findUnique.mockResolvedValue({
+        id: restB,
+        name: 'Rest B',
+        tenantId: tenantB,
+      });
 
       const ctx = createMockContext({
         user: { id: userA, role: 'OWNER' },
         tenant: { id: tenantA, name: 'Tenant A' },
         headers: { [RESTAURANT_HEADER]: restB },
       });
-      await expect(restaurantGuard.canActivate(ctx)).rejects.toThrow(ForbiddenException);
+      await expect(restaurantGuard.canActivate(ctx)).rejects.toThrow(
+        ForbiddenException,
+      );
     });
 
     it('29. should throw ForbiddenException when user has no membership in target restaurant tenant', async () => {
-      mockPrisma.restaurant.findUnique.mockResolvedValue({ id: restB, name: 'Rest B', tenantId: tenantB });
+      mockPrisma.restaurant.findUnique.mockResolvedValue({
+        id: restB,
+        name: 'Rest B',
+        tenantId: tenantB,
+      });
       mockPrisma.tenantMembership.findUnique.mockResolvedValue(null);
 
       const ctx = createMockContext({
         user: { id: userA, role: 'OWNER' },
         headers: { [RESTAURANT_HEADER]: restB },
       });
-      await expect(restaurantGuard.canActivate(ctx)).rejects.toThrow(ForbiddenException);
+      await expect(restaurantGuard.canActivate(ctx)).rejects.toThrow(
+        ForbiddenException,
+      );
     });
 
     it('30. should allow user who has membership in target restaurant tenant', async () => {
-      mockPrisma.restaurant.findUnique.mockResolvedValue({ id: restA, name: 'Rest A', tenantId: tenantA });
+      mockPrisma.restaurant.findUnique.mockResolvedValue({
+        id: restA,
+        name: 'Rest A',
+        tenantId: tenantA,
+      });
       mockPrisma.tenantMembership.findUnique.mockResolvedValue({
         id: 'mem-1',
         role: 'OWNER',
-        tenant: { id: tenantA, name: 'Tenant A', slug: 'tenant-a', status: 'ACTIVE' },
+        tenant: {
+          id: tenantA,
+          name: 'Tenant A',
+          slug: 'tenant-a',
+          status: 'ACTIVE',
+        },
       });
 
       const req: any = {
@@ -263,18 +359,28 @@ describe('100+ Iterations Multi-Tenant Isolation & Zero-Data-Leak Test Suite', (
 
       const result = await restaurantGuard.canActivate(ctx);
       expect(result).toBe(true);
-      expect(req.restaurant).toEqual({ id: restA, name: 'Rest A', tenantId: tenantA });
+      expect(req.restaurant).toEqual({
+        id: restA,
+        name: 'Rest A',
+        tenantId: tenantA,
+      });
     });
 
     it('31. should throw BadRequestException for invalid branch ID UUID', async () => {
-      const ctx = createMockContext({ headers: { [BRANCH_HEADER]: 'bad-branch-id' } });
-      await expect(branchGuard.canActivate(ctx)).rejects.toThrow(BadRequestException);
+      const ctx = createMockContext({
+        headers: { [BRANCH_HEADER]: 'bad-branch-id' },
+      });
+      await expect(branchGuard.canActivate(ctx)).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('32. should throw NotFoundException when branch does not exist', async () => {
       mockPrisma.branch.findUnique.mockResolvedValue(null);
       const ctx = createMockContext({ headers: { [BRANCH_HEADER]: branchA } });
-      await expect(branchGuard.canActivate(ctx)).rejects.toThrow(NotFoundException);
+      await expect(branchGuard.canActivate(ctx)).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     it('33. should throw ForbiddenException when target branch does not match active tenant', async () => {
@@ -291,7 +397,9 @@ describe('100+ Iterations Multi-Tenant Isolation & Zero-Data-Leak Test Suite', (
         tenant: { id: tenantA, name: 'Tenant A' },
         headers: { [BRANCH_HEADER]: branchB },
       });
-      await expect(branchGuard.canActivate(ctx)).rejects.toThrow(ForbiddenException);
+      await expect(branchGuard.canActivate(ctx)).rejects.toThrow(
+        ForbiddenException,
+      );
     });
 
     it('34. should throw ForbiddenException when target branch does not match active restaurant', async () => {
@@ -308,7 +416,9 @@ describe('100+ Iterations Multi-Tenant Isolation & Zero-Data-Leak Test Suite', (
         restaurant: { id: restA, name: 'Rest A', tenantId: tenantA },
         headers: { [BRANCH_HEADER]: branchB },
       });
-      await expect(branchGuard.canActivate(ctx)).rejects.toThrow(ForbiddenException);
+      await expect(branchGuard.canActivate(ctx)).rejects.toThrow(
+        ForbiddenException,
+      );
     });
 
     it('35. should allow branch when tenant and restaurant match and membership is valid', async () => {
@@ -322,7 +432,12 @@ describe('100+ Iterations Multi-Tenant Isolation & Zero-Data-Leak Test Suite', (
       mockPrisma.tenantMembership.findUnique.mockResolvedValue({
         id: 'mem-1',
         role: 'OWNER',
-        tenant: { id: tenantA, name: 'Tenant A', slug: 'tenant-a', status: 'ACTIVE' },
+        tenant: {
+          id: tenantA,
+          name: 'Tenant A',
+          slug: 'tenant-a',
+          status: 'ACTIVE',
+        },
       });
 
       const req: any = {
@@ -355,7 +470,9 @@ describe('100+ Iterations Multi-Tenant Isolation & Zero-Data-Leak Test Suite', (
           tenant: { id: tenantA },
           headers: { [BRANCH_HEADER]: branchB },
         });
-        await expect(branchGuard.canActivate(ctx)).rejects.toThrow(ForbiddenException);
+        await expect(branchGuard.canActivate(ctx)).rejects.toThrow(
+          ForbiddenException,
+        );
       });
     }
   });
@@ -378,12 +495,17 @@ describe('100+ Iterations Multi-Tenant Isolation & Zero-Data-Leak Test Suite', (
       };
 
       expect(() => buildWhere('OWNER', undefined)).toThrow(BadRequestException);
-      expect(buildWhere('OWNER', tenant1)).toEqual({ memberships: { some: { tenantId: tenant1 } } });
+      expect(buildWhere('OWNER', tenant1)).toEqual({
+        memberships: { some: { tenantId: tenant1 } },
+      });
       expect(buildWhere('PLATFORM_ADMIN', undefined)).toEqual({});
     });
 
     it('52. Dashboard Overview query strictly isolates orders to verified restaurantId', () => {
-      const buildOrderFilter = (verifiedRestaurantId?: string, branchId?: string) => {
+      const buildOrderFilter = (
+        verifiedRestaurantId?: string,
+        branchId?: string,
+      ) => {
         if (!verifiedRestaurantId) return null;
         return {
           restaurantId: verifiedRestaurantId,
@@ -392,7 +514,10 @@ describe('100+ Iterations Multi-Tenant Isolation & Zero-Data-Leak Test Suite', (
       };
 
       expect(buildOrderFilter(undefined)).toBeNull();
-      expect(buildOrderFilter('rest-1', 'branch-1')).toEqual({ restaurantId: 'rest-1', branchId: 'branch-1' });
+      expect(buildOrderFilter('rest-1', 'branch-1')).toEqual({
+        restaurantId: 'rest-1',
+        branchId: 'branch-1',
+      });
     });
 
     for (let i = 53; i <= 75; i++) {
@@ -434,12 +559,17 @@ describe('100+ Iterations Multi-Tenant Isolation & Zero-Data-Leak Test Suite', (
           tenantId: tenantB,
         });
 
-        mockPrisma.tenantMembership.findUnique.mockImplementation(({ where }: any) => {
-          if (where.userId_tenantId.userId === userA && where.userId_tenantId.tenantId === tenantA) {
-            return Promise.resolve({ id: `mem-${iteration}`, role: 'OWNER' });
-          }
-          return Promise.resolve(null);
-        });
+        mockPrisma.tenantMembership.findUnique.mockImplementation(
+          ({ where }: any) => {
+            if (
+              where.userId_tenantId.userId === userA &&
+              where.userId_tenantId.tenantId === tenantA
+            ) {
+              return Promise.resolve({ id: `mem-${iteration}`, role: 'OWNER' });
+            }
+            return Promise.resolve(null);
+          },
+        );
 
         const ctx = createMockContext({
           user: { id: userA, role: 'OWNER' },
@@ -450,7 +580,9 @@ describe('100+ Iterations Multi-Tenant Isolation & Zero-Data-Leak Test Suite', (
           },
         });
 
-        await expect(restaurantGuard.canActivate(ctx)).rejects.toThrow(ForbiddenException);
+        await expect(restaurantGuard.canActivate(ctx)).rejects.toThrow(
+          ForbiddenException,
+        );
       });
     }
   });

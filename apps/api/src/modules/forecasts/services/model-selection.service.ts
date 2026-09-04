@@ -25,8 +25,15 @@ export class ModelSelectionService {
   /**
    * Evaluates all registered models against the last 14 days holdout dataset.
    */
-  async benchmarkModels(restaurantId: string, branchId?: string): Promise<ModelBenchmarkResult[]> {
-    const historical = await this.featureEngine.buildHistoricalFeatures(restaurantId, branchId, 45);
+  async benchmarkModels(
+    restaurantId: string,
+    branchId?: string,
+  ): Promise<ModelBenchmarkResult[]> {
+    const historical = await this.featureEngine.buildHistoricalFeatures(
+      restaurantId,
+      branchId,
+      45,
+    );
 
     // If insufficient historical records, return theoretical benchmarks
     if (historical.length < 14) {
@@ -76,12 +83,21 @@ export class ModelSelectionService {
 
     // 1. Seasonal DoW Predictions
     const predSeasonal = evalDays.map((d) => {
-      const pastDow = [d.lag7dSales, d.lag14dSales, d.lag21dSales, d.lag28dSales].filter((v) => v > 0);
-      return pastDow.length > 0 ? pastDow.reduce((a, b) => a + b, 0) / pastDow.length : d.rolling7dMeanSales;
+      const pastDow = [
+        d.lag7dSales,
+        d.lag14dSales,
+        d.lag21dSales,
+        d.lag28dSales,
+      ].filter((v) => v > 0);
+      return pastDow.length > 0
+        ? pastDow.reduce((a, b) => a + b, 0) / pastDow.length
+        : d.rolling7dMeanSales;
     });
 
     // 2. WMA Predictions (use lag1d, lag7d)
-    const predWma = evalDays.map((d) => (d.lag1dSales * 0.6) + (d.lag7dSales * 0.4));
+    const predWma = evalDays.map(
+      (d) => d.lag1dSales * 0.6 + d.lag7dSales * 0.4,
+    );
 
     // 3. Baseline Mean
     const predBaseline = evalDays.map((d) => d.rolling7dMeanSales);
@@ -143,7 +159,10 @@ export class ModelSelectionService {
         modelName: 'Simple Rolling Mean Baseline',
         type: 'SIMPLE_AVERAGE',
         ...mBase,
-        isChampion: mBase.wape === lowestWape && mSeasonal.wape !== lowestWape && mWma.wape !== lowestWape,
+        isChampion:
+          mBase.wape === lowestWape &&
+          mSeasonal.wape !== lowestWape &&
+          mWma.wape !== lowestWape,
         status: 'ACTIVE',
       },
     ];

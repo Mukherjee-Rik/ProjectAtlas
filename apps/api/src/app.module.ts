@@ -1,6 +1,11 @@
 import crypto from 'node:crypto';
 import { IncomingMessage } from 'node:http';
-import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+} from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
@@ -52,24 +57,62 @@ import { QueueService } from './common/queue/queue.service';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true, load: [configuration], validationSchema: envValidationSchema, cache: true }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [configuration],
+      validationSchema: envValidationSchema,
+      cache: true,
+    }),
     ThrottlerModule.forRoot([{ ttl: 60000, limit: 1000 }]),
     LoggerModule.forRoot({
       pinoHttp: {
-        genReqId: (req: IncomingMessage) => (req.headers['x-request-id'] as string) ?? crypto.randomUUID(),
-        transport: process.env.NODE_ENV !== 'production' ? { target: 'pino-pretty', options: { singleLine: true, colorize: true } } : undefined,
+        genReqId: (req: IncomingMessage) =>
+          (req.headers['x-request-id'] as string) ?? crypto.randomUUID(),
+        transport:
+          process.env.NODE_ENV !== 'production'
+            ? {
+                target: 'pino-pretty',
+                options: { singleLine: true, colorize: true },
+              }
+            : undefined,
       },
     }),
     CacheModule,
-    PrismaModule, HealthModule, MonitoringModule, UsersModule, AuthModule, DashboardModule,
-    TenantsModule, RestaurantsModule, TenantMembershipsModule,
-    BranchesModule, DiningAreasModule, TablesModule, PublicTablesModule,
-    MenusModule, MenuCategoriesModule, MenuItemsModule,
-    TaxRatesModule, MenuItemVariantsModule, MenuItemAddonsModule,
-    CartModule, OrdersModule, PaymentsModule, InventoryModule,
-    SubscriptionsModule, TableCallsModule, AuditModule, SearchModule,
-    DeliveryModule, AiModule, AutomationModule, SupportModule,
-    DataIntelligenceModule, AnalyticsModule, ReportsModule, ForecastsModule,
+    PrismaModule,
+    HealthModule,
+    MonitoringModule,
+    UsersModule,
+    AuthModule,
+    DashboardModule,
+    TenantsModule,
+    RestaurantsModule,
+    TenantMembershipsModule,
+    BranchesModule,
+    DiningAreasModule,
+    TablesModule,
+    PublicTablesModule,
+    MenusModule,
+    MenuCategoriesModule,
+    MenuItemsModule,
+    TaxRatesModule,
+    MenuItemVariantsModule,
+    MenuItemAddonsModule,
+    CartModule,
+    OrdersModule,
+    PaymentsModule,
+    InventoryModule,
+    SubscriptionsModule,
+    TableCallsModule,
+    AuditModule,
+    SearchModule,
+    DeliveryModule,
+    AiModule,
+    AutomationModule,
+    SupportModule,
+    DataIntelligenceModule,
+    AnalyticsModule,
+    ReportsModule,
+    ForecastsModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },

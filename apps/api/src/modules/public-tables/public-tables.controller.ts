@@ -18,7 +18,10 @@ export class PublicTablesController {
   }
 
   @Get(':token/menu-items/:itemId')
-  async getPublicMenuItem(@Param('token') token: string, @Param('itemId') itemId: string) {
+  async getPublicMenuItem(
+    @Param('token') token: string,
+    @Param('itemId') itemId: string,
+  ) {
     return this.publicTablesService.getPublicMenuItem(token, itemId);
   }
 

@@ -10,6 +10,7 @@ import { useCart } from '@/hooks/use-cart';
 import { CartBar } from '@/components/customer/cart-bar';
 import { MenuItemSheet } from '@/components/customer/menu-item-sheet';
 import { MenuItemCard, type MenuCardItem } from '@/components/customer/menu-item-card';
+import { SmartPairingRecommendations } from '@/components/ai/smart-pairing-recommendations';
 
 export default function CustomerMenuPage({
   params,
@@ -282,6 +283,26 @@ export default function CustomerMenuPage({
             )}
           </section>
         ))}
+
+        {cart && cart.items.length > 0 && (
+          <div className="pt-2">
+            <SmartPairingRecommendations
+              activeMenu={menu}
+              cartItems={cart.items}
+              onAddPairing={(item) => {
+                void addItem(
+                  { menuItemId: item.id, quantity: 1 },
+                  {
+                    name: item.name,
+                    unitPrice: item.price,
+                    imageUrl: item.imageUrl,
+                    dietaryType: item.dietaryType,
+                  },
+                );
+              }}
+            />
+          </div>
+        )}
       </div>
 
       {openItemId && (

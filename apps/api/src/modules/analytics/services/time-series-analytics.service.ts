@@ -72,12 +72,18 @@ export class TimeSeriesAnalyticsService {
       }
       if (interval === 'MONTHLY') {
         const key = d.toISOString().slice(0, 7);
-        const label = d.toLocaleString('default', { month: 'short', year: 'numeric' });
+        const label = d.toLocaleString('default', {
+          month: 'short',
+          year: 'numeric',
+        });
         return { key, label };
       }
       // Default: DAILY
       const key = d.toISOString().slice(0, 10);
-      const label = d.toLocaleDateString('default', { month: 'short', day: 'numeric' });
+      const label = d.toLocaleDateString('default', {
+        month: 'short',
+        day: 'numeric',
+      });
       return { key, label };
     };
 
@@ -142,7 +148,9 @@ export class TimeSeriesAnalyticsService {
         grossSales: Math.round(b.grossSales * 100) / 100,
         netSales: Math.round(b.netSales * 100) / 100,
         averageOrderValue:
-          b.completedOrders > 0 ? Math.round((b.grossSales / b.completedOrders) * 100) / 100 : 0,
+          b.completedOrders > 0
+            ? Math.round((b.grossSales / b.completedOrders) * 100) / 100
+            : 0,
       }));
   }
 }

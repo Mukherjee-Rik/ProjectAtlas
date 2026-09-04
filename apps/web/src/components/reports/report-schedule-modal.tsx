@@ -47,7 +47,7 @@ export function ReportScheduleModal({
         timeOfDay,
         dayOfWeek: frequency === 'WEEKLY' ? Number(dayOfWeek) : undefined,
         dayOfMonth: frequency === 'MONTHLY' ? Number(dayOfMonth) : undefined,
-        recipients: emailList.length > 0 ? emailList : ['owner@atlas.internal'],
+        recipients: emailList.length > 0 ? emailList : ['owner@kafei.internal'],
         deliveryFormat: 'CSV',
       });
       onSuccess?.();
@@ -76,7 +76,7 @@ export function ReportScheduleModal({
         </div>
 
         {error && (
-          <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-semibold">
+          <div className="p-3 rounded-lg bg-atlas-error/10 border border-atlas-error/30 text-atlas-error text-xs font-semibold">
             {error}
           </div>
         )}

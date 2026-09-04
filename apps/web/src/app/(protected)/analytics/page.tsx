@@ -139,7 +139,7 @@ export default function AnalyticsPage() {
       link.href = url;
       link.setAttribute(
         'download',
-        `atlas_${type.toLowerCase()}_analytics_${new Date().toISOString().slice(0, 10)}.csv`,
+        `kafei_${type.toLowerCase()}_analytics_${new Date().toISOString().slice(0, 10)}.csv`,
       );
       document.body.appendChild(link);
       link.click();

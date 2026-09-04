@@ -96,9 +96,12 @@ export function AppShell({ children }: AppShellProps) {
         const features = (sub.plan.features as string[]) || [];
 
         // Users on Free Trial, Trialing state, or Starter plans do NOT have Ask AI option
+        const isPeriodValid =
+          status === 'ACTIVE' ||
+          (status === 'CANCELLED' && sub.currentPeriodEnd && new Date() <= new Date(sub.currentPeriodEnd));
+
         if (
-          status === 'TRIALING' ||
-          status !== 'ACTIVE' ||
+          !isPeriodValid ||
           planName.includes('starter') ||
           planName.includes('trial') ||
           planName.includes('free')
@@ -107,12 +110,13 @@ export function AppShell({ children }: AppShellProps) {
           return;
         }
 
-        // Only Active Paid Plans with ai_copilot feature (Growth, Pro, Enterprise)
+        // Paid Plans with ai_copilot feature (Growth, Pro, Enterprise)
         const hasAiFeature =
-          features.includes('ai_copilot') ||
+          planName.includes('enterprise') ||
           planName.includes('growth') ||
           planName.includes('pro') ||
-          planName.includes('enterprise');
+          features.includes('ai_copilot') ||
+          features.includes('ai-copilot');
           
         setCanAccessAi(hasAiFeature);
       })
@@ -280,7 +284,7 @@ export function AppShell({ children }: AppShellProps) {
                   className="w-full flex items-center justify-between rounded-xl border border-border bg-secondary px-3.5 py-1.5 text-xs text-muted-foreground hover:border-primary/40 transition-colors"
                 >
                   <span className="flex items-center gap-2">
-                    <Search className="h-3.5 w-3.5" aria-hidden="true" /> Search Atlas...
+                    <Search className="h-3.5 w-3.5" aria-hidden="true" /> Search Kafei...
                   </span>
                   <span className="rounded bg-card border border-border px-1.5 py-0.5 text-[10px] font-mono">
                     Ctrl K
@@ -296,7 +300,7 @@ export function AppShell({ children }: AppShellProps) {
               <button
                 type="button"
                 onClick={() => setIsSearchOpen(true)}
-                aria-label="Search Atlas"
+                aria-label="Search Kafei"
                 className="md:hidden flex items-center justify-center p-1.5 hover:bg-secondary rounded-lg border border-border"
               >
                 <Search className="h-5 w-5" aria-hidden="true" />

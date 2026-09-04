@@ -506,7 +506,7 @@ export default function MenuDetailPage({ params }: { params: Promise<{ id: strin
                               <button
                                 type="button"
                                 onClick={() => setNewItemIngredients(newItemIngredients.filter((_, i) => i !== idx))}
-                                className="text-atlas-error hover:text-red-300 px-2 py-1 text-xs"
+                                className="text-atlas-error hover:text-atlas-error px-2 py-1 text-xs"
                                 title="Remove ingredient"
                               >
                                 ✕
@@ -600,7 +600,7 @@ export default function MenuDetailPage({ params }: { params: Promise<{ id: strin
                   <button
                     type="button"
                     onClick={() => setQuickRecipeIngredients(quickRecipeIngredients.filter((_, i) => i !== idx))}
-                    className="text-atlas-error hover:text-red-300 p-1"
+                    className="text-atlas-error hover:text-atlas-error p-1"
                   >
                     ✕
                   </button>

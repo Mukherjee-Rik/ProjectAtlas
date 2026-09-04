@@ -1,4 +1,11 @@
-import { Controller, Get, Post, Param, UseGuards, NotFoundException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Param,
+  UseGuards,
+  NotFoundException,
+} from '@nestjs/common';
 import { ApiOperation, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { PlatformAdminGuard } from '../auth/guards/platform-admin.guard';
@@ -18,7 +25,10 @@ export class MonitoringController {
   ) {}
 
   @Get('overview')
-  @ApiOperation({ summary: 'Get comprehensive system telemetry, health, and latency percentiles for platform admins' })
+  @ApiOperation({
+    summary:
+      'Get comprehensive system telemetry, health, and latency percentiles for platform admins',
+  })
   async getOverview() {
     const system = this.metricsService.getSystemOverview();
     const readiness = await this.healthService.getReadiness();

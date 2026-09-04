@@ -27,7 +27,10 @@ async function main() {
   for (const r of restaurants) {
     const validOrders = r.orders.filter((o) => o.status !== 'CANCELLED');
     const cancelledOrders = r.orders.filter((o) => o.status === 'CANCELLED');
-    const totalSales = validOrders.reduce((sum, o) => sum + Number(o.totalAmount), 0);
+    const totalSales = validOrders.reduce(
+      (sum, o) => sum + Number(o.totalAmount),
+      0,
+    );
 
     const itemCounts: Record<string, number> = {};
     validOrders.forEach((o) => {
@@ -43,11 +46,15 @@ async function main() {
 
     console.log(`\n🍽️ Restaurant: ${r.name}`);
     console.log(`   - Total Orders: ${r.orders.length}`);
-    console.log(`   - Total Revenue: ₹${Math.round(totalSales).toLocaleString('en-IN')}`);
+    console.log(
+      `   - Total Revenue: ₹${Math.round(totalSales).toLocaleString('en-IN')}`,
+    );
     console.log(`   - Cancelled Orders: ${cancelledOrders.length}`);
     console.log(`   - Top Selling Dishes: ${topItems.join(', ')}`);
     if (r.orders.length > 0) {
-      console.log(`   - Date Span: ${r.orders[0].createdAt.toLocaleDateString()} to ${r.orders[r.orders.length - 1].createdAt.toLocaleDateString()}`);
+      console.log(
+        `   - Date Span: ${r.orders[0].createdAt.toLocaleDateString()} to ${r.orders[r.orders.length - 1].createdAt.toLocaleDateString()}`,
+      );
     }
   }
 }

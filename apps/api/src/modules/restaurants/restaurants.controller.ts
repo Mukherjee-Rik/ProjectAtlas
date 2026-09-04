@@ -7,7 +7,12 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiHeader,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 
 import { CreateRestaurantDto } from './dto/create-restaurant.dto';
 import { RestaurantsService } from './restaurants.service';
@@ -56,17 +61,21 @@ export class RestaurantsController {
 
   @Get('admin/all')
   @UseGuards(PlatformAdminGuard)
-  @ApiOperation({ summary: 'Platform Admin: Get all restaurants with operational and financial metrics' })
+  @ApiOperation({
+    summary:
+      'Platform Admin: Get all restaurants with operational and financial metrics',
+  })
   async findAllAdmin() {
     return this.restaurantsService.findAllAdminWithMetrics();
   }
 
   @Get('admin/details/:id')
   @UseGuards(PlatformAdminGuard)
-  @ApiOperation({ summary: 'Platform Admin: Get comprehensive deep-dive details for a specific restaurant' })
-  async findAdminDetail(
-    @Param('id', new ParseUUIDPipe()) id: string,
-  ) {
+  @ApiOperation({
+    summary:
+      'Platform Admin: Get comprehensive deep-dive details for a specific restaurant',
+  })
+  async findAdminDetail(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.restaurantsService.findAdminDetail(id);
   }
 

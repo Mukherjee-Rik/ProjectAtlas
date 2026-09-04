@@ -1,4 +1,11 @@
-import { ConflictException, Injectable, UnauthorizedException, ForbiddenException, BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+  ForbiddenException,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Logger } from 'nestjs-pino';
 import * as bcrypt from 'bcrypt';
@@ -8,7 +15,10 @@ import { PrismaService } from '../../database/prisma/prisma.service';
 import { RegisterRestaurantDto } from './dto/register-restaurant.dto';
 import { UserRole } from '../../generated/prisma/enums';
 import { AuditService } from '../audit/audit.service';
-import { CacheKeys, TtlCacheService } from '../../common/cache/ttl-cache.service';
+import {
+  CacheKeys,
+  TtlCacheService,
+} from '../../common/cache/ttl-cache.service';
 import { SmsDispatcherService } from './sms-dispatcher.service';
 
 @Injectable()
@@ -22,7 +32,12 @@ export class AuthService {
     private readonly smsDispatcher: SmsDispatcherService,
   ) {}
 
-  async validateUser(email: string, password: string, ip?: string, userAgent?: string) {
+  async validateUser(
+    email: string,
+    password: string,
+    ip?: string,
+    userAgent?: string,
+  ) {
     const normalizedEmail = email.trim().toLowerCase();
 
     const user = await this.prisma.user.findUnique({
@@ -30,7 +45,10 @@ export class AuthService {
     });
 
     if (!user) {
-      this.logger.warn({ email: normalizedEmail }, 'Login failed: user not found');
+      this.logger.warn(
+        { email: normalizedEmail },
+        'Login failed: user not found',
+      );
       await this.auditService.log({
         actorEmail: normalizedEmail,
         action: 'LOGIN_FAILED',
@@ -43,7 +61,10 @@ export class AuthService {
     }
 
     if (!user.passwordHash || user.passwordHash.length < 10) {
-      this.logger.warn({ email: normalizedEmail }, 'Login failed: OAuth account without password');
+      this.logger.warn(
+        { email: normalizedEmail },
+        'Login failed: OAuth account without password',
+      );
       throw new UnauthorizedException(
         'This account was created with Google Sign In. Please use Google Sign In to continue.',
       );
@@ -95,7 +116,12 @@ export class AuthService {
   /**
    * Logs in an active user directly with email and password, issuing session tokens.
    */
-  async login(email: string, password: string, ip?: string, userAgent?: string) {
+  async login(
+    email: string,
+    password: string,
+    ip?: string,
+    userAgent?: string,
+  ) {
     const user = await this.validateUser(email, password, ip, userAgent);
 
     const memberships = await this.getUserMemberships(user.id);
@@ -112,7 +138,12 @@ export class AuthService {
       },
     });
 
-    const accessToken = await this.generateAccessToken(user.id, user.email, user.role, session.id);
+    const accessToken = await this.generateAccessToken(
+      user.id,
+      user.email,
+      user.role,
+      session.id,
+    );
     const refreshToken = await this.generateRefreshToken(session.id);
 
     await this.prisma.session.update({
@@ -146,7 +177,12 @@ export class AuthService {
     };
   }
 
-  async verifyOtp(challengeId: string, otp: string, ip?: string, userAgent?: string) {
+  async verifyOtp(
+    challengeId: string,
+    otp: string,
+    ip?: string,
+    userAgent?: string,
+  ) {
     const challenge = this.cache.get<{
       userId: string;
       email: string;
@@ -156,17 +192,23 @@ export class AuthService {
     }>(`otp_challenge:${challengeId}`);
 
     if (!challenge) {
-      throw new UnauthorizedException('Verification code has expired or is invalid. Please sign in again.');
+      throw new UnauthorizedException(
+        'Verification code has expired or is invalid. Please sign in again.',
+      );
     }
 
     if (challenge.otp !== otp.trim()) {
       challenge.attempts += 1;
       if (challenge.attempts >= 5) {
         this.cache.invalidate(`otp_challenge:${challengeId}`);
-        throw new UnauthorizedException('Too many incorrect attempts. Please request a new verification code.');
+        throw new UnauthorizedException(
+          'Too many incorrect attempts. Please request a new verification code.',
+        );
       }
       this.cache.set(`otp_challenge:${challengeId}`, challenge, 5 * 60 * 1000);
-      throw new UnauthorizedException('Incorrect verification code. Please check and try again.');
+      throw new UnauthorizedException(
+        'Incorrect verification code. Please check and try again.',
+      );
     }
 
     // Success -> Invalidate challenge
@@ -194,7 +236,12 @@ export class AuthService {
       },
     });
 
-    const accessToken = await this.generateAccessToken(user.id, user.email, user.role, session.id);
+    const accessToken = await this.generateAccessToken(
+      user.id,
+      user.email,
+      user.role,
+      session.id,
+    );
     const refreshToken = await this.generateRefreshToken(session.id);
 
     await this.prisma.session.update({
@@ -266,17 +313,25 @@ export class AuthService {
             OR: [
               { phone: normalized },
               { phone: `+91${normalized}` },
-              { phone: normalized.startsWith('91') ? normalized.substring(2) : normalized },
+              {
+                phone: normalized.startsWith('91')
+                  ? normalized.substring(2)
+                  : normalized,
+              },
             ],
           },
     });
 
     if (!user) {
-      throw new NotFoundException('No account found matching this email or phone number');
+      throw new NotFoundException(
+        'No account found matching this email or phone number',
+      );
     }
 
     if (user.status !== 'ACTIVE') {
-      throw new ForbiddenException('This account is suspended or inactive. Please contact support.');
+      throw new ForbiddenException(
+        'This account is suspended or inactive. Please contact support.',
+      );
     }
 
     const targetPhone = user.phone || '9903085026';
@@ -297,7 +352,12 @@ export class AuthService {
     );
 
     // Dispatch OTP
-    void this.smsDispatcher.sendPasswordResetOtp(targetPhone, user.email, otp, user.name);
+    void this.smsDispatcher.sendPasswordResetOtp(
+      targetPhone,
+      user.email,
+      otp,
+      user.name,
+    );
 
     await this.auditService.log({
       actorUserId: user.id,
@@ -318,9 +378,17 @@ export class AuthService {
     };
   }
 
-  async resetPassword(challengeId: string, otp: string, newPassword: string, ip?: string, userAgent?: string) {
+  async resetPassword(
+    challengeId: string,
+    otp: string,
+    newPassword: string,
+    ip?: string,
+    userAgent?: string,
+  ) {
     if (!newPassword || newPassword.length < 8) {
-      throw new BadRequestException('New password must be at least 8 characters long.');
+      throw new BadRequestException(
+        'New password must be at least 8 characters long.',
+      );
     }
 
     const challenge = this.cache.get<{
@@ -332,17 +400,23 @@ export class AuthService {
     }>(`pwd_reset:${challengeId}`);
 
     if (!challenge) {
-      throw new UnauthorizedException('Reset session has expired or is invalid. Please request a new code.');
+      throw new UnauthorizedException(
+        'Reset session has expired or is invalid. Please request a new code.',
+      );
     }
 
     if (challenge.otp !== otp.trim()) {
       challenge.attempts += 1;
       if (challenge.attempts >= 5) {
         this.cache.invalidate(`pwd_reset:${challengeId}`);
-        throw new UnauthorizedException('Too many incorrect attempts. Please request a new password reset.');
+        throw new UnauthorizedException(
+          'Too many incorrect attempts. Please request a new password reset.',
+        );
       }
       this.cache.set(`pwd_reset:${challengeId}`, challenge, 10 * 60 * 1000);
-      throw new UnauthorizedException('Incorrect verification code. Please check and try again.');
+      throw new UnauthorizedException(
+        'Incorrect verification code. Please check and try again.',
+      );
     }
 
     // Invalidate reset challenge
@@ -380,7 +454,8 @@ export class AuthService {
 
     return {
       success: true,
-      message: 'Your password has been reset successfully. Please log in with your new password.',
+      message:
+        'Your password has been reset successfully. Please log in with your new password.',
     };
   }
 
@@ -394,7 +469,9 @@ export class AuthService {
     }>(`pwd_reset:${challengeId}`);
 
     if (!challenge) {
-      throw new UnauthorizedException('Reset session expired. Please start over.');
+      throw new UnauthorizedException(
+        'Reset session expired. Please start over.',
+      );
     }
 
     const newOtp = this.smsDispatcher.generateOtp();
@@ -402,7 +479,11 @@ export class AuthService {
     challenge.attempts = 0;
     this.cache.set(`pwd_reset:${challengeId}`, challenge, 10 * 60 * 1000);
 
-    void this.smsDispatcher.sendPasswordResetOtp(challenge.phone, challenge.email, newOtp);
+    void this.smsDispatcher.sendPasswordResetOtp(
+      challenge.phone,
+      challenge.email,
+      newOtp,
+    );
 
     return {
       success: true,
@@ -410,12 +491,15 @@ export class AuthService {
     };
   }
 
-
   /**
    * Step 1 of restaurant registration: validates information and sends a 6-digit OTP
    * to the owner's email. No account or tenant is created until the OTP is verified.
    */
-  async registerRestaurant(dto: RegisterRestaurantDto, ip?: string, userAgent?: string) {
+  async registerRestaurant(
+    dto: RegisterRestaurantDto,
+    ip?: string,
+    userAgent?: string,
+  ) {
     const normalizedEmail = dto.email.trim().toLowerCase();
 
     const existing = await this.prisma.user.findUnique({
@@ -473,7 +557,12 @@ export class AuthService {
    * Step 2 of restaurant registration: verifies the 6-digit OTP code and
    * atomically provisions Tenant, Restaurant, Branch, Owner User, and Session.
    */
-  async verifyRegistrationOtp(challengeId: string, otp: string, ip?: string, userAgent?: string) {
+  async verifyRegistrationOtp(
+    challengeId: string,
+    otp: string,
+    ip?: string,
+    userAgent?: string,
+  ) {
     const challenge = this.cache.get<{
       restaurantName: string;
       ownerName: string;
@@ -486,17 +575,23 @@ export class AuthService {
     }>(`reg_challenge:${challengeId}`);
 
     if (!challenge) {
-      throw new UnauthorizedException('Verification code has expired or is invalid. Please start registration again.');
+      throw new UnauthorizedException(
+        'Verification code has expired or is invalid. Please start registration again.',
+      );
     }
 
     if (challenge.otp !== otp.trim()) {
       challenge.attempts += 1;
       if (challenge.attempts >= 5) {
         this.cache.invalidate(`reg_challenge:${challengeId}`);
-        throw new UnauthorizedException('Too many incorrect attempts. Please start registration again.');
+        throw new UnauthorizedException(
+          'Too many incorrect attempts. Please start registration again.',
+        );
       }
       this.cache.set(`reg_challenge:${challengeId}`, challenge, 10 * 60 * 1000);
-      throw new UnauthorizedException('Incorrect verification code. Please check and try again.');
+      throw new UnauthorizedException(
+        'Incorrect verification code. Please check and try again.',
+      );
     }
 
     // Success -> Invalidate challenge
@@ -527,17 +622,23 @@ export class AuthService {
 
       // 2. Create Restaurant under Tenant
       const restaurant = await tx.restaurant.create({
-        data: { tenantId: tenant.id, name: challenge.restaurantName, slug: tenantSlug },
+        data: {
+          tenantId: tenant.id,
+          name: challenge.restaurantName,
+          slug: tenantSlug,
+        },
       });
 
       // 2.5. Create Default Trial Subscription
       try {
-        const defaultPlan = (await tx.plan.findFirst({
-          where: { name: 'Free', status: 'ACTIVE' },
-        })) || (await tx.plan.findFirst({
-          where: { status: 'ACTIVE' },
-          orderBy: { price: 'asc' },
-        }));
+        const defaultPlan =
+          (await tx.plan.findFirst({
+            where: { name: 'Free', status: 'ACTIVE' },
+          })) ||
+          (await tx.plan.findFirst({
+            where: { status: 'ACTIVE' },
+            orderBy: { price: 'asc' },
+          }));
 
         if (defaultPlan) {
           const trialDays = defaultPlan.trialDays || 14;
@@ -559,7 +660,10 @@ export class AuthService {
           });
         }
       } catch (subErr) {
-        this.logger.warn({ error: subErr }, 'Could not create default trial subscription during onboarding');
+        this.logger.warn(
+          { error: subErr },
+          'Could not create default trial subscription during onboarding',
+        );
       }
 
       // 3. Create Main Branch under Restaurant
@@ -605,7 +709,12 @@ export class AuthService {
         },
       });
 
-      const accessToken = await this.generateAccessToken(user.id, user.email, user.role, session.id);
+      const accessToken = await this.generateAccessToken(
+        user.id,
+        user.email,
+        user.role,
+        session.id,
+      );
       const refreshToken = await this.generateRefreshToken(session.id);
 
       await tx.session.update({
@@ -643,7 +752,11 @@ export class AuthService {
           status: user.status,
         },
         tenant: { id: tenant.id, name: tenant.name, slug: tenant.slug },
-        restaurant: { id: restaurant.id, name: restaurant.name, slug: restaurant.slug },
+        restaurant: {
+          id: restaurant.id,
+          name: restaurant.name,
+          slug: restaurant.slug,
+        },
         branch: { id: branch.id, name: branch.name, code: branch.code },
         membership: { id: membership.id, role: membership.role },
       };
@@ -653,7 +766,11 @@ export class AuthService {
   /**
    * Resends a fresh 6-digit registration OTP code for an active challenge.
    */
-  async resendRegistrationOtp(challengeId: string, ip?: string, userAgent?: string) {
+  async resendRegistrationOtp(
+    challengeId: string,
+    ip?: string,
+    userAgent?: string,
+  ) {
     const challenge = this.cache.get<{
       restaurantName: string;
       ownerName: string;
@@ -666,7 +783,9 @@ export class AuthService {
     }>(`reg_challenge:${challengeId}`);
 
     if (!challenge) {
-      throw new UnauthorizedException('Registration session expired. Please fill out the registration form again.');
+      throw new UnauthorizedException(
+        'Registration session expired. Please fill out the registration form again.',
+      );
     }
 
     const newOtp = this.smsDispatcher.generateOtp();
@@ -885,7 +1004,8 @@ export class AuthService {
       select: { id: true, role: true },
     });
 
-    const isOwnerOrPlatformAdmin = user?.role === 'OWNER' || user?.role === 'PLATFORM_ADMIN';
+    const isOwnerOrPlatformAdmin =
+      user?.role === 'OWNER' || user?.role === 'PLATFORM_ADMIN';
 
     const memberships = await this.prisma.tenantMembership.findMany({
       where: { userId },
@@ -922,7 +1042,9 @@ export class AuthService {
           restaurants: m.tenant.restaurants.map((r) => {
             const mainBranch =
               r.branches.find(
-                (b) => b.code.toUpperCase() === 'MAIN' || b.name.toLowerCase().includes('main'),
+                (b) =>
+                  b.code.toUpperCase() === 'MAIN' ||
+                  b.name.toLowerCase().includes('main'),
               ) || r.branches[0];
             return {
               ...r,
@@ -971,7 +1093,10 @@ export class AuthService {
         },
       });
 
-      this.logger.log({ userId: user.id, email: user.email, provider }, 'New user provisioned via OAuth');
+      this.logger.log(
+        { userId: user.id, email: user.email, provider },
+        'New user provisioned via OAuth',
+      );
     }
 
     const memberships = await this.getUserMemberships(user.id);
@@ -988,7 +1113,12 @@ export class AuthService {
       },
     });
 
-    const accessToken = await this.generateAccessToken(user.id, user.email, user.role, session.id);
+    const accessToken = await this.generateAccessToken(
+      user.id,
+      user.email,
+      user.role,
+      session.id,
+    );
     const refreshToken = await this.generateRefreshToken(session.id);
 
     await this.prisma.session.update({
@@ -1021,7 +1151,12 @@ export class AuthService {
     };
   }
 
-  private async generateAccessToken(userId: string, email: string, role: string, sessionId: string): Promise<string> {
+  private async generateAccessToken(
+    userId: string,
+    email: string,
+    role: string,
+    sessionId: string,
+  ): Promise<string> {
     const payload = {
       sub: userId,
       userId: userId,
@@ -1055,11 +1190,13 @@ export class AuthService {
   }
 
   private slugify(text: string): string {
-    return text
-      .toLowerCase()
-      .trim()
-      .replace(/[^\w\s-]/g, '')
-      .replace(/[\s_-]+/g, '-')
-      .replace(/^-+|-+$/g, '') || 'restaurant';
+    return (
+      text
+        .toLowerCase()
+        .trim()
+        .replace(/[^\w\s-]/g, '')
+        .replace(/[\s_-]+/g, '-')
+        .replace(/^-+|-+$/g, '') || 'restaurant'
+    );
   }
 }

@@ -37,7 +37,12 @@ export const PREBUILT_REPORT_TEMPLATES: ReportTemplateDefinition[] = [
     dataSource: 'SALES',
     category: 'SALES',
     configuration: {
-      metrics: ['GROSS_SALES', 'NET_SALES', 'TOTAL_ORDERS', 'AVERAGE_ORDER_VALUE'],
+      metrics: [
+        'GROSS_SALES',
+        'NET_SALES',
+        'TOTAL_ORDERS',
+        'AVERAGE_ORDER_VALUE',
+      ],
       dimensions: ['DATE_HOUR'],
       filters: [],
       dateRange: { preset: 'TODAY' },
@@ -52,7 +57,12 @@ export const PREBUILT_REPORT_TEMPLATES: ReportTemplateDefinition[] = [
     dataSource: 'BRANCHES',
     category: 'SALES',
     configuration: {
-      metrics: ['BRANCH_REVENUE', 'TOTAL_ORDERS', 'AVERAGE_ORDER_VALUE', 'NETWORK_SHARE_PERCENT'],
+      metrics: [
+        'BRANCH_REVENUE',
+        'TOTAL_ORDERS',
+        'AVERAGE_ORDER_VALUE',
+        'NETWORK_SHARE_PERCENT',
+      ],
       dimensions: ['BRANCH'],
       filters: [],
       dateRange: { preset: 'THIS_WEEK' },
@@ -67,7 +77,13 @@ export const PREBUILT_REPORT_TEMPLATES: ReportTemplateDefinition[] = [
     dataSource: 'SALES',
     category: 'FINANCE',
     configuration: {
-      metrics: ['GROSS_SALES', 'NET_SALES', 'TAX_AMOUNT', 'DISCOUNT_AMOUNT', 'REFUND_AMOUNT'],
+      metrics: [
+        'GROSS_SALES',
+        'NET_SALES',
+        'TAX_AMOUNT',
+        'DISCOUNT_AMOUNT',
+        'REFUND_AMOUNT',
+      ],
       dimensions: ['DATE_DAY'],
       filters: [],
       dateRange: { preset: 'THIS_MONTH' },
@@ -78,7 +94,8 @@ export const PREBUILT_REPORT_TEMPLATES: ReportTemplateDefinition[] = [
   {
     id: 'tmpl-top-10-items',
     name: 'Top 10 Best-Selling Menu Items',
-    description: 'Highest volume dishes ranked by unit velocity and revenue contribution',
+    description:
+      'Highest volume dishes ranked by unit velocity and revenue contribution',
     dataSource: 'MENU',
     category: 'MENU',
     configuration: {
@@ -94,7 +111,8 @@ export const PREBUILT_REPORT_TEMPLATES: ReportTemplateDefinition[] = [
   {
     id: 'tmpl-category-rev',
     name: 'Category Revenue Contribution',
-    description: 'Sales distribution across Starters, Mains, Desserts, and Beverages',
+    description:
+      'Sales distribution across Starters, Mains, Desserts, and Beverages',
     dataSource: 'MENU',
     category: 'MENU',
     configuration: {
@@ -109,7 +127,8 @@ export const PREBUILT_REPORT_TEMPLATES: ReportTemplateDefinition[] = [
   {
     id: 'tmpl-staff-turnaround',
     name: 'Staff Operational Turnaround',
-    description: 'Orders handled, completion velocity, and operational activity by employee',
+    description:
+      'Orders handled, completion velocity, and operational activity by employee',
     dataSource: 'STAFF',
     category: 'OPERATIONS',
     configuration: {
@@ -133,13 +152,17 @@ export const PREBUILT_REPORT_TEMPLATES: ReportTemplateDefinition[] = [
       filters: [],
       dateRange: { preset: 'THIS_MONTH' },
       sorting: [{ field: 'TOTAL_CUSTOMERS', direction: 'DESC' }],
-      visualization: { type: 'DONUT_CHART', title: 'Customer Segmentation Share' },
+      visualization: {
+        type: 'DONUT_CHART',
+        title: 'Customer Segmentation Share',
+      },
     },
   },
   {
     id: 'tmpl-payment-methods',
     name: 'Payment Methods Volume',
-    description: 'Realized settlement volume split across Cash, Card, and UPI Intent',
+    description:
+      'Realized settlement volume split across Cash, Card, and UPI Intent',
     dataSource: 'PAYMENTS',
     category: 'FINANCE',
     configuration: {
@@ -163,7 +186,10 @@ export const PREBUILT_REPORT_TEMPLATES: ReportTemplateDefinition[] = [
       filters: [],
       dateRange: { preset: 'THIS_MONTH' },
       sorting: [{ field: 'CANCELLED_AMOUNT', direction: 'DESC' }],
-      visualization: { type: 'TABLE', title: 'Cancellations & Refunds by Branch' },
+      visualization: {
+        type: 'TABLE',
+        title: 'Cancellations & Refunds by Branch',
+      },
     },
   },
   {

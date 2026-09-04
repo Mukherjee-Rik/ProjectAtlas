@@ -1,4 +1,8 @@
-import { BadRequestException, ExecutionContext, ForbiddenException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ExecutionContext,
+  ForbiddenException,
+} from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { BranchAccessGuard } from './branch-access.guard';
 import { PrismaService } from '../../../database/prisma/prisma.service';
@@ -22,7 +26,12 @@ describe('BranchAccessGuard', () => {
         findUnique: jest.fn().mockResolvedValue({
           id: 'mem-1',
           role: 'OWNER',
-          tenant: { id: tenantId, name: 'Tenant A', slug: 'tenant-a', status: 'ACTIVE' },
+          tenant: {
+            id: tenantId,
+            name: 'Tenant A',
+            slug: 'tenant-a',
+            status: 'ACTIVE',
+          },
         }),
       },
     };
@@ -38,8 +47,21 @@ describe('BranchAccessGuard', () => {
     guard = module.get<BranchAccessGuard>(BranchAccessGuard);
   });
 
-  function createMockExecutionContext(user: any, tenant: any, restaurant: any, headers: any = {}): ExecutionContext {
-    const req = { user, tenant, restaurant, params: {}, query: {}, headers, body: {} };
+  function createMockExecutionContext(
+    user: any,
+    tenant: any,
+    restaurant: any,
+    headers: any = {},
+  ): ExecutionContext {
+    const req = {
+      user,
+      tenant,
+      restaurant,
+      params: {},
+      query: {},
+      headers,
+      body: {},
+    };
     return {
       switchToHttp: () => ({
         getRequest: () => req,
@@ -48,7 +70,11 @@ describe('BranchAccessGuard', () => {
   }
 
   it('should allow access if no branch is targeted', async () => {
-    const context = createMockExecutionContext({ id: 'u-1' }, { id: tenantId }, { id: restaurantId });
+    const context = createMockExecutionContext(
+      { id: 'u-1' },
+      { id: tenantId },
+      { id: restaurantId },
+    );
     const result = await guard.canActivate(context);
     expect(result).toBe(true);
   });
@@ -60,7 +86,9 @@ describe('BranchAccessGuard', () => {
       { id: restaurantId },
       { 'x-branch-id': 'invalid-uuid' },
     );
-    await expect(guard.canActivate(context)).rejects.toThrow(BadRequestException);
+    await expect(guard.canActivate(context)).rejects.toThrow(
+      BadRequestException,
+    );
   });
 
   it('should throw ForbiddenException if branch belongs to another tenant', async () => {
@@ -79,7 +107,9 @@ describe('BranchAccessGuard', () => {
       { 'x-branch-id': validBranchId },
     );
 
-    await expect(guard.canActivate(context)).rejects.toThrow(ForbiddenException);
+    await expect(guard.canActivate(context)).rejects.toThrow(
+      ForbiddenException,
+    );
   });
 
   it('should allow access and populate request.branch when valid', async () => {

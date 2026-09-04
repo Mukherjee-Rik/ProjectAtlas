@@ -10,9 +10,29 @@ export class DataAggregationEngineService {
   /**
    * Aggregates orders for a specific restaurant, branch, and date into DailySalesAggregate & MenuItemDailyMetrics.
    */
-  async aggregateDaily(restaurantId: string, branchId: string, targetDate: Date): Promise<void> {
-    const startOfDay = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate(), 0, 0, 0, 0);
-    const endOfDay = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate(), 23, 59, 59, 999);
+  async aggregateDaily(
+    restaurantId: string,
+    branchId: string,
+    targetDate: Date,
+  ): Promise<void> {
+    const startOfDay = new Date(
+      targetDate.getFullYear(),
+      targetDate.getMonth(),
+      targetDate.getDate(),
+      0,
+      0,
+      0,
+      0,
+    );
+    const endOfDay = new Date(
+      targetDate.getFullYear(),
+      targetDate.getMonth(),
+      targetDate.getDate(),
+      23,
+      59,
+      59,
+      999,
+    );
 
     const restaurant = await this.prisma.restaurant.findUnique({
       where: { id: restaurantId },
@@ -86,7 +106,12 @@ export class DataAggregationEngineService {
 
     const itemAggregates: Record<
       string,
-      { quantitySold: number; grossRevenue: number; discountImpact: number; ordersCount: number }
+      {
+        quantitySold: number;
+        grossRevenue: number;
+        discountImpact: number;
+        ordersCount: number;
+      }
     > = {};
 
     orders.forEach((ord) => {
@@ -139,13 +164,16 @@ export class DataAggregationEngineService {
             };
           }
           itemAggregates[item.menuItemId].quantitySold += item.quantity;
-          itemAggregates[item.menuItemId].grossRevenue += Number(item.totalPrice);
+          itemAggregates[item.menuItemId].grossRevenue += Number(
+            item.totalPrice,
+          );
           itemAggregates[item.menuItemId].ordersCount += 1;
         });
       }
     });
 
-    const averageOrderValue = completedOrders > 0 ? (grossSales - refundAmount) / completedOrders : 0;
+    const averageOrderValue =
+      completedOrders > 0 ? (grossSales - refundAmount) / completedOrders : 0;
 
     // 1. Upsert DailySalesAggregate
     await this.prisma.dailySalesAggregate.upsert({
@@ -258,7 +286,10 @@ export class DataAggregationEngineService {
     }
 
     // Identify unique (restaurantId, branchId, dateString) tuples
-    const distinctDays = new Map<string, { restaurantId: string; branchId: string; date: Date }>();
+    const distinctDays = new Map<
+      string,
+      { restaurantId: string; branchId: string; date: Date }
+    >();
 
     orders.forEach((o) => {
       const dateKey = `${o.restaurantId}_${o.branchId}_${o.createdAt.toISOString().slice(0, 10)}`;
@@ -266,7 +297,11 @@ export class DataAggregationEngineService {
         distinctDays.set(dateKey, {
           restaurantId: o.restaurantId,
           branchId: o.branchId,
-          date: new Date(o.createdAt.getFullYear(), o.createdAt.getMonth(), o.createdAt.getDate()),
+          date: new Date(
+            o.createdAt.getFullYear(),
+            o.createdAt.getMonth(),
+            o.createdAt.getDate(),
+          ),
         });
       }
     });

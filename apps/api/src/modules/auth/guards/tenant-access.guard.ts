@@ -42,7 +42,9 @@ export class TenantAccessGuard implements CanActivate {
     if (user.role === 'PLATFORM_ADMIN') {
       const tenantHeaderValue = request.headers[TENANT_HEADER];
       const tenantId =
-        (typeof tenantHeaderValue === 'string' ? tenantHeaderValue : undefined) ||
+        (typeof tenantHeaderValue === 'string'
+          ? tenantHeaderValue
+          : undefined) ||
         request.params?.tenantId ||
         request.query?.tenantId ||
         request.body?.tenantId;

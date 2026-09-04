@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  Logger,
+} from '@nestjs/common';
 import { PrismaService } from '../../database/prisma/prisma.service';
 import { IsNotEmpty, IsOptional, IsString, IsEmail } from 'class-validator';
 import crypto from 'node:crypto';
@@ -11,7 +16,8 @@ export class CreateSupportTicketDto {
 
   @IsOptional()
   @IsString()
-  category?: 'TECHNICAL' | 'BILLING' | 'HARDWARE' | 'MENU_SETUP' | 'FEATURE_REQUEST';
+  category?:
+    'TECHNICAL' | 'BILLING' | 'HARDWARE' | 'MENU_SETUP' | 'FEATURE_REQUEST';
 
   @IsOptional()
   @IsString()
@@ -77,7 +83,7 @@ export class ContactInquiryDto {
 @Injectable()
 export class SupportService {
   private readonly logger = new Logger(SupportService.name);
-  private readonly notificationRecipient = 'baleremailamar@gmail.com';
+  private readonly notificationRecipient = 'rikmukherjee1999@gmail.com';
 
   constructor(
     private readonly prisma: PrismaService,
@@ -119,7 +125,7 @@ export class SupportService {
       },
     });
 
-    // Send instant email notification to baleremailamar@gmail.com
+    // Send instant email notification to rikmukherjee1999@gmail.com
     const emailSubject = `[Atlas Support - ${ticket.priority}] ${ticket.ticketNumber}: ${ticket.subject}`;
     const emailHtml = `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #0c0d12; color: #f4f4f5; padding: 24px; border-radius: 12px; max-width: 600px;">
@@ -193,12 +199,16 @@ ${ticket.description}
 
   async handleContactInquiry(dto: ContactInquiryDto) {
     const referenceCode = `INQ-${crypto.randomBytes(3).toString('hex').toUpperCase()}`;
-    const timestamp = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+    const timestamp = new Date().toLocaleString('en-IN', {
+      timeZone: 'Asia/Kolkata',
+    });
 
-    this.logger.log(`[SupportService] Contact inquiry received (${referenceCode}) from ${dto.name} (${dto.email})`);
+    this.logger.log(
+      `[SupportService] Contact inquiry received (${referenceCode}) from ${dto.name} (${dto.email})`,
+    );
 
     const emailSubject = `[Atlas Contact/Inquiry] ${dto.inquiryType || 'General'}: ${dto.subject || dto.name} (${referenceCode})`;
-    
+
     const emailHtml = `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #0c0d12; color: #f4f4f5; padding: 24px; border-radius: 12px; max-width: 600px;">
         <div style="border-bottom: 1px solid #27272a; padding-bottom: 16px; margin-bottom: 20px;">
@@ -239,7 +249,7 @@ ${ticket.description}
         </div>
 
         <div style="border-top: 1px solid #27272a; padding-top: 16px; font-size: 11px; color: #71717a; text-align: center;">
-          Project Atlas Contact Service • Direct Phone: +91 9903085026 • Email: baleremailamar@gmail.com
+          Kafei Contact Service • Direct Phone: +91 9903085026 • Email: rikmukherjee1999@gmail.com
         </div>
       </div>
     `;
@@ -269,7 +279,8 @@ ${dto.message}
     return {
       success: true,
       referenceCode,
-      message: 'Your inquiry has been received. Our team will contact you shortly.',
+      message:
+        'Your inquiry has been received. Our team will contact you shortly.',
     };
   }
 
@@ -295,7 +306,12 @@ ${dto.message}
     });
   }
 
-  async resolveTicketForUser(ticketId: string, userId: string, role: string, dto: ResolveSupportTicketDto) {
+  async resolveTicketForUser(
+    ticketId: string,
+    userId: string,
+    role: string,
+    dto: ResolveSupportTicketDto,
+  ) {
     const ticket = await this.prisma.supportTicket.findUnique({
       where: { id: ticketId },
       include: { restaurant: true },

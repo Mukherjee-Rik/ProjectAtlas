@@ -1,5 +1,5 @@
 /**
- * Atlas Standard Form Validation Utilities
+ * Kafei Standard Form Validation Utilities
  */
 
 // Email regex adhering to RFC 5322 standard

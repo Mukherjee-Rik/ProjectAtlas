@@ -136,7 +136,9 @@ export class BranchesService {
       // Non-owner staff (waiter, cashier, kitchen, manager, staff) only have access to their Main branch
       const mainBranch =
         branches.find(
-          (b) => b.code.toUpperCase() === 'MAIN' || b.name.toLowerCase().includes('main'),
+          (b) =>
+            b.code.toUpperCase() === 'MAIN' ||
+            b.name.toLowerCase().includes('main'),
         ) || branches[0];
       return mainBranch ? [mainBranch] : [];
     }
@@ -189,7 +191,9 @@ export class BranchesService {
 
       const mainBranch =
         allBranches.find(
-          (b) => b.code.toUpperCase() === 'MAIN' || b.name.toLowerCase().includes('main'),
+          (b) =>
+            b.code.toUpperCase() === 'MAIN' ||
+            b.name.toLowerCase().includes('main'),
         ) || allBranches[0];
 
       if (mainBranch && mainBranch.id !== branch.id) {

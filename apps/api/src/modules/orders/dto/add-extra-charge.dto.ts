@@ -1,8 +1,18 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString, IsUUID, Min } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsPositive,
+  IsString,
+  IsUUID,
+  Min,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class AddExtraChargeDto {
-  @ApiPropertyOptional({ description: 'Specific order ID to attach the extra charge to' })
+  @ApiPropertyOptional({
+    description: 'Specific order ID to attach the extra charge to',
+  })
   @IsOptional()
   @IsUUID()
   orderId?: string;
@@ -12,7 +22,10 @@ export class AddExtraChargeDto {
   @IsUUID()
   tableId?: string;
 
-  @ApiProperty({ description: 'Description or item name (e.g. Broken Glassware, Extra Beverage, Delivery Charge)' })
+  @ApiProperty({
+    description:
+      'Description or item name (e.g. Broken Glassware, Extra Beverage, Delivery Charge)',
+  })
   @IsNotEmpty()
   @IsString()
   name: string;
@@ -22,7 +35,10 @@ export class AddExtraChargeDto {
   @IsPositive()
   amount: number;
 
-  @ApiPropertyOptional({ description: 'Quantity of items / charges', default: 1 })
+  @ApiPropertyOptional({
+    description: 'Quantity of items / charges',
+    default: 1,
+  })
   @IsOptional()
   @IsNumber()
   @Min(1)
@@ -33,12 +49,17 @@ export class AddExtraChargeDto {
   @IsString()
   reason?: string;
 
-  @ApiPropertyOptional({ description: 'Detailed remarks or notes from cashier' })
+  @ApiPropertyOptional({
+    description: 'Detailed remarks or notes from cashier',
+  })
   @IsOptional()
   @IsString()
   notes?: string;
 
-  @ApiPropertyOptional({ description: 'Optional menu item ID if this charge references a catalog item' })
+  @ApiPropertyOptional({
+    description:
+      'Optional menu item ID if this charge references a catalog item',
+  })
   @IsOptional()
   @IsUUID()
   menuItemId?: string;

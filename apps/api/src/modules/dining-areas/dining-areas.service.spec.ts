@@ -1,4 +1,8 @@
-import { ConflictException, ForbiddenException, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { DiningAreasService } from './dining-areas.service';
 import { PrismaService } from '../../database/prisma/prisma.service';
@@ -34,7 +38,10 @@ describe('DiningAreasService', () => {
   });
 
   it('create should throw ConflictException if duplicate code in branch', async () => {
-    prismaService.diningArea.findUnique.mockResolvedValue({ id: 'da-1', code: 'INDOOR' });
+    prismaService.diningArea.findUnique.mockResolvedValue({
+      id: 'da-1',
+      code: 'INDOOR',
+    });
 
     await expect(
       service.create('branch-a', {

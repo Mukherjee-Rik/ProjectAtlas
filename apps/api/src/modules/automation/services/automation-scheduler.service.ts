@@ -17,7 +17,9 @@ export class AutomationSchedulerService implements OnModuleInit {
     try {
       await this.loadScheduledRules();
     } catch (err: any) {
-      this.logger.warn(`Could not initialize scheduled rules during startup: ${err.message}`);
+      this.logger.warn(
+        `Could not initialize scheduled rules during startup: ${err.message}`,
+      );
     }
   }
 
@@ -37,7 +39,9 @@ export class AutomationSchedulerService implements OnModuleInit {
         if (rule.schedule && cron.validate(rule.schedule)) {
           this.registerJob(rule.id, rule.schedule, rule.name);
         } else {
-          this.logger.warn(`Invalid cron expression for rule "${rule.name}": ${rule.schedule}`);
+          this.logger.warn(
+            `Invalid cron expression for rule "${rule.name}": ${rule.schedule}`,
+          );
         }
       }
 
@@ -53,11 +57,15 @@ export class AutomationSchedulerService implements OnModuleInit {
     }
 
     const task = cron.schedule(schedule, async () => {
-      this.logger.log(`⏰ Executing scheduled automation: "${name}" (${ruleId})`);
+      this.logger.log(
+        `⏰ Executing scheduled automation: "${name}" (${ruleId})`,
+      );
       try {
         await this.engine.evaluateRule(ruleId);
       } catch (err: any) {
-        this.logger.error(`Scheduled automation "${name}" failed: ${err.message}`);
+        this.logger.error(
+          `Scheduled automation "${name}" failed: ${err.message}`,
+        );
       }
     });
 

@@ -1,4 +1,8 @@
-import { Injectable, BadRequestException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from '../../database/prisma/prisma.service';
 
 @Injectable()
@@ -33,10 +37,15 @@ export class SubscriptionUsageService {
     });
   }
 
-  async checkLimit(restaurantId: string, limitType: 'maxTables' | 'maxStaff' | 'maxBranches' | 'maxMenus') {
+  async checkLimit(
+    restaurantId: string,
+    limitType: 'maxTables' | 'maxStaff' | 'maxBranches' | 'maxMenus',
+  ) {
     const subscription = await this.getActiveSubscription(restaurantId);
     if (!subscription) {
-      throw new ForbiddenException('No active subscription or trial found for this restaurant.');
+      throw new ForbiddenException(
+        'No active subscription or trial found for this restaurant.',
+      );
     }
 
     const plan = subscription.plan;
@@ -61,7 +70,9 @@ export class SubscriptionUsageService {
           },
         });
         if (currentUsage >= limitValue) {
-          throw new BadRequestException(`Table limit reached (${limitValue} tables). Upgrade your plan to add more tables.`);
+          throw new BadRequestException(
+            `Table limit reached (${limitValue} tables). Upgrade your plan to add more tables.`,
+          );
         }
         break;
 
@@ -75,7 +86,9 @@ export class SubscriptionUsageService {
             where: { tenantId: restaurant.tenantId },
           });
           if (currentUsage >= limitValue) {
-            throw new BadRequestException(`Staff limit reached (${limitValue} staff). Upgrade your plan to add more staff.`);
+            throw new BadRequestException(
+              `Staff limit reached (${limitValue} staff). Upgrade your plan to add more staff.`,
+            );
           }
         }
         break;
@@ -85,7 +98,9 @@ export class SubscriptionUsageService {
           where: { restaurantId },
         });
         if (currentUsage >= limitValue) {
-          throw new BadRequestException(`Branch limit reached (${limitValue} branches). Upgrade your plan to add more branches.`);
+          throw new BadRequestException(
+            `Branch limit reached (${limitValue} branches). Upgrade your plan to add more branches.`,
+          );
         }
         break;
 
@@ -94,7 +109,9 @@ export class SubscriptionUsageService {
           where: { restaurantId },
         });
         if (currentUsage >= limitValue) {
-          throw new BadRequestException(`Menu limit reached (${limitValue} menus). Upgrade your plan to add more menus.`);
+          throw new BadRequestException(
+            `Menu limit reached (${limitValue} menus). Upgrade your plan to add more menus.`,
+          );
         }
         break;
     }
@@ -134,7 +151,9 @@ export class SubscriptionUsageService {
     });
 
     const staffCount = restaurant
-      ? await this.prisma.tenantMembership.count({ where: { tenantId: restaurant.tenantId } })
+      ? await this.prisma.tenantMembership.count({
+          where: { tenantId: restaurant.tenantId },
+        })
       : 0;
 
     const branchesCount = await this.prisma.branch.count({
@@ -149,7 +168,10 @@ export class SubscriptionUsageService {
       planName: subscription.plan.name,
       status: subscription.status,
       billingCycle: subscription.billingCycle,
-      nextBillingDate: subscription.status === 'TRIALING' ? subscription.trialEnd : subscription.currentPeriodEnd,
+      nextBillingDate:
+        subscription.status === 'TRIALING'
+          ? subscription.trialEnd
+          : subscription.currentPeriodEnd,
       usage: {
         tables: { current: tablesCount, limit: limits.maxTables ?? 0 },
         staff: { current: staffCount, limit: limits.maxStaff ?? 0 },

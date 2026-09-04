@@ -1,6 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ForecastExplainabilityService } from './forecast-explainability.service';
-import { FeatureEngineeringService, DailyFeatureVector } from './feature-engineering.service';
+import {
+  FeatureEngineeringService,
+  DailyFeatureVector,
+} from './feature-engineering.service';
 
 describe('ForecastExplainabilityService', () => {
   let service: ForecastExplainabilityService;
@@ -40,7 +43,9 @@ describe('ForecastExplainabilityService', () => {
       ],
     }).compile();
 
-    service = module.get<ForecastExplainabilityService>(ForecastExplainabilityService);
+    service = module.get<ForecastExplainabilityService>(
+      ForecastExplainabilityService,
+    );
   });
 
   it('should decompose forecast into 4 causal factors with human explanation', async () => {
