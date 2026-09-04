@@ -67,7 +67,15 @@ export function InteractiveTableStandee({ className = '' }: { className?: string
   const [addedItemKey, setAddedItemKey] = useState<string | null>(null);
   const [lastTicketNumber, setLastTicketNumber] = useState<number>(284);
 
-  // Mouse physics for 3D tilt
+  const [isDesktopHover, setIsDesktopHover] = useState(false);
+
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setIsDesktopHover(window.matchMedia('(hover: hover) and (pointer: fine)').matches);
+    }
+  }, []);
+
+  // Mouse physics for 3D tilt (only on desktop hover devices)
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
@@ -78,7 +86,7 @@ export function InteractiveTableStandee({ className = '' }: { className?: string
   const glareY = useSpring(useTransform(mouseY, [-0.5, 0.5], [10, 90]), springConfig);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!containerRef.current) return;
+    if (!isDesktopHover || !containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
     const x = (e.clientX - rect.left) / rect.width - 0.5;
     const y = (e.clientY - rect.top) / rect.height - 0.5;
@@ -87,6 +95,7 @@ export function InteractiveTableStandee({ className = '' }: { className?: string
   };
 
   const handleMouseLeave = () => {
+    if (!isDesktopHover) return;
     mouseX.set(0);
     mouseY.set(0);
   };
@@ -128,27 +137,33 @@ export function InteractiveTableStandee({ className = '' }: { className?: string
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       className={`relative w-full max-w-full select-none ${className}`}
-      style={{ perspective: 1200 }}
+      style={isDesktopHover ? { perspective: 1200 } : undefined}
     >
       {/* Ambient glowing backdrop glow */}
       <div className="pointer-events-none absolute -inset-2 sm:-inset-4 rounded-3xl bg-gradient-to-tr from-emerald-500/10 via-primary/10 to-amber-500/10 blur-xl opacity-80" />
 
-      {/* Main 3D Container Box */}
+      {/* Main Container Box (Flat hardware-accelerated on mobile, 3D tilted on desktop) */}
       <motion.div
-        style={{
-          rotateX,
-          rotateY,
-          transformStyle: 'preserve-3d',
-        }}
-        className="relative w-full overflow-hidden rounded-2xl sm:rounded-3xl border border-border/80 bg-gradient-to-b from-card/95 via-card/85 to-card/95 p-4 sm:p-5 shadow-2xl backdrop-blur-xl"
+        style={
+          isDesktopHover
+            ? {
+                rotateX,
+                rotateY,
+                transformStyle: 'preserve-3d',
+              }
+            : undefined
+        }
+        className="relative w-full overflow-hidden rounded-2xl sm:rounded-3xl border border-border/80 bg-card sm:bg-card/90 sm:backdrop-blur-xl p-4 sm:p-5 shadow-xl sm:shadow-2xl"
       >
-        {/* Dynamic Glare Shimmer */}
-        <motion.div
-          className="pointer-events-none absolute inset-0 rounded-2xl sm:rounded-3xl opacity-15"
-          style={{
-            background: `radial-gradient(circle at ${glareX}% ${glareY}%, rgba(255,255,255,0.4) 0%, transparent 65%)`,
-          }}
-        />
+        {/* Dynamic Glare Shimmer (Desktop Only) */}
+        {isDesktopHover && (
+          <motion.div
+            className="pointer-events-none absolute inset-0 rounded-2xl sm:rounded-3xl opacity-15"
+            style={{
+              background: `radial-gradient(circle at ${glareX}% ${glareY}%, rgba(255,255,255,0.4) 0%, transparent 65%)`,
+            }}
+          />
+        )}
 
         {/* ═══ Top Control Bar ═══ */}
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/60 pb-3 sm:pb-3.5">
@@ -234,7 +249,7 @@ export function InteractiveTableStandee({ className = '' }: { className?: string
           >
             {/* Acrylic Glass Plaque */}
             <div
-              className="relative w-full max-w-[210px] rounded-2xl border border-white/25 bg-gradient-to-b from-white/20 via-white/10 to-white/15 p-3.5 shadow-xl backdrop-blur-md dark:border-white/15 dark:from-white/10 dark:via-white/5 dark:to-white/10"
+              className="relative w-full max-w-[210px] rounded-2xl border border-white/25 bg-gradient-to-b from-white/20 via-white/10 to-white/15 p-3.5 shadow-xl sm:backdrop-blur-md dark:border-white/15 dark:from-white/10 dark:via-white/5 dark:to-white/10"
               style={{
                 boxShadow:
                   '0 15px 35px -10px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.4)',

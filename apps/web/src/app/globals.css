@@ -144,11 +144,16 @@
   --font-display: var(--font-funnel-display), var(--font-geist-sans), system-ui, sans-serif;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
   background-color: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   -webkit-tap-highlight-color: transparent;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* ---------------------------------------------------------------------------
@@ -538,17 +543,18 @@ select:disabled,
   z-index: -1;
   overflow: hidden;
   pointer-events: none;
+  transform: translateZ(0);
+  will-change: transform;
 }
 
 .ambient::before {
   content: '';
   position: absolute;
-  inset: -25%;
+  inset: -10%;
   background:
     radial-gradient(38rem 38rem at 14% 16%, rgb(200 30 30 / var(--amb-1)), transparent 62%),
     radial-gradient(34rem 34rem at 86% 10%, rgb(140 140 152 / var(--amb-2)), transparent 64%),
     radial-gradient(36rem 36rem at 72% 86%, rgb(255 107 107 / var(--amb-3)), transparent 62%);
-  filter: blur(28px);
 }
 
 /* Grain kills the banding you otherwise get across a wide soft gradient. */
@@ -561,18 +567,16 @@ select:disabled,
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
+/* Disable full-screen fixed blended layer on mobile to preserve 60/120fps scrolling */
+@media (max-width: 768px), (pointer: coarse) {
+  .ambient {
+    display: none !important;
+  }
+}
+
 /* ---------------------------------------------------------------------------
    Liquid glass
-   Frosted glass (.glass above) is blur. This is the lens version: the backdrop
-   is REFRACTED at the edges via an SVG displacement map (see
-   components/ui/liquid-glass-defs.tsx), which is what makes it read as a
-   physical pane rather than a translucent rectangle.
-
-   Four layers, in paint order:
-     1. backdrop  — refract, then blur and saturate what shows through.
-     2. body tint — low alpha; the lens does the work, not the fill.
-     3. ::before  — specular sheen that follows the pointer (the "liquid" part).
-     4. ::after   — a 1px rim lit from the pointer side, masked to the border.
+   High-performance frosted material with specular sheen and lit rim.
 --------------------------------------------------------------------------- */
 @property --lg-x {
   syntax: '<percentage>';
@@ -587,28 +591,22 @@ select:disabled,
 
 :root {
   --lg-tint: 255 255 255;
-  --lg-tint-a: 0.42;
+  --lg-tint-a: 0.65;
   --lg-sheen: rgba(255, 255, 255, 0.75);
   --lg-rim: rgba(255, 255, 255, 1);
   --lg-rim-dim: rgba(255, 255, 255, 0.25);
-  --lg-shadow: 0 16px 50px rgba(23, 23, 26, 0.18), 0 3px 12px rgba(23, 23, 26, 0.10);
+  --lg-shadow: 0 16px 50px rgba(23, 23, 26, 0.14), 0 3px 12px rgba(23, 23, 26, 0.08);
 }
 
 .dark {
-  --lg-tint: 31 31 35;
-  --lg-tint-a: 0.32;
-  --lg-sheen: rgba(242, 242, 243, 0.40);
-  --lg-rim: rgba(242, 242, 243, 0.72);
+  --lg-tint: 27 27 31;
+  --lg-tint-a: 0.55;
+  --lg-sheen: rgba(242, 242, 243, 0.35);
+  --lg-rim: rgba(242, 242, 243, 0.60);
   --lg-rim-dim: rgba(242, 242, 243, 0.10);
-  --lg-shadow: 0 16px 50px rgba(0, 0, 0, 0.55), 0 3px 12px rgba(0, 0, 0, 0.35);
+  --lg-shadow: 0 16px 50px rgba(0, 0, 0, 0.45), 0 3px 12px rgba(0, 0, 0, 0.25);
 }
 
-/* Must sit INSIDE a layer. Unlayered declarations outrank every layered one
-   regardless of specificity, so as plain CSS this silently beat Tailwind's
-   `sticky` utility and pinned the nav to position:relative. :where() did not
-   help — layer origin is compared before specificity. In @layer components
-   the utilities layer wins, which is what we want: any position utility on
-   the element overrides this default. */
 @layer components {
   .liquid-glass {
     position: relative;
@@ -618,10 +616,8 @@ select:disabled,
 .liquid-glass {
   isolation: isolate;
   background-color: rgb(var(--lg-tint) / var(--lg-tint-a));
-  -webkit-backdrop-filter: blur(16px) saturate(190%);
-  backdrop-filter: blur(16px) saturate(190%);
-  /* Progressive enhancement: adds edge refraction where url() is honoured. */
-  backdrop-filter: url(#kafei-lens) url(#atlas-lens) blur(16px) saturate(190%);
+  -webkit-backdrop-filter: blur(14px) saturate(180%);
+  backdrop-filter: blur(14px) saturate(180%);
   box-shadow:
     var(--lg-shadow),
     inset 0 1px 1px 0 var(--lg-rim),
@@ -670,19 +666,21 @@ select:disabled,
 
 /* Small controls get the gentler lens. */
 .liquid-glass-sm {
-  -webkit-backdrop-filter: blur(12px) saturate(175%);
-  backdrop-filter: blur(12px) saturate(175%);
-  backdrop-filter: url(#kafei-lens-sm) url(#atlas-lens-sm) blur(12px) saturate(175%);
+  -webkit-backdrop-filter: blur(10px) saturate(160%);
+  backdrop-filter: blur(10px) saturate(160%);
 }
 
-/* No SVG-filter support in backdrop-filter (Safari today): fall back to the
-   frosted material, which still looks intentional. */
-@supports not ((backdrop-filter: url(#kafei-lens)) or (backdrop-filter: url(#atlas-lens))) {
-  .liquid-glass,
-  .liquid-glass-sm {
-    backdrop-filter: blur(22px) saturate(180%);
-    -webkit-backdrop-filter: blur(22px) saturate(180%);
-    background-color: rgb(var(--lg-tint) / calc(var(--lg-tint-a) + 0.18));
+/* Mobile high-efficiency glass: disable heavy mask composites and use native blur */
+@media (max-width: 768px), (pointer: coarse) {
+  .liquid-glass {
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    background-color: rgb(var(--card) / 0.88);
+    transition: none;
+  }
+  .liquid-glass::before,
+  .liquid-glass::after {
+    display: none !important;
   }
 }
 
