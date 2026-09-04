@@ -19,7 +19,10 @@ import { Permissions } from '../auth/decorators/permissions.decorator';
 import { CurrentRestaurant } from '../auth/decorators/current-restaurant.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { PERMISSIONS } from '../auth/permissions/permissions';
-import { RESTAURANT_HEADER, TENANT_HEADER } from '../auth/constants/tenant.constants';
+import {
+  RESTAURANT_HEADER,
+  TENANT_HEADER,
+} from '../auth/constants/tenant.constants';
 import type { CurrentRestaurant as CurrentRestaurantType } from '../auth/types/current-restaurant.type';
 import { InitiatePaymentDto } from './dto/initiate-payment.dto';
 import { MockWebhookDto } from './dto/mock-webhook.dto';
@@ -34,7 +37,12 @@ export class PaymentsController {
   @ApiBearerAuth('access-token')
   @ApiHeader({ name: TENANT_HEADER, required: true })
   @ApiHeader({ name: RESTAURANT_HEADER, required: true })
-  @UseGuards(JwtAuthGuard, PermissionsGuard, TenantAccessGuard, RestaurantAccessGuard)
+  @UseGuards(
+    JwtAuthGuard,
+    PermissionsGuard,
+    TenantAccessGuard,
+    RestaurantAccessGuard,
+  )
   @Post('initiate')
   @Permissions(PERMISSIONS.ORDERS_UPDATE)
   async initiate(
@@ -42,7 +50,8 @@ export class PaymentsController {
     @Headers(TENANT_HEADER) tenantId: string,
     @Body() dto: InitiatePaymentDto,
   ) {
-    if (!restaurant) throw new BadRequestException('No active restaurant selected');
+    if (!restaurant)
+      throw new BadRequestException('No active restaurant selected');
     return this.paymentsService.initiatePayment({
       tenantId,
       restaurantId: restaurant.id,
@@ -56,11 +65,17 @@ export class PaymentsController {
   @ApiBearerAuth('access-token')
   @ApiHeader({ name: TENANT_HEADER, required: true })
   @ApiHeader({ name: RESTAURANT_HEADER, required: true })
-  @UseGuards(JwtAuthGuard, PermissionsGuard, TenantAccessGuard, RestaurantAccessGuard)
+  @UseGuards(
+    JwtAuthGuard,
+    PermissionsGuard,
+    TenantAccessGuard,
+    RestaurantAccessGuard,
+  )
   @Get()
   @Permissions(PERMISSIONS.ORDERS_READ)
   async findAll(@CurrentRestaurant() restaurant: CurrentRestaurantType) {
-    if (!restaurant) throw new BadRequestException('No active restaurant selected');
+    if (!restaurant)
+      throw new BadRequestException('No active restaurant selected');
     return this.paymentsService.findAll(restaurant.id);
   }
 
@@ -68,11 +83,17 @@ export class PaymentsController {
   @ApiBearerAuth('access-token')
   @ApiHeader({ name: TENANT_HEADER, required: true })
   @ApiHeader({ name: RESTAURANT_HEADER, required: true })
-  @UseGuards(JwtAuthGuard, PermissionsGuard, TenantAccessGuard, RestaurantAccessGuard)
+  @UseGuards(
+    JwtAuthGuard,
+    PermissionsGuard,
+    TenantAccessGuard,
+    RestaurantAccessGuard,
+  )
   @Get('refunds')
   @Permissions(PERMISSIONS.ORDERS_READ)
   async findRefunds(@CurrentRestaurant() restaurant: CurrentRestaurantType) {
-    if (!restaurant) throw new BadRequestException('No active restaurant selected');
+    if (!restaurant)
+      throw new BadRequestException('No active restaurant selected');
     return this.paymentsService.findRefunds(restaurant.id);
   }
 
@@ -80,7 +101,12 @@ export class PaymentsController {
   @ApiBearerAuth('access-token')
   @ApiHeader({ name: TENANT_HEADER, required: true })
   @ApiHeader({ name: RESTAURANT_HEADER, required: true })
-  @UseGuards(JwtAuthGuard, PermissionsGuard, TenantAccessGuard, RestaurantAccessGuard)
+  @UseGuards(
+    JwtAuthGuard,
+    PermissionsGuard,
+    TenantAccessGuard,
+    RestaurantAccessGuard,
+  )
   @Post(':id/refund')
   @Permissions(PERMISSIONS.ORDERS_UPDATE)
   async refund(
@@ -89,8 +115,14 @@ export class PaymentsController {
     @CurrentUser() user: any,
     @Body() dto: ProcessRefundDto,
   ) {
-    if (!restaurant) throw new BadRequestException('No active restaurant selected');
-    return this.paymentsService.refundPayment(paymentId, restaurant.id, user, dto);
+    if (!restaurant)
+      throw new BadRequestException('No active restaurant selected');
+    return this.paymentsService.refundPayment(
+      paymentId,
+      restaurant.id,
+      user,
+      dto,
+    );
   }
 
   // 5. Webhook listener for Stripe/Razorpay (Public / No Auth guard)
@@ -100,9 +132,15 @@ export class PaymentsController {
     @Body() payload: MockWebhookDto,
   ) {
     if (payload.status === 'SUCCESS') {
-      return this.paymentsService.settlePayment(paymentId, payload.transactionReference);
+      return this.paymentsService.settlePayment(
+        paymentId,
+        payload.transactionReference,
+      );
     } else {
-      return this.paymentsService.failPayment(paymentId, payload.failureReason ?? 'Transaction declined');
+      return this.paymentsService.failPayment(
+        paymentId,
+        payload.failureReason ?? 'Transaction declined',
+      );
     }
   }
 }

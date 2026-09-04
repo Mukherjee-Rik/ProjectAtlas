@@ -101,3 +101,11 @@ export async function updateUser(id: string, data: UpdateUserPayload) {
 export async function deleteUser(id: string) {
   return apiClient.delete<void>(`/users/${id}`);
 }
+
+export async function exportMyUserData() {
+  return apiClient.get<any>('/users/me/export');
+}
+
+export async function deleteMyAccount() {
+  return apiClient.delete<{ success: boolean; message: string; deactivatedAt: string }>('/users/me');
+}

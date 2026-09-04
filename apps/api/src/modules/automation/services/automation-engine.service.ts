@@ -20,7 +20,9 @@ export class AutomationEngineService {
    * Returns true if the rule fired, false otherwise.
    */
   async evaluateRule(ruleId: string): Promise<boolean> {
-    const rule = await this.prisma.automationRule.findUnique({ where: { id: ruleId } });
+    const rule = await this.prisma.automationRule.findUnique({
+      where: { id: ruleId },
+    });
     if (!rule || !rule.enabled) return false;
 
     // Cooldown check
@@ -28,14 +30,20 @@ export class AutomationEngineService {
       const cooldownMs = rule.cooldownMinutes * 60 * 1000;
       const elapsed = Date.now() - rule.lastTriggeredAt.getTime();
       if (elapsed < cooldownMs) {
-        this.logger.debug(`Rule "${rule.name}" is in cooldown (${Math.round((cooldownMs - elapsed) / 60000)}m remaining)`);
+        this.logger.debug(
+          `Rule "${rule.name}" is in cooldown (${Math.round((cooldownMs - elapsed) / 60000)}m remaining)`,
+        );
         return false;
       }
     }
 
     // Compute context for condition evaluation
     const now = new Date();
-    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const todayStart = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+    );
 
     let conditionMet = false;
     let contextData: any = {};
@@ -43,49 +51,77 @@ export class AutomationEngineService {
     if (rule.conditionType && rule.conditionValue !== null) {
       switch (rule.conditionType) {
         case 'SALES_BELOW': {
-          const sales = await this.contextService.getSalesContext(rule.restaurantId, todayStart, now);
+          const sales = await this.contextService.getSalesContext(
+            rule.restaurantId,
+            todayStart,
+            now,
+          );
           conditionMet = sales.totalSales < (rule.conditionValue ?? 0);
           contextData = { sales };
           break;
         }
         case 'SALES_ABOVE': {
-          const sales = await this.contextService.getSalesContext(rule.restaurantId, todayStart, now);
+          const sales = await this.contextService.getSalesContext(
+            rule.restaurantId,
+            todayStart,
+            now,
+          );
           conditionMet = sales.totalSales > (rule.conditionValue ?? 0);
           contextData = { sales };
           break;
         }
         case 'ORDERS_ABOVE': {
-          const orders = await this.contextService.getOrderContext(rule.restaurantId, todayStart, now);
+          const orders = await this.contextService.getOrderContext(
+            rule.restaurantId,
+            todayStart,
+            now,
+          );
           conditionMet = orders.totalOrders > (rule.conditionValue ?? 0);
           contextData = { orders };
           break;
         }
         case 'CANCELLATIONS_ABOVE': {
-          const ops = await this.contextService.getOperationsContext(rule.restaurantId, todayStart, now);
+          const ops = await this.contextService.getOperationsContext(
+            rule.restaurantId,
+            todayStart,
+            now,
+          );
           conditionMet = ops.cancelledOrders > (rule.conditionValue ?? 0);
           contextData = { ops };
           break;
         }
         case 'PENDING_ORDERS_ABOVE': {
-          const orders = await this.contextService.getOrderContext(rule.restaurantId, todayStart, now);
-          conditionMet = (orders.statusBreakdown['PENDING'] || 0) > (rule.conditionValue ?? 0);
+          const orders = await this.contextService.getOrderContext(
+            rule.restaurantId,
+            todayStart,
+            now,
+          );
+          conditionMet =
+            (orders.statusBreakdown['PENDING'] || 0) >
+            (rule.conditionValue ?? 0);
           contextData = { orders };
           break;
         }
         case 'INVENTORY_LOW': {
-          const inv = await this.contextService.getInventoryContext(rule.restaurantId);
+          const inv = await this.contextService.getInventoryContext(
+            rule.restaurantId,
+          );
           conditionMet = inv.lowStockCount > 0;
           contextData = { inventory: inv };
           break;
         }
         case 'INVENTORY_CRITICAL': {
-          const inv = await this.contextService.getInventoryContext(rule.restaurantId);
+          const inv = await this.contextService.getInventoryContext(
+            rule.restaurantId,
+          );
           conditionMet = inv.criticalCount > 0;
           contextData = { inventory: inv };
           break;
         }
         case 'INVENTORY_OUT': {
-          const inv = await this.contextService.getInventoryContext(rule.restaurantId);
+          const inv = await this.contextService.getInventoryContext(
+            rule.restaurantId,
+          );
           conditionMet = inv.outOfStockCount > 0;
           contextData = { inventory: inv };
           break;
@@ -155,7 +191,11 @@ export class AutomationEngineService {
    * Dispatches events (e.g. from OrderController, PaymentService, InventoryService)
    * and runs all event-triggered automations.
    */
-  async handleEvent(eventType: string, restaurantId: string, eventData?: any): Promise<number> {
+  async handleEvent(
+    eventType: string,
+    restaurantId: string,
+    eventData?: any,
+  ): Promise<number> {
     const rules = await this.prisma.automationRule.findMany({
       where: {
         restaurantId,
@@ -176,7 +216,11 @@ export class AutomationEngineService {
 
   private async dispatchAction(rule: any, contextData?: any) {
     const now = new Date();
-    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const todayStart = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+    );
 
     switch (rule.actionType) {
       case 'SEND_NOTIFICATION': {
@@ -190,11 +234,16 @@ export class AutomationEngineService {
         break;
       }
       case 'NOTIFY_LOW_INVENTORY': {
-        const inv = contextData?.inventory || (await this.contextService.getInventoryContext(rule.restaurantId));
+        const inv =
+          contextData?.inventory ||
+          (await this.contextService.getInventoryContext(rule.restaurantId));
         const items = inv.lowStockItems.concat(inv.outOfStockItems);
         const itemSummary = items
           .slice(0, 5)
-          .map((i: any) => `• ⚠️ **${i.name}**: ${i.currentStock} ${i.unit} (Min: ${i.minimumReorderLevel} ${i.unit} | Recommended reorder: ${i.recommendedReorder} ${i.unit})`)
+          .map(
+            (i: any) =>
+              `• ⚠️ **${i.name}**: ${i.currentStock} ${i.unit} (Min: ${i.minimumReorderLevel} ${i.unit} | Recommended reorder: ${i.recommendedReorder} ${i.unit})`,
+          )
           .join('\n');
 
         await this.notificationService.create({
@@ -202,14 +251,30 @@ export class AutomationEngineService {
           title: `📦 Low Inventory Warning — ${items.length} Item(s)`,
           message: `The following ingredients are at or below minimum threshold:\n\n${itemSummary}\n\nPlease generate purchase orders with suppliers to avoid stockouts.`,
           type: 'ALERT',
-          metadata: { automationId: rule.id, lowStockCount: inv.lowStockCount, outOfStockCount: inv.outOfStockCount },
+          metadata: {
+            automationId: rule.id,
+            lowStockCount: inv.lowStockCount,
+            outOfStockCount: inv.outOfStockCount,
+          },
         });
         break;
       }
       case 'GENERATE_REPORT': {
-        const sales = await this.contextService.getSalesContext(rule.restaurantId, todayStart, now);
-        const orders = await this.contextService.getOrderContext(rule.restaurantId, todayStart, now);
-        const ops = await this.contextService.getOperationsContext(rule.restaurantId, todayStart, now);
+        const sales = await this.contextService.getSalesContext(
+          rule.restaurantId,
+          todayStart,
+          now,
+        );
+        const orders = await this.contextService.getOrderContext(
+          rule.restaurantId,
+          todayStart,
+          now,
+        );
+        const ops = await this.contextService.getOperationsContext(
+          rule.restaurantId,
+          todayStart,
+          now,
+        );
 
         const report =
           `📊 **${rule.name}**\n\n` +
@@ -230,23 +295,44 @@ export class AutomationEngineService {
         break;
       }
       case 'GENERATE_RECOMMENDATION': {
-        const sales = await this.contextService.getSalesContext(rule.restaurantId, todayStart, now);
-        const ops = await this.contextService.getOperationsContext(rule.restaurantId, todayStart, now);
-        const inv = await this.contextService.getInventoryContext(rule.restaurantId);
+        const sales = await this.contextService.getSalesContext(
+          rule.restaurantId,
+          todayStart,
+          now,
+        );
+        const ops = await this.contextService.getOperationsContext(
+          rule.restaurantId,
+          todayStart,
+          now,
+        );
+        const inv = await this.contextService.getInventoryContext(
+          rule.restaurantId,
+        );
 
         const recommendations: string[] = [];
 
         if (ops.cancellationRate > 10) {
-          recommendations.push(`• 🚨 **High Cancellation Rate (${ops.cancellationRate.toFixed(1)}%)**: Review kitchen prep bottlenecks or customer table wait times.`);
+          recommendations.push(
+            `• 🚨 **High Cancellation Rate (${ops.cancellationRate.toFixed(1)}%)**: Review kitchen prep bottlenecks or customer table wait times.`,
+          );
         }
         if (inv.lowStockCount > 0) {
-          recommendations.push(`• 📦 **${inv.lowStockCount} ingredient(s) low in stock**: Create purchase orders for ${inv.lowStockItems.map((i: any) => i.name).slice(0, 3).join(', ')}.`);
+          recommendations.push(
+            `• 📦 **${inv.lowStockCount} ingredient(s) low in stock**: Create purchase orders for ${inv.lowStockItems
+              .map((i: any) => i.name)
+              .slice(0, 3)
+              .join(', ')}.`,
+          );
         }
         if (sales.topItem && sales.topItem !== 'None') {
-          recommendations.push(`• ⭐ **Promote Star Dishes**: "${sales.topItem}" is your #1 seller. Consider featuring it in menu combos during peak hours (**${ops.peakHours}**).`);
+          recommendations.push(
+            `• ⭐ **Promote Star Dishes**: "${sales.topItem}" is your #1 seller. Consider featuring it in menu combos during peak hours (**${ops.peakHours}**).`,
+          );
         }
         if (recommendations.length === 0) {
-          recommendations.push(`• ✅ **Operations Stable**: All operational metrics and stock levels are currently within target thresholds.`);
+          recommendations.push(
+            `• ✅ **Operations Stable**: All operational metrics and stock levels are currently within target thresholds.`,
+          );
         }
 
         await this.notificationService.create({
@@ -259,8 +345,16 @@ export class AutomationEngineService {
         break;
       }
       case 'CREATE_AI_INSIGHT': {
-        const sales = await this.contextService.getSalesContext(rule.restaurantId, todayStart, now);
-        const ops = await this.contextService.getOperationsContext(rule.restaurantId, todayStart, now);
+        const sales = await this.contextService.getSalesContext(
+          rule.restaurantId,
+          todayStart,
+          now,
+        );
+        const ops = await this.contextService.getOperationsContext(
+          rule.restaurantId,
+          todayStart,
+          now,
+        );
 
         const insight =
           `🤖 **Atlas Insight — ${rule.name}**\n\n` +
@@ -302,7 +396,13 @@ export class AutomationEngineService {
    * Platform Admin System-wide statistics.
    */
   async getAdminStats() {
-    const [totalRules, activeRules, totalExecutions, failedExecutions, notificationsSent] = await Promise.all([
+    const [
+      totalRules,
+      activeRules,
+      totalExecutions,
+      failedExecutions,
+      notificationsSent,
+    ] = await Promise.all([
       this.prisma.automationRule.count(),
       this.prisma.automationRule.count({ where: { enabled: true } }),
       this.prisma.automationExecution.count(),

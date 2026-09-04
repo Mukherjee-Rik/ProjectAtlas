@@ -1,5 +1,18 @@
-import { Controller, Post, Get, Body, UseGuards, BadRequestException, ForbiddenException } from '@nestjs/common';
-import { ApiOperation, ApiTags, ApiBearerAuth, ApiHeader } from '@nestjs/swagger';
+import {
+  Controller,
+  Post,
+  Get,
+  Body,
+  UseGuards,
+  BadRequestException,
+  ForbiddenException,
+} from '@nestjs/common';
+import {
+  ApiOperation,
+  ApiTags,
+  ApiBearerAuth,
+  ApiHeader,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RestaurantAccessGuard } from '../auth/guards/restaurant-access.guard';
 import { SubscriptionGuard } from '../auth/guards/subscription.guard';
@@ -24,16 +37,30 @@ export class AiController {
 
   @Post('query')
   @RequiresFeature('ai_copilot')
-  @ApiOperation({ summary: 'Ask natural-language questions about restaurant operations (Growth & Enterprise only)' })
+  @ApiOperation({
+    summary:
+      'Ask natural-language questions about restaurant operations (Growth & Enterprise only)',
+  })
   async query(
     @CurrentUser('id') userId: string,
     @CurrentUser('role') role: UserRole,
     @CurrentRestaurant() restaurant: CurrentRestaurantType,
-    @Body() body: { query: string; history?: { role: 'user' | 'model'; content: string }[] },
+    @Body()
+    body: {
+      query: string;
+      history?: { role: 'user' | 'model'; content: string }[];
+    },
   ) {
-    const allowedRoles: UserRole[] = [UserRole.PLATFORM_ADMIN, UserRole.OWNER, UserRole.ADMIN, UserRole.MANAGER];
+    const allowedRoles: UserRole[] = [
+      UserRole.PLATFORM_ADMIN,
+      UserRole.OWNER,
+      UserRole.ADMIN,
+      UserRole.MANAGER,
+    ];
     if (!allowedRoles.includes(role)) {
-      throw new ForbiddenException('AI Assistant is only accessible to Owners, Managers, and Platform Administrators.');
+      throw new ForbiddenException(
+        'AI Assistant is only accessible to Owners, Managers, and Platform Administrators.',
+      );
     }
 
     if (!restaurant?.id) {
@@ -44,20 +71,36 @@ export class AiController {
       throw new BadRequestException('Query parameter is required');
     }
 
-    return this.aiService.runQuery(userId, role, restaurant.id, body.query, body.history || []);
+    return this.aiService.runQuery(
+      userId,
+      role,
+      restaurant.id,
+      body.query,
+      body.history || [],
+    );
   }
 
   @Get('insights')
   @RequiresFeature('ai_copilot')
-  @ApiOperation({ summary: 'Get pre-calculated structured dashboard insights (Growth & Enterprise only)' })
+  @ApiOperation({
+    summary:
+      'Get pre-calculated structured dashboard insights (Growth & Enterprise only)',
+  })
   async getInsights(
     @CurrentUser('id') userId: string,
     @CurrentUser('role') role: UserRole,
     @CurrentRestaurant() restaurant: CurrentRestaurantType,
   ) {
-    const allowedRoles: UserRole[] = [UserRole.PLATFORM_ADMIN, UserRole.OWNER, UserRole.ADMIN, UserRole.MANAGER];
+    const allowedRoles: UserRole[] = [
+      UserRole.PLATFORM_ADMIN,
+      UserRole.OWNER,
+      UserRole.ADMIN,
+      UserRole.MANAGER,
+    ];
     if (!allowedRoles.includes(role)) {
-      throw new ForbiddenException('AI Insights are only accessible to Owners, Managers, and Platform Administrators.');
+      throw new ForbiddenException(
+        'AI Insights are only accessible to Owners, Managers, and Platform Administrators.',
+      );
     }
 
     if (!restaurant?.id) {
@@ -68,19 +111,22 @@ export class AiController {
       {
         id: 'ins-1',
         title: 'Busiest Operational Window',
-        description: 'Orders spike significantly between **7 PM - 9 PM**. Ensure staffing levels are optimized during this time.',
+        description:
+          'Orders spike significantly between **7 PM - 9 PM**. Ensure staffing levels are optimized during this time.',
         type: 'OPERATIONS',
       },
       {
         id: 'ins-2',
         title: 'Loyalty Performance',
-        description: 'Customer retention remains steady. **Repeat customers** represent a significant portion of active dine-in sessions.',
+        description:
+          'Customer retention remains steady. **Repeat customers** represent a significant portion of active dine-in sessions.',
         type: 'CUSTOMER',
       },
       {
         id: 'ins-3',
         title: 'System Health Check',
-        description: 'Third-party delivery integrations are connected and synchronized with no major callback errors in the last 24h.',
+        description:
+          'Third-party delivery integrations are connected and synchronized with no major callback errors in the last 24h.',
         type: 'INTEGRATIONS',
       },
     ];

@@ -15,6 +15,8 @@ import { StatCard } from '@/components/dashboard/stat-card';
 import { DashboardSkeleton } from '@/components/dashboard/dashboard-skeleton';
 import { PlatformAdminDashboard } from '@/components/dashboard/platform-admin-dashboard';
 import { AnalyticsDetailModal, AnalyticsModalMode } from '@/components/dashboard/revenue-detail-modal';
+import { DashboardLineGraph } from '@/components/dashboard/dashboard-line-graph';
+import { Pagination } from '@/components/ui/pagination';
 import { formatCurrency } from '@/lib/currency';
 
 export default function DashboardPage() {
@@ -59,6 +61,8 @@ export default function DashboardPage() {
   const [isLoadingAnalytics, setIsLoadingAnalytics] = useState(false);
   const [analyticsError, setAnalyticsError] = useState('');
   const [modalMode, setModalMode] = useState<AnalyticsModalMode | null>(null);
+  const [recentOrdersPage, setRecentOrdersPage] = useState(1);
+  const [recentOrdersPageSize, setRecentOrdersPageSize] = useState(5);
 
   const loadDashboard = useCallback(async (showRefreshing = false, start?: string, end?: string) => {
     if (user?.role === 'PLATFORM_ADMIN') {
@@ -165,6 +169,13 @@ export default function DashboardPage() {
 
   const { metrics, recentOrders, restaurantStaff } = dashboard;
 
+  const recentOrdersTotal = recentOrders?.length || 0;
+  const recentOrdersTotalPages = Math.ceil(recentOrdersTotal / recentOrdersPageSize) || 1;
+  const paginatedRecentOrders = (recentOrders || []).slice(
+    (recentOrdersPage - 1) * recentOrdersPageSize,
+    recentOrdersPage * recentOrdersPageSize,
+  );
+
   const getStatusStyle = (status: string) => {
     switch (status) {
       case 'COMPLETED':
@@ -182,11 +193,6 @@ export default function DashboardPage() {
         return 'bg-secondary text-muted-foreground border-border';
     }
   };
-
-  // Find max sales for SVG trend scaling
-  const maxSales = analytics?.salesTrend?.length
-    ? Math.max(...analytics.salesTrend.map((t) => t.sales), 100)
-    : 100;
 
   // Find max hourly count for hourly scaling
   const maxHourlyCount = analytics?.peakHours?.length
@@ -397,7 +403,7 @@ export default function DashboardPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border/50">
-                    {recentOrders.map((ord) => (
+                    {paginatedRecentOrders.map((ord) => (
                       <tr key={ord.id} className="hover:bg-secondary/50 transition-colors">
                         <td className="py-2.5 px-3 font-mono font-bold text-foreground">{ord.orderNumber}</td>
                         <td className="py-2.5 px-3 text-muted-foreground">{ord.tableName}</td>
@@ -424,6 +430,24 @@ export default function DashboardPage() {
                   </tbody>
                 </table>
               </div>
+
+              {recentOrders.length > 0 && (
+                <div className="pt-2 border-t border-border/40">
+                  <Pagination
+                    currentPage={recentOrdersPage}
+                    totalPages={recentOrdersTotalPages}
+                    onPageChange={setRecentOrdersPage}
+                    totalItems={recentOrdersTotal}
+                    pageSize={recentOrdersPageSize}
+                    pageSizeOptions={[5, 10, 20]}
+                    onPageSizeChange={(size) => {
+                      setRecentOrdersPageSize(size);
+                      setRecentOrdersPage(1);
+                    }}
+                    compact
+                  />
+                </div>
+              )}
             </div>
 
             {/* Restaurant Employees & Staff */}
@@ -585,55 +609,11 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              {/* Charts Section */}
+              {/* 1. Advanced Performance Trend Line & Bar Graph */}
+              <DashboardLineGraph data={analytics.salesTrend} />
+
+              {/* Secondary Grid: Peak Hours Histogram & Top 5 Selling Items */}
               <div className="grid gap-6 md:grid-cols-2">
-                {/* 1. Sales Trend SVG Area Chart */}
-                <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
-                  <div>
-                    <h4 className="text-sm font-bold text-foreground">Daily Sales Trend</h4>
-                    <p className="text-[10px] text-muted-foreground">Revenue generated over the last 30 days</p>
-                  </div>
-
-                  <div className="relative h-44 w-full">
-                    {/* Y Axis Grid Lines */}
-                    <div className="absolute inset-0 flex flex-col justify-between pointer-events-none">
-                      <div className="w-full border-b border-border/30 text-[9px] text-muted-foreground pb-0.5">₹{maxSales.toFixed(0)}</div>
-                      <div className="w-full border-b border-border/30 text-[9px] text-muted-foreground pb-0.5">₹{(maxSales / 2).toFixed(0)}</div>
-                      <div className="w-full text-[9px] text-muted-foreground">₹0</div>
-                    </div>
-
-                    {/* Bars Grid */}
-                    <div className="absolute inset-x-0 bottom-0 top-4 flex items-end justify-between gap-1 px-1">
-                      {analytics.salesTrend.map((t, idx) => {
-                        const heightPct = (t.sales / maxSales) * 100;
-                        return (
-                          <div
-                            key={t.date}
-                            className="group relative flex-1 flex flex-col items-center justify-end h-full"
-                          >
-                            {/* Tooltip */}
-                            <div className="absolute bottom-full mb-1 hidden group-hover:block z-20 rounded bg-secondary border border-border px-2 py-1 text-[9px] whitespace-nowrap text-foreground font-bold">
-                              {t.date}: {formatCurrency(t.sales)} ({t.orders} orders)
-                            </div>
-                            {/* Bar segment */}
-                            <div
-                              style={{ height: `${Math.max(heightPct, 2)}%` }}
-                              className={`w-full rounded-t transition-all ${
-                                heightPct > 0 ? 'bg-primary/80 hover:bg-primary' : 'bg-border/40'
-                              }`}
-                            />
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  <div className="flex justify-between text-[9px] text-muted-foreground pt-1">
-                    <span>30 Days Ago</span>
-                    <span>Today</span>
-                  </div>
-                </div>
-
                 {/* 2. Peak Hours Histogram */}
                 <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
                   <div>
@@ -679,10 +659,6 @@ export default function DashboardPage() {
                     <span>11 PM (23)</span>
                   </div>
                 </div>
-              </div>
-
-              {/* Lower Section: Popular items and Branch comparison */}
-              <div className="grid gap-6 md:grid-cols-2">
                 {/* 3. Popular Menu Items */}
                 <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
                   <div>

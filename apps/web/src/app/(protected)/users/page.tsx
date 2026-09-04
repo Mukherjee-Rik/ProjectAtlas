@@ -8,6 +8,7 @@ import { useRestaurant } from '@/hooks/use-restaurant';
 import type { User, UserRole, UserStatus } from '@/types/user';
 
 import { PageError } from '@/components/ui/page-error';
+import { Pagination } from '@/components/ui/pagination';
 import { UsersTableSkeleton } from '@/components/users/users-table-skeleton';
 import { UserRoleBadge } from '@/components/users/user-role-badge';
 import { UserStatusBadge } from '@/components/users/user-status-badge';
@@ -262,30 +263,14 @@ export default function UsersPage() {
 
         {/* Pagination Footer */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between border-t border-border px-4 py-4 bg-secondary/40">
-            <p className="text-sm text-muted-foreground">
-              Page {currentPage} of {totalPages}
-            </p>
-
-            <div className="flex gap-2">
-              <button
-                type="button"
-                disabled={currentPage === 1}
-                onClick={() => setCurrentPage((page) => page - 1)}
-                className="rounded-lg border border-border bg-secondary px-3 py-1.5 text-sm text-foreground transition-colors hover:border-primary disabled:opacity-40"
-              >
-                Previous
-              </button>
-
-              <button
-                type="button"
-                disabled={currentPage === totalPages}
-                onClick={() => setCurrentPage((page) => page + 1)}
-                className="rounded-lg border border-border bg-secondary px-3 py-1.5 text-sm text-foreground transition-colors hover:border-primary disabled:opacity-40"
-              >
-                Next
-              </button>
-            </div>
+          <div className="border-t border-border p-4 bg-secondary/20">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+              totalItems={totalUsers}
+              pageSize={pageSize}
+            />
           </div>
         )}
       </div>

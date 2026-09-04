@@ -7,7 +7,8 @@ export interface EmitEventParams {
   restaurantId: string;
   branchId: string;
   eventType: OperationalEventType | string;
-  entityType: 'ORDER' | 'PAYMENT' | 'CUSTOMER' | 'MENU_ITEM' | 'STOCK' | 'STAFF';
+  entityType:
+    'ORDER' | 'PAYMENT' | 'CUSTOMER' | 'MENU_ITEM' | 'STOCK' | 'STAFF';
   entityId: string;
   actorUserId?: string;
   metadata?: Record<string, any>;
@@ -44,7 +45,10 @@ export class OperationalEventService {
       );
     } catch (err: any) {
       // Event persistence should never crash the main transaction thread
-      this.logger.error(`Failed to persist operational event ${params.eventType}: ${err?.message}`, err?.stack);
+      this.logger.error(
+        `Failed to persist operational event ${params.eventType}: ${err?.message}`,
+        err?.stack,
+      );
     }
   }
 

@@ -1,7 +1,16 @@
 // Force type reload
-import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from '../../database/prisma/prisma.service';
-import { PaymentMethod, PaymentStatus, OrderStatus } from '../../generated/prisma/enums';
+import {
+  PaymentMethod,
+  PaymentStatus,
+  OrderStatus,
+} from '../../generated/prisma/enums';
 import { InventoryService } from '../inventory/inventory.service';
 import { AuditService } from '../audit/audit.service';
 import { ProcessRefundDto } from './dto/process-refund.dto';
@@ -179,8 +188,14 @@ export class PaymentsService {
     user: { id: string; name?: string; email?: string; role: string },
     dto: ProcessRefundDto,
   ) {
-    if (!['CASHIER', 'MANAGER', 'ADMIN', 'OWNER', 'PLATFORM_ADMIN'].includes(user.role)) {
-      throw new ForbiddenException('Only Cashiers, Managers, or Admins can process refunds.');
+    if (
+      !['CASHIER', 'MANAGER', 'ADMIN', 'OWNER', 'PLATFORM_ADMIN'].includes(
+        user.role,
+      )
+    ) {
+      throw new ForbiddenException(
+        'Only Cashiers, Managers, or Admins can process refunds.',
+      );
     }
 
     const payment = await this.prisma.payment.findFirst({
@@ -196,11 +211,19 @@ export class PaymentsService {
       throw new NotFoundException('Payment record not found');
     }
 
-    if (payment.status !== 'SUCCESS' && payment.status !== 'PARTIALLY_REFUNDED') {
-      throw new BadRequestException(`Only successful payments can be refunded (current status: ${payment.status})`);
+    if (
+      payment.status !== 'SUCCESS' &&
+      payment.status !== 'PARTIALLY_REFUNDED'
+    ) {
+      throw new BadRequestException(
+        `Only successful payments can be refunded (current status: ${payment.status})`,
+      );
     }
 
-    const totalRefundedSoFar = payment.refunds.reduce((sum, r) => sum + Number(r.amount), 0);
+    const totalRefundedSoFar = payment.refunds.reduce(
+      (sum, r) => sum + Number(r.amount),
+      0,
+    );
     const remainingRefundable = Number(payment.amount) - totalRefundedSoFar;
 
     if (dto.amount <= 0) {
@@ -214,7 +237,8 @@ export class PaymentsService {
     }
 
     const approverName = user.name || user.email || `Staff (${user.id})`;
-    const isFullRefund = (totalRefundedSoFar + dto.amount) >= Number(payment.amount);
+    const isFullRefund =
+      totalRefundedSoFar + dto.amount >= Number(payment.amount);
 
     const result = await this.prisma.$transaction(async (tx) => {
       // 1. Create Refund Record
@@ -259,7 +283,8 @@ export class PaymentsService {
               cancelledAt: new Date(),
               cancelledBy: approverName,
               cancellationReason: dto.reason,
-              cancellationNote: dto.note || 'Order automatically cancelled upon full refund',
+              cancellationNote:
+                dto.note || 'Order automatically cancelled upon full refund',
             },
           });
         }

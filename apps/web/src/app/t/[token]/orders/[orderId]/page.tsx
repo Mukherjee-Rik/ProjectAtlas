@@ -316,7 +316,7 @@ export default function OrderSuccessPage({
 
         <div className="text-center text-[9px] text-gray-800 pt-1">
           <p className="font-bold">*** THANK YOU FOR DINING WITH US ***</p>
-          <p className="text-[8px] text-gray-600 mt-0.5">Please visit again</p>
+          <p className="text-[8px] text-muted-foreground mt-0.5">Please visit again</p>
         </div>
       </div>
 

@@ -41,7 +41,9 @@ export class EmailDispatcherService implements OnModuleInit {
           rejectUnauthorized: process.env.NODE_ENV === 'production',
         },
       });
-      this.logger.log(`[EmailDispatcher] Configured authenticated SMTP transport for ${host}:${port} (${user})`);
+      this.logger.log(
+        `[EmailDispatcher] Configured authenticated SMTP transport for ${host}:${port} (${user})`,
+      );
     } else {
       this.logger.warn(
         `[EmailDispatcher] No SMTP credentials configured. Set SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS in .env to deliver emails to real inboxes.`,
@@ -52,15 +54,39 @@ export class EmailDispatcherService implements OnModuleInit {
   /**
    * Dispatches an email notification using Nodemailer authenticated SMTP transport.
    */
-  async sendEmail(payload: Partial<EmailPayload> & { subject: string; html: string; text: string }): Promise<boolean> {
-    const to = payload.to || process.env.DEFAULT_EMAIL_RECIPIENT || 'support@projectatlas.io';
-    const senderName = (payload.senderName || process.env.SMTP_FROM_NAME || 'Kafei').replace(/["']/g, '').trim();
-    const rawEmail = (payload.from || process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER || 'rikmukherjee21071999@gmail.com').trim();
+  async sendEmail(
+    payload: Partial<EmailPayload> & {
+      subject: string;
+      html: string;
+      text: string;
+    },
+  ): Promise<boolean> {
+    const to =
+      payload.to ||
+      process.env.DEFAULT_EMAIL_RECIPIENT ||
+      'support@projectatlas.io';
+    const senderName = (
+      payload.senderName ||
+      process.env.SMTP_FROM_NAME ||
+      'Kafei'
+    )
+      .replace(/["']/g, '')
+      .trim();
+    const rawEmail = (
+      payload.from ||
+      process.env.SMTP_FROM_EMAIL ||
+      process.env.SMTP_USER ||
+      'rikmukherjee21071999@gmail.com'
+    ).trim();
     const emailMatch = rawEmail.match(/<([^>]+)>/);
-    const cleanEmail = (emailMatch ? emailMatch[1] : rawEmail).replace(/["']/g, '').trim();
+    const cleanEmail = (emailMatch ? emailMatch[1] : rawEmail)
+      .replace(/["']/g, '')
+      .trim();
     const fromAddress = `"${senderName}" <${cleanEmail}>`;
 
-    this.logger.log(`[EmailDispatcher] Dispatching "${payload.subject}" to ${to}`);
+    this.logger.log(
+      `[EmailDispatcher] Dispatching "${payload.subject}" to ${to}`,
+    );
 
     if (this.transporter) {
       try {
@@ -72,10 +98,15 @@ export class EmailDispatcherService implements OnModuleInit {
           html: payload.html,
           replyTo: payload.replyTo,
         });
-        this.logger.log(`[EmailDispatcher] ✅ Successfully delivered via SMTP to ${to} (MessageId: ${info.messageId})`);
+        this.logger.log(
+          `[EmailDispatcher] ✅ Successfully delivered via SMTP to ${to} (MessageId: ${info.messageId})`,
+        );
         return true;
       } catch (err: any) {
-        this.logger.error(`[EmailDispatcher] ❌ SMTP delivery failed: ${err.message}`, err.stack);
+        this.logger.error(
+          `[EmailDispatcher] ❌ SMTP delivery failed: ${err.message}`,
+          err.stack,
+        );
         return false;
       }
     } else {

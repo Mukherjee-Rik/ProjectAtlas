@@ -6,7 +6,10 @@ import crypto from 'node:crypto';
 export class CorrelationIdMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
     const existingId = req.headers['x-request-id'] as string;
-    const correlationId = existingId && existingId.trim() !== '' ? existingId : `req_${crypto.randomUUID().replace(/-/g, '').slice(0, 16)}`;
+    const correlationId =
+      existingId && existingId.trim() !== ''
+        ? existingId
+        : `req_${crypto.randomUUID().replace(/-/g, '').slice(0, 16)}`;
 
     // Set on request and response headers
     req.headers['x-request-id'] = correlationId;

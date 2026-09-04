@@ -260,7 +260,9 @@ export class MenuCategoriesService {
     }
 
     // If any historical items remain attached, mark category inactive
-    const remainingItems = await this.prisma.menuItem.count({ where: { categoryId: id } });
+    const remainingItems = await this.prisma.menuItem.count({
+      where: { categoryId: id },
+    });
     if (remainingItems > 0) {
       await this.prisma.menuCategory.update({
         where: { id },
@@ -269,7 +271,13 @@ export class MenuCategoriesService {
           code: `${existing.code}_deleted_${Date.now()}`,
         },
       });
-      return { id, name: existing.name, code: existing.code, status: 'INACTIVE', deleted: true };
+      return {
+        id,
+        name: existing.name,
+        code: existing.code,
+        status: 'INACTIVE',
+        deleted: true,
+      };
     }
 
     return this.prisma.menuCategory.delete({

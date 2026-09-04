@@ -1,4 +1,12 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CartService } from './cart.service';
 import { AddCartItemDto } from './dto/add-cart-item.dto';
@@ -24,7 +32,10 @@ export class CartController {
 
   @Post('set-item')
   @ApiOperation({ summary: 'Set exact quantity of a menu item (idempotent)' })
-  async setItemQuantity(@Param('token') token: string, @Body() dto: SetCartItemDto) {
+  async setItemQuantity(
+    @Param('token') token: string,
+    @Body() dto: SetCartItemDto,
+  ) {
     return this.cartService.setItemQuantity(token, dto);
   }
 
@@ -49,7 +60,10 @@ export class CartController {
 
   @Delete('items/:itemId')
   @ApiOperation({ summary: 'Remove a cart line' })
-  async removeItem(@Param('token') token: string, @Param('itemId') itemId: string) {
+  async removeItem(
+    @Param('token') token: string,
+    @Param('itemId') itemId: string,
+  ) {
     return this.cartService.removeItem(token, itemId);
   }
 }

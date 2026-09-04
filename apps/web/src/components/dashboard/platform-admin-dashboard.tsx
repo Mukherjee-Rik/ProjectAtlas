@@ -98,7 +98,7 @@ export function PlatformAdminDashboard() {
     } else if (task === 'cache') {
       log('Resolving platform Redis caching clusters...');
       await new Promise(r => setTimeout(r, 600));
-      log('Invalidating namespace cache keys: "atlas:session:*", "atlas:menu:*"');
+      log('Invalidating namespace cache keys: "kafei:session:*", "kafei:menu:*"');
       await new Promise(r => setTimeout(r, 800));
       log('Flushing 42 stale response records...');
       await new Promise(r => setTimeout(r, 500));

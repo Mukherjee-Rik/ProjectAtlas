@@ -9,7 +9,11 @@ function parseStartOfDay(dateStr?: string): Date | undefined {
     return new Date(Date.UTC(Number(y), Number(m) - 1, Number(d), 0, 0, 0, 0));
   }
   const parsed = new Date(`${dateStr}T00:00:00.000`);
-  return isNaN(parsed.getTime()) ? (isNaN(new Date(dateStr).getTime()) ? undefined : new Date(dateStr)) : parsed;
+  return isNaN(parsed.getTime())
+    ? isNaN(new Date(dateStr).getTime())
+      ? undefined
+      : new Date(dateStr)
+    : parsed;
 }
 
 function parseEndOfDay(dateStr?: string): Date | undefined {
@@ -17,10 +21,16 @@ function parseEndOfDay(dateStr?: string): Date | undefined {
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateStr.trim());
   if (match) {
     const [, y, m, d] = match;
-    return new Date(Date.UTC(Number(y), Number(m) - 1, Number(d), 23, 59, 59, 999));
+    return new Date(
+      Date.UTC(Number(y), Number(m) - 1, Number(d), 23, 59, 59, 999),
+    );
   }
   const parsed = new Date(`${dateStr}T23:59:59.999`);
-  return isNaN(parsed.getTime()) ? (isNaN(new Date(dateStr).getTime()) ? undefined : new Date(dateStr)) : parsed;
+  return isNaN(parsed.getTime())
+    ? isNaN(new Date(dateStr).getTime())
+      ? undefined
+      : new Date(dateStr)
+    : parsed;
 }
 
 @Injectable()
@@ -149,11 +159,21 @@ export class DashboardService {
           })
         : { _sum: { totalAmount: null } },
 
-      restaurantId ? this.prisma.table.count({ where: { ...whereTables, status: 'ACTIVE' } }) : 0,
+      restaurantId
+        ? this.prisma.table.count({
+            where: { ...whereTables, status: 'ACTIVE' },
+          })
+        : 0,
 
-      restaurantId ? this.prisma.menuItem.count({ where: { ...whereMenuItems, status: 'ACTIVE' } }) : 0,
+      restaurantId
+        ? this.prisma.menuItem.count({
+            where: { ...whereMenuItems, status: 'ACTIVE' },
+          })
+        : 0,
 
-      tenantId ? this.prisma.tenantMembership.count({ where: { tenantId } }) : 0,
+      tenantId
+        ? this.prisma.tenantMembership.count({ where: { tenantId } })
+        : 0,
 
       restaurantId
         ? this.prisma.order.findMany({
@@ -211,7 +231,9 @@ export class DashboardService {
         status: o.status,
         totalAmount: Number(o.totalAmount),
         createdAt: o.createdAt,
-        tableName: o.table ? `${o.table.name} (${o.table.code})` : 'Takeout / Direct',
+        tableName: o.table
+          ? `${o.table.name} (${o.table.code})`
+          : 'Takeout / Direct',
         itemCount: o._count.items,
       })),
       restaurantStaff: restaurantStaff.map((m) => ({
@@ -287,7 +309,11 @@ export class DashboardService {
           averageItemsPerOrder: 0,
           highestOrderAmount: 0,
           lowestOrderAmount: 0,
-          ticketDistribution: { under500: 0, between500And1000: 0, above1000: 0 },
+          ticketDistribution: {
+            under500: 0,
+            between500And1000: 0,
+            above1000: 0,
+          },
           topTablesBySpend: [],
           salesTrend: [],
           statusDistribution: [],
@@ -305,8 +331,8 @@ export class DashboardService {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    let start: Date = parseStartOfDay(startDate) ?? thirtyDaysAgo;
-    let end: Date = parseEndOfDay(endDate) ?? new Date();
+    const start: Date = parseStartOfDay(startDate) ?? thirtyDaysAgo;
+    const end: Date = parseEndOfDay(endDate) ?? new Date();
 
     whereOrder.createdAt = {
       gte: start,
@@ -340,32 +366,61 @@ export class DashboardService {
 
     // 1. Calculate General & Itemized Revenue Metrics
     const totalOrders = orders.length;
-    const totalRevenue = orders.reduce((sum, o) => sum + Number(o.totalAmount || 0), 0);
-    const totalSubtotal = orders.reduce((sum, o) => sum + Number(o.subtotal || 0), 0);
-    const totalTaxAmount = orders.reduce((sum, o) => sum + Number(o.taxAmount || 0), 0);
-    const totalDiscountAmount = orders.reduce((sum, o) => sum + Number(o.discountAmount || 0), 0);
+    const totalRevenue = orders.reduce(
+      (sum, o) => sum + Number(o.totalAmount || 0),
+      0,
+    );
+    const totalSubtotal = orders.reduce(
+      (sum, o) => sum + Number(o.subtotal || 0),
+      0,
+    );
+    const totalTaxAmount = orders.reduce(
+      (sum, o) => sum + Number(o.taxAmount || 0),
+      0,
+    );
+    const totalDiscountAmount = orders.reduce(
+      (sum, o) => sum + Number(o.discountAmount || 0),
+      0,
+    );
     const netRevenue = totalSubtotal - totalDiscountAmount;
     const averageOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
-    const averageTaxPerOrder = totalOrders > 0 ? totalTaxAmount / totalOrders : 0;
-    const effectiveTaxRate = totalSubtotal > 0 ? (totalTaxAmount / totalSubtotal) * 100 : 0;
+    const averageTaxPerOrder =
+      totalOrders > 0 ? totalTaxAmount / totalOrders : 0;
+    const effectiveTaxRate =
+      totalSubtotal > 0 ? (totalTaxAmount / totalSubtotal) * 100 : 0;
     const dineInOrdersCount = orders.filter((o) => o.tableId !== null).length;
     const takeoutOrdersCount = orders.filter((o) => o.tableId === null).length;
 
-    const totalItemsCount = orders.reduce((sum, o) => sum + o.items.reduce((iSum, i) => iSum + i.quantity, 0), 0);
-    const averageItemsPerOrder = totalOrders > 0 ? totalItemsCount / totalOrders : 0;
+    const totalItemsCount = orders.reduce(
+      (sum, o) => sum + o.items.reduce((iSum, i) => iSum + i.quantity, 0),
+      0,
+    );
+    const averageItemsPerOrder =
+      totalOrders > 0 ? totalItemsCount / totalOrders : 0;
     const orderAmounts = orders.map((o) => Number(o.totalAmount || 0));
-    const highestOrderAmount = orderAmounts.length > 0 ? Math.max(...orderAmounts) : 0;
-    const lowestOrderAmount = orderAmounts.length > 0 ? Math.min(...orderAmounts) : 0;
+    const highestOrderAmount =
+      orderAmounts.length > 0 ? Math.max(...orderAmounts) : 0;
+    const lowestOrderAmount =
+      orderAmounts.length > 0 ? Math.min(...orderAmounts) : 0;
 
     const ticketDistribution = {
       under500: orders.filter((o) => Number(o.totalAmount || 0) < 500).length,
-      between500And1000: orders.filter((o) => Number(o.totalAmount || 0) >= 500 && Number(o.totalAmount || 0) <= 1000).length,
+      between500And1000: orders.filter(
+        (o) =>
+          Number(o.totalAmount || 0) >= 500 &&
+          Number(o.totalAmount || 0) <= 1000,
+      ).length,
       above1000: orders.filter((o) => Number(o.totalAmount || 0) > 1000).length,
     };
 
-    const tableSpendMap = new Map<string, { tableName: string; totalRevenue: number; ordersCount: number }>();
+    const tableSpendMap = new Map<
+      string,
+      { tableName: string; totalRevenue: number; ordersCount: number }
+    >();
     orders.forEach((o) => {
-      const tName = o.table ? `${o.table.name} (${o.table.code})` : 'Direct / Takeout';
+      const tName = o.table
+        ? `${o.table.name} (${o.table.code})`
+        : 'Direct / Takeout';
       const existing = tableSpendMap.get(tName);
       if (existing) {
         existing.totalRevenue += Number(o.totalAmount || 0);
@@ -382,7 +437,10 @@ export class DashboardService {
     const tableSpendBreakdown = Array.from(tableSpendMap.values())
       .map((t) => ({
         ...t,
-        averageSpend: t.ordersCount > 0 ? Math.round((t.totalRevenue / t.ordersCount) * 100) / 100 : 0,
+        averageSpend:
+          t.ordersCount > 0
+            ? Math.round((t.totalRevenue / t.ordersCount) * 100) / 100
+            : 0,
         totalRevenue: Math.round(t.totalRevenue * 100) / 100,
       }))
       .sort((a, b) => b.totalRevenue - a.totalRevenue);
@@ -405,23 +463,38 @@ export class DashboardService {
       lowestOrderAmount: Math.round(lowestOrderAmount * 100) / 100,
       ticketDistribution,
       tableSpendBreakdown,
-      recentTransactions: orders.slice(-30).reverse().map((o) => ({
-        id: o.id,
-        orderNumber: o.orderNumber,
-        subtotal: Number(o.subtotal || 0),
-        taxAmount: Number(o.taxAmount || 0),
-        discountAmount: Number(o.discountAmount || 0),
-        totalAmount: Number(o.totalAmount || 0),
-        itemCount: o.items.reduce((iSum, i) => iSum + i.quantity, 0),
-        status: o.status,
-        tableName: o.table ? `${o.table.name} (${o.table.code})` : 'Direct / Takeout',
-        createdAt: o.createdAt.toISOString(),
-      })),
+      recentTransactions: orders
+        .slice(-30)
+        .reverse()
+        .map((o) => ({
+          id: o.id,
+          orderNumber: o.orderNumber,
+          subtotal: Number(o.subtotal || 0),
+          taxAmount: Number(o.taxAmount || 0),
+          discountAmount: Number(o.discountAmount || 0),
+          totalAmount: Number(o.totalAmount || 0),
+          itemCount: o.items.reduce((iSum, i) => iSum + i.quantity, 0),
+          status: o.status,
+          tableName: o.table
+            ? `${o.table.name} (${o.table.code})`
+            : 'Direct / Takeout',
+          createdAt: o.createdAt.toISOString(),
+        })),
     };
 
     // 2. Sales Trend (group by day)
-    const salesTrendMap = new Map<string, { date: string; sales: number; subtotal: number; taxAmount: number; discountAmount: number; orders: number }>();
-    
+    const salesTrendMap = new Map<
+      string,
+      {
+        date: string;
+        sales: number;
+        subtotal: number;
+        taxAmount: number;
+        discountAmount: number;
+        orders: number;
+      }
+    >();
+
     const formatDateStr = (d: Date) => {
       const year = d.getFullYear();
       const month = String(d.getMonth() + 1).padStart(2, '0');
@@ -431,11 +504,18 @@ export class DashboardService {
 
     const currentDay = new Date(start);
     const endMidnight = new Date(end);
-    
+
     while (currentDay <= endMidnight) {
       const dateStr = formatDateStr(currentDay);
       if (!salesTrendMap.has(dateStr)) {
-        salesTrendMap.set(dateStr, { date: dateStr, sales: 0, subtotal: 0, taxAmount: 0, discountAmount: 0, orders: 0 });
+        salesTrendMap.set(dateStr, {
+          date: dateStr,
+          sales: 0,
+          subtotal: 0,
+          taxAmount: 0,
+          discountAmount: 0,
+          orders: 0,
+        });
       }
       currentDay.setDate(currentDay.getDate() + 1);
     }
@@ -466,7 +546,10 @@ export class DashboardService {
     );
 
     // 3. Popular Menu Items
-    const itemsMap = new Map<string, { name: string; count: number; revenue: number }>();
+    const itemsMap = new Map<
+      string,
+      { name: string; count: number; revenue: number }
+    >();
     orders.forEach((o) => {
       o.items.forEach((item) => {
         const existing = itemsMap.get(item.name);
@@ -502,7 +585,10 @@ export class DashboardService {
     }));
 
     // 5. Branch Performance
-    const branchMap = new Map<string, { branchName: string; sales: number; orders: number }>();
+    const branchMap = new Map<
+      string,
+      { branchName: string; sales: number; orders: number }
+    >();
     orders.forEach((o) => {
       const branchName = o.branch?.name ?? 'Main Branch';
       const existing = branchMap.get(branchName);
@@ -518,7 +604,9 @@ export class DashboardService {
       }
     });
 
-    const branchPerformance = Array.from(branchMap.values()).sort((a, b) => b.sales - a.sales);
+    const branchPerformance = Array.from(branchMap.values()).sort(
+      (a, b) => b.sales - a.sales,
+    );
 
     return {
       metrics: {
@@ -590,7 +678,9 @@ export class DashboardService {
         totalRestaurants,
         totalUsers,
         totalOrders,
-        totalRevenue: ordersRevenueSum._sum.totalAmount ? Number(ordersRevenueSum._sum.totalAmount) : 0,
+        totalRevenue: ordersRevenueSum._sum.totalAmount
+          ? Number(ordersRevenueSum._sum.totalAmount)
+          : 0,
       },
       systemMetrics,
       recentGlobalOrders: recentGlobalOrders.map((o) => ({
@@ -604,5 +694,4 @@ export class DashboardService {
       })),
     };
   }
-
 }

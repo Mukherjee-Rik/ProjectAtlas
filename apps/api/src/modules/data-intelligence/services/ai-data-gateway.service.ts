@@ -1,4 +1,9 @@
-import { Injectable, Logger, BadRequestException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  BadRequestException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from '../../../database/prisma/prisma.service';
 
 export interface AiGatewayContext {
@@ -35,15 +40,21 @@ export class AiDataGatewayService {
     const startTime = Date.now();
 
     if (!context.restaurantId) {
-      throw new BadRequestException('Restaurant context is strictly required for AI data gateway access');
+      throw new BadRequestException(
+        'Restaurant context is strictly required for AI data gateway access',
+      );
     }
 
     let queryResultData: Record<string, any> = {};
 
     switch (queryType) {
       case 'REVENUE_SUMMARY': {
-        const startDate = parameters?.startDate ? new Date(parameters.startDate) : new Date(Date.now() - 30 * 86400000);
-        const endDate = parameters?.endDate ? new Date(parameters.endDate) : new Date();
+        const startDate = parameters?.startDate
+          ? new Date(parameters.startDate)
+          : new Date(Date.now() - 30 * 86400000);
+        const endDate = parameters?.endDate
+          ? new Date(parameters.endDate)
+          : new Date();
 
         const aggregates = await this.prisma.dailySalesAggregate.findMany({
           where: {
@@ -54,9 +65,18 @@ export class AiDataGatewayService {
           orderBy: { date: 'asc' },
         });
 
-        const totalGross = aggregates.reduce((sum, a) => sum + Number(a.grossSales), 0);
-        const totalNet = aggregates.reduce((sum, a) => sum + Number(a.netSales), 0);
-        const totalOrders = aggregates.reduce((sum, a) => sum + a.totalOrders, 0);
+        const totalGross = aggregates.reduce(
+          (sum, a) => sum + Number(a.grossSales),
+          0,
+        );
+        const totalNet = aggregates.reduce(
+          (sum, a) => sum + Number(a.netSales),
+          0,
+        );
+        const totalOrders = aggregates.reduce(
+          (sum, a) => sum + a.totalOrders,
+          0,
+        );
 
         queryResultData = {
           periodDays: aggregates.length,
@@ -119,7 +139,9 @@ export class AiDataGatewayService {
       }
 
       default:
-        throw new BadRequestException(`Unsupported AI Gateway queryType "${queryType}"`);
+        throw new BadRequestException(
+          `Unsupported AI Gateway queryType "${queryType}"`,
+        );
     }
 
     const executionTimeMs = Date.now() - startTime;

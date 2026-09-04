@@ -18,8 +18,14 @@ export class AiProviderService {
     if (!apiKey) {
       // No key configured, so this is the engine that actually answers. It is
       // a deterministic responder over verified context, not a language model.
-      this.logger.warn('GEMINI_API_KEY is not configured. Using the rule-based engine.');
-      const responseText = this.generateMockResponse(userQuery || prompt, contextSummary, history);
+      this.logger.warn(
+        'GEMINI_API_KEY is not configured. Using the rule-based engine.',
+      );
+      const responseText = this.generateMockResponse(
+        userQuery || prompt,
+        contextSummary,
+        history,
+      );
       return {
         text: responseText,
         inputTokens: Math.ceil(prompt.length / 4),
@@ -32,9 +38,18 @@ export class AiProviderService {
     // network meant "hi" took 15 seconds and could still time out into the
     // very answer we already had locally.
     const { intent: earlyIntent } = detectIntent(userQuery || '');
-    const NO_LLM_NEEDED = ['GREETING', 'GRATITUDE', 'CAPABILITIES', 'UNRELATED_QUERY'];
+    const NO_LLM_NEEDED = [
+      'GREETING',
+      'GRATITUDE',
+      'CAPABILITIES',
+      'UNRELATED_QUERY',
+    ];
     if (NO_LLM_NEEDED.includes(earlyIntent)) {
-      const text = this.generateMockResponse(userQuery || prompt, contextSummary, history);
+      const text = this.generateMockResponse(
+        userQuery || prompt,
+        contextSummary,
+        history,
+      );
       return { text, inputTokens: 0, outputTokens: 0 };
     }
 
@@ -85,7 +100,10 @@ export class AiProviderService {
       try {
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
         const ac = new AbortController();
-        const timer = setTimeout(() => ac.abort(), Math.min(PER_REQUEST_MS, remaining));
+        const timer = setTimeout(
+          () => ac.abort(),
+          Math.min(PER_REQUEST_MS, remaining),
+        );
         const response = await fetch(url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -119,7 +137,10 @@ export class AiProviderService {
           break;
         }
 
-        const retryable = response.status === 503 || response.status === 429 || response.status >= 500;
+        const retryable =
+          response.status === 503 ||
+          response.status === 429 ||
+          response.status >= 500;
         if (!retryable || attempt === MAX_ATTEMPTS) {
           this.logger.error(`Gemini call failed (${lastReason}): ${safe}`);
           break;
@@ -132,7 +153,9 @@ export class AiProviderService {
       } catch (err: any) {
         lastReason = err?.message ?? 'request threw';
         if (attempt === MAX_ATTEMPTS) {
-          this.logger.error(`Gemini call failed after ${MAX_ATTEMPTS} attempts: ${lastReason}`);
+          this.logger.error(
+            `Gemini call failed after ${MAX_ATTEMPTS} attempts: ${lastReason}`,
+          );
           break;
         }
         await new Promise((r) => setTimeout(r, 400 * 2 ** (attempt - 1)));
@@ -144,7 +167,11 @@ export class AiProviderService {
     this.logger.warn(
       `Falling back to the rule-based engine (model="${model}", last reason: ${lastReason}).`,
     );
-    const text = this.generateMockResponse(userQuery || prompt, contextSummary, history);
+    const text = this.generateMockResponse(
+      userQuery || prompt,
+      contextSummary,
+      history,
+    );
     return { text, inputTokens: 0, outputTokens: 0 };
   }
 
@@ -171,10 +198,16 @@ export class AiProviderService {
 
   /** True when this exact question was already answered in the visible history. */
   private isRepeat(query: string, history: ChatTurn[]): boolean {
-    const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9 ]/g, '').trim();
+    const norm = (s: string) =>
+      s
+        .toLowerCase()
+        .replace(/[^a-z0-9 ]/g, '')
+        .trim();
     const q = norm(query);
     if (!q) return false;
-    return history.filter((h) => h.role === 'user').some((h) => norm(h.content) === q);
+    return history
+      .filter((h) => h.role === 'user')
+      .some((h) => norm(h.content) === q);
   }
 
   private generateMockResponse(
@@ -237,30 +270,45 @@ export class AiProviderService {
       case 'FORECAST': {
         // Projected from the restaurant's OWN trailing data. If there is no
         // history, say so — never invent a number.
-        const dailyAvg = Number(sales.averageDailySales ?? 0);
-        const avgOrders = Number(sales.averageDailyOrders ?? 0);
+        const fc = context.forecast;
+        const dailyAvg = Number(
+          fc?.trailingAverageSales || sales.averageDailySales || 0,
+        );
+        const avgOrders = Number(
+          fc?.predictedOrders || sales.averageDailyOrders || 0,
+        );
         const observed = Number(sales.totalSales ?? 0);
         const orderCount = Number(sales.totalOrders ?? 0);
 
-        if (!observed && !dailyAvg) {
+        if (!observed && !dailyAvg && !fc) {
           return (
             `I can't project **${rangeLabel}** yet — there's no completed order history to extrapolate from. ` +
             `Once a few days of service are recorded I can give you a figure with a sensible range.`
           );
         }
 
-        const base = dailyAvg || observed;
-        const baseOrders = avgOrders || orderCount;
-        const low = Math.round(base * 0.8);
-        const high = Math.round(base * 1.2);
-        const peak = operations.peakHours || 'your usual dinner window';
+        const base = fc?.predictedSales || dailyAvg || observed;
+        const baseOrders = fc?.predictedOrders || avgOrders || orderCount;
+        const low = fc?.rangeLow || Math.round(base * 0.85);
+        const high = fc?.rangeHigh || Math.round(base * 1.15);
+        const peak =
+          fc?.expectedPeakHours ||
+          operations.peakHours ||
+          'your usual dinner window';
+        const targetDay = fc?.targetDay ? ` (${fc.targetDay})` : '';
+        const dishes = fc?.topExpectedDishes?.length
+          ? `\n• **Top Expected Dishes**: ${fc.topExpectedDishes.join(', ')}`
+          : '';
 
         return (
-          `${repeatPrefix}**Projection for ${rangeLabel}**\n\n` +
-          `On recent trading, expect roughly **₹${this.inr(base)}** — realistically between ` +
-          `**₹${this.inr(low)}** and **₹${this.inr(high)}**, across about **${baseOrders}** orders.\n\n` +
-          `That's extrapolated from your completed orders, not a live booking count, so treat it as a ` +
-          `planning figure. Staff for the rush around **${peak}**.`
+          `${repeatPrefix}**Projection for ${rangeLabel}${targetDay}**\n\n` +
+          `Based on recent trading momentum, expected sales are roughly **₹${this.inr(base)}** ` +
+          `(realistically between **₹${this.inr(low)}** and **₹${this.inr(high)}**), across about **${baseOrders}** orders.\n\n` +
+          `• **Estimated AOV**: ₹${this.inr(fc?.predictedAov || 1500)}\n` +
+          `• **Peak Shifts**: ${peak}` +
+          dishes +
+          `\n\n` +
+          `*(Extrapolated from ${fc?.trailingActiveDays || 5} active trading days on record)*`
         );
       }
 
@@ -284,8 +332,13 @@ export class AiProviderService {
       }
 
       case 'STRATEGY_GROWTH': {
-        const topItem = sales.topItem && sales.topItem !== 'None' ? sales.topItem : 'your specialty dishes';
-        const aov = sales.averageOrderValue ? `₹${Number(sales.averageOrderValue).toFixed(2)}` : '₹829.50';
+        const topItem =
+          sales.topItem && sales.topItem !== 'None'
+            ? sales.topItem
+            : 'your specialty dishes';
+        const aov = sales.averageOrderValue
+          ? `₹${Number(sales.averageOrderValue).toFixed(2)}`
+          : '₹829.50';
         const peak = operations.peakHours || '7 PM - 9 PM';
 
         return (
@@ -346,7 +399,8 @@ export class AiProviderService {
         if (!sales || sales.totalOrders === undefined) {
           return `You don't have permission to view item sales metrics.`;
         }
-        const topItem = sales.topItem && sales.topItem !== 'None' ? sales.topItem : null;
+        const topItem =
+          sales.topItem && sales.topItem !== 'None' ? sales.topItem : null;
         if (!topItem) {
           return `Nothing has sold yet for **${rangeLabel}**, so there's no best seller to report.`;
         }
@@ -367,7 +421,9 @@ export class AiProviderService {
       case 'CANCELLATIONS': {
         const total = operations.totalOrders || 0;
         const cancelled = operations.cancelledOrders || 0;
-        const rate = operations.cancellationRate ? operations.cancellationRate.toFixed(1) : '0';
+        const rate = operations.cancellationRate
+          ? operations.cancellationRate.toFixed(1)
+          : '0';
         if (!cancelled) {
           return `No cancellations for **${rangeLabel}** — ${total} orders, all of them saw service.`;
         }
@@ -401,7 +457,9 @@ export class AiProviderService {
         }
 
         const q = queryInput.toLowerCase();
-        const isValuation = /value|valuation|worth|cost|capital|tied up/.test(q);
+        const isValuation = /value|valuation|worth|cost|capital|tied up/.test(
+          q,
+        );
 
         if (isValuation) {
           return `You're holding **${inv.totalIngredients}** tracked ingredients, valued at **₹${this.inr(inv.totalValuation)}**.`;
@@ -409,9 +467,12 @@ export class AiProviderService {
 
         if (inv.lowStockCount > 0 || inv.outOfStockCount > 0) {
           const warningItems = [
-            ...(inv.outOfStockItems || []).map((i: any) => `• **${i.name}** — out of stock`),
+            ...(inv.outOfStockItems || []).map(
+              (i: any) => `• **${i.name}** — out of stock`,
+            ),
             ...(inv.lowStockItems || []).map(
-              (i: any) => `• **${i.name}** — ${i.currentStock} ${i.unit} left (reorder at ${i.minimumReorderLevel} ${i.unit})`,
+              (i: any) =>
+                `• **${i.name}** — ${i.currentStock} ${i.unit} left (reorder at ${i.minimumReorderLevel} ${i.unit})`,
             ),
           ].join('\n');
 

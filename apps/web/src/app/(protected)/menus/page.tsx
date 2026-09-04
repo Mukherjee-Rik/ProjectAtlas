@@ -6,6 +6,7 @@ import { useRestaurant } from '@/hooks/use-restaurant';
 import { getMenus, deleteMenu } from '@/services/menus.service';
 import type { Menu } from '@/types/menu';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
+import { Pagination } from '@/components/ui/pagination';
 
 export default function MenusPage() {
   const router = useRouter();
@@ -16,6 +17,10 @@ export default function MenusPage() {
   const [error, setError] = useState('');
   const [deletingMenu, setDeletingMenu] = useState<Menu | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // Pagination
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   const loadData = useCallback(async () => {
     if (!currentRestaurant) {
@@ -61,6 +66,9 @@ export default function MenusPage() {
     );
   }
 
+  const totalPages = Math.ceil(menus.length / pageSize) || 1;
+  const paginatedMenus = menus.slice((page - 1) * pageSize, page * pageSize);
+
   return (
     <div className="space-y-8">
       <div className="flex flex-wrap items-center justify-between gap-4">
@@ -97,52 +105,71 @@ export default function MenusPage() {
           </button>
         </div>
       ) : (
-        <div className="table-responsive rounded-xl border border-border bg-card">
-          <table className="w-full min-w-[600px] text-left">
-            <thead className="border-b border-border bg-secondary">
-              <tr>
-                {['Menu Name', 'Code', 'Status', 'Actions'].map((h) => (
-                  <th key={h} className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {menus.map((menu) => (
-                <tr
-                  key={menu.id}
-                  onClick={() => router.push(`/menus/${menu.id}`)}
-                  className="cursor-pointer transition-colors hover:bg-secondary"
-                >
-                  <td className="px-6 py-4 text-sm font-semibold text-foreground">{menu.name}</td>
-                  <td className="px-6 py-4 font-mono text-sm text-primary">{menu.code}</td>
-                  <td className="px-6 py-4">
-                    <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold border ${menu.status === 'ACTIVE' ? 'bg-atlas-success/15 text-atlas-success border-atlas-success/30' : 'bg-muted-foreground/15 text-muted-foreground border-muted-foreground/30'}`}>
-                      <span className={`h-1.5 w-1.5 rounded-full ${menu.status === 'ACTIVE' ? 'bg-atlas-success' : 'bg-muted-foreground'}`} />
-                      {menu.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}>
-                    <div className="flex gap-2">
-                      <button
-                        type="button"
-                        onClick={() => router.push(`/menus/${menu.id}/edit`)}
-                        className="rounded-lg border border-border bg-secondary px-2.5 py-1 text-xs text-foreground hover:border-primary"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setDeletingMenu(menu)}
-                        className="rounded-lg border border-atlas-error/40 bg-atlas-error/10 px-2.5 py-1 text-xs text-atlas-error hover:bg-atlas-error/20"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </td>
+        <div className="space-y-4">
+          <div className="table-responsive rounded-xl border border-border bg-card">
+            <table className="w-full min-w-[600px] text-left">
+              <thead className="border-b border-border bg-secondary">
+                <tr>
+                  {['Menu Name', 'Code', 'Status', 'Actions'].map((h) => (
+                    <th key={h} className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">{h}</th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {paginatedMenus.map((menu) => (
+                  <tr
+                    key={menu.id}
+                    onClick={() => router.push(`/menus/${menu.id}`)}
+                    className="cursor-pointer transition-colors hover:bg-secondary"
+                  >
+                    <td className="px-6 py-4 text-sm font-semibold text-foreground">{menu.name}</td>
+                    <td className="px-6 py-4 font-mono text-sm text-primary">{menu.code}</td>
+                    <td className="px-6 py-4">
+                      <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold border ${menu.status === 'ACTIVE' ? 'bg-atlas-success/15 text-atlas-success border-atlas-success/30' : 'bg-muted-foreground/15 text-muted-foreground border-muted-foreground/30'}`}>
+                        <span className={`h-1.5 w-1.5 rounded-full ${menu.status === 'ACTIVE' ? 'bg-atlas-success' : 'bg-muted-foreground'}`} />
+                        {menu.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}>
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => router.push(`/menus/${menu.id}/edit`)}
+                          className="rounded-lg border border-border bg-secondary px-2.5 py-1 text-xs text-foreground hover:border-primary"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setDeletingMenu(menu)}
+                          className="rounded-lg border border-atlas-error/40 bg-atlas-error/10 px-2.5 py-1 text-xs text-atlas-error hover:bg-atlas-error/20"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {menus.length > 0 && (
+            <div className="pt-2">
+              <Pagination
+                currentPage={page}
+                totalPages={totalPages}
+                onPageChange={setPage}
+                totalItems={menus.length}
+                pageSize={pageSize}
+                pageSizeOptions={[10, 25, 50]}
+                onPageSizeChange={(newSize) => {
+                  setPageSize(newSize);
+                  setPage(1);
+                }}
+              />
+            </div>
+          )}
         </div>
       )}
 

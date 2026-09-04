@@ -98,6 +98,24 @@ export default function SecuritySettingsPage() {
         </div>
       </div>
 
+      {/* Privacy, Google OAuth & Account Erasure Card */}
+      <div className="rounded-xl border border-border bg-card p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h2 className="text-base font-bold text-foreground">
+            🛡️ Privacy Rights & Data Portability
+          </h2>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Export personal data in JSON format, manage Google OAuth permissions, or permanently scrub your account.
+          </p>
+        </div>
+        <a
+          href="/settings/privacy"
+          className="rounded-xl bg-primary px-4 py-2.5 text-xs font-bold text-background shadow transition-all hover:bg-primary-hover active:scale-[0.98] shrink-0"
+        >
+          Manage Data & Privacy →
+        </a>
+      </div>
+
       {/* Active Device Sessions List */}
       <SessionsList />
     </div>

@@ -50,7 +50,7 @@ export function SessionStatus() {
 
       <ConfirmDialog
         open={showLogoutConfirm}
-        title="Sign Out of Atlas"
+        title="Sign Out of Kafei"
         description="Are you sure you want to sign out? You will need to log in again to access protected areas."
         confirmText="Sign Out"
         cancelText="Cancel"

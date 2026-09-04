@@ -22,6 +22,16 @@ export class CreateMembershipDto {
     example: 'CASHIER',
     description: 'Role of the user within this tenant',
   })
-  @IsIn(['PLATFORM_ADMIN', 'OWNER', 'ADMIN', 'MANAGER', 'STAFF', 'WAITER', 'KITCHEN', 'CASHIER', 'USER'])
+  @IsIn([
+    'PLATFORM_ADMIN',
+    'OWNER',
+    'ADMIN',
+    'MANAGER',
+    'STAFF',
+    'WAITER',
+    'KITCHEN',
+    'CASHIER',
+    'USER',
+  ])
   role: UserRole;
 }

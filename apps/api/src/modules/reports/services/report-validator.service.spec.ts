@@ -53,7 +53,13 @@ describe('ReportValidatorService', () => {
       validator.validate('SALES', {
         metrics: ['GROSS_SALES'],
         dimensions: ['BRANCH'],
-        filters: [{ field: 'branchId', operator: 'EQUALS', value: "1; DROP TABLE orders; --" }],
+        filters: [
+          {
+            field: 'branchId',
+            operator: 'EQUALS',
+            value: '1; DROP TABLE orders; --',
+          },
+        ],
         dateRange: { preset: 'TODAY' },
         visualization: { type: 'TABLE' },
       }),

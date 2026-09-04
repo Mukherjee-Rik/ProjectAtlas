@@ -9,8 +9,12 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UpdateMyProfileDto } from './dto/update-my-profile.dto';
 import { UsersQueryDto } from './dto/users-query.dto';
+import { Prisma } from '../../generated/prisma/client';
 import { UserRole } from '../../generated/prisma/enums';
-import { CacheKeys, TtlCacheService } from '../../common/cache/ttl-cache.service';
+import {
+  CacheKeys,
+  TtlCacheService,
+} from '../../common/cache/ttl-cache.service';
 
 @Injectable()
 export class UsersService {
@@ -20,15 +24,9 @@ export class UsersService {
   ) {}
 
   async findAll(query: UsersQueryDto = new UsersQueryDto(), tenantId?: string) {
-    const {
-      search,
-      role,
-      status,
-      page = 1,
-      limit = 10,
-    } = query;
+    const { search, role, status, page = 1, limit = 10 } = query;
 
-    const where: any = {
+    const where: Prisma.UserWhereInput = {
       ...(role !== undefined && { role }),
       ...(status !== undefined && { status }),
       ...(tenantId && {
@@ -224,7 +222,9 @@ export class UsersService {
       });
 
       if (duplicateUser) {
-        throw new ConflictException('Another user with this phone already exists');
+        throw new ConflictException(
+          'Another user with this phone already exists',
+        );
       }
     }
 
@@ -255,9 +255,7 @@ export class UsersService {
 
   async remove(id: string, currentUserId: string, tenantId?: string) {
     if (id === currentUserId) {
-      throw new ConflictException(
-        'You cannot deactivate your own account',
-      );
+      throw new ConflictException('You cannot deactivate your own account');
     }
 
     const existingUser = await this.prisma.user.findFirst({
@@ -360,5 +358,99 @@ export class UsersService {
         updatedAt: user.updatedAt,
       };
     });
+  }
+
+  async exportMyData(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        role: true,
+        status: true,
+        createdAt: true,
+        updatedAt: true,
+        memberships: {
+          select: {
+            role: true,
+            createdAt: true,
+            tenant: {
+              select: {
+                id: true,
+                name: true,
+                slug: true,
+                status: true,
+                createdAt: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return {
+      appName: 'Kafei',
+      company: 'Antigravity',
+      exportGeneratedAt: new Date().toISOString(),
+      complianceStandard: 'GDPR / DPDP Act 2023 / Google OAuth Limited Use',
+      dataSubject: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+        status: user.status,
+        memberSince: user.createdAt,
+        lastProfileUpdate: user.updatedAt,
+      },
+      organizations: user.memberships.map((m) => ({
+        tenantId: m.tenant.id,
+        tenantName: m.tenant.name,
+        roleInTenant: m.role,
+        joinedAt: m.createdAt,
+      })),
+      privacyGuarantees: {
+        zeroAiTraining:
+          'Your data is strictly private and never used to train foundation AI models.',
+        oauthScopeAccess:
+          'Google OAuth scopes (openid, email, profile) are used solely for authentication.',
+      },
+    };
+  }
+
+  async deleteMyAccount(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Scrub personal data and deactivate user to preserve referential integrity for invoices
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        name: 'Deleted User',
+        email: `deleted_${user.id.slice(0, 8)}_${Date.now()}@kafei.in`,
+        phone: null,
+        status: 'INACTIVE',
+      },
+    });
+
+    this.cache.invalidate(CacheKeys.user(userId));
+
+    return {
+      success: true,
+      message:
+        'Account successfully deactivated and all personal identifiable information scrubbed.',
+      deactivatedAt: new Date().toISOString(),
+    };
   }
 }

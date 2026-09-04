@@ -74,7 +74,7 @@ async function main() {
 
   // 3. Growth / Professional Plan
   const professionalPlan = await prisma.plan.findFirst({
-    where: { name: 'Professional' }
+    where: { name: 'Professional' },
   });
   if (professionalPlan) {
     console.log('Renaming Professional plan to Growth...');
@@ -89,7 +89,7 @@ async function main() {
           maxTables: 100,
           maxMenus: 20,
         },
-      }
+      },
     });
   } else {
     await prisma.plan.upsert({
@@ -109,8 +109,22 @@ async function main() {
         currency: 'INR',
         billingCycle: 'MONTHLY',
         trialDays: 14,
-        description: 'Multi-branch operations with higher staff cap',
-        features: ['qr-menu', 'tables', 'orders', 'kitchen', 'analytics'],
+        description:
+          'Multi-branch operations with higher staff cap and AI intelligence',
+        features: [
+          'qr-menu',
+          'qr_menu',
+          'tables',
+          'table_management',
+          'orders',
+          'kitchen',
+          'analytics',
+          'ai_copilot',
+          'ai-copilot',
+          'automations',
+          'reports',
+          'forecasts',
+        ],
         limits: {
           maxBranches: 5,
           maxStaff: 50,
@@ -127,6 +141,23 @@ async function main() {
     where: { name: 'Enterprise' },
     update: {
       price: 4999,
+      features: [
+        'qr-menu',
+        'qr_menu',
+        'tables',
+        'table_management',
+        'orders',
+        'kitchen',
+        'analytics',
+        'ai_copilot',
+        'ai-copilot',
+        'automations',
+        'reports',
+        'forecasts',
+        'multi-branch',
+        'multi_branch',
+        'priority_support',
+      ],
       limits: {
         maxBranches: -1,
         maxStaff: -1,
@@ -140,8 +171,25 @@ async function main() {
       currency: 'INR',
       billingCycle: 'MONTHLY',
       trialDays: 14,
-      description: 'Unlimited branches, staff and dedicated support',
-      features: ['qr-menu', 'tables', 'orders', 'kitchen', 'analytics', 'multi-branch'],
+      description:
+        'Unlimited branches, staff, full AI Copilot, and dedicated support',
+      features: [
+        'qr-menu',
+        'qr_menu',
+        'tables',
+        'table_management',
+        'orders',
+        'kitchen',
+        'analytics',
+        'ai_copilot',
+        'ai-copilot',
+        'automations',
+        'reports',
+        'forecasts',
+        'multi-branch',
+        'multi_branch',
+        'priority_support',
+      ],
       limits: {
         maxBranches: -1,
         maxStaff: -1,

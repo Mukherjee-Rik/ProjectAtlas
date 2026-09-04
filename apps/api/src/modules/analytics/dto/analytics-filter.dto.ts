@@ -41,7 +41,9 @@ export class AnalyticsFilterDto {
 export class PeriodComparisonDto extends AnalyticsFilterDto {
   @IsOptional()
   @IsString()
-  comparisonPeriod?: 'PREVIOUS_PERIOD' | 'PREVIOUS_YEAR' | 'SAME_DAY_LAST_WEEK' | 'CUSTOM' = 'PREVIOUS_PERIOD';
+  comparisonPeriod?:
+    'PREVIOUS_PERIOD' | 'PREVIOUS_YEAR' | 'SAME_DAY_LAST_WEEK' | 'CUSTOM' =
+    'PREVIOUS_PERIOD';
 
   @IsOptional()
   @IsDateString()

@@ -53,6 +53,16 @@ export class CreateUserDto {
     description: 'Role assigned to the new user',
   })
   @IsOptional()
-  @IsIn(['PLATFORM_ADMIN', 'OWNER', 'ADMIN', 'MANAGER', 'STAFF', 'WAITER', 'KITCHEN', 'CASHIER', 'USER'])
+  @IsIn([
+    'PLATFORM_ADMIN',
+    'OWNER',
+    'ADMIN',
+    'MANAGER',
+    'STAFF',
+    'WAITER',
+    'KITCHEN',
+    'CASHIER',
+    'USER',
+  ])
   role?: UserRole;
 }

@@ -8,6 +8,16 @@ export class UpdateMembershipDto {
     example: 'CASHIER',
     description: 'Updated role of the user within this tenant',
   })
-  @IsIn(['PLATFORM_ADMIN', 'OWNER', 'ADMIN', 'MANAGER', 'STAFF', 'WAITER', 'KITCHEN', 'CASHIER', 'USER'])
+  @IsIn([
+    'PLATFORM_ADMIN',
+    'OWNER',
+    'ADMIN',
+    'MANAGER',
+    'STAFF',
+    'WAITER',
+    'KITCHEN',
+    'CASHIER',
+    'USER',
+  ])
   role: UserRole;
 }

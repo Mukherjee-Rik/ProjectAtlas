@@ -1088,7 +1088,7 @@ export default function CashierPage() {
                               ? 'bg-atlas-error/10 text-atlas-error border border-atlas-error/20'
                               : p.status === 'PARTIALLY_REFUNDED'
                               ? 'bg-atlas-warning/10 text-atlas-warning border border-atlas-warning/20'
-                              : 'bg-zinc-500/10 text-muted-foreground'
+                              : 'bg-muted-foreground/10 text-muted-foreground'
                           }`}
                         >
                           {p.status}
@@ -1228,7 +1228,7 @@ export default function CashierPage() {
                 className={`flex-1 rounded-lg py-2.5 text-xs font-bold transition-all disabled:opacity-50 ${
                   reviewAction === 'APPROVE'
                     ? 'bg-primary text-background hover:bg-primary-hover'
-                    : 'bg-atlas-error text-foreground hover:bg-red-600'
+                    : 'bg-atlas-error text-foreground hover:bg-atlas-error'
                 }`}
               >
                 {isProcessing ? 'Processing...' : reviewAction === 'APPROVE' ? 'Confirm Approval' : 'Confirm Rejection'}

@@ -20,7 +20,10 @@ export class MenuDemandForecasterService {
   /**
    * Forecasts dish-level demand and portion ranges for tomorrow.
    */
-  async forecastMenuDemand(restaurantId: string, branchId?: string): Promise<ItemDemandForecast[]> {
+  async forecastMenuDemand(
+    restaurantId: string,
+    branchId?: string,
+  ): Promise<ItemDemandForecast[]> {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
@@ -37,14 +40,27 @@ export class MenuDemandForecasterService {
       where,
       include: {
         menuItem: {
-          select: { name: true, price: true, category: { select: { name: true } } },
+          select: {
+            name: true,
+            price: true,
+            category: { select: { name: true } },
+          },
         },
       },
       orderBy: { date: 'asc' },
     });
 
     // Group historical metrics by menuItemId
-    const itemMap = new Map<string, { name: string; price: number; category: string; portions: number[]; dates: string[] }>();
+    const itemMap = new Map<
+      string,
+      {
+        name: string;
+        price: number;
+        category: string;
+        portions: number[];
+        dates: string[];
+      }
+    >();
 
     itemMetrics.forEach((m) => {
       const existing = itemMap.get(m.menuItemId) || {
@@ -72,7 +88,11 @@ export class MenuDemandForecasterService {
         },
         include: {
           menuItem: {
-            select: { name: true, price: true, category: { select: { name: true } } },
+            select: {
+              name: true,
+              price: true,
+              category: { select: { name: true } },
+            },
           },
         },
       });
@@ -104,8 +124,12 @@ export class MenuDemandForecasterService {
       // Trend check: compare last 7 days vs previous 7 days
       const first7 = recent.slice(0, 7);
       const last7 = recent.slice(-7);
-      const avgFirst = first7.length > 0 ? first7.reduce((a, b) => a + b, 0) / first7.length : 0;
-      const avgLast = last7.length > 0 ? last7.reduce((a, b) => a + b, 0) / last7.length : 0;
+      const avgFirst =
+        first7.length > 0
+          ? first7.reduce((a, b) => a + b, 0) / first7.length
+          : 0;
+      const avgLast =
+        last7.length > 0 ? last7.reduce((a, b) => a + b, 0) / last7.length : 0;
 
       let trend: 'INCREASING' | 'STABLE' | 'DECREASING' = 'STABLE';
       if (avgLast > avgFirst * 1.15) trend = 'INCREASING';
@@ -125,6 +149,8 @@ export class MenuDemandForecasterService {
     });
 
     // Sort by highest expected portions
-    return forecasts.sort((a, b) => b.predictedPortionsTomorrow - a.predictedPortionsTomorrow);
+    return forecasts.sort(
+      (a, b) => b.predictedPortionsTomorrow - a.predictedPortionsTomorrow,
+    );
   }
 }

@@ -18,7 +18,7 @@ describe('AppController', () => {
     it('should return health status', () => {
       const result = appController.healthCheck();
       expect(result.status).toBe('ok');
-      expect(result.service).toBe('atlas-api');
+      expect(result.service).toBe('kafei-api');
     });
   });
 });

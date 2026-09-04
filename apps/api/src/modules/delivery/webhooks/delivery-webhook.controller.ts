@@ -1,5 +1,21 @@
-import { Controller, Post, Get, Body, Param, Headers, UseGuards, HttpStatus, HttpCode, BadRequestException } from '@nestjs/common';
-import { ApiOperation, ApiTags, ApiBearerAuth, ApiHeader } from '@nestjs/swagger';
+import {
+  Controller,
+  Post,
+  Get,
+  Body,
+  Param,
+  Headers,
+  UseGuards,
+  HttpStatus,
+  HttpCode,
+  BadRequestException,
+} from '@nestjs/common';
+import {
+  ApiOperation,
+  ApiTags,
+  ApiBearerAuth,
+  ApiHeader,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { RestaurantAccessGuard } from '../../auth/guards/restaurant-access.guard';
 import { CurrentRestaurant } from '../../auth/decorators/current-restaurant.decorator';
@@ -17,7 +33,10 @@ export class DeliveryWebhookController {
 
   @Post('webhooks/:provider')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Receive callbacks from external delivery platforms (Zomato/Swiggy)' })
+  @ApiOperation({
+    summary:
+      'Receive callbacks from external delivery platforms (Zomato/Swiggy)',
+  })
   async handleWebhook(
     @Param('provider') provider: string,
     @Headers('x-signature') signature: string,
@@ -50,7 +69,9 @@ export class DeliveryWebhookController {
   @UseGuards(JwtAuthGuard, RestaurantAccessGuard)
   @ApiBearerAuth('access-token')
   @ApiHeader({ name: RESTAURANT_HEADER, required: true })
-  @ApiOperation({ summary: 'Get configured delivery integrations for restaurant' })
+  @ApiOperation({
+    summary: 'Get configured delivery integrations for restaurant',
+  })
   async getConfig(@CurrentRestaurant() restaurant: CurrentRestaurantType) {
     if (!restaurant?.id) {
       throw new BadRequestException('Restaurant context is required');
@@ -70,7 +91,10 @@ export class DeliveryWebhookController {
     if (!restaurant?.id) {
       throw new BadRequestException('Restaurant context is required');
     }
-    const isHealthy = await this.deliveryService.getProviderHealth(restaurant.id, provider);
+    const isHealthy = await this.deliveryService.getProviderHealth(
+      restaurant.id,
+      provider,
+    );
     return { provider, status: isHealthy ? 'HEALTHY' : 'UNHEALTHY' };
   }
 }

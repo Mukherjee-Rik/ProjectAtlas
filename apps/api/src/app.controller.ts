@@ -8,7 +8,7 @@ export class AppController {
   healthCheck() {
     return {
       status: 'ok',
-      service: 'atlas-api',
+      service: 'kafei-api',
       timestamp: new Date().toISOString(),
     };
   }

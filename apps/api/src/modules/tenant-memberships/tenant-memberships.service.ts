@@ -7,7 +7,10 @@ import { PrismaService } from '../../database/prisma/prisma.service';
 import { CreateMembershipDto } from './dto/create-membership.dto';
 import { UpdateMembershipDto } from './dto/update-membership.dto';
 import { SubscriptionUsageService } from '../subscriptions/subscription-usage.service';
-import { CacheKeys, TtlCacheService } from '../../common/cache/ttl-cache.service';
+import {
+  CacheKeys,
+  TtlCacheService,
+} from '../../common/cache/ttl-cache.service';
 
 @Injectable()
 export class TenantMembershipsService {
@@ -176,7 +179,12 @@ export class TenantMembershipsService {
     });
   }
 
-  async findByIdForUser(id: string, userId: string, role: string, activeTenantId?: string) {
+  async findByIdForUser(
+    id: string,
+    userId: string,
+    role: string,
+    activeTenantId?: string,
+  ) {
     const membership = await this.findById(id);
     if (role !== 'PLATFORM_ADMIN') {
       if (activeTenantId && membership.tenantId !== activeTenantId) {
@@ -192,7 +200,13 @@ export class TenantMembershipsService {
     return membership;
   }
 
-  async updateForUser(id: string, updateMembershipDto: UpdateMembershipDto, userId: string, role: string, activeTenantId?: string) {
+  async updateForUser(
+    id: string,
+    updateMembershipDto: UpdateMembershipDto,
+    userId: string,
+    role: string,
+    activeTenantId?: string,
+  ) {
     const existing = await this.prisma.tenantMembership.findUnique({
       where: { id },
     });
@@ -213,7 +227,12 @@ export class TenantMembershipsService {
     return this.update(id, updateMembershipDto);
   }
 
-  async removeForUser(id: string, userId: string, role: string, activeTenantId?: string) {
+  async removeForUser(
+    id: string,
+    userId: string,
+    role: string,
+    activeTenantId?: string,
+  ) {
     const existing = await this.prisma.tenantMembership.findUnique({
       where: { id },
     });

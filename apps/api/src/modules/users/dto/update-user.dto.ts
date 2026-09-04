@@ -9,10 +9,7 @@ import {
   MinLength,
 } from 'class-validator';
 
-import {
-  UserRole,
-  UserStatus,
-} from '../../../generated/prisma/enums';
+import { UserRole, UserStatus } from '../../../generated/prisma/enums';
 
 export class UpdateUserDto {
   @ApiPropertyOptional({
@@ -49,7 +46,17 @@ export class UpdateUserDto {
     description: 'Updated user role',
   })
   @IsOptional()
-  @IsIn(['PLATFORM_ADMIN', 'OWNER', 'ADMIN', 'MANAGER', 'STAFF', 'WAITER', 'KITCHEN', 'CASHIER', 'USER'])
+  @IsIn([
+    'PLATFORM_ADMIN',
+    'OWNER',
+    'ADMIN',
+    'MANAGER',
+    'STAFF',
+    'WAITER',
+    'KITCHEN',
+    'CASHIER',
+    'USER',
+  ])
   role?: UserRole;
 
   @ApiPropertyOptional({

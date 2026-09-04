@@ -24,7 +24,9 @@ describe('SearchService', () => {
       findMany: jest.fn().mockResolvedValue([]),
     },
     user: {
-      findUnique: jest.fn().mockResolvedValue({ id: 'u1', email: 'owner@test.com' }),
+      findUnique: jest
+        .fn()
+        .mockResolvedValue({ id: 'u1', email: 'owner@test.com' }),
       findMany: jest.fn().mockResolvedValue([]),
     },
   };

@@ -43,6 +43,40 @@ export default function SettingsPage() {
           </div>
         </Link>
 
+        {/* Billing & Subscription Plans */}
+        <Link
+          href="/settings/billing"
+          className="block rounded-xl border border-border bg-card p-6 transition-all hover:border-primary hover:bg-secondary"
+        >
+          <div className="flex items-center justify-between">
+            <h2 className="text-base font-bold text-foreground">
+              📦 Billing & Plans
+            </h2>
+            <span className="text-primary">→</span>
+          </div>
+
+          <p className="mt-2 text-xs text-muted-foreground">
+            Manage your store license, upgrade tiers, quotas, or cancel recurring subscription.
+          </p>
+        </Link>
+
+        {/* AI & Automation Governance */}
+        <Link
+          href="/settings/ai"
+          className="block rounded-xl border border-border bg-card p-6 transition-all hover:border-primary hover:bg-secondary"
+        >
+          <div className="flex items-center justify-between">
+            <h2 className="text-base font-bold text-foreground">
+              ✨ AI & Automations
+            </h2>
+            <span className="text-primary">→</span>
+          </div>
+
+          <p className="mt-2 text-xs text-muted-foreground">
+            Configure assistive AI copilot, prep forecasting opt-out, and model safety controls.
+          </p>
+        </Link>
+
         {/* Organization */}
         <Link
           href="/settings/organization"
@@ -74,6 +108,23 @@ export default function SettingsPage() {
 
           <p className="mt-2 text-xs text-muted-foreground">
             Manage password policies, active authentication tokens, and session credentials.
+          </p>
+        </Link>
+
+        {/* Privacy & Data Management */}
+        <Link
+          href="/settings/privacy"
+          className="block rounded-xl border border-border bg-card p-6 transition-all hover:border-primary hover:bg-secondary"
+        >
+          <div className="flex items-center justify-between">
+            <h2 className="text-base font-bold text-foreground">
+              🛡️ Privacy & Data Export
+            </h2>
+            <span className="text-primary">→</span>
+          </div>
+
+          <p className="mt-2 text-xs text-muted-foreground">
+            Export personal data, manage Google OAuth permissions, and account erasure.
           </p>
         </Link>
       </div>

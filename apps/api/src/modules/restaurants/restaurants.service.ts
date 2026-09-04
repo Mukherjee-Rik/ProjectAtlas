@@ -179,9 +179,14 @@ export class RestaurantsService {
 
     return restaurants.map((r) => {
       const activeSubscription = r.subscriptions?.[0] || null;
-      const totalSales = r.orders.reduce((sum, o) => sum + Number(o.totalAmount || 0), 0);
-      const completedOrders = r.orders.filter((o) => o.status === 'COMPLETED' || o.status === 'SERVED').length;
-      
+      const totalSales = r.orders.reduce(
+        (sum, o) => sum + Number(o.totalAmount || 0),
+        0,
+      );
+      const completedOrders = r.orders.filter(
+        (o) => o.status === 'COMPLETED' || o.status === 'SERVED',
+      ).length;
+
       let tablesCount = 0;
       r.branches.forEach((b) => {
         b.diningAreas.forEach((da) => {
@@ -281,15 +286,27 @@ export class RestaurantsService {
 
     // Compute sales analytics
     const allOrders = restaurant.orders;
-    const totalSales = allOrders.reduce((sum, o) => sum + Number(o.totalAmount || 0), 0);
-    const completedOrders = allOrders.filter((o) => o.status === 'COMPLETED' || o.status === 'SERVED');
-    const completedSales = completedOrders.reduce((sum, o) => sum + Number(o.totalAmount || 0), 0);
-    const averageOrderValue = completedOrders.length > 0 ? completedSales / completedOrders.length : 0;
+    const totalSales = allOrders.reduce(
+      (sum, o) => sum + Number(o.totalAmount || 0),
+      0,
+    );
+    const completedOrders = allOrders.filter(
+      (o) => o.status === 'COMPLETED' || o.status === 'SERVED',
+    );
+    const completedSales = completedOrders.reduce(
+      (sum, o) => sum + Number(o.totalAmount || 0),
+      0,
+    );
+    const averageOrderValue =
+      completedOrders.length > 0 ? completedSales / completedOrders.length : 0;
 
-    const ordersByStatus = allOrders.reduce((acc, o) => {
-      acc[o.status] = (acc[o.status] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    const ordersByStatus = allOrders.reduce(
+      (acc, o) => {
+        acc[o.status] = (acc[o.status] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
 
     // Collect all tables across branches & dining areas
     const allTables: Array<{

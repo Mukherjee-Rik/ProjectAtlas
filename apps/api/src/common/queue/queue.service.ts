@@ -1,8 +1,10 @@
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import crypto from 'node:crypto';
 
-export type JobType = 'NOTIFICATION' | 'REPORT' | 'AUTOMATION' | 'EMAIL' | 'MAINTENANCE';
-export type JobStatus = 'WAITING' | 'ACTIVE' | 'COMPLETED' | 'FAILED' | 'RETRYING' | 'DEAD_LETTER';
+export type JobType =
+  'NOTIFICATION' | 'REPORT' | 'AUTOMATION' | 'EMAIL' | 'MAINTENANCE';
+export type JobStatus =
+  'WAITING' | 'ACTIVE' | 'COMPLETED' | 'FAILED' | 'RETRYING' | 'DEAD_LETTER';
 
 export interface BackgroundJob<T = any> {
   id: string;
@@ -85,7 +87,8 @@ export class QueueService implements OnModuleDestroy {
       const now = new Date();
       const eligibleJobs = Array.from(this.jobs.values()).filter((j) => {
         if (j.status === 'WAITING') return true;
-        if (j.status === 'RETRYING' && j.nextRetryAt && j.nextRetryAt <= now) return true;
+        if (j.status === 'RETRYING' && j.nextRetryAt && j.nextRetryAt <= now)
+          return true;
         return false;
       });
 
@@ -111,14 +114,21 @@ export class QueueService implements OnModuleDestroy {
 
           if (job.attempts < job.maxAttempts) {
             // Exponential backoff: 2s * 2^(attempts-1)
-            const backoffMs = Math.min(2000 * Math.pow(2, job.attempts - 1), 60000);
+            const backoffMs = Math.min(
+              2000 * Math.pow(2, job.attempts - 1),
+              60000,
+            );
             job.status = 'RETRYING';
             job.nextRetryAt = new Date(Date.now() + backoffMs);
-            this.logger.warn(`Job ${job.id} (${job.type}) failed attempt ${job.attempts}/${job.maxAttempts}. Retrying in ${backoffMs / 1000}s: ${errorMessage}`);
+            this.logger.warn(
+              `Job ${job.id} (${job.type}) failed attempt ${job.attempts}/${job.maxAttempts}. Retrying in ${backoffMs / 1000}s: ${errorMessage}`,
+            );
           } else {
             job.status = 'DEAD_LETTER';
             job.completedAt = new Date();
-            this.logger.error(`Job ${job.id} (${job.type}) exceeded maximum attempts (${job.maxAttempts}). Moved to DEAD_LETTER: ${errorMessage}`);
+            this.logger.error(
+              `Job ${job.id} (${job.type}) exceeded maximum attempts (${job.maxAttempts}). Moved to DEAD_LETTER: ${errorMessage}`,
+            );
           }
         }
       }
@@ -139,12 +149,22 @@ export class QueueService implements OnModuleDestroy {
 
     for (const job of this.jobs.values()) {
       switch (job.status) {
-        case 'WAITING': waiting++; break;
-        case 'ACTIVE': active++; break;
-        case 'COMPLETED': completed++; break;
-        case 'RETRYING': retrying++; break;
+        case 'WAITING':
+          waiting++;
+          break;
+        case 'ACTIVE':
+          active++;
+          break;
+        case 'COMPLETED':
+          completed++;
+          break;
+        case 'RETRYING':
+          retrying++;
+          break;
         case 'DEAD_LETTER':
-        case 'FAILED': deadLetter++; break;
+        case 'FAILED':
+          deadLetter++;
+          break;
       }
     }
 

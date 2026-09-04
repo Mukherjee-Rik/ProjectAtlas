@@ -1,4 +1,8 @@
-import { ConflictException, ForbiddenException, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { TablesService } from './tables.service';
 import { PrismaService } from '../../database/prisma/prisma.service';
@@ -58,8 +62,14 @@ describe('TablesService', () => {
   });
 
   it('create should throw ConflictException if duplicate code in dining area', async () => {
-    prismaService.diningArea.findFirst.mockResolvedValue({ id: 'da-a', branchId: 'branch-a' });
-    prismaService.table.findUnique.mockResolvedValue({ id: 't-1', code: 'T01' });
+    prismaService.diningArea.findFirst.mockResolvedValue({
+      id: 'da-a',
+      branchId: 'branch-a',
+    });
+    prismaService.table.findUnique.mockResolvedValue({
+      id: 't-1',
+      code: 'T01',
+    });
 
     await expect(
       service.create('branch-a', {
@@ -72,7 +82,10 @@ describe('TablesService', () => {
   });
 
   it('create should create table when valid', async () => {
-    prismaService.diningArea.findFirst.mockResolvedValue({ id: 'da-a', branchId: 'branch-a' });
+    prismaService.diningArea.findFirst.mockResolvedValue({
+      id: 'da-a',
+      branchId: 'branch-a',
+    });
     prismaService.table.findUnique.mockResolvedValue(null);
     const mockTable = {
       id: 't-1',

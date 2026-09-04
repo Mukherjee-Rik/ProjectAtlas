@@ -1,6 +1,6 @@
 export const configuration = () => ({
   app: {
-    name: process.env.APP_NAME ?? 'Atlas API',
+    name: process.env.APP_NAME ?? 'Kafei API',
     version: process.env.APP_VERSION ?? '1.0.0',
   },
 

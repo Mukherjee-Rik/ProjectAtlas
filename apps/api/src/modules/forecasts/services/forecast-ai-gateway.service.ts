@@ -6,7 +6,13 @@ import { ForecastExplainabilityService } from './forecast-explainability.service
 
 export interface AiForecastAnswer {
   question: string;
-  intent: 'SALES_TOMORROW' | 'BUSIEST_DAY' | 'DINNER_ORDERS' | 'MENU_DEMAND' | 'EXPLAIN_CHANGE' | 'GENERAL';
+  intent:
+    | 'SALES_TOMORROW'
+    | 'BUSIEST_DAY'
+    | 'DINNER_ORDERS'
+    | 'MENU_DEMAND'
+    | 'EXPLAIN_CHANGE'
+    | 'GENERAL';
   headlineAnswer: string;
   supportingDetails: string[];
   confidence: number;
@@ -33,11 +39,17 @@ export class ForecastAiGatewayService {
     const qLower = question.toLowerCase();
 
     // 1. Fetch current 7-day forecast
-    const salesForecast = await this.forecastingEngine.generateSalesForecast(restaurantId, branchId, 7);
+    const salesForecast = await this.forecastingEngine.generateSalesForecast(
+      restaurantId,
+      branchId,
+      7,
+    );
     const tomorrow = salesForecast.summary;
 
     if (qLower.includes('busiest') || qLower.includes('busy')) {
-      const sortedBySales = [...salesForecast.dailyProjections].sort((a, b) => b.predictedSales - a.predictedSales);
+      const sortedBySales = [...salesForecast.dailyProjections].sort(
+        (a, b) => b.predictedSales - a.predictedSales,
+      );
       const busiest = sortedBySales[0];
       return {
         question,
@@ -52,15 +64,24 @@ export class ForecastAiGatewayService {
       };
     }
 
-    if (qLower.includes('dinner') || qLower.includes('lunch') || qLower.includes('meal')) {
-      const breakdown = await this.mealChannelForecaster.forecastMealPeriodsAndChannels(
-        restaurantId,
-        tomorrow.tomorrowSales,
-        tomorrow.tomorrowOrders,
-        branchId,
-      );
-      const dinner = breakdown.mealPeriods.find((m) => m.periodId === 'DINNER') || breakdown.mealPeriods[0];
-      const lunch = breakdown.mealPeriods.find((m) => m.periodId === 'LUNCH') || breakdown.mealPeriods[1];
+    if (
+      qLower.includes('dinner') ||
+      qLower.includes('lunch') ||
+      qLower.includes('meal')
+    ) {
+      const breakdown =
+        await this.mealChannelForecaster.forecastMealPeriodsAndChannels(
+          restaurantId,
+          tomorrow.tomorrowSales,
+          tomorrow.tomorrowOrders,
+          branchId,
+        );
+      const dinner =
+        breakdown.mealPeriods.find((m) => m.periodId === 'DINNER') ||
+        breakdown.mealPeriods[0];
+      const lunch =
+        breakdown.mealPeriods.find((m) => m.periodId === 'LUNCH') ||
+        breakdown.mealPeriods[1];
 
       return {
         question,
@@ -75,10 +96,23 @@ export class ForecastAiGatewayService {
       };
     }
 
-    if (qLower.includes('item') || qLower.includes('menu') || qLower.includes('dish') || qLower.includes('demand')) {
-      const menuDemand = await this.menuDemandForecaster.forecastMenuDemand(restaurantId, branchId);
+    if (
+      qLower.includes('item') ||
+      qLower.includes('menu') ||
+      qLower.includes('dish') ||
+      qLower.includes('demand')
+    ) {
+      const menuDemand = await this.menuDemandForecaster.forecastMenuDemand(
+        restaurantId,
+        branchId,
+      );
       const top3 = menuDemand.slice(0, 3);
-      const topText = top3.map((t, idx) => `${idx + 1}. ${t.name}: ${t.predictedPortionsTomorrow} portions (range ${t.portionRangeLower}-${t.portionRangeUpper})`).join(', ');
+      const topText = top3
+        .map(
+          (t, idx) =>
+            `${idx + 1}. ${t.name}: ${t.predictedPortionsTomorrow} portions (range ${t.portionRangeLower}-${t.portionRangeUpper})`,
+        )
+        .join(', ');
 
       return {
         question,
@@ -93,13 +127,26 @@ export class ForecastAiGatewayService {
       };
     }
 
-    if (qLower.includes('why') || qLower.includes('reason') || qLower.includes('change') || qLower.includes('increase') || qLower.includes('decrease')) {
-      const explanation = await this.explainabilityService.explainForecast(restaurantId, tomorrow.tomorrowSales, branchId);
+    if (
+      qLower.includes('why') ||
+      qLower.includes('reason') ||
+      qLower.includes('change') ||
+      qLower.includes('increase') ||
+      qLower.includes('decrease')
+    ) {
+      const explanation = await this.explainabilityService.explainForecast(
+        restaurantId,
+        tomorrow.tomorrowSales,
+        branchId,
+      );
       return {
         question,
         intent: 'EXPLAIN_CHANGE',
         headlineAnswer: explanation.summaryText,
-        supportingDetails: explanation.factors.map((f) => `${f.name} (${f.impactPercentage >= 0 ? '+' : ''}${f.impactPercentage}%): ${f.description}`),
+        supportingDetails: explanation.factors.map(
+          (f) =>
+            `${f.name} (${f.impactPercentage >= 0 ? '+' : ''}${f.impactPercentage}%): ${f.description}`,
+        ),
         confidence: tomorrow.tomorrowConfidence,
         dataPayload: { explanation },
       };

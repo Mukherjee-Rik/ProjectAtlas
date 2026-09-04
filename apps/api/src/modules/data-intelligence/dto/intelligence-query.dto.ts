@@ -1,6 +1,16 @@
-import { IsOptional, IsString, IsDateString, IsEnum, IsNumber, Min } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  IsDateString,
+  IsEnum,
+  IsNumber,
+  Min,
+} from 'class-validator';
 import { Type } from 'class-transformer';
-import { CANONICAL_TIME_INTERVALS, type CanonicalTimeInterval } from '../constants/canonical-metrics.constants';
+import {
+  CANONICAL_TIME_INTERVALS,
+  type CanonicalTimeInterval,
+} from '../constants/canonical-metrics.constants';
 
 export class IntelligenceDateFilterDto {
   @IsOptional()

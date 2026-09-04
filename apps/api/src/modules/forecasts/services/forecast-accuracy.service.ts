@@ -31,7 +31,10 @@ export class ForecastAccuracyService {
   /**
    * Evaluates historical accuracy records and builds Forecast vs Actuals table.
    */
-  async getAccuracySummary(restaurantId: string, branchId?: string): Promise<AccuracyMetrics> {
+  async getAccuracySummary(
+    restaurantId: string,
+    branchId?: string,
+  ): Promise<AccuracyMetrics> {
     const records = await this.prisma.forecastAccuracy.findMany({
       where: {
         restaurantId,
@@ -41,7 +44,15 @@ export class ForecastAccuracyService {
       take: 30,
     });
 
-    const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const DAY_NAMES = [
+      'Sunday',
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+    ];
 
     if (records.length === 0) {
       // Build a synthetic historical comparison window for clean demo/initialization
@@ -109,7 +120,12 @@ export class ForecastAccuracyService {
         absoluteError: absErr,
         percentageError: pctErr,
         accuracy: Math.max(0, Math.round((100 - pctErr) * 10) / 10),
-        bias: pred > act ? 'OVER_PREDICTED' : pred < act ? 'UNDER_PREDICTED' : 'EXACT',
+        bias:
+          pred > act
+            ? 'OVER_PREDICTED'
+            : pred < act
+              ? 'UNDER_PREDICTED'
+              : 'EXACT',
         modelVersion: r.modelVersion,
       };
     });
@@ -119,9 +135,10 @@ export class ForecastAccuracyService {
     const wape = sumActual > 0 ? (sumAbsError / sumActual) * 100 : 12;
     const accuracyScore = Math.max(0, Math.round((100 - wape) * 10) / 10);
     const avgDiff = sumDiff / records.length;
-    const biasSummary = avgDiff > 0
-      ? `Over-predicting by ₹${Math.round(avgDiff).toLocaleString('en-IN')} on average`
-      : `Under-predicting by ₹${Math.round(Math.abs(avgDiff)).toLocaleString('en-IN')} on average`;
+    const biasSummary =
+      avgDiff > 0
+        ? `Over-predicting by ₹${Math.round(avgDiff).toLocaleString('en-IN')} on average`
+        : `Under-predicting by ₹${Math.round(Math.abs(avgDiff)).toLocaleString('en-IN')} on average`;
 
     return {
       mae: Math.round(mae * 100) / 100,
@@ -141,7 +158,10 @@ export class ForecastAccuracyService {
   computeWape(actuals: number[], predictions: number[]): number {
     if (actuals.length === 0 || actuals.length !== predictions.length) return 0;
     const totalActual = actuals.reduce((a, b) => a + b, 0);
-    const totalAbsError = actuals.reduce((sum, act, idx) => sum + Math.abs(act - predictions[idx]), 0);
+    const totalAbsError = actuals.reduce(
+      (sum, act, idx) => sum + Math.abs(act - predictions[idx]),
+      0,
+    );
     return totalActual > 0 ? (totalAbsError / totalActual) * 100 : 0;
   }
 }

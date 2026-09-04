@@ -1,7 +1,14 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { getSubscriptionUsage, getPlans, upgradeSubscription, type UsageStats, type Plan } from '@/services/subscriptions.service';
+import {
+  getSubscriptionUsage,
+  getPlans,
+  upgradeSubscription,
+  cancelSubscription,
+  type UsageStats,
+  type Plan,
+} from '@/services/subscriptions.service';
 import { formatCurrency } from '@/lib/currency';
 
 export function RestaurantSubscriptionView() {
@@ -11,6 +18,10 @@ export function RestaurantSubscriptionView() {
   const [isUpgradingId, setIsUpgradingId] = useState<string | null>(null);
   const [error, setError] = useState('');
   const [selectedPlanDetails, setSelectedPlanDetails] = useState<Plan | null>(null);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [cancelReason, setCancelReason] = useState('Found another solution');
+  const [isCancelling, setIsCancelling] = useState(false);
+  const [cancelMessage, setCancelMessage] = useState('');
   const [receipt, setReceipt] = useState<{
     planName: string;
     amountPaid: number;
@@ -74,6 +85,25 @@ export function RestaurantSubscriptionView() {
     }
   };
 
+  const handleCancelSubscription = async () => {
+    setIsCancelling(true);
+    try {
+      const res = await cancelSubscription(cancelReason);
+      const data = res.data as any;
+      setCancelMessage(
+        data?.message ||
+          'Your subscription has been cancelled. Your workspace retains access until the end of your prepaid period.',
+      );
+      setShowCancelModal(false);
+      await loadUsage();
+    } catch (err: any) {
+      console.error(err);
+      alert(err?.message ?? 'Failed to cancel subscription. Please try again.');
+    } finally {
+      setIsCancelling(false);
+    }
+  };
+
   useEffect(() => {
     void loadUsage();
   }, [loadUsage]);
@@ -134,6 +164,40 @@ export function RestaurantSubscriptionView() {
         </p>
       </div>
 
+      {/* Cancellation Notice Banner */}
+      {status === 'CANCELLED' && (
+        <div className="rounded-2xl border border-atlas-warning/30 bg-atlas-warning/10 p-5 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">🛑</span>
+            <div>
+              <p className="text-xs font-bold text-foreground">Subscription Cancelled</p>
+              <p className="text-[11px] text-muted-foreground">
+                Your subscription will not renew. Your restaurant retains full access to all features until{' '}
+                <span className="font-semibold text-foreground">
+                  {nextBillingDate ? new Date(nextBillingDate).toLocaleDateString() : 'the end of your period'}
+                </span>.
+              </p>
+            </div>
+          </div>
+          <a
+            href="#pricing"
+            onClick={(e) => {
+              e.preventDefault();
+              window.scrollTo({ top: 600, behavior: 'smooth' });
+            }}
+            className="rounded-xl bg-primary px-3.5 py-1.5 text-xs font-bold text-background shadow hover:bg-primary-hover transition-all"
+          >
+            Reactivate Plan
+          </a>
+        </div>
+      )}
+
+      {cancelMessage && (
+        <div className="rounded-2xl border border-atlas-success/30 bg-atlas-success/10 p-4 text-xs font-semibold text-atlas-success">
+          {cancelMessage}
+        </div>
+      )}
+
       {/* Trial Alert Banner */}
       {status === 'TRIALING' && nextBillingDate && (
         <div className="rounded-2xl border border-atlas-info/30 bg-atlas-info/10 p-5 flex flex-wrap items-center justify-between gap-4">
@@ -153,7 +217,7 @@ export function RestaurantSubscriptionView() {
       )}
 
       {/* Expired / Suspended Warning */}
-      {!['ACTIVE', 'TRIALING'].includes(status) && (
+      {!['ACTIVE', 'TRIALING', 'CANCELLED'].includes(status) && (
         <div className="rounded-2xl border border-atlas-error/30 bg-atlas-error/10 p-5 flex items-center gap-3">
           <span className="text-2xl">⚠️</span>
           <div>
@@ -168,56 +232,71 @@ export function RestaurantSubscriptionView() {
       {/* Grid: Subscription Info Card + Usage Meters Card */}
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Info Card */}
-        <div className="lg:col-span-1 rounded-2xl border border-border bg-card p-6 space-y-6">
-          <div>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Current Plan Tier</span>
-            <div className="mt-2 flex items-baseline gap-2">
-              <h2 className="text-3xl font-black text-primary">{planName}</h2>
-              <span className={`rounded-full border px-2 py-0.5 text-[9px] font-bold ${getStatusBadgeStyle(status)}`}>
-                {status}
-              </span>
+        <div className="lg:col-span-1 rounded-2xl border border-border bg-card p-6 space-y-6 flex flex-col justify-between">
+          <div className="space-y-6">
+            <div>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Current Plan Tier</span>
+              <div className="mt-2 flex items-baseline gap-2">
+                <h2 className="text-3xl font-black text-primary">{planName}</h2>
+                <span className={`rounded-full border px-2 py-0.5 text-[9px] font-bold ${getStatusBadgeStyle(status)}`}>
+                  {status}
+                </span>
+              </div>
+            </div>
+
+            <div className="border-t border-border/60 pt-4 space-y-3 text-xs">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Billing Cycle</span>
+                <span className="font-semibold text-foreground uppercase">{billingCycle}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Renewal/Expiry Date</span>
+                <span className="font-semibold text-foreground">
+                  {nextBillingDate ? new Date(nextBillingDate).toLocaleDateString() : 'N/A'}
+                </span>
+              </div>
+            </div>
+
+            <div className="border-t border-border/60 pt-4 space-y-2">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Included Features</p>
+              <ul className="space-y-1.5 text-xs text-foreground">
+                <li className="flex items-center gap-2">
+                  <span className="text-primary">✓</span> QR Menu Ordering
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-primary">✓</span> Table & Area Setup
+                </li>
+                {['Starter', 'Growth', 'Professional', 'Enterprise'].includes(planName) && (
+                  <li className="flex items-center gap-2">
+                    <span className="text-primary">✓</span> Order Dispatch & Kitchen Screen
+                  </li>
+                )}
+                {['Growth', 'Professional', 'Enterprise'].includes(planName) && (
+                  <li className="flex items-center gap-2">
+                    <span className="text-primary">✓</span> Advanced Revenue Analytics
+                  </li>
+                )}
+                {planName === 'Enterprise' && (
+                  <li className="flex items-center gap-2">
+                    <span className="text-primary">✓</span> Multi-Branch Corporate Control
+                  </li>
+                )}
+              </ul>
             </div>
           </div>
 
-          <div className="border-t border-border/60 pt-4 space-y-3 text-xs">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Billing Cycle</span>
-              <span className="font-semibold text-foreground uppercase">{billingCycle}</span>
+          {/* Self-Service Cancellation CTA in Current Plan Card */}
+          {['ACTIVE', 'TRIALING'].includes(status) && (
+            <div className="border-t border-border/60 pt-4">
+              <button
+                type="button"
+                onClick={() => setShowCancelModal(true)}
+                className="w-full rounded-xl border border-destructive/30 bg-destructive/5 hover:bg-destructive/10 text-destructive py-2 text-xs font-semibold transition-colors cursor-pointer"
+              >
+                Cancel Subscription
+              </button>
             </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Renewal/Expiry Date</span>
-              <span className="font-semibold text-foreground">
-                {nextBillingDate ? new Date(nextBillingDate).toLocaleDateString() : 'N/A'}
-              </span>
-            </div>
-          </div>
-
-          <div className="border-t border-border/60 pt-4 space-y-2">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Included Features</p>
-            <ul className="space-y-1.5 text-xs text-foreground">
-              <li className="flex items-center gap-2">
-                <span className="text-primary">✓</span> QR Menu Ordering
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="text-primary">✓</span> Table & Area Setup
-              </li>
-              {['Starter', 'Growth', 'Professional', 'Enterprise'].includes(planName) && (
-                <li className="flex items-center gap-2">
-                  <span className="text-primary">✓</span> Order Dispatch & Kitchen Screen
-                </li>
-              )}
-              {['Growth', 'Professional', 'Enterprise'].includes(planName) && (
-                <li className="flex items-center gap-2">
-                  <span className="text-primary">✓</span> Advanced Revenue Analytics
-                </li>
-              )}
-              {planName === 'Enterprise' && (
-                <li className="flex items-center gap-2">
-                  <span className="text-primary">✓</span> Multi-Branch Corporate Control
-                </li>
-              )}
-            </ul>
-          </div>
+          )}
         </div>
 
         {/* Resource Usage Meters Card */}
@@ -324,7 +403,7 @@ export function RestaurantSubscriptionView() {
                       </span>
                     )}
                   </div>
-                  <p className="text-xs text-muted-foreground line-clamp-2">{pl.description || `Atlas scaling plan for restaurants.`}</p>
+                  <p className="text-xs text-muted-foreground line-clamp-2">{pl.description || `Kafei scaling plan for restaurants.`}</p>
                   
                   <div className="pt-2">
                     {pl.name.toLowerCase() === 'enterprise' && (
@@ -386,6 +465,56 @@ export function RestaurantSubscriptionView() {
               </div>
             );
           })}
+        </div>
+      </div>
+
+      {/* Billing, Cancellation & Refund Policy Card */}
+      <div className="rounded-2xl border border-border bg-card p-6 space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/60 pb-4">
+          <div>
+            <h3 className="text-base font-bold text-foreground">
+              🛡️ Subscription Cancellation & 7-Day Refund Policy
+            </h3>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Transparent, hassle-free subscription management and statutory consumer protections.
+            </p>
+          </div>
+          <a
+            href="/refunds"
+            target="_blank"
+            className="text-xs font-semibold text-primary hover:underline inline-flex items-center gap-1 shrink-0"
+          >
+            <span>Read Refund Policy</span>
+            <span>→</span>
+          </a>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2 text-xs text-muted-foreground leading-relaxed">
+          <div className="rounded-xl border border-border bg-secondary/40 p-4 space-y-1.5">
+            <h4 className="font-bold text-foreground">7-Day Money-Back Guarantee</h4>
+            <p>
+              If you upgrade to any paid Kafei plan and are not completely satisfied within 7 days of initial subscription activation, you are eligible for a full 100% refund.
+            </p>
+          </div>
+          <div className="rounded-xl border border-border bg-secondary/40 p-4 space-y-1.5">
+            <h4 className="font-bold text-foreground">Immediate Cancellation Support</h4>
+            <p>
+              You can cancel your recurring plan renewal at any time. Your restaurant retains full access to all features until the end of the prepaid billing cycle.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
+          <p className="text-[11px] text-muted-foreground">
+            Questions regarding an invoice? Contact our billing desk at{' '}
+            <strong className="text-foreground">rikmukherjee1999@gmail.com</strong>.
+          </p>
+          <a
+            href="mailto:rikmukherjee1999@gmail.com?subject=Subscription%20Cancellation%20%2F%20Refund%20Request%20-%20Kafei"
+            className="rounded-xl border border-border bg-secondary px-4 py-2 text-xs font-bold text-foreground hover:bg-border transition-colors cursor-pointer"
+          >
+            Submit Refund or Cancellation Request
+          </a>
         </div>
       </div>
 
@@ -561,6 +690,77 @@ export function RestaurantSubscriptionView() {
                   {isUpgradingId === selectedPlanDetails.id ? 'Upgrading...' : `Select & Upgrade`}
                 </button>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Cancel Subscription Confirmation Modal ─────────────────── */}
+      {showCancelModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-md p-4 animate-fadeIn">
+          <div className="w-full max-w-md rounded-3xl border border-border bg-card p-6 sm:p-8 space-y-6 shadow-2xl">
+            <div className="flex items-center gap-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-destructive/10 text-destructive border border-destructive/20 text-xl font-bold">
+                🛑
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-foreground">
+                  Cancel Kafei Subscription?
+                </h3>
+                <p className="text-xs text-muted-foreground">
+                  Self-service cancellation per our Refund & Cancellation Policy.
+                </p>
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-border bg-secondary/40 p-4 space-y-2 text-xs text-muted-foreground leading-relaxed">
+              <p className="font-semibold text-foreground">What happens when you cancel:</p>
+              <ul className="list-disc list-inside space-y-1 pl-1 text-[11px]">
+                <li>
+                  Your restaurant retains <strong>uninterrupted full access</strong> to POS, KDS screens, and QR tables until <strong className="text-foreground">{nextBillingDate ? new Date(nextBillingDate).toLocaleDateString() : 'your period ends'}</strong>.
+                </li>
+                <li>
+                  No automatic renewal charges will be made.
+                </li>
+                <li>
+                  Your menu data, floor plan, and historical reports remain safely preserved.
+                </li>
+              </ul>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-foreground">
+                Reason for Cancellation (Optional)
+              </label>
+              <select
+                value={cancelReason}
+                onChange={(e) => setCancelReason(e.target.value)}
+                className="w-full rounded-xl border border-border bg-secondary px-3.5 py-2.5 text-xs text-foreground focus:border-primary focus:outline-none"
+              >
+                <option value="Temporary or seasonal closure">Temporary or seasonal restaurant closure</option>
+                <option value="Missing a specific feature">Missing a specific feature</option>
+                <option value="Budget or cost constraints">Budget or cost constraints</option>
+                <option value="Switching to another system">Switching to another system</option>
+                <option value="Other">Other reason</option>
+              </select>
+            </div>
+
+            <div className="flex gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setShowCancelModal(false)}
+                className="flex-1 rounded-xl border border-border bg-secondary py-3 text-xs font-semibold text-foreground hover:bg-border transition-colors cursor-pointer"
+              >
+                Keep My Plan
+              </button>
+              <button
+                type="button"
+                disabled={isCancelling}
+                onClick={handleCancelSubscription}
+                className="flex-1 rounded-xl bg-destructive py-3 text-xs font-bold text-destructive-foreground shadow-md hover:bg-destructive/90 active:scale-[0.98] transition-all disabled:opacity-50 cursor-pointer"
+              >
+                {isCancelling ? 'Cancelling...' : 'Confirm Cancellation'}
+              </button>
             </div>
           </div>
         </div>

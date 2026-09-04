@@ -1,10 +1,17 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsPositive,
+  IsString,
+} from 'class-validator';
 
 export class ProcessRefundDto {
   @ApiProperty({
     example: 250.0,
-    description: 'Amount to refund (must be > 0 and <= total paid minus previous refunds)',
+    description:
+      'Amount to refund (must be > 0 and <= total paid minus previous refunds)',
   })
   @IsNotEmpty()
   @IsNumber()

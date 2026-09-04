@@ -31,16 +31,25 @@ describe('MealPeriodChannelForecasterService', () => {
       ],
     }).compile();
 
-    service = module.get<MealPeriodChannelForecasterService>(MealPeriodChannelForecasterService);
+    service = module.get<MealPeriodChannelForecasterService>(
+      MealPeriodChannelForecasterService,
+    );
   });
 
   it('should forecast meal periods and channels accurately', async () => {
-    const res = await service.forecastMealPeriodsAndChannels('rest-1', 80000, 600);
+    const res = await service.forecastMealPeriodsAndChannels(
+      'rest-1',
+      80000,
+      600,
+    );
 
     expect(res.mealPeriods.length).toBe(4);
     expect(res.channels.length).toBeGreaterThan(0);
 
-    const totalPeriodSales = res.mealPeriods.reduce((s, m) => s + m.predictedSales, 0);
+    const totalPeriodSales = res.mealPeriods.reduce(
+      (s, m) => s + m.predictedSales,
+      0,
+    );
     expect(totalPeriodSales).toBeGreaterThan(0);
   });
 

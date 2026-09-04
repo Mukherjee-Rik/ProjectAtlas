@@ -13,7 +13,9 @@ export class MockWebhookDto {
   @IsOptional()
   transactionReference?: string;
 
-  @ApiPropertyOptional({ description: 'Failure explanation if status is FAILED' })
+  @ApiPropertyOptional({
+    description: 'Failure explanation if status is FAILED',
+  })
   @IsString()
   @IsOptional()
   failureReason?: string;

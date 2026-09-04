@@ -21,11 +21,29 @@ describe('AiService', () => {
   };
 
   const mockContextService = {
-    getOrderContext: jest.fn().mockResolvedValue({ totalOrders: 10, statusBreakdown: {} }),
-    getSalesContext: jest.fn().mockResolvedValue({ totalSales: 25000, totalOrders: 10, averageOrderValue: 2500, topItem: 'Chicken Biryani', topItemQty: 10, peakHours: '7 PM - 9 PM' }),
-    getCustomerContext: jest.fn().mockResolvedValue({ totalCustomers: 8, repeatCustomers: 2 }),
-    getOperationsContext: jest.fn().mockResolvedValue({ totalOrders: 10, cancelledOrders: 1, cancellationRate: 10, peakHours: '7 PM - 9 PM' }),
-    getInventoryContext: jest.fn().mockResolvedValue({ lowStockItems: [], totalInventoryValue: 0 }),
+    getOrderContext: jest
+      .fn()
+      .mockResolvedValue({ totalOrders: 10, statusBreakdown: {} }),
+    getSalesContext: jest.fn().mockResolvedValue({
+      totalSales: 25000,
+      totalOrders: 10,
+      averageOrderValue: 2500,
+      topItem: 'Chicken Biryani',
+      topItemQty: 10,
+      peakHours: '7 PM - 9 PM',
+    }),
+    getCustomerContext: jest
+      .fn()
+      .mockResolvedValue({ totalCustomers: 8, repeatCustomers: 2 }),
+    getOperationsContext: jest.fn().mockResolvedValue({
+      totalOrders: 10,
+      cancelledOrders: 1,
+      cancellationRate: 10,
+      peakHours: '7 PM - 9 PM',
+    }),
+    getInventoryContext: jest
+      .fn()
+      .mockResolvedValue({ lowStockItems: [], totalInventoryValue: 0 }),
   };
 
   const mockProviderService = {
@@ -64,16 +82,30 @@ describe('AiService', () => {
   });
 
   it('should successfully run a query for OWNER and calculate correct context', async () => {
-    const res = await service.runQuery('user-1', UserRole.OWNER, 'res-1', 'How were my sales today?');
+    const res = await service.runQuery(
+      'user-1',
+      UserRole.OWNER,
+      'res-1',
+      'How were my sales today?',
+    );
 
     expect(res.text).toContain('Mock response explaining');
-    expect(mockContextService.getSalesContext).toHaveBeenCalledWith('res-1', expect.any(Date), expect.any(Date));
+    expect(mockContextService.getSalesContext).toHaveBeenCalledWith(
+      'res-1',
+      expect.any(Date),
+      expect.any(Date),
+    );
     expect(mockPrismaService.aiUsage.create).toHaveBeenCalled();
   });
 
   it('should block financial queries requested by WAITER', async () => {
     await expect(
-      service.runQuery('user-2', UserRole.WAITER, 'res-1', 'What is our total revenue this month?'),
+      service.runQuery(
+        'user-2',
+        UserRole.WAITER,
+        'res-1',
+        'What is our total revenue this month?',
+      ),
     ).rejects.toThrow(ForbiddenException);
 
     expect(mockAuditService.log).toHaveBeenCalledWith(
@@ -84,10 +116,19 @@ describe('AiService', () => {
   });
 
   it('should allow non-financial queries requested by WAITER', async () => {
-    const res = await service.runQuery('user-2', UserRole.WAITER, 'res-1', 'How many orders are cancelled?');
+    const res = await service.runQuery(
+      'user-2',
+      UserRole.WAITER,
+      'res-1',
+      'How many orders are cancelled?',
+    );
 
     expect(res.text).toBeDefined();
-    expect(mockContextService.getOperationsContext).toHaveBeenCalledWith('res-1', expect.any(Date), expect.any(Date));
+    expect(mockContextService.getOperationsContext).toHaveBeenCalledWith(
+      'res-1',
+      expect.any(Date),
+      expect.any(Date),
+    );
     // Sales context should not be queried or populated for restricted roles
     expect(mockContextService.getSalesContext).not.toHaveBeenCalled();
   });
@@ -95,7 +136,12 @@ describe('AiService', () => {
   it('should enforce rate limits on excessive user queries', async () => {
     // Fire 20 requests
     for (let i = 0; i < 20; i++) {
-      await service.runQuery('user-rate-limit', UserRole.OWNER, 'res-1', 'hello');
+      await service.runQuery(
+        'user-rate-limit',
+        UserRole.OWNER,
+        'res-1',
+        'hello',
+      );
     }
 
     // The 21st request must trigger a rate limit error

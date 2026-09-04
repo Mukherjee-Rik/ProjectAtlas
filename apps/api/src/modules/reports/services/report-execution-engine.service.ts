@@ -2,7 +2,10 @@ import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../../../database/prisma/prisma.service';
 import { ReportValidatorService } from './report-validator.service';
 import { ReportConfigurationDto } from '../dto/custom-report.dto';
-import { APPROVED_METRICS, APPROVED_DIMENSIONS } from '../constants/metric-registry.constants';
+import {
+  APPROVED_METRICS,
+  APPROVED_DIMENSIONS,
+} from '../constants/metric-registry.constants';
 
 export interface ReportExecutionResult {
   reportName: string;
@@ -34,7 +37,10 @@ export class ReportExecutionEngineService {
   /**
    * Resolves relative date preset strings into concrete Start and End Date objects.
    */
-  resolveDateRange(dateRange: ReportConfigurationDto['dateRange']): { start: Date; end: Date } {
+  resolveDateRange(dateRange: ReportConfigurationDto['dateRange']): {
+    start: Date;
+    end: Date;
+  } {
     const now = new Date();
     const preset = dateRange.preset || 'THIS_MONTH';
 
@@ -45,8 +51,24 @@ export class ReportExecutionEngineService {
       };
     }
 
-    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
-    const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+    const todayStart = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+      0,
+      0,
+      0,
+      0,
+    );
+    const todayEnd = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+      23,
+      59,
+      59,
+      999,
+    );
 
     switch (preset) {
       case 'TODAY':
@@ -80,8 +102,24 @@ export class ReportExecutionEngineService {
       }
 
       case 'LAST_MONTH': {
-        const lmStart = new Date(now.getFullYear(), now.getMonth() - 1, 1, 0, 0, 0, 0);
-        const lmEnd = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
+        const lmStart = new Date(
+          now.getFullYear(),
+          now.getMonth() - 1,
+          1,
+          0,
+          0,
+          0,
+          0,
+        );
+        const lmEnd = new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          0,
+          23,
+          59,
+          59,
+          999,
+        );
         return { start: lmStart, end: lmEnd };
       }
 
@@ -93,7 +131,15 @@ export class ReportExecutionEngineService {
       case 'LAST_30_DAYS':
       default: {
         // Default: THIS_MONTH
-        const mStart = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
+        const mStart = new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          1,
+          0,
+          0,
+          0,
+          0,
+        );
         return { start: mStart, end: todayEnd };
       }
     }
@@ -134,11 +180,24 @@ export class ReportExecutionEngineService {
           orderBy: { createdAt: 'asc' },
         });
 
-        const groupMap = new Map<string, { label: string; gross: number; net: number; tax: number; disc: number; refund: number; cancel: number; totalOrders: number; completedOrders: number }>();
+        const groupMap = new Map<
+          string,
+          {
+            label: string;
+            gross: number;
+            net: number;
+            tax: number;
+            disc: number;
+            refund: number;
+            cancel: number;
+            totalOrders: number;
+            completedOrders: number;
+          }
+        >();
 
         let totGross = 0;
         let totNet = 0;
-        let totOrders = orders.length;
+        const totOrders = orders.length;
 
         orders.forEach((o) => {
           let groupKey = o.createdAt.toISOString().slice(0, 10);
@@ -206,7 +265,11 @@ export class ReportExecutionEngineService {
           DISCOUNT_AMOUNT: Math.round(v.disc * 100) / 100,
           REFUND_AMOUNT: Math.round(v.refund * 100) / 100,
           CANCELLED_AMOUNT: Math.round(v.cancel * 100) / 100,
-          AVERAGE_ORDER_VALUE: v.completedOrders > 0 ? Math.round(((v.gross - v.refund) / v.completedOrders) * 100) / 100 : 0,
+          AVERAGE_ORDER_VALUE:
+            v.completedOrders > 0
+              ? Math.round(((v.gross - v.refund) / v.completedOrders) * 100) /
+                100
+              : 0,
           TOTAL_ORDERS: v.totalOrders,
         }));
 
@@ -233,12 +296,27 @@ export class ReportExecutionEngineService {
           },
         });
 
-        const itemMap = new Map<string, { label: string; category: string; units: number; revenue: number; orders: Set<string> }>();
+        const itemMap = new Map<
+          string,
+          {
+            label: string;
+            category: string;
+            units: number;
+            revenue: number;
+            orders: Set<string>;
+          }
+        >();
         let grandMenuRevenue = 0;
 
         orderItems.forEach((oi) => {
-          const key = primaryDimension === 'MENU_CATEGORY' ? (oi.menuItem?.category?.name || 'General') : oi.menuItemId;
-          const label = primaryDimension === 'MENU_CATEGORY' ? key : (oi.menuItem?.name || oi.name);
+          const key =
+            primaryDimension === 'MENU_CATEGORY'
+              ? oi.menuItem?.category?.name || 'General'
+              : oi.menuItemId;
+          const label =
+            primaryDimension === 'MENU_CATEGORY'
+              ? key
+              : oi.menuItem?.name || oi.name;
 
           const existing = itemMap.get(key) || {
             label,
@@ -262,12 +340,18 @@ export class ReportExecutionEngineService {
           dimensionLabel: v.label,
           UNITS_SOLD: v.units,
           GROSS_REVENUE: Math.round(v.revenue * 100) / 100,
-          REVENUE_SHARE_PERCENT: grandMenuRevenue > 0 ? Math.round((v.revenue / grandMenuRevenue) * 10000) / 100 : 0,
+          REVENUE_SHARE_PERCENT:
+            grandMenuRevenue > 0
+              ? Math.round((v.revenue / grandMenuRevenue) * 10000) / 100
+              : 0,
           ORDERS_CONTAINING_ITEM: v.orders.size,
         }));
 
         summary.totalMenuRevenue = Math.round(grandMenuRevenue * 100) / 100;
-        summary.totalUnitsSold = rows.reduce((s, r) => s + (r.UNITS_SOLD || 0), 0);
+        summary.totalUnitsSold = rows.reduce(
+          (s, r) => s + (r.UNITS_SOLD || 0),
+          0,
+        );
         break;
       }
 
@@ -289,8 +373,18 @@ export class ReportExecutionEngineService {
           dimensionKey: seg,
           dimensionLabel: seg,
           TOTAL_CUSTOMERS: data.count,
-          LIFETIME_VALUE: data.count > 0 ? Math.round((data.spend / data.count) * 100) / 100 : 0,
-          REPEAT_RATE: customers.length > 0 ? Math.round(((customers.filter((c) => c.totalOrders >= 2).length) / customers.length) * 10000) / 100 : 0,
+          LIFETIME_VALUE:
+            data.count > 0
+              ? Math.round((data.spend / data.count) * 100) / 100
+              : 0,
+          REPEAT_RATE:
+            customers.length > 0
+              ? Math.round(
+                  (customers.filter((c) => c.totalOrders >= 2).length /
+                    customers.length) *
+                    10000,
+                ) / 100
+              : 0,
         }));
 
         summary.totalCustomers = customers.length;
@@ -310,7 +404,10 @@ export class ReportExecutionEngineService {
 
         rows = aggregates.map((a) => ({
           dimensionKey: a.date.toISOString().slice(0, 10),
-          dimensionLabel: primaryDimension === 'BRANCH' ? a.branch.name : a.date.toISOString().slice(0, 10),
+          dimensionLabel:
+            primaryDimension === 'BRANCH'
+              ? a.branch.name
+              : a.date.toISOString().slice(0, 10),
           GROSS_SALES: Number(a.grossSales),
           NET_SALES: Number(a.netSales),
           TOTAL_ORDERS: a.totalOrders,
@@ -344,7 +441,10 @@ export class ReportExecutionEngineService {
     const columns: ReportExecutionResult['columns'] = [
       {
         key: 'dimensionLabel',
-        label: APPROVED_DIMENSIONS[primaryDimension as keyof typeof APPROVED_DIMENSIONS]?.name || 'Group',
+        label:
+          APPROVED_DIMENSIONS[
+            primaryDimension as keyof typeof APPROVED_DIMENSIONS
+          ]?.name || 'Group',
       },
       ...config.metrics.map((mKey) => ({
         key: mKey,

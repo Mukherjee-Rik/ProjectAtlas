@@ -15,22 +15,26 @@ async function main() {
 
   // Find or create default plans
   let plan = await prisma.plan.findFirst({
-    where: { name: { contains: 'Professional', mode: 'insensitive' } }
+    where: { name: { contains: 'Professional', mode: 'insensitive' } },
   });
   if (!plan) {
     plan = await prisma.plan.findFirst();
   }
   if (!plan) {
-    throw new Error('No plans found in the database. Please run ensures:platform-admin or seeds first.');
+    throw new Error(
+      'No plans found in the database. Please run ensures:platform-admin or seeds first.',
+    );
   }
 
   for (const rest of restaurants) {
     const sub = await prisma.subscription.findFirst({
-      where: { restaurantId: rest.id }
+      where: { restaurantId: rest.id },
     });
 
     if (!sub) {
-      console.log(`Creating TRIALING subscription for restaurant: ${rest.name}...`);
+      console.log(
+        `Creating TRIALING subscription for restaurant: ${rest.name}...`,
+      );
       const now = new Date();
       const trialEnd = new Date();
       trialEnd.setDate(now.getDate() + 14);
@@ -45,16 +49,18 @@ async function main() {
           trialEnd: trialEnd,
           currentPeriodStart: now,
           currentPeriodEnd: trialEnd,
-        }
+        },
       });
       console.log(`Successfully created subscription for: ${rest.name}`);
     } else {
-      console.log(`Restaurant ${rest.name} already has a subscription. Status: ${sub.status}`);
+      console.log(
+        `Restaurant ${rest.name} already has a subscription. Status: ${sub.status}`,
+      );
       if (sub.status !== 'ACTIVE' && sub.status !== 'TRIALING') {
         console.log(`Re-activating subscription for ${rest.name} to ACTIVE...`);
         await prisma.subscription.update({
           where: { id: sub.id },
-          data: { status: 'ACTIVE' }
+          data: { status: 'ACTIVE' },
         });
       }
     }

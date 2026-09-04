@@ -132,9 +132,9 @@ export function AuthenticHeroTerminal() {
         };
       case 'cooking':
         return {
-          bg: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+          bg: 'bg-atlas-warning/10 text-atlas-warning border-atlas-warning/20',
           label: 'In Kitchen',
-          dot: 'bg-amber-400 animate-ping',
+          dot: 'bg-atlas-warning animate-ping',
         };
       case 'ready':
         return {
@@ -144,9 +144,9 @@ export function AuthenticHeroTerminal() {
         };
       default:
         return {
-          bg: 'bg-secondary text-muted-foreground border-zinc-700',
+          bg: 'bg-secondary text-muted-foreground border-border',
           label: 'Settled',
-          dot: 'bg-zinc-500',
+          dot: 'bg-muted-foreground',
         };
     }
   };
@@ -163,7 +163,7 @@ export function AuthenticHeroTerminal() {
           </div>
           <div className="h-4 w-px bg-secondary hidden sm:block" />
           <span className="font-mono text-xs text-muted-foreground font-medium hidden sm:inline-flex items-center gap-2">
-            <span>atlas.terminal</span>
+            <span>kafei.terminal</span>
             <span className="text-subtle">/</span>
             <span className="text-foreground font-semibold">Cafe Rizz (Main Dining)</span>
           </span>
@@ -308,23 +308,23 @@ export function AuthenticHeroTerminal() {
               </div>
 
               <div className="space-y-3">
-                <div className="rounded-xl border border-amber-500/30 bg-secondary p-4 space-y-2.5">
+                <div className="rounded-xl border border-atlas-warning/30 bg-secondary p-4 space-y-2.5">
                   <div className="flex items-center justify-between">
                     <span className="font-mono text-xs font-semibold text-foreground">
                       #AT-1082 • Table 01 (Main Hall)
                     </span>
-                    <span className="rounded bg-amber-500/10 border border-amber-500/30 px-2 py-0.5 text-[10px] font-semibold text-amber-400">
+                    <span className="rounded bg-atlas-warning/10 border border-atlas-warning/30 px-2 py-0.5 text-[10px] font-semibold text-atlas-warning">
                       PREP • 04:18m
                     </span>
                   </div>
                   <div className="text-xs text-foreground space-y-1">
                     <div className="flex justify-between">
                       <span>1x Woodfired Truffle Pizza</span>
-                      <span className="text-amber-400 text-[11px]">Extra crispy</span>
+                      <span className="text-atlas-warning text-[11px]">Extra crispy</span>
                     </div>
                     <div className="flex justify-between">
                       <span>2x House Smoked Wings</span>
-                      <span className="text-amber-400 text-[11px]">Spicy glaze</span>
+                      <span className="text-atlas-warning text-[11px]">Spicy glaze</span>
                     </div>
                   </div>
                   <div className="pt-2 flex gap-2">
@@ -394,7 +394,7 @@ export function AuthenticHeroTerminal() {
                   <button
                     type="button"
                     onClick={() => setReceiptPrinted(!receiptPrinted)}
-                    className="flex-1 flex items-center justify-center gap-1.5 rounded-lg border border-border bg-secondary py-2 text-xs font-semibold text-foreground hover:bg-zinc-700 transition-all cursor-pointer"
+                    className="flex-1 flex items-center justify-center gap-1.5 rounded-lg border border-border bg-secondary py-2 text-xs font-semibold text-foreground hover:bg-border transition-all cursor-pointer"
                   >
                     <Printer className="h-3.5 w-3.5" />
                     <span>{receiptPrinted ? 'Receipt Printed ✓' : 'Print 80mm Slip'}</span>
@@ -445,7 +445,7 @@ export function AuthenticHeroTerminal() {
                             {item.qty}x {item.name}
                           </p>
                           {item.notes && (
-                            <p className="text-[10px] text-amber-400/90">{item.notes}</p>
+                            <p className="text-[10px] text-atlas-warning/90">{item.notes}</p>
                           )}
                         </div>
                         <span className="text-primary text-[11px] font-mono">Kitchen Synced</span>

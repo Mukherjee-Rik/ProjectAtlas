@@ -1,5 +1,8 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import { DeliveryProvider, NormalizedOrderPayload } from '../../interfaces/delivery-provider.interface';
+import {
+  DeliveryProvider,
+  NormalizedOrderPayload,
+} from '../../interfaces/delivery-provider.interface';
 import { OrderStatus } from '../../../../generated/prisma/enums';
 
 @Injectable()
@@ -7,7 +10,11 @@ export class ProviderBAdapter implements DeliveryProvider {
   async createOrder(
     order: NormalizedOrderPayload,
     config: any,
-  ): Promise<{ externalOrderId: string; status: OrderStatus; rawResponse: any }> {
+  ): Promise<{
+    externalOrderId: string;
+    status: OrderStatus;
+    rawResponse: any;
+  }> {
     this.validateConfig(config);
 
     // Simulate different payload structure
@@ -74,7 +81,9 @@ export class ProviderBAdapter implements DeliveryProvider {
 
   private validateConfig(config: any) {
     if (!config || !config.apiKey || !config.apiKey.startsWith('PROV_B_')) {
-      throw new BadRequestException('Invalid Provider B API key or credentials configuration');
+      throw new BadRequestException(
+        'Invalid Provider B API key or credentials configuration',
+      );
     }
   }
 

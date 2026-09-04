@@ -7,7 +7,9 @@ export function getAccessToken(): string | null {
     return inMemoryAccessToken;
   }
   if (typeof window !== 'undefined') {
-    const token = localStorage.getItem(AUTH_STORAGE_KEYS.accessToken);
+    const token =
+      localStorage.getItem(AUTH_STORAGE_KEYS.accessToken) ||
+      localStorage.getItem(AUTH_STORAGE_KEYS.legacyAccessToken);
     if (token) {
       inMemoryAccessToken = token;
       return token;
@@ -27,6 +29,7 @@ export function removeAccessToken() {
   inMemoryAccessToken = null;
   if (typeof window !== 'undefined') {
     localStorage.removeItem(AUTH_STORAGE_KEYS.accessToken);
+    localStorage.removeItem(AUTH_STORAGE_KEYS.legacyAccessToken);
   }
 }
 
@@ -35,9 +38,9 @@ export function getStoredUser<T>(): T | null {
     return null;
   }
 
-  const user = localStorage.getItem(
-    AUTH_STORAGE_KEYS.user,
-  );
+  const user =
+    localStorage.getItem(AUTH_STORAGE_KEYS.user) ||
+    localStorage.getItem(AUTH_STORAGE_KEYS.legacyUser);
 
   if (!user) {
     return null;
@@ -58,9 +61,10 @@ export function setStoredUser<T>(user: T) {
 }
 
 export function removeStoredUser() {
-  localStorage.removeItem(
-    AUTH_STORAGE_KEYS.user,
-  );
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem(AUTH_STORAGE_KEYS.user);
+    localStorage.removeItem(AUTH_STORAGE_KEYS.legacyUser);
+  }
 }
 
 export function clearAuthStorage() {

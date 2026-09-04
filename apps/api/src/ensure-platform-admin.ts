@@ -4,8 +4,8 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from './generated/prisma/client';
 import { UserRole, UserStatus } from './generated/prisma/enums';
 
-const ADMIN_EMAIL = 'atlas@atlas.com';
-const ADMIN_PASSWORD = 'Atlas@12345';
+const ADMIN_EMAIL = 'admin@kafei.in';
+const ADMIN_PASSWORD = 'Kafei@12345';
 
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL,
@@ -19,7 +19,7 @@ async function main() {
   const user = await prisma.user.upsert({
     where: { email: ADMIN_EMAIL },
     create: {
-      name: 'Atlas Platform Admin',
+      name: 'Kafei Platform Admin',
       email: ADMIN_EMAIL,
       passwordHash,
       role: UserRole.PLATFORM_ADMIN,
@@ -72,8 +72,22 @@ async function main() {
       currency: 'INR',
       billingCycle: 'MONTHLY' as any,
       trialDays: 14,
-      description: 'Advanced features for single/multi restaurant',
-      features: ['qr_menu', 'table_management', 'orders', 'kitchen', 'analytics'],
+      description:
+        'Advanced features with AI Copilot for single/multi restaurant',
+      features: [
+        'qr_menu',
+        'qr-menu',
+        'table_management',
+        'tables',
+        'orders',
+        'kitchen',
+        'analytics',
+        'ai_copilot',
+        'ai-copilot',
+        'automations',
+        'reports',
+        'forecasts',
+      ],
       limits: { maxTables: 100, maxStaff: 50, maxBranches: 5, maxMenus: 20 },
       status: 'ACTIVE' as any,
     },
@@ -83,8 +97,25 @@ async function main() {
       currency: 'INR',
       billingCycle: 'YEARLY' as any,
       trialDays: 30,
-      description: 'Starting from ₹4,999 / year for large restaurant chains',
-      features: ['qr_menu', 'table_management', 'orders', 'kitchen', 'analytics', 'multi_branch', 'priority_support'],
+      description:
+        'Starting from ₹4,999 / year for large restaurant chains with full AI intelligence',
+      features: [
+        'qr_menu',
+        'qr-menu',
+        'table_management',
+        'tables',
+        'orders',
+        'kitchen',
+        'analytics',
+        'ai_copilot',
+        'ai-copilot',
+        'automations',
+        'reports',
+        'forecasts',
+        'multi_branch',
+        'multi-branch',
+        'priority_support',
+      ],
       limits: { maxTables: -1, maxStaff: -1, maxBranches: -1, maxMenus: -1 },
       status: 'ACTIVE' as any,
     },

@@ -29,20 +29,38 @@ export class KpiEngineService {
   async computeKpis(
     restaurantId: string,
     filter: PeriodComparisonDto,
-  ): Promise<{ kpis: KpiCard[]; metadata: { currentWindow: string; previousWindow: string } }> {
-    const { start: currentFrom, end: currentTo } = parseDateBounds(filter.dateFrom, filter.dateTo, 30);
-
-    const { previousFrom, previousTo } = this.comparisonEngine.resolveComparisonWindow(
-      currentFrom,
-      currentTo,
-      filter.comparisonPeriod ?? 'PREVIOUS_PERIOD',
-      filter.previousFrom ? new Date(filter.previousFrom) : undefined,
-      filter.previousTo ? new Date(filter.previousTo) : undefined,
+  ): Promise<{
+    kpis: KpiCard[];
+    metadata: { currentWindow: string; previousWindow: string };
+  }> {
+    const { start: currentFrom, end: currentTo } = parseDateBounds(
+      filter.dateFrom,
+      filter.dateTo,
+      30,
     );
 
+    const { previousFrom, previousTo } =
+      this.comparisonEngine.resolveComparisonWindow(
+        currentFrom,
+        currentTo,
+        filter.comparisonPeriod ?? 'PREVIOUS_PERIOD',
+        filter.previousFrom ? new Date(filter.previousFrom) : undefined,
+        filter.previousTo ? new Date(filter.previousTo) : undefined,
+      );
+
     const [currentMetrics, previousMetrics] = await Promise.all([
-      this.fetchWindowMetrics(restaurantId, currentFrom, currentTo, filter.branchId),
-      this.fetchWindowMetrics(restaurantId, previousFrom, previousTo, filter.branchId),
+      this.fetchWindowMetrics(
+        restaurantId,
+        currentFrom,
+        currentTo,
+        filter.branchId,
+      ),
+      this.fetchWindowMetrics(
+        restaurantId,
+        previousFrom,
+        previousTo,
+        filter.branchId,
+      ),
     ]);
 
     const buildKpi = (
@@ -67,15 +85,69 @@ export class KpiEngineService {
     };
 
     const kpis: KpiCard[] = [
-      buildKpi('gross_revenue', 'Gross Revenue', currentMetrics.grossRevenue, previousMetrics.grossRevenue, 'INR'),
-      buildKpi('net_revenue', 'Net Revenue', currentMetrics.netRevenue, previousMetrics.netRevenue, 'INR'),
-      buildKpi('total_orders', 'Total Orders', currentMetrics.totalOrders, previousMetrics.totalOrders, 'COUNT'),
-      buildKpi('average_order_value', 'Average Order Value (AOV)', currentMetrics.aov, previousMetrics.aov, 'INR'),
-      buildKpi('unique_customers', 'Active Customers', currentMetrics.uniqueCustomers, previousMetrics.uniqueCustomers, 'COUNT'),
-      buildKpi('repeat_customer_rate', 'Repeat Customer Rate', currentMetrics.repeatCustomerRate, previousMetrics.repeatCustomerRate, 'PERCENT'),
-      buildKpi('cancellation_rate', 'Cancellation Rate', currentMetrics.cancellationRate, previousMetrics.cancellationRate, 'PERCENT'),
-      buildKpi('refund_rate', 'Refund Rate', currentMetrics.refundRate, previousMetrics.refundRate, 'PERCENT'),
-      buildKpi('discount_rate', 'Discount Rate', currentMetrics.discountRate, previousMetrics.discountRate, 'PERCENT'),
+      buildKpi(
+        'gross_revenue',
+        'Gross Revenue',
+        currentMetrics.grossRevenue,
+        previousMetrics.grossRevenue,
+        'INR',
+      ),
+      buildKpi(
+        'net_revenue',
+        'Net Revenue',
+        currentMetrics.netRevenue,
+        previousMetrics.netRevenue,
+        'INR',
+      ),
+      buildKpi(
+        'total_orders',
+        'Total Orders',
+        currentMetrics.totalOrders,
+        previousMetrics.totalOrders,
+        'COUNT',
+      ),
+      buildKpi(
+        'average_order_value',
+        'Average Order Value (AOV)',
+        currentMetrics.aov,
+        previousMetrics.aov,
+        'INR',
+      ),
+      buildKpi(
+        'unique_customers',
+        'Active Customers',
+        currentMetrics.uniqueCustomers,
+        previousMetrics.uniqueCustomers,
+        'COUNT',
+      ),
+      buildKpi(
+        'repeat_customer_rate',
+        'Repeat Customer Rate',
+        currentMetrics.repeatCustomerRate,
+        previousMetrics.repeatCustomerRate,
+        'PERCENT',
+      ),
+      buildKpi(
+        'cancellation_rate',
+        'Cancellation Rate',
+        currentMetrics.cancellationRate,
+        previousMetrics.cancellationRate,
+        'PERCENT',
+      ),
+      buildKpi(
+        'refund_rate',
+        'Refund Rate',
+        currentMetrics.refundRate,
+        previousMetrics.refundRate,
+        'PERCENT',
+      ),
+      buildKpi(
+        'discount_rate',
+        'Discount Rate',
+        currentMetrics.discountRate,
+        previousMetrics.discountRate,
+        'PERCENT',
+      ),
     ];
 
     return {
@@ -116,7 +188,7 @@ export class KpiEngineService {
 
     let grossRevenue = 0;
     let netRevenue = 0;
-    let totalOrders = orders.length;
+    const totalOrders = orders.length;
     let completedOrders = 0;
     let cancelledOrders = 0;
     let totalDiscounts = 0;
@@ -128,7 +200,10 @@ export class KpiEngineService {
       totalDiscounts += Number(o.discountAmount);
 
       const custKey = o.customerId || o.customerSessionId || 'anon';
-      customerOrderCounts.set(custKey, (customerOrderCounts.get(custKey) || 0) + 1);
+      customerOrderCounts.set(
+        custKey,
+        (customerOrderCounts.get(custKey) || 0) + 1,
+      );
 
       if (o.status === 'CANCELLED') {
         cancelledOrders++;
@@ -147,17 +222,22 @@ export class KpiEngineService {
       });
     });
 
-    const aov = completedOrders > 0 ? (grossRevenue - totalRefunds) / completedOrders : 0;
-    const cancellationRate = totalOrders > 0 ? (cancelledOrders / totalOrders) * 100 : 0;
-    const refundRate = grossRevenue > 0 ? (totalRefunds / grossRevenue) * 100 : 0;
-    const discountRate = grossRevenue > 0 ? (totalDiscounts / grossRevenue) * 100 : 0;
+    const aov =
+      completedOrders > 0 ? (grossRevenue - totalRefunds) / completedOrders : 0;
+    const cancellationRate =
+      totalOrders > 0 ? (cancelledOrders / totalOrders) * 100 : 0;
+    const refundRate =
+      grossRevenue > 0 ? (totalRefunds / grossRevenue) * 100 : 0;
+    const discountRate =
+      grossRevenue > 0 ? (totalDiscounts / grossRevenue) * 100 : 0;
 
     let repeatCustomers = 0;
     customerOrderCounts.forEach((count) => {
       if (count >= 2) repeatCustomers++;
     });
     const uniqueCustomers = customerOrderCounts.size;
-    const repeatCustomerRate = uniqueCustomers > 0 ? (repeatCustomers / uniqueCustomers) * 100 : 0;
+    const repeatCustomerRate =
+      uniqueCustomers > 0 ? (repeatCustomers / uniqueCustomers) * 100 : 0;
 
     return {
       grossRevenue,

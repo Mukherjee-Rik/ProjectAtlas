@@ -12,7 +12,10 @@ describe('UsersController', () => {
 
   beforeEach(async () => {
     usersService = {
-      findAll: jest.fn().mockResolvedValue({ data: [], meta: { page: 1, limit: 10, total: 0, totalPages: 1 } }),
+      findAll: jest.fn().mockResolvedValue({
+        data: [],
+        meta: { page: 1, limit: 10, total: 0, totalPages: 1 },
+      }),
       findById: jest.fn(),
       updateMyProfile: jest.fn(),
       create: jest.fn(),
@@ -65,7 +68,7 @@ describe('UsersController', () => {
     };
     const mockUser: any = { id: 'u-1', role: 'PLATFORM_ADMIN' };
 
-    await controller.findAll(query as any, mockUser, undefined);
+    await controller.findAll(query, mockUser, undefined);
 
     expect(usersService.findAll).toHaveBeenCalledWith(query, undefined);
   });

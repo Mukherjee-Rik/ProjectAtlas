@@ -58,7 +58,9 @@ export class AnalyticsController {
   ) {}
 
   @Get('kpis')
-  @ApiOperation({ summary: 'Get standardized restaurant KPIs with period comparisons' })
+  @ApiOperation({
+    summary: 'Get standardized restaurant KPIs with period comparisons',
+  })
   async getKpis(
     @Headers('x-restaurant-id') restaurantId: string,
     @Query() query: PeriodComparisonDto,
@@ -67,16 +69,24 @@ export class AnalyticsController {
   }
 
   @Get('time-series')
-  @ApiOperation({ summary: 'Get continuous time-series curves (Hourly, Daily, Monthly)' })
+  @ApiOperation({
+    summary: 'Get continuous time-series curves (Hourly, Daily, Monthly)',
+  })
   async getTimeSeries(
     @Headers('x-restaurant-id') restaurantId: string,
-    @Query() query: AnalyticsFilterDto & { interval?: 'HOURLY' | 'DAILY' | 'WEEKLY' | 'MONTHLY' },
+    @Query()
+    query: AnalyticsFilterDto & {
+      interval?: 'HOURLY' | 'DAILY' | 'WEEKLY' | 'MONTHLY';
+    },
   ) {
     return this.timeSeries.getTimeSeries(restaurantId, query, query.interval);
   }
 
   @Get('revenue')
-  @ApiOperation({ summary: 'Get detailed revenue breakdown, taxes, discounts, and payment channels' })
+  @ApiOperation({
+    summary:
+      'Get detailed revenue breakdown, taxes, discounts, and payment channels',
+  })
   async getRevenue(
     @Headers('x-restaurant-id') restaurantId: string,
     @Query() query: AnalyticsFilterDto,
@@ -94,7 +104,9 @@ export class AnalyticsController {
   }
 
   @Get('customers')
-  @ApiOperation({ summary: 'Get customer segmentation and monthly cohort retention matrices' })
+  @ApiOperation({
+    summary: 'Get customer segmentation and monthly cohort retention matrices',
+  })
   async getCustomers(@Headers('x-restaurant-id') restaurantId: string) {
     return this.cohortAnalytics.getCustomerAndCohortAnalytics(restaurantId);
   }
@@ -109,12 +121,17 @@ export class AnalyticsController {
   }
 
   @Get('staff')
-  @ApiOperation({ summary: 'Get normalized staff operational turnaround metrics' })
+  @ApiOperation({
+    summary: 'Get normalized staff operational turnaround metrics',
+  })
   async getStaff(
     @Headers('x-restaurant-id') restaurantId: string,
     @Query() query: AnalyticsFilterDto,
   ) {
-    return this.branchStaffAnalytics.getStaffOperationalAnalytics(restaurantId, query);
+    return this.branchStaffAnalytics.getStaffOperationalAnalytics(
+      restaurantId,
+      query,
+    );
   }
 
   @Get('demand-matrix')
@@ -127,7 +144,9 @@ export class AnalyticsController {
   }
 
   @Get('drilldown')
-  @ApiOperation({ summary: 'Hierarchical transaction drill-down from aggregates to orders' })
+  @ApiOperation({
+    summary: 'Hierarchical transaction drill-down from aggregates to orders',
+  })
   async drillDown(
     @Headers('x-restaurant-id') restaurantId: string,
     @Query() query: DrillDownQueryDto,

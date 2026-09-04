@@ -6,7 +6,7 @@ import { parseDateBounds } from '../utils/date-range.util';
 export interface HeatmapCell {
   dayOfWeek: number; // 0 = Sunday, 1 = Monday ... 6 = Saturday
   dayName: string;
-  hour: number;      // 0..23
+  hour: number; // 0..23
   orderCount: number;
   totalVolume: number;
   intensity: number; // 0.0 to 1.0 relative heat
@@ -16,7 +16,10 @@ export interface HeatmapCell {
 export class OperationalDemandAnalyticsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getOperationalDemandMatrix(restaurantId: string, filter: AnalyticsFilterDto) {
+  async getOperationalDemandMatrix(
+    restaurantId: string,
+    filter: AnalyticsFilterDto,
+  ) {
     const { start, end } = parseDateBounds(filter.dateFrom, filter.dateTo, 30);
 
     const where: any = {
@@ -70,7 +73,10 @@ export class OperationalDemandAnalyticsService {
 
     // Compute relative heat intensity 0.0 - 1.0
     matrix.forEach((c) => {
-      c.intensity = maxCellOrders > 0 ? Math.round((c.orderCount / maxCellOrders) * 100) / 100 : 0;
+      c.intensity =
+        maxCellOrders > 0
+          ? Math.round((c.orderCount / maxCellOrders) * 100) / 100
+          : 0;
       c.totalVolume = Math.round(c.totalVolume * 100) / 100;
     });
 

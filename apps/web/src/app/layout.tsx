@@ -8,6 +8,7 @@ import { QueryProvider } from "@/lib/query-client";
 import { ToastProvider } from "@/components/ui/toast";
 import { ThemeProvider, themeInitScript } from "@/hooks/use-theme";
 import { LiquidGlassDefs } from "@/components/ui/liquid-glass-defs";
+import { CookieConsentBanner } from "@/components/legal/CookieConsentBanner";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -27,7 +28,12 @@ const funnelDisplay = Funnel_Display({
   subsets: ["latin"],
 });
 
+// Absolute base for canonical and OG URLs. Next treats a relative URL in any
+// `metadata` field as a build error unless this is set.
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://kafei.in";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: "Kafei — Restaurant Billing & Floor Operations App",
   description:
     "Kafei runs your entire restaurant floor on one platform: QR ordering at the table, kitchen KDS screens, waiter tablets, and fast cashier POS billing.",
@@ -67,6 +73,7 @@ export default function RootLayout({
             </ToastProvider>
           </QueryProvider>
         </ThemeProvider>
+        <CookieConsentBanner />
       </body>
     </html>
   );

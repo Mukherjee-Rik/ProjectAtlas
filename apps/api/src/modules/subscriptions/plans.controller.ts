@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, UseGuards, ParseUUIDPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Body,
+  Param,
+  UseGuards,
+  ParseUUIDPipe,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { SubscriptionsService } from './subscriptions.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -33,7 +43,10 @@ export class PlansController {
 
   @UseGuards(JwtAuthGuard, PlatformAdminGuard)
   @Patch(':id')
-  async updatePlan(@Param('id', new ParseUUIDPipe()) id: string, @Body() body: any) {
+  async updatePlan(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Body() body: any,
+  ) {
     return this.subscriptionsService.updatePlan(id, body);
   }
 

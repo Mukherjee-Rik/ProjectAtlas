@@ -2,9 +2,11 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { use } from 'react';
+import { use, useEffect, useState } from 'react';
 import { useCart } from '@/hooks/use-cart';
 import { formatCurrency } from '@/lib/currency';
+import { getPublicCustomerMenu } from '@/services/public-tables.service';
+import { SmartPairingRecommendations } from '@/components/ai/smart-pairing-recommendations';
 
 const MAX_QUANTITY = 99;
 
@@ -15,8 +17,29 @@ export default function CustomerCartPage({
 }) {
   const { token } = use(params);
   const router = useRouter();
-  const { cart, itemCount, totalQuantity, subtotal, isLoading, isMutating, error, updateQuantity, removeItem } =
-    useCart();
+  const [menu, setMenu] = useState<any>(null);
+  const {
+    cart,
+    itemCount,
+    totalQuantity,
+    subtotal,
+    isLoading,
+    isMutating,
+    error,
+    updateQuantity,
+    removeItem,
+    addItem,
+  } = useCart();
+
+  useEffect(() => {
+    getPublicCustomerMenu(token)
+      .then((res) => {
+        if (res.data) setMenu(res.data);
+      })
+      .catch((err) => {
+        console.warn('Failed to load menu for upsell pairings', err);
+      });
+  }, [token]);
 
   return (
     <main className="min-h-screen bg-background pb-8 text-foreground">
@@ -141,6 +164,24 @@ export default function CustomerCartPage({
               </div>
             </article>
           ))}
+
+        {!isLoading && cart && cart.items.length > 0 && menu && (
+          <SmartPairingRecommendations
+            activeMenu={menu}
+            cartItems={cart.items}
+            onAddPairing={(item) => {
+              void addItem(
+                { menuItemId: item.id, quantity: 1 },
+                {
+                  name: item.name,
+                  unitPrice: item.price,
+                  imageUrl: item.imageUrl,
+                  dietaryType: item.dietaryType,
+                },
+              );
+            }}
+          />
+        )}
 
         {!isLoading && cart && cart.items.length > 0 && (
           <div className="space-y-4 rounded-2xl border border-border bg-card p-4">

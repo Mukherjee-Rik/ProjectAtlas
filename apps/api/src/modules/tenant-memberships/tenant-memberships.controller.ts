@@ -51,7 +51,9 @@ export class TenantMembershipsController {
     if (user.role !== 'PLATFORM_ADMIN') {
       const activeTenantId = tenant?.id || createMembershipDto.tenantId;
       if (!activeTenantId || activeTenantId !== createMembershipDto.tenantId) {
-        throw new ForbiddenException('Cannot assign memberships outside your tenant');
+        throw new ForbiddenException(
+          'Cannot assign memberships outside your tenant',
+        );
       }
     }
     return this.tenantMembershipsService.create(createMembershipDto);
@@ -64,7 +66,12 @@ export class TenantMembershipsController {
     @CurrentUser() user: AuthenticatedUser,
     @CurrentTenant() tenant?: CurrentTenantType,
   ) {
-    return this.tenantMembershipsService.findByIdForUser(id, user.id, user.role, tenant?.id);
+    return this.tenantMembershipsService.findByIdForUser(
+      id,
+      user.id,
+      user.role,
+      tenant?.id,
+    );
   }
 
   @Get('user/:userId')
@@ -100,7 +107,13 @@ export class TenantMembershipsController {
     @CurrentUser() user: AuthenticatedUser,
     @CurrentTenant() tenant?: CurrentTenantType,
   ) {
-    return this.tenantMembershipsService.updateForUser(id, updateMembershipDto, user.id, user.role, tenant?.id);
+    return this.tenantMembershipsService.updateForUser(
+      id,
+      updateMembershipDto,
+      user.id,
+      user.role,
+      tenant?.id,
+    );
   }
 
   @Delete(':id')
@@ -110,6 +123,11 @@ export class TenantMembershipsController {
     @CurrentUser() user: AuthenticatedUser,
     @CurrentTenant() tenant?: CurrentTenantType,
   ) {
-    return this.tenantMembershipsService.removeForUser(id, user.id, user.role, tenant?.id);
+    return this.tenantMembershipsService.removeForUser(
+      id,
+      user.id,
+      user.role,
+      tenant?.id,
+    );
   }
 }

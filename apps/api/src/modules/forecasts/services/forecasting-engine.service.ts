@@ -1,5 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { FeatureEngineeringService, DailyFeatureVector } from './feature-engineering.service';
+import {
+  FeatureEngineeringService,
+  DailyFeatureVector,
+} from './feature-engineering.service';
 import { PrismaService } from '../../../database/prisma/prisma.service';
 import { formatLocalDate } from '../utils/forecast-date.util';
 
@@ -62,19 +65,41 @@ export class ForecastingEngineService {
     horizonDays = 7,
     modelVersion = 'seasonal-dow-v1',
   ): Promise<SalesForecastResult> {
-    const historical = await this.featureEngine.buildHistoricalFeatures(restaurantId, branchId, 60);
+    const historical = await this.featureEngine.buildHistoricalFeatures(
+      restaurantId,
+      branchId,
+      60,
+    );
 
-    const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const DAY_NAMES = [
+      'Sunday',
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+    ];
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
     // Calculate baseline standard error from recent history
     const recentSales = historical.slice(-14).map((h) => h.grossSales);
-    const avgRecentSales = recentSales.length > 0 ? recentSales.reduce((a, b) => a + b, 0) / recentSales.length : 1000;
-    const stdDev = recentSales.length > 1
-      ? Math.sqrt(recentSales.reduce((sum, v) => sum + Math.pow(v - avgRecentSales, 2), 0) / (recentSales.length - 1))
-      : avgRecentSales * 0.15;
+    const avgRecentSales =
+      recentSales.length > 0
+        ? recentSales.reduce((a, b) => a + b, 0) / recentSales.length
+        : 1000;
+    const stdDev =
+      recentSales.length > 1
+        ? Math.sqrt(
+            recentSales.reduce(
+              (sum, v) => sum + Math.pow(v - avgRecentSales, 2),
+              0,
+            ) /
+              (recentSales.length - 1),
+          )
+        : avgRecentSales * 0.15;
 
     const baseStd = Math.max(stdDev, avgRecentSales * 0.08);
 
@@ -83,12 +108,14 @@ export class ForecastingEngineService {
     let totOrders = 0;
 
     const activeDays = historical.filter((h) => h.grossSales > 0);
-    const avgActiveSales = activeDays.length > 0
-      ? activeDays.reduce((a, b) => a + b.grossSales, 0) / activeDays.length
-      : 3500;
-    const avgActiveOrders = activeDays.length > 0
-      ? activeDays.reduce((a, b) => a + b.totalOrders, 0) / activeDays.length
-      : 25;
+    const avgActiveSales =
+      activeDays.length > 0
+        ? activeDays.reduce((a, b) => a + b.grossSales, 0) / activeDays.length
+        : 3500;
+    const avgActiveOrders =
+      activeDays.length > 0
+        ? activeDays.reduce((a, b) => a + b.totalOrders, 0) / activeDays.length
+        : 25;
 
     for (let d = 1; d <= horizonDays; d++) {
       const targetDate = new Date(today);
@@ -98,7 +125,9 @@ export class ForecastingEngineService {
       const isWeekend = dow === 0 || dow === 5 || dow === 6;
 
       // Find historical records matching this Day-of-Week with non-zero sales
-      const dowMatches = historical.filter((h) => h.dayOfWeek === dow && h.grossSales > 0).slice(-4);
+      const dowMatches = historical
+        .filter((h) => h.dayOfWeek === dow && h.grossSales > 0)
+        .slice(-4);
 
       let predictedSales = 0;
       let predictedOrders = 0;
@@ -139,8 +168,12 @@ export class ForecastingEngineService {
       const upperBoundSales = Math.round(predictedSales + margin);
 
       // Confidence score decreases gently over time horizon
-      const baseConfidence = historical.length >= 30 ? 88 : historical.length >= 14 ? 80 : 72;
-      const confidence = Math.max(60, Math.round((baseConfidence - (d - 1) * 0.6) * 10) / 10);
+      const baseConfidence =
+        historical.length >= 30 ? 88 : historical.length >= 14 ? 80 : 72;
+      const confidence = Math.max(
+        60,
+        Math.round((baseConfidence - (d - 1) * 0.6) * 10) / 10,
+      );
 
       totSales += predictedSales;
       totOrders += predictedOrders;
@@ -159,7 +192,10 @@ export class ForecastingEngineService {
     }
 
     // Generate Diurnal Hourly Curve for Tomorrow
-    const hourlyProjections = this.generateHourlyCurve(dailyProjections[0]?.predictedSales || 5000, dailyProjections[0]?.predictedOrders || 40);
+    const hourlyProjections = this.generateHourlyCurve(
+      dailyProjections[0]?.predictedSales || 5000,
+      dailyProjections[0]?.predictedOrders || 40,
+    );
 
     const tomorrow = dailyProjections[0];
 
@@ -169,7 +205,9 @@ export class ForecastingEngineService {
       modelVersion,
       horizon: `${horizonDays}D`,
       startDate: dailyProjections[0]?.date || formatLocalDate(today),
-      endDate: dailyProjections[dailyProjections.length - 1]?.date || formatLocalDate(today),
+      endDate:
+        dailyProjections[dailyProjections.length - 1]?.date ||
+        formatLocalDate(today),
       summary: {
         tomorrowSales: tomorrow?.predictedSales || 0,
         tomorrowOrders: tomorrow?.predictedOrders || 0,
@@ -188,19 +226,42 @@ export class ForecastingEngineService {
   /**
    * Distributes tomorrow's projected total into 24 hour operational bins.
    */
-  private generateHourlyCurve(totalSales: number, totalOrders: number): HourlyProjectedPoint[] {
+  private generateHourlyCurve(
+    totalSales: number,
+    totalOrders: number,
+  ): HourlyProjectedPoint[] {
     // Restaurant diurnal distribution profile (Lunch peak 12-14, Dinner peak 19-21)
     const hourlyWeights = [
-      0.00, 0.00, 0.00, 0.00, 0.00, 0.00, // 0..5
-      0.01, 0.02, 0.04, 0.05, 0.06, 0.08, // 6..11
-      0.12, 0.14, 0.08, 0.04, 0.03, 0.04, // 12..17 (Lunch peak at 13)
-      0.07, 0.11, 0.10, 0.06, 0.03, 0.01, // 18..23 (Dinner peak at 19-20)
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0, // 0..5
+      0.01,
+      0.02,
+      0.04,
+      0.05,
+      0.06,
+      0.08, // 6..11
+      0.12,
+      0.14,
+      0.08,
+      0.04,
+      0.03,
+      0.04, // 12..17 (Lunch peak at 13)
+      0.07,
+      0.11,
+      0.1,
+      0.06,
+      0.03,
+      0.01, // 18..23 (Dinner peak at 19-20)
     ];
 
     return hourlyWeights.map((w, h) => {
       const pSales = Math.round(totalSales * w);
       const pOrders = Math.round(totalOrders * w);
-      const isPeak = w >= 0.10;
+      const isPeak = w >= 0.1;
       const timeLabel = `${h % 12 === 0 ? 12 : h % 12}:00 ${h >= 12 ? 'PM' : 'AM'}`;
 
       return {

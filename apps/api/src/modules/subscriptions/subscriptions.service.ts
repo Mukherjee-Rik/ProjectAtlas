@@ -1,6 +1,13 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../../database/prisma/prisma.service';
-import { CacheKeys, TtlCacheService } from '../../common/cache/ttl-cache.service';
+import {
+  CacheKeys,
+  TtlCacheService,
+} from '../../common/cache/ttl-cache.service';
 
 @Injectable()
 export class SubscriptionsService {
@@ -64,7 +71,9 @@ export class SubscriptionsService {
       where: { planId: id, status: { in: ['ACTIVE', 'TRIALING'] } },
     });
     if (subCount > 0) {
-      throw new BadRequestException('Cannot delete plan with active subscriptions.');
+      throw new BadRequestException(
+        'Cannot delete plan with active subscriptions.',
+      );
     }
     return this.prisma.plan.delete({ where: { id } });
   }
@@ -103,7 +112,7 @@ export class SubscriptionsService {
 
   async assignSubscription(restaurantId: string, planId: string) {
     const plan = await this.findPlanById(planId);
-    
+
     // Invalidate existing subscriptions
     await this.prisma.subscription.updateMany({
       where: { restaurantId, status: { in: ['ACTIVE', 'TRIALING'] } },
@@ -144,10 +153,14 @@ export class SubscriptionsService {
 
     if (!subscription) throw new NotFoundException('Subscription not found');
     if (subscription.status !== 'TRIALING') {
-      throw new BadRequestException('Can only extend trials for subscriptions in TRIALING status.');
+      throw new BadRequestException(
+        'Can only extend trials for subscriptions in TRIALING status.',
+      );
     }
 
-    const currentTrialEnd = subscription.trialEnd ? new Date(subscription.trialEnd) : new Date();
+    const currentTrialEnd = subscription.trialEnd
+      ? new Date(subscription.trialEnd)
+      : new Date();
     currentTrialEnd.setDate(currentTrialEnd.getDate() + extensionDays);
 
     const extended = await this.prisma.subscription.update({
@@ -185,5 +198,40 @@ export class SubscriptionsService {
     this.cache.invalidate(CacheKeys.subscription(subscription.restaurantId));
 
     return updated;
+  }
+
+  async cancelRestaurantSubscription(restaurantId: string, reason?: string) {
+    const subscription = await this.prisma.subscription.findFirst({
+      where: {
+        restaurantId,
+        status: { in: ['ACTIVE', 'TRIALING', 'PAST_DUE'] },
+      },
+      orderBy: { createdAt: 'desc' },
+      include: { plan: true },
+    });
+
+    if (!subscription) {
+      throw new NotFoundException(
+        'No active or trialing subscription found to cancel.',
+      );
+    }
+
+    const cancelled = await this.prisma.subscription.update({
+      where: { id: subscription.id },
+      data: {
+        status: 'CANCELLED',
+        cancelledAt: new Date(),
+      },
+      include: { plan: true },
+    });
+
+    this.cache.invalidate(CacheKeys.subscription(restaurantId));
+
+    return {
+      subscription: cancelled,
+      message: `Subscription successfully cancelled. Your restaurant retains full access until ${cancelled.currentPeriodEnd ? new Date(cancelled.currentPeriodEnd).toLocaleDateString() : 'the end of your billing cycle'}.`,
+      effectiveUntil: cancelled.currentPeriodEnd,
+      cancelledAt: cancelled.cancelledAt,
+    };
   }
 }

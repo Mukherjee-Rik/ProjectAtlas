@@ -1,4 +1,8 @@
-import { BadRequestException, ExecutionContext, ForbiddenException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ExecutionContext,
+  ForbiddenException,
+} from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { RestaurantAccessGuard } from './restaurant-access.guard';
 import { PrismaService } from '../../../database/prisma/prisma.service';
@@ -21,7 +25,12 @@ describe('RestaurantAccessGuard', () => {
         findUnique: jest.fn().mockResolvedValue({
           id: 'mem-1',
           role: 'OWNER',
-          tenant: { id: tenantId, name: 'Tenant A', slug: 'tenant-a', status: 'ACTIVE' },
+          tenant: {
+            id: tenantId,
+            name: 'Tenant A',
+            slug: 'tenant-a',
+            status: 'ACTIVE',
+          },
         }),
       },
     };
@@ -37,7 +46,11 @@ describe('RestaurantAccessGuard', () => {
     guard = module.get<RestaurantAccessGuard>(RestaurantAccessGuard);
   });
 
-  function createMockExecutionContext(user: any, tenant: any, headers: any = {}): ExecutionContext {
+  function createMockExecutionContext(
+    user: any,
+    tenant: any,
+    headers: any = {},
+  ): ExecutionContext {
     const req = { user, tenant, params: {}, query: {}, headers, body: {} };
     return {
       switchToHttp: () => ({
@@ -58,7 +71,9 @@ describe('RestaurantAccessGuard', () => {
       { id: tenantId },
       { 'x-restaurant-id': 'invalid-uuid' },
     );
-    await expect(guard.canActivate(context)).rejects.toThrow(BadRequestException);
+    await expect(guard.canActivate(context)).rejects.toThrow(
+      BadRequestException,
+    );
   });
 
   it('should throw ForbiddenException if restaurant belongs to another tenant', async () => {
@@ -74,7 +89,9 @@ describe('RestaurantAccessGuard', () => {
       { 'x-restaurant-id': validRestaurantId },
     );
 
-    await expect(guard.canActivate(context)).rejects.toThrow(ForbiddenException);
+    await expect(guard.canActivate(context)).rejects.toThrow(
+      ForbiddenException,
+    );
   });
 
   it('should allow access and populate request.restaurant when valid', async () => {
