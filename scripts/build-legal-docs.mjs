@@ -10,8 +10,10 @@ fs.mkdirSync(rootLegalDir, { recursive: true });
 const policies = {
   'Kafei_Privacy_Policy.md': `# Kafei Privacy Policy
 
-**Last Updated:** September 4, 2026  
-**Effective Date:** September 4, 2026  
+**Last Updated:** September 3, 2026  
+**Effective Date:** September 3, 2026
+**Copyright Claim:** September 3, 2026 (03-09-2026)
+**Copyright Notice:** © 2026 Antigravity. All rights reserved. Registered & Protected from 03-09-2026.  
 **Entity:** Antigravity ("Kafei", "we", "our", or "us")  
 **Application / Brand:** Kafei (including Project Atlas & Kafei Restaurant Operating System)  
 **Website:** https://kafei.in
@@ -161,8 +163,10 @@ For inquiries, data requests, or privacy concerns, please contact our privacy de
 
   'Kafei_Terms_of_Service.md': `# Kafei Terms of Service
 
-**Last Updated:** September 4, 2026  
-**Effective Date:** September 4, 2026  
+**Last Updated:** September 3, 2026  
+**Effective Date:** September 3, 2026
+**Copyright Claim:** September 3, 2026 (03-09-2026)
+**Copyright Notice:** © 2026 Antigravity. All rights reserved. Registered & Protected from 03-09-2026.  
 **Entity:** Antigravity ("Kafei", "we", "our", or "us")  
 **Application / Service:** Kafei Restaurant Operating System, Project Atlas & Kafei Platform  
 **Website:** https://kafei.in
@@ -321,8 +325,10 @@ Legal notices under this Agreement must be addressed to:
 
   'Kafei_AI_Usage_&_Responsible_Use_Policy.md': `# Kafei AI Usage & Responsible Use Policy
 
-**Last Updated:** September 4, 2026  
-**Effective Date:** September 4, 2026  
+**Last Updated:** September 3, 2026  
+**Effective Date:** September 3, 2026
+**Copyright Claim:** September 3, 2026 (03-09-2026)
+**Copyright Notice:** © 2026 Antigravity. All rights reserved. Registered & Protected from 03-09-2026.  
 **Entity:** Antigravity ("Kafei", "we", "our", or "us")  
 **Application / Brand:** Kafei (including Project Atlas AI & Demand Forecasting Engine)  
 **Website:** https://kafei.in
@@ -399,8 +405,10 @@ Kafei enforces continuous safety evaluations and automated guardrails to filter 
 
   'Acceptable_Use_Policy.md': `# Kafei Acceptable Use Policy (AUP)
 
-**Last Updated:** September 4, 2026  
-**Effective Date:** September 4, 2026  
+**Last Updated:** September 3, 2026  
+**Effective Date:** September 3, 2026
+**Copyright Claim:** September 3, 2026 (03-09-2026)
+**Copyright Notice:** © 2026 Antigravity. All rights reserved. Registered & Protected from 03-09-2026.  
 **Entity:** Antigravity ("Kafei", "we", "our", or "us")  
 **Application / Brand:** Kafei Restaurant Operating System & API  
 **Website:** https://kafei.in
@@ -470,8 +478,10 @@ If you discover a violation of this Acceptable Use Policy, please report it imme
 
   'Kafei_Cookie_Policy.md': `# Kafei Cookie Policy
 
-**Last Updated:** September 4, 2026  
-**Effective Date:** September 4, 2026  
+**Last Updated:** September 3, 2026  
+**Effective Date:** September 3, 2026
+**Copyright Claim:** September 3, 2026 (03-09-2026)
+**Copyright Notice:** © 2026 Antigravity. All rights reserved. Registered & Protected from 03-09-2026.  
 **Entity:** Antigravity ("Kafei", "we", "our", or "us")  
 **Application / Brand:** Kafei (including Project Atlas & Kafei Platform)  
 **Website:** https://kafei.in
@@ -538,8 +548,10 @@ For questions regarding our use of cookies and local storage technologies, pleas
 
   'Kafei_Copyright_&_DMCA_Policy.md': `# Kafei Copyright & DMCA Policy
 
-**Last Updated:** September 4, 2026  
-**Effective Date:** September 4, 2026  
+**Last Updated:** September 3, 2026  
+**Effective Date:** September 3, 2026
+**Copyright Claim:** September 3, 2026 (03-09-2026)
+**Copyright Notice:** © 2026 Antigravity. All rights reserved. Registered & Protected from 03-09-2026.  
 **Entity:** Antigravity ("Kafei", "we", "our", or "us")  
 **Application / Brand:** Kafei Platform & Digital Ordering  
 **Website:** https://kafei.in
@@ -599,8 +611,10 @@ Kafei enforces a strict repeat infringer policy. Subscribers whose accounts are 
 
   'Kafei_Data_Processing_Addendum_(DPA).md': `# Kafei Data Processing Addendum (DPA)
 
-**Last Updated:** September 4, 2026  
-**Effective Date:** September 4, 2026  
+**Last Updated:** September 3, 2026  
+**Effective Date:** September 3, 2026
+**Copyright Claim:** September 3, 2026 (03-09-2026)
+**Copyright Notice:** © 2026 Antigravity. All rights reserved. Registered & Protected from 03-09-2026.  
 **Entity:** Antigravity ("Processor", "Kafei", "we")  
 **Customer:** The Subscriber entity utilizing the Kafei Services ("Controller", "Customer")  
 **Website:** https://kafei.in
@@ -686,8 +700,10 @@ For DPA execution inquiries or audit questions:
 
   'Kafei_Refund_&_Cancellation_Policy.md': `# Kafei Refund & Cancellation Policy
 
-**Last Updated:** September 4, 2026  
-**Effective Date:** September 4, 2026  
+**Last Updated:** September 3, 2026  
+**Effective Date:** September 3, 2026
+**Copyright Claim:** September 3, 2026 (03-09-2026)
+**Copyright Notice:** © 2026 Antigravity. All rights reserved. Registered & Protected from 03-09-2026.  
 **Entity:** Antigravity ("Kafei", "we", "our", or "us")  
 **Application / Service:** Kafei Restaurant Operating System, Project Atlas & Kafei Platform  
 **Website:** https://kafei.in
@@ -757,8 +773,10 @@ To request a refund, dispute a charge, or inquire about cancellation:
 
   'Kafei_Security_Policy.md': `# Kafei Security Policy
 
-**Last Updated:** September 4, 2026  
-**Effective Date:** September 4, 2026  
+**Last Updated:** September 3, 2026  
+**Effective Date:** September 3, 2026
+**Copyright Claim:** September 3, 2026 (03-09-2026)
+**Copyright Notice:** © 2026 Antigravity. All rights reserved. Registered & Protected from 03-09-2026.  
 **Entity:** Antigravity ("Kafei", "we", "our", or "us")  
 **Application / Brand:** Kafei Platform (Project Atlas Architecture)  
 **Website:** https://kafei.in

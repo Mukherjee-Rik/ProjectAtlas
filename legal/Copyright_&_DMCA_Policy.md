@@ -1,7 +1,7 @@
 # Copyright & DMCA Policy — Kafei
 
 **Effective Date**: January 1, 2025  
-**Last Updated**: September 4, 2026  
+**Last Updated**: September 3, 2026  
 **Official Application**: Kafei ([https://kafei.in](https://kafei.in))  
 **Operating Entity**: Antigravity  
 **Designated Agent Email**: [legal@kafei.in](mailto:legal@kafei.in) / [rikmukherjee1999@gmail.com](mailto:rikmukherjee1999@gmail.com)  
@@ -21,6 +21,10 @@ This Copyright & DMCA Policy outlines the procedures for submitting notices of a
 ## 2. Proprietary Software & Assets
 
 All platform source code, interactive web terminal components, UI designs, brand logos, icons, vector graphics, table QR standee layouts, documentation, and database schemas available on **[https://kafei.in](https://kafei.in)** are the exclusive intellectual property of Antigravity. 
+
+- **Official Copyright Claim:** © 2026 Antigravity. All rights reserved.
+- **Effective Claim Date:** September 3, 2026 (03-09-2026)
+- **International Protection:** Protected under the Berne Convention, Universal Copyright Convention, and the Indian Copyright Act, 1957.
 
 Unauthorized reproduction, distribution, scraping, or reverse engineering of any portion of Kafei is strictly prohibited.
 

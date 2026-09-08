@@ -610,7 +610,7 @@ export default function SupportPage() {
           </div>
 
           <p className="text-[11px] text-muted-foreground">
-            © {new Date().getFullYear()} Antigravity. All rights reserved.
+            © {new Date().getFullYear()} Antigravity. All rights reserved (Copyright Claim from 03-09-2026).
           </p>
         </div>
       </footer>
