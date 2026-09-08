@@ -240,7 +240,7 @@ export default function ContactUsPage() {
                 </div>
                 <p className="text-xs text-muted-foreground leading-relaxed">
                   Kafei Engineering & Operations<br />
-                  Kolkata, WB / Bangalore, KA<br />
+                  Sundarban, West Bengal &amp; Teliamura, Tripura<br />
                   India</p>
               </div>
 

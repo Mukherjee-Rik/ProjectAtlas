@@ -26,7 +26,7 @@ export const LEGAL_ENTITY = {
   domain: 'kafei.in',
   homepage: 'https://kafei.in',
   jurisdiction: 'India',
-  address: 'Kolkata, West Bengal, India',
+  address: 'Sundarban, West Bengal & Teliamura, Tripura, India',
   effectiveDate: 'September 3, 2026',
   copyrightClaimDate: 'September 3, 2026 (03-09-2026)',
   copyrightNotice: '© 2026 Kafei. All rights reserved. Registered & Protected from September 3, 2026 (03-09-2026).',

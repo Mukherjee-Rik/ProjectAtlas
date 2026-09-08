@@ -6,7 +6,7 @@
 **Operating Entity**: Kafei  
 **Contact Email**: [restaurant.kafei@gmail.com](mailto:restaurant.kafei@gmail.com)  
 **Support Hotline**: [+91 9903085026](tel:9903085026)  
-**Registered Address**: Kolkata, West Bengal & Bangalore, Karnataka, India  
+**Registered Address**: Sundarban, West Bengal & Teliamura, Tripura, India  
 
 ---
 

@@ -135,7 +135,7 @@ export default function TermsOfServicePage() {
       <h2>9. Governing Law &amp; Dispute Resolution</h2>
       <p>
         This Agreement shall be governed by and construed in accordance with the laws of India. Any dispute arising out of or
-        relating to this Agreement shall be resolved through binding arbitration in Kolkata / Bangalore, India, under the
+        relating to this Agreement shall be resolved through binding arbitration in West Bengal / Tripura, India, under the
         Arbitration and Conciliation Act, 1996.
       </p>
     </LegalPageShell>

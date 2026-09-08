@@ -6,7 +6,7 @@
 **Operating Entity**: Kafei  
 **Designated Agent Email**: [restaurant.kafei@gmail.com](mailto:restaurant.kafei@gmail.com)  
 **Agent Phone**: [+91 9903085026](tel:9903085026)  
-**Registered Address**: Kolkata, West Bengal & Bangalore, Karnataka, India  
+**Registered Address**: Sundarban, West Bengal & Teliamura, Tripura, India  
 
 ---
 
@@ -47,7 +47,7 @@ If you believe that your copyrighted work (e.g., food photography, restaurant me
 - **Email**: [restaurant.kafei@gmail.com](mailto:restaurant.kafei@gmail.com)
 - **Direct Review Contact**: [restaurant.kafei@gmail.com](mailto:restaurant.kafei@gmail.com)
 - **Phone / WhatsApp**: [+91 9903085026](tel:9903085026)
-- **Address**: Kolkata, West Bengal & Bangalore, Karnataka, India
+- **Address**: Sundarban, West Bengal & Teliamura, Tripura, India
 
 ---
 
@@ -61,7 +61,7 @@ If a restaurant tenant believes their material was removed or disabled by mistak
 1. The tenant's physical or electronic signature.
 2. Identification of the material that was removed and the location where it appeared before removal.
 3. A statement under penalty of perjury that the tenant has a good faith belief that the material was removed or disabled as a result of mistake or misidentification.
-4. The tenant's name, address, telephone number, email address, and consent to the jurisdiction of the competent courts in Kolkata, West Bengal, India.
+4. The tenant's name, address, telephone number, email address, and consent to the jurisdiction of the competent courts in Sundarban, West Bengal & Teliamura, Tripura, India.
 
 If a valid counter-notice is received, Kafei may restore the disabled content after 10 to 14 business days unless the original claimant files a court action seeking a restraining order.
 
