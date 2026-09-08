@@ -158,7 +158,7 @@ For inquiries, data requests, or privacy concerns, please contact our privacy de
 - **Email:** restaurant.kafei@gmail.com
 - **Legal & Compliance:** restaurant.kafei@gmail.com
 - **Phone / WhatsApp:** +91 9903085026
-- **Headquarters:** Kolkata, WB / Bangalore, KA, India
+- **Headquarters:** Sundarban, West Bengal & Teliamura, Tripura, India
 `,
 
   'Kafei_Terms_of_Service.md': `# Kafei Terms of Service
@@ -300,7 +300,7 @@ Upon termination, your right to access the Services immediately ceases. You may 
 
 ## 11. Governing Law & Dispute Resolution
 
-This Agreement shall be governed by and construed in accordance with the laws of India, without regard to its conflict of law principles. Any dispute, controversy, or claim arising out of or relating to this Agreement shall be resolved through binding arbitration in Kolkata / Bangalore, India, conducted in English under the Arbitration and Conciliation Act, 1996.
+This Agreement shall be governed by and construed in accordance with the laws of India, without regard to its conflict of law principles. Any dispute, controversy, or claim arising out of or relating to this Agreement shall be resolved through binding arbitration in West Bengal / Tripura, India, conducted in English under the Arbitration and Conciliation Act, 1996.
 
 ---
 
@@ -320,7 +320,7 @@ Legal notices under this Agreement must be addressed to:
 - **Entity:** Kafei
 - **Email:** restaurant.kafei@gmail.com
 - **Phone:** +91 9903085026
-- **Headquarters:** Kolkata, WB / Bangalore, KA, India
+- **Headquarters:** Sundarban, West Bengal & Teliamura, Tripura, India
 `,
 
   'Kafei_AI_Usage_&_Responsible_Use_Policy.md': `# Kafei AI Usage & Responsible Use Policy
@@ -572,7 +572,7 @@ Notices of claimed copyright infringement must be sent to our Designated Copyrig
 - **Entity:** Kafei
 - **Email:** restaurant.kafei@gmail.com
 - **Phone / WhatsApp:** +91 9903085026
-- **Address:** Legal Department, Kafei, Kolkata, WB / Bangalore, KA, India
+- **Address:** Legal Department, Kafei, Sundarban, West Bengal & Teliamura, Tripura, India
 
 ---
 
