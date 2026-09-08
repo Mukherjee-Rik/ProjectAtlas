@@ -3,7 +3,7 @@
 **Effective Date**: January 1, 2025  
 **Last Updated**: September 3, 2026  
 **Official Application**: Kafei (accessible at [https://kafei.in](https://kafei.in))  
-**Operating Entity**: Antoant  
+**Operating Entity**: Kafei  
 **Contact Email**: [privacy@kafei.in](mailto:privacy@kafei.in) / [rikmukherjee1999@gmail.com](mailto:rikmukherjee1999@gmail.com)  
 **Support Hotline**: [+91 9903085026](tel:9903085026)  
 **Registered Address**: Kolkata, West Bengal & Bangalore, Karnataka, India  
@@ -144,7 +144,7 @@ We may update this Privacy Policy periodically to reflect technological improvem
 
 If you have questions, feedback, or wish to exercise your data privacy rights, please contact our Data Protection and Compliance Desk:
 
-- **Company**: Antoant
+- **Company**: Kafei
 - **Privacy Email**: [privacy@kafei.in](mailto:privacy@kafei.in)
 - **Primary Review Contact**: [rikmukherjee1999@gmail.com](mailto:rikmukherjee1999@gmail.com)
 - **Direct Phone / WhatsApp**: [+91 9903085026](tel:9903085026)

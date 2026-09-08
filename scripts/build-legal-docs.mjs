@@ -13,8 +13,8 @@ const policies = {
 **Last Updated:** September 3, 2026  
 **Effective Date:** September 3, 2026
 **Copyright Claim:** September 3, 2026 (03-09-2026)
-**Copyright Notice:** © 2026 Antoant. All rights reserved. Registered & Protected from 03-09-2026.  
-**Entity:** Antoant ("Kafei", "we", "our", or "us")  
+**Copyright Notice:** © 2026 Kafei. All rights reserved. Registered & Protected from 03-09-2026.  
+**Entity:** Kafei ("Kafei", "we", "our", or "us")  
 **Application / Brand:** Kafei (including Project Atlas & Kafei Restaurant Operating System)  
 **Website:** https://kafei.in
 
@@ -154,7 +154,7 @@ We may update this Privacy Policy periodically to reflect technological updates,
 
 For inquiries, data requests, or privacy concerns, please contact our privacy desk:
 
-- **Entity:** Antoant
+- **Entity:** Kafei
 - **Email:** privacy@kafei.in / rikmukherjee1999@gmail.com
 - **Legal & Compliance:** legal@kafei.in
 - **Phone / WhatsApp:** +91 9903085026
@@ -166,8 +166,8 @@ For inquiries, data requests, or privacy concerns, please contact our privacy de
 **Last Updated:** September 3, 2026  
 **Effective Date:** September 3, 2026
 **Copyright Claim:** September 3, 2026 (03-09-2026)
-**Copyright Notice:** © 2026 Antoant. All rights reserved. Registered & Protected from 03-09-2026.  
-**Entity:** Antoant ("Kafei", "we", "our", or "us")  
+**Copyright Notice:** © 2026 Kafei. All rights reserved. Registered & Protected from 03-09-2026.  
+**Entity:** Kafei ("Kafei", "we", "our", or "us")  
 **Application / Service:** Kafei Restaurant Operating System, Project Atlas & Kafei Platform  
 **Website:** https://kafei.in
 
@@ -175,7 +175,7 @@ For inquiries, data requests, or privacy concerns, please contact our privacy de
 
 ## 1. Acceptance of Terms
 
-These Terms of Service (the **"Terms"** or **"Agreement"**) constitute a legally binding agreement between Antoant and the individual or legal entity (**"Customer"**, **"Subscriber"**, **"you"**, or **"your"**) accessing or using our cloud restaurant operating system, point-of-sale (POS) terminals, Kitchen Display Systems (KDS), waiter portals, table QR ordering, inventory modules, demand forecasting, and artificial intelligence copilots (collectively, the **"Services"**).
+These Terms of Service (the **"Terms"** or **"Agreement"**) constitute a legally binding agreement between Kafei and the individual or legal entity (**"Customer"**, **"Subscriber"**, **"you"**, or **"your"**) accessing or using our cloud restaurant operating system, point-of-sale (POS) terminals, Kitchen Display Systems (KDS), waiter portals, table QR ordering, inventory modules, demand forecasting, and artificial intelligence copilots (collectively, the **"Services"**).
 
 By registering an account, integrating via Google OAuth or third-party sign-in, configuring a restaurant branch, or accessing the Services, you acknowledge that you have read, understood, and agreed to be bound by these Terms, our [Privacy Policy](Kafei_Privacy_Policy.md), and our [Acceptable Use Policy](Acceptable_Use_Policy.md). If you are entering into this Agreement on behalf of a company or other legal entity, you represent that you have the authority to bind such entity.
 
@@ -317,7 +317,7 @@ This Agreement shall be governed by and construed in accordance with the laws of
 
 Legal notices under this Agreement must be addressed to:
 
-- **Entity:** Antoant
+- **Entity:** Kafei
 - **Email:** legal@kafei.in / rikmukherjee1999@gmail.com
 - **Phone:** +91 9903085026
 - **Headquarters:** Kolkata, WB / Bangalore, KA, India
@@ -328,8 +328,8 @@ Legal notices under this Agreement must be addressed to:
 **Last Updated:** September 3, 2026  
 **Effective Date:** September 3, 2026
 **Copyright Claim:** September 3, 2026 (03-09-2026)
-**Copyright Notice:** © 2026 Antoant. All rights reserved. Registered & Protected from 03-09-2026.  
-**Entity:** Antoant ("Kafei", "we", "our", or "us")  
+**Copyright Notice:** © 2026 Kafei. All rights reserved. Registered & Protected from 03-09-2026.  
+**Entity:** Kafei ("Kafei", "we", "our", or "us")  
 **Application / Brand:** Kafei (including Project Atlas AI & Demand Forecasting Engine)  
 **Website:** https://kafei.in
 
@@ -408,8 +408,8 @@ Kafei enforces continuous safety evaluations and automated guardrails to filter 
 **Last Updated:** September 3, 2026  
 **Effective Date:** September 3, 2026
 **Copyright Claim:** September 3, 2026 (03-09-2026)
-**Copyright Notice:** © 2026 Antoant. All rights reserved. Registered & Protected from 03-09-2026.  
-**Entity:** Antoant ("Kafei", "we", "our", or "us")  
+**Copyright Notice:** © 2026 Kafei. All rights reserved. Registered & Protected from 03-09-2026.  
+**Entity:** Kafei ("Kafei", "we", "our", or "us")  
 **Application / Brand:** Kafei Restaurant Operating System & API  
 **Website:** https://kafei.in
 
@@ -481,8 +481,8 @@ If you discover a violation of this Acceptable Use Policy, please report it imme
 **Last Updated:** September 3, 2026  
 **Effective Date:** September 3, 2026
 **Copyright Claim:** September 3, 2026 (03-09-2026)
-**Copyright Notice:** © 2026 Antoant. All rights reserved. Registered & Protected from 03-09-2026.  
-**Entity:** Antoant ("Kafei", "we", "our", or "us")  
+**Copyright Notice:** © 2026 Kafei. All rights reserved. Registered & Protected from 03-09-2026.  
+**Entity:** Kafei ("Kafei", "we", "our", or "us")  
 **Application / Brand:** Kafei (including Project Atlas & Kafei Platform)  
 **Website:** https://kafei.in
 
@@ -551,8 +551,8 @@ For questions regarding our use of cookies and local storage technologies, pleas
 **Last Updated:** September 3, 2026  
 **Effective Date:** September 3, 2026
 **Copyright Claim:** September 3, 2026 (03-09-2026)
-**Copyright Notice:** © 2026 Antoant. All rights reserved. Registered & Protected from 03-09-2026.  
-**Entity:** Antoant ("Kafei", "we", "our", or "us")  
+**Copyright Notice:** © 2026 Kafei. All rights reserved. Registered & Protected from 03-09-2026.  
+**Entity:** Kafei ("Kafei", "we", "our", or "us")  
 **Application / Brand:** Kafei Platform & Digital Ordering  
 **Website:** https://kafei.in
 
@@ -569,10 +569,10 @@ Kafei respects the intellectual property rights of creators, restaurateurs, phot
 Notices of claimed copyright infringement must be sent to our Designated Copyright Agent:
 
 - **Attn:** Designated DMCA Copyright Agent
-- **Entity:** Antoant
+- **Entity:** Kafei
 - **Email:** dmca@kafei.in / legal@kafei.in
 - **Phone / WhatsApp:** +91 9903085026
-- **Address:** Legal Department, Antoant, Kolkata, WB / Bangalore, KA, India
+- **Address:** Legal Department, Kafei, Kolkata, WB / Bangalore, KA, India
 
 ---
 
@@ -614,8 +614,8 @@ Kafei enforces a strict repeat infringer policy. Subscribers whose accounts are 
 **Last Updated:** September 3, 2026  
 **Effective Date:** September 3, 2026
 **Copyright Claim:** September 3, 2026 (03-09-2026)
-**Copyright Notice:** © 2026 Antoant. All rights reserved. Registered & Protected from 03-09-2026.  
-**Entity:** Antoant ("Processor", "Kafei", "we")  
+**Copyright Notice:** © 2026 Kafei. All rights reserved. Registered & Protected from 03-09-2026.  
+**Entity:** Kafei ("Processor", "Kafei", "we")  
 **Customer:** The Subscriber entity utilizing the Kafei Services ("Controller", "Customer")  
 **Website:** https://kafei.in
 
@@ -703,8 +703,8 @@ For DPA execution inquiries or audit questions:
 **Last Updated:** September 3, 2026  
 **Effective Date:** September 3, 2026
 **Copyright Claim:** September 3, 2026 (03-09-2026)
-**Copyright Notice:** © 2026 Antoant. All rights reserved. Registered & Protected from 03-09-2026.  
-**Entity:** Antoant ("Kafei", "we", "our", or "us")  
+**Copyright Notice:** © 2026 Kafei. All rights reserved. Registered & Protected from 03-09-2026.  
+**Entity:** Kafei ("Kafei", "we", "our", or "us")  
 **Application / Service:** Kafei Restaurant Operating System, Project Atlas & Kafei Platform  
 **Website:** https://kafei.in
 
@@ -776,8 +776,8 @@ To request a refund, dispute a charge, or inquire about cancellation:
 **Last Updated:** September 3, 2026  
 **Effective Date:** September 3, 2026
 **Copyright Claim:** September 3, 2026 (03-09-2026)
-**Copyright Notice:** © 2026 Antoant. All rights reserved. Registered & Protected from 03-09-2026.  
-**Entity:** Antoant ("Kafei", "we", "our", or "us")  
+**Copyright Notice:** © 2026 Kafei. All rights reserved. Registered & Protected from 03-09-2026.  
+**Entity:** Kafei ("Kafei", "we", "our", or "us")  
 **Application / Brand:** Kafei Platform (Project Atlas Architecture)  
 **Website:** https://kafei.in
 

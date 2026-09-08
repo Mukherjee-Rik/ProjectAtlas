@@ -3,7 +3,7 @@
 **Effective Date**: January 1, 2025  
 **Last Updated**: September 3, 2026  
 **Official Application**: Kafei ([https://kafei.in](https://kafei.in))  
-**Operating Entity**: Antoant  
+**Operating Entity**: Kafei  
 **Data Protection Email**: [dpo@kafei.in](mailto:dpo@kafei.in) / [rikmukherjee1999@gmail.com](mailto:rikmukherjee1999@gmail.com)  
 **Hotline**: [+91 9903085026](tel:9903085026)  
 
@@ -11,7 +11,7 @@
 
 ## 1. Introduction & Scope
 
-This Data Processing Addendum ("DPA") supplements the [Kafei Terms of Service](https://kafei.in/terms) between **Antoant** ("Kafei," "Processor," or "Data Processor") and the restaurant business or subscriber ("Customer," "Controller," or "Data Controller").
+This Data Processing Addendum ("DPA") supplements the [Kafei Terms of Service](https://kafei.in/terms) between **Kafei** ("Kafei," "Processor," or "Data Processor") and the restaurant business or subscriber ("Customer," "Controller," or "Data Controller").
 
 This DPA applies to the processing of personal data by Kafei on behalf of the Customer in connection with providing the Kafei restaurant operating system, table QR ordering, KDS, and POS cashier services at **[https://kafei.in](https://kafei.in)**.
 
