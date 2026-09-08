@@ -73,7 +73,7 @@ graph TD
 - **EPIC 6: Aggregator Integration Hub (Swiggy & Zomato)**
   - Webhook ingestion workers (BullMQ), HMAC signature validation, order auto-acceptance, menu sync engine, auto-pause items on stock depletion.
 - **EPIC 7: AI Business Brain & Memory Layer**
-  - PGVector embedding store, LLM abstraction layer (OpenAI/Anthropic/Local LLM), natural language query builder (Text-to-SQL), demand forecast models.
+  - PGVector embedding store, LLM abstraction layer (Gemini/OpenAI/Local LLM), natural language query builder (Text-to-SQL), demand forecast models.
 
 ---
 
