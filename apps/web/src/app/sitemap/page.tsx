@@ -21,9 +21,9 @@ import { LEGAL_DOCS } from '@/lib/legal-docs-data';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Antoant Site Map | Directory of Pages & Public Services',
+  title: 'Kafei Site Map | Directory of Pages & Public Services',
   description:
-    'Comprehensive site map and navigation directory for Antoant, Project Atlas, and Kafei Restaurant Operating System.',
+    'Comprehensive site map and navigation directory for Kafei, Project Atlas, and Kafei Restaurant Operating System.',
 };
 
 interface SiteSection {
@@ -168,7 +168,7 @@ export default function SitemapPage() {
           </div>
 
           <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-foreground">
-            Antoant Platform Site Map
+            Kafei Platform Site Map
           </h1>
 
           <p className="mx-auto max-w-2xl text-xs sm:text-sm text-muted-foreground leading-relaxed">

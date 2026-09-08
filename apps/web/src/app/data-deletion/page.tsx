@@ -298,14 +298,14 @@ export default function DataDeletionPage() {
           <div className="pt-3 border-t border-border/60 flex flex-wrap items-center justify-between gap-3 text-[11px]">
             <span>Direct DPO Contact: <strong className="text-foreground">rikmukherjee1999@gmail.com</strong></span>
             <span>Hotline: <strong className="text-foreground">+91 9903085026</strong></span>
-            <span>Entity: <strong className="text-foreground">Antoant</strong></span>
+            <span>Entity: <strong className="text-foreground">Kafei</strong></span>
           </div>
         </div>
       </main>
 
       {/* ── Footer ─────────────────────────────────────────────────── */}
       <footer className="border-t border-border bg-background px-6 py-8 text-center text-xs text-muted-foreground space-y-2">
-        <p>© {new Date().getFullYear()} Antoant. Kafei — All rights reserved (Copyright Claim from 03-09-2026).</p>
+        <p>© {new Date().getFullYear()} Kafei. Kafei — All rights reserved (Copyright Claim from 03-09-2026).</p>
         <div className="flex justify-center gap-4 text-xs">
           <Link href="/privacy" className="hover:text-foreground">Privacy Policy</Link>
           <Link href="/terms" className="hover:text-foreground">Terms of Service</Link>
