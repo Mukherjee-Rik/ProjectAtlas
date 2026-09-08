@@ -389,35 +389,35 @@ export function OAuthButtons({ onLoading, onError }: OAuthButtonsProps) {
               <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"
-                  onClick={() => handlePresetSelect('sweta@kafei.in', 'Sweta Owner')}
+                  onClick={() => handlePresetSelect('restaurant.kafei@gmail.com', 'Restaurant Owner')}
                   className="flex flex-col items-start rounded-xl border border-border/80 bg-secondary/50 p-2.5 text-left text-xs hover:border-primary hover:bg-secondary transition-all cursor-pointer"
                 >
                   <span className="font-semibold text-foreground">Restaurant Owner</span>
-                  <span className="text-[10px] text-muted-foreground">sweta@kafei.in</span>
+                  <span className="text-[10px] text-muted-foreground">restaurant.kafei@gmail.com</span>
                 </button>
                 <button
                   type="button"
-                  onClick={() => handlePresetSelect('admin@kafei.in', 'Platform Admin')}
+                  onClick={() => handlePresetSelect('admin@kafei.internal', 'Platform Admin')}
                   className="flex flex-col items-start rounded-xl border border-border/80 bg-secondary/50 p-2.5 text-left text-xs hover:border-primary hover:bg-secondary transition-all cursor-pointer"
                 >
                   <span className="font-semibold text-foreground">Platform Admin</span>
-                  <span className="text-[10px] text-muted-foreground">admin@kafei.in</span>
+                  <span className="text-[10px] text-muted-foreground">admin@kafei.internal</span>
                 </button>
                 <button
                   type="button"
-                  onClick={() => handlePresetSelect('waiter@kafei.in', 'Waiter Staff')}
+                  onClick={() => handlePresetSelect('waiter@kafei.internal', 'Waiter Staff')}
                   className="flex flex-col items-start rounded-xl border border-border/80 bg-secondary/50 p-2.5 text-left text-xs hover:border-primary hover:bg-secondary transition-all cursor-pointer"
                 >
                   <span className="font-semibold text-foreground">Waitstaff</span>
-                  <span className="text-[10px] text-muted-foreground">waiter@kafei.in</span>
+                  <span className="text-[10px] text-muted-foreground">waiter@kafei.internal</span>
                 </button>
                 <button
                   type="button"
-                  onClick={() => handlePresetSelect('chef@kafei.in', 'Head Chef')}
+                  onClick={() => handlePresetSelect('chef@kafei.internal', 'Head Chef')}
                   className="flex flex-col items-start rounded-xl border border-border/80 bg-secondary/50 p-2.5 text-left text-xs hover:border-primary hover:bg-secondary transition-all cursor-pointer"
                 >
                   <span className="font-semibold text-foreground">Kitchen / Chef</span>
-                  <span className="text-[10px] text-muted-foreground">chef@kafei.in</span>
+                  <span className="text-[10px] text-muted-foreground">chef@kafei.internal</span>
                 </button>
               </div>
             </div>

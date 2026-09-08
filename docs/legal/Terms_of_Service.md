@@ -4,7 +4,7 @@
 **Last Updated**: September 3, 2026  
 **Official Application**: Kafei ([https://kafei.in](https://kafei.in))  
 **Operating Entity**: Kafei  
-**Contact Email**: [legal@kafei.in](mailto:legal@kafei.in) / [rikmukherjee1999@gmail.com](mailto:rikmukherjee1999@gmail.com)  
+**Contact Email**: [restaurant.kafei@gmail.com](mailto:restaurant.kafei@gmail.com)  
 **Support Hotline**: [+91 9903085026](tel:9903085026)  
 **Jurisdiction**: Kolkata, West Bengal, India  
 
@@ -27,7 +27,7 @@ You must be at least 18 years of age and possess the legal authority to bind the
 - You may register using your business email and a password or through **Google Single Sign-On (Google OAuth 2.0)**.
 - When registering via Google OAuth, you authorize Kafei to verify your identity and access your basic profile information (`openid`, `email`, `profile`) strictly in compliance with our [Privacy Policy](https://kafei.in/privacy) and the Google API Services User Data Policy.
 - You agree to provide accurate, current, and complete information and promptly update it if changes occur.
-- You are responsible for safeguarding your login credentials and are solely liable for all activities that occur under your restaurant workspace. You must notify us immediately at [security@kafei.in](mailto:security@kafei.in) of any unauthorized access or breach.
+- You are responsible for safeguarding your login credentials and are solely liable for all activities that occur under your restaurant workspace. You must notify us immediately at [restaurant.kafei@gmail.com](mailto:restaurant.kafei@gmail.com) of any unauthorized access or breach.
 
 ---
 
@@ -79,7 +79,7 @@ Violation of these standards constitutes grounds for immediate suspension or ter
 We strive to maintain a 99.9% service availability target for live restaurant operations. Scheduled maintenance is conducted during off-peak hours with advance dashboard notices.
 
 ### 6.2 Operations & Emergency Support
-- We provide dedicated operational support via phone hotline and WhatsApp at **[+91 9903085026](tel:9903085026)** and email at **[rikmukherjee1999@gmail.com](mailto:rikmukherjee1999@gmail.com)**.
+- We provide dedicated operational support via phone hotline and WhatsApp at **[+91 9903085026](tel:9903085026)** and email at **[restaurant.kafei@gmail.com](mailto:restaurant.kafei@gmail.com)**.
 - Critical dining room floor outages are prioritized with rapid response protocols.
 
 ---
@@ -126,7 +126,7 @@ We reserve the right to revise these Terms at any time. We will post the revised
 
 For any legal inquiries, notices, or support concerning these Terms:
 - **Company**: Kafei
-- **Legal Desk**: [legal@kafei.in](mailto:legal@kafei.in)
-- **Primary Review Contact**: [rikmukherjee1999@gmail.com](mailto:rikmukherjee1999@gmail.com)
+- **Legal Desk**: [restaurant.kafei@gmail.com](mailto:restaurant.kafei@gmail.com)
+- **Primary Review Contact**: [restaurant.kafei@gmail.com](mailto:restaurant.kafei@gmail.com)
 - **Operations Hotline**: [+91 9903085026](tel:9903085026)
 - **Website**: [https://kafei.in](https://kafei.in)

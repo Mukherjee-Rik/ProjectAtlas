@@ -67,5 +67,5 @@ Kafei reserves the right to investigate any suspected breach of this AUP. Upon i
 ## 7. Reporting Violations
 
 If you discover a violation of this Acceptable Use Policy, please report it immediately to:
-- **Compliance Desk:** abuse@kafei.in / legal@kafei.in
+- **Compliance Desk:** restaurant.kafei@gmail.com
 - **Emergency Phone:** +91 9903085026

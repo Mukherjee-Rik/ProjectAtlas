@@ -438,7 +438,7 @@ export class UsersService {
       where: { id: userId },
       data: {
         name: 'Deleted User',
-        email: `deleted_${user.id.slice(0, 8)}_${Date.now()}@kafei.in`,
+        email: `deleted_${user.id.slice(0, 8)}_${Date.now()}@deleted.invalid`,
         phone: null,
         status: 'INACTIVE',
       },

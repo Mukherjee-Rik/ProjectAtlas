@@ -4,7 +4,7 @@
 **Last Updated**: September 3, 2026  
 **Official Application**: Kafei ([https://kafei.in](https://kafei.in))  
 **Operating Entity**: Kafei  
-**Security Desk**: [security@kafei.in](mailto:security@kafei.in) / [rikmukherjee1999@gmail.com](mailto:rikmukherjee1999@gmail.com)  
+**Security Desk**: [restaurant.kafei@gmail.com](mailto:restaurant.kafei@gmail.com)  
 **Emergency Hotline**: [+91 9903085026](tel:9903085026)  
 
 ---
@@ -79,7 +79,7 @@ If you discover a potential security flaw, please email our security team with:
 
 ## 6. Security Contact Information
 
-- **Security Desk**: [security@kafei.in](mailto:security@kafei.in)
-- **Direct Review Contact**: [rikmukherjee1999@gmail.com](mailto:rikmukherjee1999@gmail.com)
+- **Security Desk**: [restaurant.kafei@gmail.com](mailto:restaurant.kafei@gmail.com)
+- **Direct Review Contact**: [restaurant.kafei@gmail.com](mailto:restaurant.kafei@gmail.com)
 - **Incident Hotline**: [+91 9903085026](tel:9903085026)
 - **Official Portal**: [https://kafei.in](https://kafei.in)

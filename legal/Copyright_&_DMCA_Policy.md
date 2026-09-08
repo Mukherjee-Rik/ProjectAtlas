@@ -4,7 +4,7 @@
 **Last Updated**: September 3, 2026  
 **Official Application**: Kafei ([https://kafei.in](https://kafei.in))  
 **Operating Entity**: Kafei  
-**Designated Agent Email**: [legal@kafei.in](mailto:legal@kafei.in) / [rikmukherjee1999@gmail.com](mailto:rikmukherjee1999@gmail.com)  
+**Designated Agent Email**: [restaurant.kafei@gmail.com](mailto:restaurant.kafei@gmail.com)  
 **Agent Phone**: [+91 9903085026](tel:9903085026)  
 **Registered Address**: Kolkata, West Bengal & Bangalore, Karnataka, India  
 
@@ -44,8 +44,8 @@ If you believe that your copyrighted work (e.g., food photography, restaurant me
 ### Designated Copyright Agent Contact:
 - **Attention**: Kafei DMCA & Copyright Compliance Officer
 - **Entity**: Kafei
-- **Email**: [legal@kafei.in](mailto:legal@kafei.in)
-- **Direct Review Contact**: [rikmukherjee1999@gmail.com](mailto:rikmukherjee1999@gmail.com)
+- **Email**: [restaurant.kafei@gmail.com](mailto:restaurant.kafei@gmail.com)
+- **Direct Review Contact**: [restaurant.kafei@gmail.com](mailto:restaurant.kafei@gmail.com)
 - **Phone / WhatsApp**: [+91 9903085026](tel:9903085026)
 - **Address**: Kolkata, West Bengal & Bangalore, Karnataka, India
 
@@ -76,6 +76,6 @@ Under appropriate circumstances and at our sole discretion, Kafei maintains a po
 ## 6. Contact Information
 
 For copyright inquiries or to submit takedown notices:
-- **Email**: [legal@kafei.in](mailto:legal@kafei.in) / [rikmukherjee1999@gmail.com](mailto:rikmukherjee1999@gmail.com)
+- **Email**: [restaurant.kafei@gmail.com](mailto:restaurant.kafei@gmail.com)
 - **Hotline**: [+91 9903085026](tel:9903085026)
 - **Website**: [https://kafei.in](https://kafei.in)

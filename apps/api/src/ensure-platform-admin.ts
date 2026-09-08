@@ -4,7 +4,7 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from './generated/prisma/client';
 import { UserRole, UserStatus } from './generated/prisma/enums';
 
-const ADMIN_EMAIL = 'admin@kafei.in';
+const ADMIN_EMAIL = 'restaurant.kafei@gmail.com';
 const ADMIN_PASSWORD = 'Kafei@12345';
 
 const adapter = new PrismaPg({

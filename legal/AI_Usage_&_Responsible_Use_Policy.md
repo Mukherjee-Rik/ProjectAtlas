@@ -4,7 +4,7 @@
 **Last Updated**: September 3, 2026  
 **Official Application**: Kafei ([https://kafei.in](https://kafei.in))  
 **Operating Entity**: Kafei  
-**Contact Email**: [ai-ethics@kafei.in](mailto:ai-ethics@kafei.in) / [rikmukherjee1999@gmail.com](mailto:rikmukherjee1999@gmail.com)  
+**Contact Email**: [restaurant.kafei@gmail.com](mailto:restaurant.kafei@gmail.com)  
 **Support Hotline**: [+91 9903085026](tel:9903085026)  
 
 ---
@@ -67,7 +67,7 @@ Restaurant administrators have full control over AI features:
 
 We welcome feedback, questions, or vulnerability reports related to our AI models and ethical compliance:
 
-- **AI Ethics Desk**: [ai-ethics@kafei.in](mailto:ai-ethics@kafei.in)
-- **Direct Review Contact**: [rikmukherjee1999@gmail.com](mailto:rikmukherjee1999@gmail.com)
+- **AI Ethics Desk**: [restaurant.kafei@gmail.com](mailto:restaurant.kafei@gmail.com)
+- **Direct Review Contact**: [restaurant.kafei@gmail.com](mailto:restaurant.kafei@gmail.com)
 - **Operations Hotline**: [+91 9903085026](tel:9903085026)
 - **Platform**: [https://kafei.in](https://kafei.in)
