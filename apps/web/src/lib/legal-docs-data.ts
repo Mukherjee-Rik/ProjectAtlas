@@ -30,11 +30,11 @@ export const LEGAL_ENTITY = {
   effectiveDate: 'September 3, 2026',
   copyrightClaimDate: 'September 3, 2026 (03-09-2026)',
   copyrightNotice: '© 2026 Kafei. All rights reserved. Registered & Protected from September 3, 2026 (03-09-2026).',
-  privacyEmail: 'privacy@kafei.in',
-  legalEmail: 'legal@kafei.in',
-  securityEmail: 'security@kafei.in',
-  dmcaEmail: 'dmca@kafei.in',
-  supportEmail: 'support@kafei.in',
+  privacyEmail: 'restaurant.kafei@gmail.com',
+  legalEmail: 'restaurant.kafei@gmail.com',
+  securityEmail: 'restaurant.kafei@gmail.com',
+  dmcaEmail: 'restaurant.kafei@gmail.com',
+  supportEmail: 'restaurant.kafei@gmail.com',
   phone: '+91 99030 85026',
 } as const;
 

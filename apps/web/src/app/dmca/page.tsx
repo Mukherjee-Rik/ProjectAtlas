@@ -59,7 +59,7 @@ export default function DmcaPolicyPage() {
       <div className="rounded-xl border border-border bg-secondary/40 p-4 space-y-1.5 text-xs sm:text-sm">
         <p><strong>Attn:</strong> Designated DMCA Copyright Agent</p>
         <p><strong>Entity:</strong> {LEGAL_ENTITY.name}</p>
-        <p><strong>Email:</strong> <a href={`mailto:${LEGAL_ENTITY.dmcaEmail}`} className="text-primary underline font-semibold">{LEGAL_ENTITY.dmcaEmail}</a> / <a href={`mailto:${LEGAL_ENTITY.legalEmail}`} className="text-primary underline font-semibold">{LEGAL_ENTITY.legalEmail}</a></p>
+        <p><strong>Email:</strong> <a href={`mailto:${LEGAL_ENTITY.dmcaEmail}`} className="text-primary underline font-semibold">{LEGAL_ENTITY.dmcaEmail}</a></p>
         <p><strong>Phone:</strong> {LEGAL_ENTITY.phone}</p>
         <p><strong>Address:</strong> Legal Department, {LEGAL_ENTITY.name}, {LEGAL_ENTITY.address}</p>
       </div>

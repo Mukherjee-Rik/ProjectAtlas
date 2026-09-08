@@ -70,7 +70,7 @@ export default function ContactUsPage() {
     }
   };
 
-  const mailtoUrl = `mailto:rikmukherjee1999@gmail.com?subject=${encodeURIComponent(
+  const mailtoUrl = `mailto:restaurant.kafei@gmail.com?subject=${encodeURIComponent(
     form.subject || `Inquiry from ${form.name || 'Restaurant Owner'}`
   )}&body=${encodeURIComponent(
     `Name: ${form.name}\nPhone: ${form.phone}\nRestaurant: ${form.restaurantName}\nType: ${form.inquiryType}\n\nMessage:\n${form.message}`
@@ -202,10 +202,10 @@ export default function ContactUsPage() {
                       Email Inquiries & Desk
                     </p>
                     <a
-                      href="mailto:rikmukherjee1999@gmail.com"
+                      href="mailto:restaurant.kafei@gmail.com"
                       className="text-sm font-bold text-primary underline underline-offset-4 hover:text-primary-hover"
                     >
-                      rikmukherjee1999@gmail.com
+                      restaurant.kafei@gmail.com
                     </a>
                     <p className="text-[12px] text-muted-foreground">
                       Detailed proposals, customized kitchen floor plans, and billing queries.
@@ -268,7 +268,7 @@ export default function ContactUsPage() {
                       Thank you for contacting us. Your reference code is{' '}
                       <strong className="font-mono text-primary font-bold">{submittedRef}</strong>.
                       An email notification has been dispatched to our engineering team at{' '}
-                      <span className="text-foreground font-semibold">rikmukherjee1999@gmail.com</span>.
+                      <span className="text-foreground font-semibold">restaurant.kafei@gmail.com</span>.
                     </p>
                   </div>
 
@@ -495,7 +495,7 @@ export default function ContactUsPage() {
             <div className="rounded-2xl border border-border bg-card p-5 space-y-2">
               <h3 className="text-sm font-bold text-foreground">How do we get emergency support on a busy night?</h3>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Our support team is on standby 24/7 for live floor emergencies at <strong>+91 9903085026</strong> and <strong>rikmukherjee1999@gmail.com</strong>.
+                Our support team is on standby 24/7 for live floor emergencies at <strong>+91 9903085026</strong> and <strong>restaurant.kafei@gmail.com</strong>.
               </p>
             </div>
           </div>

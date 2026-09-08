@@ -4,7 +4,7 @@
 **Last Updated**: September 3, 2026  
 **Official Application**: Kafei ([https://kafei.in](https://kafei.in))  
 **Operating Entity**: Kafei  
-**Data Protection Email**: [dpo@kafei.in](mailto:dpo@kafei.in) / [rikmukherjee1999@gmail.com](mailto:rikmukherjee1999@gmail.com)  
+**Data Protection Email**: [restaurant.kafei@gmail.com](mailto:restaurant.kafei@gmail.com)  
 **Hotline**: [+91 9903085026](tel:9903085026)  
 
 ---
@@ -109,7 +109,7 @@ Upon reasonable prior written notice (no more than once annually), Kafei shall m
 
 For any inquiries regarding this Data Processing Addendum:
 
-- **Data Protection Officer**: [dpo@kafei.in](mailto:dpo@kafei.in)
-- **Primary Review Contact**: [rikmukherjee1999@gmail.com](mailto:rikmukherjee1999@gmail.com)
+- **Data Protection Officer**: [restaurant.kafei@gmail.com](mailto:restaurant.kafei@gmail.com)
+- **Primary Review Contact**: [restaurant.kafei@gmail.com](mailto:restaurant.kafei@gmail.com)
 - **Operations Hotline**: [+91 9903085026](tel:9903085026)
 - **Platform**: [https://kafei.in](https://kafei.in)

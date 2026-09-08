@@ -4,7 +4,7 @@
 **Last Updated**: September 3, 2026  
 **Official Application**: Kafei (accessible at [https://kafei.in](https://kafei.in))  
 **Operating Entity**: Kafei  
-**Contact Email**: [privacy@kafei.in](mailto:privacy@kafei.in) / [rikmukherjee1999@gmail.com](mailto:rikmukherjee1999@gmail.com)  
+**Contact Email**: [restaurant.kafei@gmail.com](mailto:restaurant.kafei@gmail.com)  
 **Support Hotline**: [+91 9903085026](tel:9903085026)  
 **Registered Address**: Kolkata, West Bengal & Bangalore, Karnataka, India  
 
@@ -103,7 +103,7 @@ You can revoke Kafei's access to your Google account at any time via your Google
 ### 6.2 Requesting Complete Data Deletion
 To permanently delete your user account, restaurant records, or any associated data:
 - **In-App**: Navigate to `Dashboard > Settings > Account > Delete Account`.
-- **Email Request**: Send an email to [privacy@kafei.in](mailto:privacy@kafei.in) or [rikmukherjee1999@gmail.com](mailto:rikmukherjee1999@gmail.com) with the subject line *"Data Deletion Request"*.
+- **Email Request**: Send an email to [restaurant.kafei@gmail.com](mailto:restaurant.kafei@gmail.com) with the subject line *"Data Deletion Request"*.
 - We will verify your identity and process the complete purge of your personal data from active databases within **30 days**, subject to statutory recordkeeping requirements.
 
 ---
@@ -145,7 +145,7 @@ We may update this Privacy Policy periodically to reflect technological improvem
 If you have questions, feedback, or wish to exercise your data privacy rights, please contact our Data Protection and Compliance Desk:
 
 - **Company**: Kafei
-- **Privacy Email**: [privacy@kafei.in](mailto:privacy@kafei.in)
-- **Primary Review Contact**: [rikmukherjee1999@gmail.com](mailto:rikmukherjee1999@gmail.com)
+- **Privacy Email**: [restaurant.kafei@gmail.com](mailto:restaurant.kafei@gmail.com)
+- **Primary Review Contact**: [restaurant.kafei@gmail.com](mailto:restaurant.kafei@gmail.com)
 - **Direct Phone / WhatsApp**: [+91 9903085026](tel:9903085026)
 - **Official Website**: [https://kafei.in](https://kafei.in)

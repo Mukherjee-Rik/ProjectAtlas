@@ -83,7 +83,7 @@ export class ContactInquiryDto {
 @Injectable()
 export class SupportService {
   private readonly logger = new Logger(SupportService.name);
-  private readonly notificationRecipient = 'rikmukherjee1999@gmail.com';
+  private readonly notificationRecipient = 'restaurant.kafei@gmail.com';
 
   constructor(
     private readonly prisma: PrismaService,
@@ -125,7 +125,7 @@ export class SupportService {
       },
     });
 
-    // Send instant email notification to rikmukherjee1999@gmail.com
+    // Send instant email notification to restaurant.kafei@gmail.com
     const emailSubject = `[Atlas Support - ${ticket.priority}] ${ticket.ticketNumber}: ${ticket.subject}`;
     const emailHtml = `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #0c0d12; color: #f4f4f5; padding: 24px; border-radius: 12px; max-width: 600px;">
@@ -249,7 +249,7 @@ ${ticket.description}
         </div>
 
         <div style="border-top: 1px solid #27272a; padding-top: 16px; font-size: 11px; color: #71717a; text-align: center;">
-          Kafei Contact Service • Direct Phone: +91 9903085026 • Email: rikmukherjee1999@gmail.com
+          Kafei Contact Service • Direct Phone: +91 9903085026 • Email: restaurant.kafei@gmail.com
         </div>
       </div>
     `;
