@@ -146,24 +146,36 @@ const plans = [
 
 const faqs = [
   {
-    q: 'Do guests have to download anything?',
-    a: 'No. They point their camera at the standee on the table and the menu opens in whatever browser their phone already has — photos, variants, and a live cooking countdown once the kitchen accepts.',
+    q: 'What is Kafei and how does it replace traditional restaurant billing software?',
+    a: 'Kafei is an all-in-one cloud restaurant billing software and POS system. Unlike traditional legacy POS systems that require proprietary hardware and upfront license fees, Kafei connects table QR ordering, kitchen display screens (KDS), waiter handhelds, recipe inventory, and 80mm thermal receipt printing through standard web browsers with zero setup hassle.',
   },
   {
-    q: 'What hardware do we need to buy?',
-    a: 'None, in most cases. Kafei is a web application. If a device has a browser it can be a terminal — the tablet behind your counter, a kitchen touchscreen, a laptop, or a waiter’s own phone.',
+    q: 'Do guests have to download anything to order from their table?',
+    a: 'No. Guests simply point their phone camera at the print-ready standee on their table. The digital menu opens immediately in their default browser with high-resolution photos, dietary tags, customizable variants, and a live kitchen cooking countdown once the order is accepted.',
   },
   {
-    q: 'How does the payment QR work?',
-    a: 'You upload your own UPI QR image in Settings. When guests are done, their phone shows the bill total alongside that QR. They can also just pay cash or card at the counter — the cashier screen handles both.',
+    q: 'What hardware do we need to buy for billing and kitchen display?',
+    a: 'None in most cases. Kafei is a lightweight, high-performance web application. Any device with a modern browser can become an operational terminal: an iPad or Android tablet at the counter, a kitchen touchscreen, a laptop, standard 80mm thermal receipt printers, or a waiter’s existing smartphone.',
   },
   {
-    q: 'What stops a waiter from quietly cancelling an order?',
-    a: 'Nothing gets cancelled on the spot. The request goes into a review queue on the cashier and owner screens with the waiter’s reason attached, and it stays there until a manager approves it. Refunds work the same way.',
+    q: 'Does Kafei support 80mm thermal receipt printing and tax breakouts?',
+    a: 'Yes. Kafei formats and prints crisp 80mm and 58mm thermal receipts directly from the browser to standard USB, Bluetooth, or network receipt printers. It includes full GST itemization, restaurant branding, table numbers, and order tokens.',
   },
   {
-    q: 'Can we run more than one room, or more than one outlet?',
-    a: 'Yes. Dining areas are separate inside a branch, and branches are separate inside your account — each with its own tables, tax rules, and staff. Revenue from all of them rolls up into one dashboard.',
+    q: 'How does the UPI payment QR and split billing work?',
+    a: 'You can upload your own UPI QR image in Settings. When guests finish dining, their phone displays the exact bill total alongside that QR for direct 0% commission settlement. The cashier POS screen also effortlessly supports cash, card, custom discounts, and multi-way split bills.',
+  },
+  {
+    q: 'What stops a waiter or staff member from quietly cancelling an order?',
+    a: 'Kafei includes a built-in manager approval audit trail. When a waiter requests a void, discount, or refund, they must supply an explanatory reason. The request stays pending in an approval queue on the cashier and owner screens until an authorized manager approves it.',
+  },
+  {
+    q: 'Can we run multiple restaurant branches and separate dining areas?',
+    a: 'Yes. You can manage separate dining areas (indoor, outdoor patio, bar, rooftop) per branch, and manage multiple branches under a single owner login. Each branch maintains distinct tax rules, menus, and staff permissions, while consolidated sales analytics roll up into one central dashboard.',
+  },
+  {
+    q: 'How does recipe-level inventory deduction work?',
+    a: 'When an order is accepted at the pass, Kafei automatically deducts the exact recipe ingredients from your live inventory in real time—rather than waiting for end-of-day reconciliation. You get automated low-stock alerts before ingredients run out.',
   },
 ];
 
@@ -249,7 +261,7 @@ export default function Home() {
               className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground"
             >
               <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-              Kafei 2.0 is live
+              Restaurant Billing Software & Cloud POS • Kafei 2.0
             </motion.p>
 
             <motion.h1
@@ -271,9 +283,9 @@ export default function Home() {
               transition={{ duration: 0.55, delay: 0.15, ease: [0.22, 0.61, 0.36, 1] }}
               className="mt-6 max-w-xl text-[14px] sm:text-[15px] leading-[1.7] text-muted-foreground"
             >
-              Kafei runs the whole floor on one system: the QR menu your guests order
-              from, the screen your kitchen cooks off, the tablet your waiters carry,
-              and the counter where the bill gets settled.
+              Kafei is the modern restaurant billing software and cloud POS that runs your whole floor
+              on one system: QR code ordering at the table, live kitchen display screens (KDS), waiter
+              handhelds, recipe inventory, and fast 80mm thermal cashier billing.
             </motion.p>
 
             <motion.div
