@@ -193,8 +193,8 @@ export async function sendRegistrationEmail(toEmail: string, otp: string, userNa
 
   const host = process.env.SMTP_HOST || 'smtp.gmail.com';
   const port = Number(process.env.SMTP_PORT || 465);
-  const user = process.env.SMTP_USER || 'rikmukherjee21071999@gmail.com';
-  const pass = process.env.SMTP_PASS || 'gfgf vktd icgs qfvm';
+  const user = process.env.SMTP_USER || 'restaurant.kafei@gmail.com';
+  const pass = process.env.SMTP_PASS || 'gphu typj dotf crvi';
   const senderName = (process.env.SMTP_FROM_NAME || 'Kafei').replace(/["']/g, '').trim();
   const cleanEmail = (process.env.SMTP_FROM_EMAIL || user).replace(/["']/g, '').trim();
   const fromAddress = `"${senderName}" <${cleanEmail}>`;
@@ -232,10 +232,22 @@ export async function provisionRegisteredAccount(challenge: RegistrationChalleng
   try {
     await client.query('BEGIN');
 
-    // 1. Check if user already registered
+    // 1. Check if email or phone already registered
     const existingUser = await client.query('SELECT id FROM users WHERE email = $1', [challenge.email]);
     if (existingUser.rows.length > 0) {
       throw new Error('Email address has already been registered');
+    }
+
+    if (challenge.phone) {
+      const cleanPhone = challenge.phone.replace(/[\s-]/g, '');
+      const barePhone = cleanPhone.replace(/^\+91/, '');
+      const existingPhone = await client.query(
+        'SELECT id FROM users WHERE phone = $1 OR phone = $2 OR phone = $3',
+        [cleanPhone, barePhone, `+91${barePhone}`],
+      );
+      if (existingPhone.rows.length > 0) {
+        throw new Error('Phone number has already been registered to another account.');
+      }
     }
 
     const baseSlug = slugify(challenge.restaurantName);

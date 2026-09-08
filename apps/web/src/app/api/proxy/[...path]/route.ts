@@ -341,6 +341,7 @@ async function handler(
         );
       }
       const normalizedEmail = String(email).trim().toLowerCase();
+      const cleanPhone = phone ? String(phone).replace(/[\s-]/g, '').trim() : null;
       const pool = getRegPool();
       const existing = await pool.query('SELECT id FROM users WHERE email = $1', [normalizedEmail]);
       if (existing.rows.length > 0) {
@@ -348,6 +349,19 @@ async function handler(
           { success: false, error: 'Email address is already registered. Please sign in.' },
           { status: 409 },
         );
+      }
+      if (cleanPhone) {
+        const barePhone = cleanPhone.replace(/^\+91/, '');
+        const existingPhone = await pool.query(
+          'SELECT id FROM users WHERE phone = $1 OR phone = $2 OR phone = $3',
+          [cleanPhone, barePhone, `+91${barePhone}`],
+        );
+        if (existingPhone.rows.length > 0) {
+          return NextResponse.json(
+            { success: false, error: 'Phone number is already registered to an existing account. Please sign in or use another number.' },
+            { status: 409 },
+          );
+        }
       }
       const passwordHash = await bcrypt.hash(password, 10);
       const otp = generateOtp();

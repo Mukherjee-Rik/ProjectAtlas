@@ -501,6 +501,7 @@ export class AuthService {
     userAgent?: string,
   ) {
     const normalizedEmail = dto.email.trim().toLowerCase();
+    const cleanPhone = dto.phone?.trim() ? dto.phone.replace(/[\s-]/g, '') : null;
 
     const existing = await this.prisma.user.findUnique({
       where: { email: normalizedEmail },
@@ -508,6 +509,25 @@ export class AuthService {
 
     if (existing) {
       throw new ConflictException('Email address is already registered');
+    }
+
+    if (cleanPhone) {
+      const barePhone = cleanPhone.replace(/^\+91/, '');
+      const existingPhone = await this.prisma.user.findFirst({
+        where: {
+          OR: [
+            { phone: cleanPhone },
+            { phone: barePhone },
+            { phone: `+91${barePhone}` },
+          ],
+        },
+      });
+
+      if (existingPhone) {
+        throw new ConflictException(
+          'This phone number is already registered to an existing account. Please sign in or use a different phone number.',
+        );
+      }
     }
 
     const passwordHash = await bcrypt.hash(dto.password, 10);
@@ -603,6 +623,26 @@ export class AuthService {
 
     if (existingUser) {
       throw new ConflictException('Email address has already been registered');
+    }
+
+    if (challenge.phone) {
+      const cleanPhone = challenge.phone.replace(/[\s-]/g, '');
+      const barePhone = cleanPhone.replace(/^\+91/, '');
+      const existingPhone = await this.prisma.user.findFirst({
+        where: {
+          OR: [
+            { phone: cleanPhone },
+            { phone: barePhone },
+            { phone: `+91${barePhone}` },
+          ],
+        },
+      });
+
+      if (existingPhone) {
+        throw new ConflictException(
+          'This phone number has already been registered to another account. Please use a different phone number.',
+        );
+      }
     }
 
     const baseSlug = this.slugify(challenge.restaurantName);
