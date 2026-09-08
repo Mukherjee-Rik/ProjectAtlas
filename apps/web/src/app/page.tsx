@@ -734,6 +734,11 @@ export default function Home() {
                   </Link>
                 </li>
                 <li>
+                  <Link href="/sitemap" className="transition-colors hover:text-foreground">
+                    Site Map
+                  </Link>
+                </li>
+                <li>
                   <a href="tel:9903085026" className="text-primary font-mono text-[12px] hover:underline">
                     +91 9903085026
                   </a>
@@ -761,6 +766,7 @@ export default function Home() {
               </button>
               <Link href="/data-deletion" className="hover:text-foreground transition-colors">Data Deletion</Link>
               <Link href="/legal" className="hover:text-foreground transition-colors">Legal Hub</Link>
+              <Link href="/sitemap" className="hover:text-foreground transition-colors">Site Map</Link>
             </div>
           </div>
         </div>
