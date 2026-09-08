@@ -4,7 +4,7 @@
 **Last Updated**: September 3, 2026  
 **Official Application**: Kafei ([https://kafei.in](https://kafei.in))  
 **Operating Entity**: Kafei  
-**Contact Email**: [privacy@kafei.in](mailto:privacy@kafei.in) / [rikmukherjee1999@gmail.com](mailto:rikmukherjee1999@gmail.com)  
+**Contact Email**: [restaurant.kafei@gmail.com](mailto:restaurant.kafei@gmail.com)  
 **Hotline**: [+91 9903085026](tel:9903085026)  
 
 ---
@@ -69,7 +69,7 @@ You can control, block, or delete cookies and browser storage through your web b
 
 If you have questions about our use of cookies or local storage, please reach out to:
 
-- **Data Privacy Desk**: [privacy@kafei.in](mailto:privacy@kafei.in)
-- **Primary Review Contact**: [rikmukherjee1999@gmail.com](mailto:rikmukherjee1999@gmail.com)
+- **Data Privacy Desk**: [restaurant.kafei@gmail.com](mailto:restaurant.kafei@gmail.com)
+- **Primary Review Contact**: [restaurant.kafei@gmail.com](mailto:restaurant.kafei@gmail.com)
 - **Operations Hotline**: [+91 9903085026](tel:9903085026)
 - **Website**: [https://kafei.in](https://kafei.in)

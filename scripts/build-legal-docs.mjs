@@ -104,7 +104,7 @@ We share information only under strict safeguards:
 
 - **Active Accounts:** We retain your account data and restaurant records for the duration of your active subscription.
 - **Account Deletion:** Upon receiving an account deletion request, Kafei permanently wipes or anonymizes all associated personal data, Google OAuth tokens, and restaurant operational records within **30 days**, except where legal retention is required by tax authorities.
-- **Data Deletion Requests:** You can initiate data deletion directly inside your workspace settings or by emailing **privacy@kafei.in** or **legal@kafei.in**.
+- **Data Deletion Requests:** You can initiate data deletion directly inside your workspace settings or by emailing **restaurant.kafei@gmail.com** or **restaurant.kafei@gmail.com**.
 
 ---
 
@@ -134,7 +134,7 @@ Depending on your jurisdiction, you have the right to:
 - **Withdraw Consent:** Withdraw consent at any time where processing is based on consent.
 - **Non-Discrimination:** Exercise your privacy rights without facing discriminatory service penalties.
 
-To exercise any of these rights, contact us at **privacy@kafei.in**.
+To exercise any of these rights, contact us at **restaurant.kafei@gmail.com**.
 
 ---
 
@@ -155,8 +155,8 @@ We may update this Privacy Policy periodically to reflect technological updates,
 For inquiries, data requests, or privacy concerns, please contact our privacy desk:
 
 - **Entity:** Kafei
-- **Email:** privacy@kafei.in / rikmukherjee1999@gmail.com
-- **Legal & Compliance:** legal@kafei.in
+- **Email:** restaurant.kafei@gmail.com
+- **Legal & Compliance:** restaurant.kafei@gmail.com
 - **Phone / WhatsApp:** +91 9903085026
 - **Headquarters:** Kolkata, WB / Bangalore, KA, India
 `,
@@ -318,7 +318,7 @@ This Agreement shall be governed by and construed in accordance with the laws of
 Legal notices under this Agreement must be addressed to:
 
 - **Entity:** Kafei
-- **Email:** legal@kafei.in / rikmukherjee1999@gmail.com
+- **Email:** restaurant.kafei@gmail.com
 - **Phone:** +91 9903085026
 - **Headquarters:** Kolkata, WB / Bangalore, KA, India
 `,
@@ -399,7 +399,7 @@ Subscribers, operators, and staff are strictly prohibited from using Kafei AI to
 
 Kafei enforces continuous safety evaluations and automated guardrails to filter hallucinated, toxic, or unsafe outputs. If you observe an erroneous, anomalous, or unexpected AI recommendation, please report it immediately:
 
-- **AI Safety Desk:** ai-safety@kafei.in / support@kafei.in
+- **AI Safety Desk:** restaurant.kafei@gmail.com
 - **Technical Hotline:** +91 9903085026
 `,
 
@@ -472,7 +472,7 @@ Kafei reserves the right to investigate any suspected breach of this AUP. Upon i
 ## 7. Reporting Violations
 
 If you discover a violation of this Acceptable Use Policy, please report it immediately to:
-- **Compliance Desk:** abuse@kafei.in / legal@kafei.in
+- **Compliance Desk:** restaurant.kafei@gmail.com
 - **Emergency Phone:** +91 9903085026
 `,
 
@@ -542,7 +542,7 @@ We may update this Cookie Policy from time to time. Any changes will become effe
 ## 6. Contact Us
 
 For questions regarding our use of cookies and local storage technologies, please reach out to:
-- **Email:** privacy@kafei.in / support@kafei.in
+- **Email:** restaurant.kafei@gmail.com
 - **Phone:** +91 9903085026
 `,
 
@@ -570,7 +570,7 @@ Notices of claimed copyright infringement must be sent to our Designated Copyrig
 
 - **Attn:** Designated DMCA Copyright Agent
 - **Entity:** Kafei
-- **Email:** dmca@kafei.in / legal@kafei.in
+- **Email:** restaurant.kafei@gmail.com
 - **Phone / WhatsApp:** +91 9903085026
 - **Address:** Legal Department, Kafei, Kolkata, WB / Bangalore, KA, India
 
@@ -694,8 +694,8 @@ Where transfers of Personal Data from the EEA, UK, or Switzerland to countries w
 ## 9. Inquiries & DPA Contact
 
 For DPA execution inquiries or audit questions:
-- **DPO Email:** privacy@kafei.in / dpo@kafei.in
-- **Legal Team:** legal@kafei.in
+- **DPO Email:** restaurant.kafei@gmail.com
+- **Legal Team:** restaurant.kafei@gmail.com
 `,
 
   'Kafei_Refund_&_Cancellation_Policy.md': `# Kafei Refund & Cancellation Policy
@@ -766,7 +766,7 @@ The following fees are non-refundable:
 ## 7. Contact Billing Support
 
 To request a refund, dispute a charge, or inquire about cancellation:
-- **Billing Desk:** billing@kafei.in / support@kafei.in
+- **Billing Desk:** restaurant.kafei@gmail.com
 - **Phone / WhatsApp:** +91 9903085026
 - **Support Hours:** Mon – Sun, 9:00 AM – 10:00 PM IST
 `,
@@ -837,7 +837,7 @@ Security is built into the core of the Kafei architecture. As an enterprise rest
 We welcome security researchers and ethical hackers to identify and report potential security vulnerabilities.
 
 ### 7.1 Responsible Disclosure Guidelines
-- Submit vulnerability reports directly to **security@kafei.in**.
+- Submit vulnerability reports directly to **restaurant.kafei@gmail.com**.
 - Provide detailed steps to reproduce the issue.
 - Allow our security team reasonable time to remediate before public disclosure.
 - Do not exploit vulnerabilities to access or modify real customer data or degrade system performance.
@@ -861,7 +861,7 @@ Kafei maintains a documented Incident Response Plan:
 ## 9. Contact Security Team
 
 For urgent security reports or compliance audits:
-- **Security Operations Center:** security@kafei.in / legal@kafei.in
+- **Security Operations Center:** restaurant.kafei@gmail.com
 - **Emergency Hotline:** +91 9903085026
 `
 };

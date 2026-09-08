@@ -507,10 +507,10 @@ export function RestaurantSubscriptionView() {
         <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
           <p className="text-[11px] text-muted-foreground">
             Questions regarding an invoice? Contact our billing desk at{' '}
-            <strong className="text-foreground">rikmukherjee1999@gmail.com</strong>.
+            <strong className="text-foreground">restaurant.kafei@gmail.com</strong>.
           </p>
           <a
-            href="mailto:rikmukherjee1999@gmail.com?subject=Subscription%20Cancellation%20%2F%20Refund%20Request%20-%20Kafei"
+            href="mailto:restaurant.kafei@gmail.com?subject=Subscription%20Cancellation%20%2F%20Refund%20Request%20-%20Kafei"
             className="rounded-xl border border-border bg-secondary px-4 py-2 text-xs font-bold text-foreground hover:bg-border transition-colors cursor-pointer"
           >
             Submit Refund or Cancellation Request

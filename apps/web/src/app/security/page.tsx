@@ -83,7 +83,7 @@ export default function SecurityPolicyPage() {
       <h2>5. Vulnerability Management &amp; Responsible Disclosure</h2>
       <p>
         We welcome security researchers to report potential vulnerabilities. Please email reports to{' '}
-        <a href="mailto:security@kafei.in" className="text-primary underline font-bold">security@kafei.in</a>.
+        <a href="mailto:restaurant.kafei@gmail.com" className="text-primary underline font-bold">restaurant.kafei@gmail.com</a>.
       </p>
       <ul>
         <li><strong>Acknowledgment:</strong> Within 24 hours.</li>

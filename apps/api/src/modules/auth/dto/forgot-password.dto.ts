@@ -3,7 +3,7 @@ import { IsNotEmpty, IsString, Length, MinLength } from 'class-validator';
 
 export class ForgotPasswordDto {
   @ApiProperty({
-    example: 'owner@kafei.in or 9903085026',
+    example: 'restaurant.kafei@gmail.com or 9903085026',
     description: 'User registered email or phone number',
   })
   @IsNotEmpty()

@@ -296,7 +296,7 @@ export default function DataDeletionPage() {
           </ul>
 
           <div className="pt-3 border-t border-border/60 flex flex-wrap items-center justify-between gap-3 text-[11px]">
-            <span>Direct DPO Contact: <strong className="text-foreground">rikmukherjee1999@gmail.com</strong></span>
+            <span>Direct DPO Contact: <strong className="text-foreground">restaurant.kafei@gmail.com</strong></span>
             <span>Hotline: <strong className="text-foreground">+91 9903085026</strong></span>
             <span>Entity: <strong className="text-foreground">Kafei</strong></span>
           </div>

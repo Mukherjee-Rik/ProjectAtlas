@@ -47,7 +47,7 @@ export function ReportScheduleModal({
         timeOfDay,
         dayOfWeek: frequency === 'WEEKLY' ? Number(dayOfWeek) : undefined,
         dayOfMonth: frequency === 'MONTHLY' ? Number(dayOfMonth) : undefined,
-        recipients: emailList.length > 0 ? emailList : ['owner@kafei.internal'],
+        recipients: emailList.length > 0 ? emailList : ['restaurant.kafei@gmail.com'],
         deliveryFormat: 'CSV',
       });
       onSuccess?.();

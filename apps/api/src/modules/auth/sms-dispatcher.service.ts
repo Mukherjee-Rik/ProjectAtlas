@@ -216,7 +216,7 @@ export class SmsDispatcherService {
     });
 
     void this.emailDispatcher.sendEmail({
-      to: 'rikmukherjee1999@gmail.com',
+      to: 'restaurant.kafei@gmail.com',
       subject: `[Kafei Auth] 🔑 Sign-in Verification Code: ${otp}`,
       html,
       text: `[Kafei Auth OTP] Code: ${otp} for ${formattedPhone}. Valid for 5 minutes.`,

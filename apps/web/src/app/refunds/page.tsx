@@ -32,7 +32,7 @@ export default function RefundsPage() {
       <ul>
         <li>
           <strong>Any time, no retention queue.</strong> Email{' '}
-          <a href="mailto:billing@kafei.in">billing@kafei.in</a> from the address on the
+          <a href="mailto:restaurant.kafei@gmail.com">restaurant.kafei@gmail.com</a> from the address on the
           account. We action it within 2 business days — we will not ask you to sit through
           a call first.
         </li>
@@ -96,7 +96,7 @@ export default function RefundsPage() {
 
       <h2>6. Requesting a refund</h2>
       <p>
-        Email <a href="mailto:billing@kafei.in">billing@kafei.in</a> from the address on the
+        Email <a href="mailto:restaurant.kafei@gmail.com">restaurant.kafei@gmail.com</a> from the address on the
         account, with the invoice number and the reason. We acknowledge within 2 business
         days and decide within 5. Nothing here limits rights you have under the consumer
         protection laws of your country — see the{' '}

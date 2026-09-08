@@ -292,7 +292,7 @@ export default function SupportPage() {
                   <Phone className="h-4 w-4" /> Call 9903085026
                 </a>
                 <a
-                  href="mailto:rikmukherjee1999@gmail.com"
+                  href="mailto:restaurant.kafei@gmail.com"
                   className="inline-flex items-center gap-2 rounded-xl border border-border bg-secondary px-4 py-3 text-xs font-bold text-foreground transition-all hover:border-primary/40 hover:text-primary active:scale-95"
                 >
                   <Mail className="h-4 w-4" /> Email Desk
@@ -375,7 +375,7 @@ export default function SupportPage() {
                   <Mail className="h-4 w-4 text-primary shrink-0 mt-0.5" />
                   <div>
                     <strong className="text-foreground">Email Notifications:</strong>
-                    <p className="mt-0.5">All tickets automatically alert lead engineers at <span className="text-primary font-semibold">rikmukherjee1999@gmail.com</span>.</p>
+                    <p className="mt-0.5">All tickets automatically alert lead engineers at <span className="text-primary font-semibold">restaurant.kafei@gmail.com</span>.</p>
                   </div>
                 </li>
                 <li className="flex items-start gap-2.5">
@@ -412,7 +412,7 @@ export default function SupportPage() {
                     <p className="text-xs text-muted-foreground max-w-md mx-auto">
                       Your reference tracking number is{' '}
                       <strong className="font-mono text-primary font-bold">{submittedRef}</strong>.
-                      Our team and lead engineer (<span className="text-foreground font-semibold">rikmukherjee1999@gmail.com</span>) have been notified.
+                      Our team and lead engineer (<span className="text-foreground font-semibold">restaurant.kafei@gmail.com</span>) have been notified.
                     </p>
                   </div>
 

@@ -4,7 +4,7 @@
 **Last Updated**: September 3, 2026  
 **Official Application**: Kafei ([https://kafei.in](https://kafei.in))  
 **Operating Entity**: Kafei  
-**Billing Email**: [billing@kafei.in](mailto:billing@kafei.in) / [rikmukherjee1999@gmail.com](mailto:rikmukherjee1999@gmail.com)  
+**Billing Email**: [restaurant.kafei@gmail.com](mailto:restaurant.kafei@gmail.com)  
 **Support Hotline**: [+91 9903085026](tel:9903085026)  
 
 ---
@@ -67,7 +67,7 @@ You may cancel your Kafei subscription at any time without talking to a salesper
 
 If you believe you have been incorrectly charged or have a question regarding a tax invoice, please contact our billing team before initiating a bank dispute or chargeback:
 
-- **Billing Desk**: [billing@kafei.in](mailto:billing@kafei.in)
-- **Primary Review Contact**: [rikmukherjee1999@gmail.com](mailto:rikmukherjee1999@gmail.com)
+- **Billing Desk**: [restaurant.kafei@gmail.com](mailto:restaurant.kafei@gmail.com)
+- **Primary Review Contact**: [restaurant.kafei@gmail.com](mailto:restaurant.kafei@gmail.com)
 - **Direct Phone / WhatsApp**: [+91 9903085026](tel:9903085026)
 - **Platform**: [https://kafei.in](https://kafei.in)

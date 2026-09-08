@@ -273,7 +273,7 @@ function LoginForm() {
 
   /** The landing page publishes these, so offering them here saves retyping. */
   function fillDemo() {
-    setEmail('sweta@kafei.in');
+    setEmail('restaurant.kafei@gmail.com');
     setPassword('Kafei@12345');
     setEmailError('');
     setPasswordError('');
