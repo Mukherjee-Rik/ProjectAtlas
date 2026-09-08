@@ -64,7 +64,7 @@ export class EmailDispatcherService implements OnModuleInit {
     const to =
       payload.to ||
       process.env.DEFAULT_EMAIL_RECIPIENT ||
-      'support@projectatlas.io';
+      'restaurant.kafei@gmail.com';
     const senderName = (
       payload.senderName ||
       process.env.SMTP_FROM_NAME ||
@@ -76,7 +76,7 @@ export class EmailDispatcherService implements OnModuleInit {
       payload.from ||
       process.env.SMTP_FROM_EMAIL ||
       process.env.SMTP_USER ||
-      'rikmukherjee21071999@gmail.com'
+      'restaurant.kafei@gmail.com'
     ).trim();
     const emailMatch = rawEmail.match(/<([^>]+)>/);
     const cleanEmail = (emailMatch ? emailMatch[1] : rawEmail)
