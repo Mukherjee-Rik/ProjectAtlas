@@ -19,7 +19,7 @@ export default function TermsOfServicePage() {
       <h2>1. Acceptance of Terms</h2>
       <p>
         These Terms of Service (the &quot;Terms&quot; or &quot;Agreement&quot;) constitute a legally binding agreement between
-        Antigravity (&quot;Kafei&quot;, &quot;we&quot;, &quot;our&quot;, or &quot;us&quot;) and the individual or legal entity
+        Antoant (&quot;Kafei&quot;, &quot;we&quot;, &quot;our&quot;, or &quot;us&quot;) and the individual or legal entity
         (&quot;Customer&quot;, &quot;Subscriber&quot;, &quot;you&quot;, or &quot;your&quot;) accessing or using our cloud restaurant operating system,
         point-of-sale (POS) terminals, Kitchen Display Systems (KDS), waiter portals, table QR ordering, inventory modules,
         demand forecasting, and artificial intelligence copilots (collectively, the &quot;Services&quot;).
