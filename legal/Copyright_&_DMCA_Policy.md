@@ -3,7 +3,7 @@
 **Effective Date**: January 1, 2025  
 **Last Updated**: September 3, 2026  
 **Official Application**: Kafei ([https://kafei.in](https://kafei.in))  
-**Operating Entity**: Antoant  
+**Operating Entity**: Kafei  
 **Designated Agent Email**: [legal@kafei.in](mailto:legal@kafei.in) / [rikmukherjee1999@gmail.com](mailto:rikmukherjee1999@gmail.com)  
 **Agent Phone**: [+91 9903085026](tel:9903085026)  
 **Registered Address**: Kolkata, West Bengal & Bangalore, Karnataka, India  
@@ -12,7 +12,7 @@
 
 ## 1. Commitment to Intellectual Property Protection
 
-**Antoant** ("Kafei") respects the intellectual property rights of creators, photographers, culinary brands, and copyright holders. We comply with the **Digital Millennium Copyright Act of 1998 (17 U.S.C. § 512)** ("DMCA"), the **Indian Copyright Act, 1957**, and applicable international intellectual property treaties.
+**Kafei** ("Kafei") respects the intellectual property rights of creators, photographers, culinary brands, and copyright holders. We comply with the **Digital Millennium Copyright Act of 1998 (17 U.S.C. § 512)** ("DMCA"), the **Indian Copyright Act, 1957**, and applicable international intellectual property treaties.
 
 This Copyright & DMCA Policy outlines the procedures for submitting notices of alleged copyright infringement regarding content hosted on the Kafei platform (such as menu photography, logos, or brand graphics uploaded by restaurant tenants), as well as counter-notification procedures.
 
@@ -20,9 +20,9 @@ This Copyright & DMCA Policy outlines the procedures for submitting notices of a
 
 ## 2. Proprietary Software & Assets
 
-All platform source code, interactive web terminal components, UI designs, brand logos, icons, vector graphics, table QR standee layouts, documentation, and database schemas available on **[https://kafei.in](https://kafei.in)** are the exclusive intellectual property of Antoant. 
+All platform source code, interactive web terminal components, UI designs, brand logos, icons, vector graphics, table QR standee layouts, documentation, and database schemas available on **[https://kafei.in](https://kafei.in)** are the exclusive intellectual property of Kafei. 
 
-- **Official Copyright Claim:** © 2026 Antoant. All rights reserved.
+- **Official Copyright Claim:** © 2026 Kafei. All rights reserved.
 - **Effective Claim Date:** September 3, 2026 (03-09-2026)
 - **International Protection:** Protected under the Berne Convention, Universal Copyright Convention, and the Indian Copyright Act, 1957.
 
@@ -43,7 +43,7 @@ If you believe that your copyrighted work (e.g., food photography, restaurant me
 
 ### Designated Copyright Agent Contact:
 - **Attention**: Kafei DMCA & Copyright Compliance Officer
-- **Entity**: Antoant
+- **Entity**: Kafei
 - **Email**: [legal@kafei.in](mailto:legal@kafei.in)
 - **Direct Review Contact**: [rikmukherjee1999@gmail.com](mailto:rikmukherjee1999@gmail.com)
 - **Phone / WhatsApp**: [+91 9903085026](tel:9903085026)

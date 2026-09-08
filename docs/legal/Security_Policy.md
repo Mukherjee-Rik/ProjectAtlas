@@ -3,7 +3,7 @@
 **Effective Date**: January 1, 2025  
 **Last Updated**: September 3, 2026  
 **Official Application**: Kafei ([https://kafei.in](https://kafei.in))  
-**Operating Entity**: Antoant  
+**Operating Entity**: Kafei  
 **Security Desk**: [security@kafei.in](mailto:security@kafei.in) / [rikmukherjee1999@gmail.com](mailto:rikmukherjee1999@gmail.com)  
 **Emergency Hotline**: [+91 9903085026](tel:9903085026)  
 

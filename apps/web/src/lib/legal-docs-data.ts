@@ -21,7 +21,7 @@ import {
  * in both places or not at all.
  */
 export const LEGAL_ENTITY = {
-  name: 'Antoant',
+  name: 'Kafei',
   product: 'Kafei',
   domain: 'kafei.in',
   homepage: 'https://kafei.in',
@@ -29,7 +29,7 @@ export const LEGAL_ENTITY = {
   address: 'Kolkata, West Bengal, India',
   effectiveDate: 'September 3, 2026',
   copyrightClaimDate: 'September 3, 2026 (03-09-2026)',
-  copyrightNotice: '© 2026 Antoant. All rights reserved. Registered & Protected from September 3, 2026 (03-09-2026).',
+  copyrightNotice: '© 2026 Kafei. All rights reserved. Registered & Protected from September 3, 2026 (03-09-2026).',
   privacyEmail: 'privacy@kafei.in',
   legalEmail: 'legal@kafei.in',
   securityEmail: 'security@kafei.in',
