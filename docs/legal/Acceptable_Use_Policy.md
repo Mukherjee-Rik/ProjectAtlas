@@ -3,8 +3,8 @@
 **Last Updated:** September 3, 2026  
 **Effective Date:** September 3, 2026
 **Copyright Claim:** September 3, 2026 (03-09-2026)
-**Copyright Notice:** © 2026 Antigravity. All rights reserved. Registered & Protected from 03-09-2026.  
-**Entity:** Antigravity ("Kafei", "we", "our", or "us")  
+**Copyright Notice:** © 2026 Antoant. All rights reserved. Registered & Protected from 03-09-2026.  
+**Entity:** Antoant ("Kafei", "we", "our", or "us")  
 **Application / Brand:** Kafei Restaurant Operating System & API  
 **Website:** https://kafei.in
 

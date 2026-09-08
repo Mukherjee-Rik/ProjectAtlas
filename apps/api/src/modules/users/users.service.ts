@@ -396,7 +396,7 @@ export class UsersService {
 
     return {
       appName: 'Kafei',
-      company: 'Antigravity',
+      company: 'Antoant',
       exportGeneratedAt: new Date().toISOString(),
       complianceStandard: 'GDPR / DPDP Act 2023 / Google OAuth Limited Use',
       dataSubject: {

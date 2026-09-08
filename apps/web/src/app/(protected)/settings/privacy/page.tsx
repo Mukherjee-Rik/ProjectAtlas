@@ -56,7 +56,7 @@ export default function PrivacySettingsPage() {
       // Fallback export in case of network issue
       const fallback = {
         appName: 'Kafei',
-        company: 'Antigravity',
+        company: 'Antoant',
         exportGeneratedAt: new Date().toISOString(),
         user: {
           id: user?.id,
