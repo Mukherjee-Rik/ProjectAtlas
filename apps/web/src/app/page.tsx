@@ -748,7 +748,7 @@ export default function Home() {
           </div>
 
           <div className="mt-14 flex flex-col sm:flex-row items-center justify-between border-t border-border pt-7 text-[12px] text-subtle gap-4">
-            <p>© {new Date().getFullYear()} Antigravity. All rights reserved.</p>
+            <p>© {new Date().getFullYear()} Antigravity. All rights reserved (Copyright Claim from 03-09-2026).</p>
             <div className="flex flex-wrap items-center gap-4">
               <Link href="/privacy" className="hover:text-foreground transition-colors">Privacy</Link>
               <Link href="/terms" className="hover:text-foreground transition-colors">Terms</Link>
