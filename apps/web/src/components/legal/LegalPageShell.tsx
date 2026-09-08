@@ -378,7 +378,7 @@ export function LegalFooter() {
 
         <div className="mt-10 flex flex-col gap-3 border-t border-border pt-6 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
           <span>
-            © {new Date().getFullYear()} {LEGAL_ENTITY.name}. All rights reserved.
+            © {new Date().getFullYear()} {LEGAL_ENTITY.name}. All rights reserved (Copyright Claim from 03-09-2026).
           </span>
           <div className="flex items-center gap-4">
             <Link href="/data-deletion" className="hover:text-foreground transition-colors">Data Deletion</Link>

@@ -1,7 +1,7 @@
 # Security Policy & Vulnerability Disclosure — Kafei
 
 **Effective Date**: January 1, 2025  
-**Last Updated**: September 4, 2026  
+**Last Updated**: September 3, 2026  
 **Official Application**: Kafei ([https://kafei.in](https://kafei.in))  
 **Operating Entity**: Antigravity  
 **Security Desk**: [security@kafei.in](mailto:security@kafei.in) / [rikmukherjee1999@gmail.com](mailto:rikmukherjee1999@gmail.com)  

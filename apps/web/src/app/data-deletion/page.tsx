@@ -305,7 +305,7 @@ export default function DataDeletionPage() {
 
       {/* ── Footer ─────────────────────────────────────────────────── */}
       <footer className="border-t border-border bg-background px-6 py-8 text-center text-xs text-muted-foreground space-y-2">
-        <p>© {new Date().getFullYear()} Antigravity. Kafei — All rights reserved.</p>
+        <p>© {new Date().getFullYear()} Antigravity. Kafei — All rights reserved (Copyright Claim from 03-09-2026).</p>
         <div className="flex justify-center gap-4 text-xs">
           <Link href="/privacy" className="hover:text-foreground">Privacy Policy</Link>
           <Link href="/terms" className="hover:text-foreground">Terms of Service</Link>
