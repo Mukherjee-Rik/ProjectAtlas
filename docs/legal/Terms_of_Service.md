@@ -6,7 +6,7 @@
 **Operating Entity**: Kafei  
 **Contact Email**: [restaurant.kafei@gmail.com](mailto:restaurant.kafei@gmail.com)  
 **Support Hotline**: [+91 9903085026](tel:9903085026)  
-**Jurisdiction**: Kolkata, West Bengal, India  
+**Jurisdiction**: Sundarban, West Bengal & Teliamura, Tripura, India  
 
 ---
 
@@ -112,7 +112,7 @@ We reserve the right to suspend or terminate your account and access to the Serv
 
 ## 11. Governing Law & Dispute Resolution
 
-These Terms shall be governed by and construed in accordance with the laws of **India**, without regard to conflict of law principles. Any dispute, controversy, or claim arising out of or relating to these Terms shall be subject to the exclusive jurisdiction of the competent courts located in **Kolkata, West Bengal, India**.
+These Terms shall be governed by and construed in accordance with the laws of **India**, without regard to conflict of law principles. Any dispute, controversy, or claim arising out of or relating to these Terms shall be subject to the exclusive jurisdiction of the competent courts located in **Sundarban, West Bengal & Teliamura, Tripura, India**.
 
 ---
 
