@@ -3,7 +3,7 @@
 **Effective Date**: January 1, 2025  
 **Last Updated**: September 3, 2026  
 **Official Application**: Kafei ([https://kafei.in](https://kafei.in))  
-**Operating Entity**: Antigravity  
+**Operating Entity**: Antoant  
 **Contact Email**: [legal@kafei.in](mailto:legal@kafei.in) / [rikmukherjee1999@gmail.com](mailto:rikmukherjee1999@gmail.com)  
 **Support Hotline**: [+91 9903085026](tel:9903085026)  
 **Jurisdiction**: Kolkata, West Bengal, India  
@@ -12,7 +12,7 @@
 
 ## 1. Agreement to Terms
 
-These Terms of Service ("Terms") constitute a legally binding agreement between **Antigravity** ("Kafei," "we," "us," or "our") and you, whether personally or on behalf of an entity ("Customer," "Restaurant Tenant," "User," or "you"), governing your access to and use of the **Kafei** restaurant management platform, available at **[https://kafei.in](https://kafei.in)**, including related web applications, APIs, table QR ordering interfaces, KDS displays, and support channels (collectively, the "Service").
+These Terms of Service ("Terms") constitute a legally binding agreement between **Antoant** ("Kafei," "we," "us," or "our") and you, whether personally or on behalf of an entity ("Customer," "Restaurant Tenant," "User," or "you"), governing your access to and use of the **Kafei** restaurant management platform, available at **[https://kafei.in](https://kafei.in)**, including related web applications, APIs, table QR ordering interfaces, KDS displays, and support channels (collectively, the "Service").
 
 By accessing or using the Service, or clicking "Sign in with Google" / "Register," you agree that you have read, understood, and accept these Terms in full. If you do not agree with these Terms, you must not access or use the Service.
 
@@ -56,7 +56,7 @@ Kafei is built on a multi-tenant cloud architecture. We maintain strict logical 
 You retain full ownership of all restaurant data, menu listings, pricing, branding logos, recipe inventory, and transaction records uploaded or generated through your account ("Customer Data"). You grant Kafei a worldwide, non-exclusive, royalty-free license to host, process, and transmit Customer Data solely to provide, secure, and maintain the Service.
 
 ### 4.3 Kafei Intellectual Property
-Kafei, including its source code, user interface designs, logos, interactive terminal simulators, algorithms, and documentation, is the exclusive intellectual property of Antigravity and is protected by copyright, trademark, and international IP laws. You may not copy, reverse engineer, decompile, or create derivative works of any part of the Service.
+Kafei, including its source code, user interface designs, logos, interactive terminal simulators, algorithms, and documentation, is the exclusive intellectual property of Antoant and is protected by copyright, trademark, and international IP laws. You may not copy, reverse engineer, decompile, or create derivative works of any part of the Service.
 
 ---
 
@@ -125,7 +125,7 @@ We reserve the right to revise these Terms at any time. We will post the revised
 ## 13. Contact Information
 
 For any legal inquiries, notices, or support concerning these Terms:
-- **Company**: Antigravity
+- **Company**: Antoant
 - **Legal Desk**: [legal@kafei.in](mailto:legal@kafei.in)
 - **Primary Review Contact**: [rikmukherjee1999@gmail.com](mailto:rikmukherjee1999@gmail.com)
 - **Operations Hotline**: [+91 9903085026](tel:9903085026)
