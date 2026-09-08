@@ -117,8 +117,8 @@ export async function sendPasswordResetEmail(toEmail: string, otp: string, userN
 
   const host = process.env.SMTP_HOST || 'smtp.gmail.com';
   const port = Number(process.env.SMTP_PORT || 465);
-  const user = process.env.SMTP_USER || 'rikmukherjee21071999@gmail.com';
-  const pass = process.env.SMTP_PASS || 'gfgf vktd icgs qfvm';
+  const user = process.env.SMTP_USER || 'restaurant.kafei@gmail.com';
+  const pass = process.env.SMTP_PASS || 'gphu typj dotf crvi';
   const senderName = (process.env.SMTP_FROM_NAME || 'Kafei Security').replace(/["']/g, '').trim();
   const cleanEmail = (process.env.SMTP_FROM_EMAIL || user).replace(/["']/g, '').trim();
   const fromAddress = `"${senderName}" <${cleanEmail}>`;
