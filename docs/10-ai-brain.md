@@ -36,7 +36,7 @@ graph TD
     end
 
     subgraph LLM & Memory Layer
-        LLMGateway[LLM Abstraction Layer: OpenAI / Anthropic / Gemini / Ollama]
+        LLMGateway[LLM Abstraction Layer: Google Gemini / OpenAI / Ollama]
         VectorDB[(PGVector Memory & Knowledge Base)]
     end
 
@@ -163,25 +163,25 @@ flowchart LR
 
 ## 7. LLM Abstraction Layer & Provider Routing
 
-Atlas features a provider-agnostic **LLM Abstraction Layer** allowing seamless failover between OpenAI, Anthropic, Google Gemini, and local open-source models.
+Atlas features a provider-agnostic **LLM Abstraction Layer** allowing seamless failover between Google Gemini, OpenAI, and local open-source models.
 
 ```mermaid
 graph TD
     Request[AI System Request] --> Router[LLM Abstraction Router]
     
-    Router --> CheckPrimary{OpenAI Available?}
-    CheckPrimary -- Yes --> GPT4[OpenAI gpt-4o]
-    CheckPrimary -- No / Rate Limited --> CheckSecondary{Anthropic Available?}
+    Router --> CheckPrimary{Google Gemini Available?}
+    CheckPrimary -- Yes --> GeminiModel[Gemini 1.5 Pro / Flash]
+    CheckPrimary -- No / Rate Limited --> CheckSecondary{OpenAI Available?}
     
-    CheckSecondary -- Yes --> Claude[Anthropic Claude 3.5 Sonnet]
+    CheckSecondary -- Yes --> GPT4[OpenAI gpt-4o]
     CheckSecondary -- No --> LocalFallback[Local Ollama Llama-3-8B Edge]
 ```
 
 | Provider | Model | Primary Use Case | Cost / Latency Profile |
 | :--- | :--- | :--- | :--- |
+| **Google** | `gemini-1.5-pro` | High-token document parsing (Vendor Invoice OCR) & synthesis. | Massive Context / Low Cost |
+| **Google** | `gemini-1.5-flash` | Real-time POS query execution & instant menu insights. | Ultra Fast / Very Low Cost |
 | **OpenAI** | `gpt-4o` | Complex Text-to-SQL analytics, Multi-Agent Reasoning. | High Speed / Medium Cost |
-| **Anthropic** | `claude-3-5-sonnet` | Long-context report synthesis, Menu engineering text. | Ultra High Quality / Medium Cost |
-| **Google** | `gemini-1.5-pro` | High-token document parsing (Vendor Invoice OCR). | Massive Context / Low Cost |
 | **Local / Edge**| `ollama / llama-3-8b` | Offline local POS fallback, Basic menu classification. | Zero Cost / Local Edge execution |
 
 ---

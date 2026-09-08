@@ -9,7 +9,7 @@
 | Document Version | 1.0.0 |
 | Status | Draft |
 | Owner | Rik Mukherjee (Founder) |
-| Technical Architect | ChatGPT |
+| Technical Architect | Kafei Engineering |
 | Last Updated | 31 July 2026 |
 | Classification | Internal Product Documentation |
 

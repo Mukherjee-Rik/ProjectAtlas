@@ -263,7 +263,7 @@ graph TD
     subgraph AI Engine Orchestrator
         Orchestrator[NestJS AI Agent Orchestrator]
         Embedder[OpenAI text-embedding-3 Engine]
-        LLM[LLM Abstraction: OpenAI GPT-4o / Anthropic / Ollama]
+        LLM[LLM Abstraction: Google Gemini / OpenAI / Ollama]
     end
 
     subgraph Knowledge & Vector Store
