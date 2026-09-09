@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Kafei 2.0 — End-to-End Visual Product Guide & Live UI Walkthrough</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+    :root {
+      --primary: #10B981;
+      --primary-dark: #059669;
+      --primary-light: #34D399;
+      --bg-dark: #0B0F14;
+      --bg-card: #131A22;
+      --bg-card-alt: #1A232E;
+      --border: #232E3C;
+      --border-light: #2D3A4B;
+      --text-main: #F8FAFC;
+      --text-muted: #94A3B8;
+      --text-subtle: #64748B;
+      --warning: #F59E0B;
+      --danger: #EF4444;
+      --info: #3B82F6;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      line-height: 1.6;
+      font-size: 13px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .guide-container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 40px;
+    }
+
+    @media print {
+      body {
+        background-color: #0B0F14 !important;
+        color: #F8FAFC !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      .guide-container {
+        padding: 20px;
+        max-width: 100%;
+      }
+      .page-break {
+        page-break-before: always;
+        break-before: page;
+      }
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 24px;
+      margin-bottom: 30px;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .logo-badge {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: #042F1E;
+      font-weight: 800;
+      font-size: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+    }
+
+    .brand-text h1 {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #FFFFFF;
+      line-height: 1.1;
+    }
+
+    .brand-text p {
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--primary-light);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+    }
+
+    .header-meta {
+      text-align: right;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .header-meta a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    /* Executive Hero */
+    .hero-box {
+      background: linear-gradient(180deg, var(--bg-card) 0%, rgba(19, 26, 34, 0.6) 100%);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 30px;
+      margin-bottom: 35px;
+    }
+
+    .badge {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--primary);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .hero-box h2 {
+      font-size: 26px;
+      font-weight: 800;
+      color: #FFFFFF;
+      margin-bottom: 10px;
+      letter-spacing: -0.02em;
+    }
+
+    .hero-box p {
+      font-size: 13.5px;
+      color: var(--text-muted);
+      max-width: 750px;
+      line-height: 1.6;
+    }
+
+    /* Section Styling */
+    .section-head {
+      margin-bottom: 20px;
+    }
+
+    .section-head h3 {
+      font-size: 19px;
+      font-weight: 700;
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-head p {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Visual Flow Step Container */
+    .flow-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 30px;
+      position: relative;
+    }
+
+    .step-badge-ribbon {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .step-pill {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 800;
+      background: var(--primary);
+      color: #042F1E;
+      padding: 4px 10px;
+      border-radius: 6px;
+      text-transform: uppercase;
+    }
+
+    .step-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #FFFFFF;
+      margin-bottom: 8px;
+    }
+
+    .step-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    /* UI Mockup Blocks */
+    .mockup-window {
+      background: #0D1219;
+      border: 1px solid var(--border-light);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .mockup-topbar {
+      background: #141B24;
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .mockup-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+    }
+    .dot-red { background: #EF4444; }
+    .dot-yellow { background: #F59E0B; }
+    .dot-green { background: #10B981; }
+
+    .mockup-topbar-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      color: var(--text-subtle);
+      margin-left: 6px;
+    }
+
+    .mockup-body {
+      padding: 18px;
+    }
+
+    /* UI Layout: QR Guest Mobile Screen */
+    .phone-mockup-container {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .phone-frame {
+      background: #090D12;
+      border: 3px solid #232E3C;
+      border-radius: 28px;
+      padding: 14px 12px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+    }
+
+    .phone-notch {
+      width: 80px;
+      height: 14px;
+      background: #1A232E;
+      border-radius: 0 0 10px 10px;
+      margin: 0 auto 10px auto;
+    }
+
+    .phone-card {
+      background: #121820;
+      border: 1px solid #232E3C;
+      border-radius: 10px;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+
+    .phone-dish-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+      border-bottom: 1px solid #1C2633;
+      font-size: 11px;
+    }
+
+    .phone-dish-row:last-child {
+      border-bottom: none;
+    }
+
+    .phone-btn {
+      background: var(--primary);
+      color: #042F1E;
+      font-weight: 700;
+      font-size: 11px;
+      text-align: center;
+      padding: 8px;
+      border-radius: 8px;
+      display: block;
+      margin-top: 8px;
+    }
+
+    /* KDS Screen UI */
+    .kds-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .kds-card {
+      background: #121820;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .kds-card-head {
+      padding: 8px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .kds-green { background: rgba(16, 185, 129, 0.2); color: var(--primary); border-bottom: 1px solid rgba(16, 185, 129, 0.3); }
+    .kds-yellow { background: rgba(245, 158, 11, 0.2); color: var(--warning); border-bottom: 1px solid rgba(245, 158, 11, 0.3); }
+    .kds-red { background: rgba(239, 68, 68, 0.2); color: var(--danger); border-bottom: 1px solid rgba(239, 68, 68, 0.3); }
+
+    .kds-card-body {
+      padding: 10px 12px;
+      font-size: 11.5px;
+    }
+
+    .kds-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    .kds-note {
+      font-size: 10px;
+      color: var(--warning);
+      font-style: italic;
+      margin-bottom: 6px;
+    }
+
+    .kds-btn {
+      width: 100%;
+      background: #1C2633;
+      color: var(--text-main);
+      border: 1px solid #2D3A4B;
+      font-size: 10.5px;
+      font-weight: 600;
+      padding: 6px;
+      border-radius: 6px;
+      text-align: center;
+      margin-top: 6px;
+    }
+
+    /* Cashier & Receipt Layout */
+    .cashier-receipt-container {
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      gap: 20px;
+    }
+
+    .receipt-paper {
+      background: #F8FAFC;
+      color: #0F172A;
+      font-family: 'JetBrains Mono', monospace;
+      padding: 16px;
+      border-radius: 4px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+      font-size: 10.5px;
+      line-height: 1.4;
+    }
+
+    .receipt-paper .title {
+      text-align: center;
+      font-weight: 800;
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+
+    .receipt-paper .center {
+      text-align: center;
+      font-size: 9.5px;
+      color: #475569;
+      margin-bottom: 8px;
+    }
+
+    .receipt-divider {
+      border-top: 1px dashed #94A3B8;
+      margin: 8px 0;
+    }
+
+    .receipt-row {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .receipt-total {
+      font-weight: 800;
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    /* Feature Bullet Callouts */
+    .feature-points {
+      list-style: none;
+    }
+
+    .feature-points li {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .feature-points li strong {
+      color: #FFFFFF;
+    }
+
+    .feature-points li::before {
+      content: '✓';
+      color: var(--primary);
+      font-weight: bold;
+      margin-top: 1px;
+    }
+
+    /* Footer */
+    .footer {
+      border-top: 2px solid var(--border);
+      padding-top: 24px;
+      margin-top: 35px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11.5px;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+<div class="guide-container">
+
+  <!-- Header -->
+  <header class="header">
+    <div class="brand-group">
+      <div class="logo-badge">K</div>
+      <div class="brand-text">
+        <h1>Kafei 2.0 Visual Guide</h1>
+        <p>End-to-End Live Workflow & Screen Walkthrough</p>
+      </div>
+    </div>
+    <div class="header-meta">
+      <div>Platform: <a href="https://kafei.in">https://kafei.in</a></div>
+      <div>Sales & Onboarding: <strong>+91 9903085026</strong></div>
+      <div>Support: <strong>restaurant.kafei@gmail.com</strong></div>
+    </div>
+  </header>
+
+  <!-- Hero Box -->
+  <div class="hero-box">
+    <span class="badge">Complete Operations Guide</span>
+    <h2>How Kafei Powers a Real Dinner Service</h2>
+    <p>
+      This document demonstrates the live user interface (UI) and technical mechanics of Kafei 2.0. See exactly what your customers, kitchen staff, waiters, and cashiers experience during peak rush hours.
+    </p>
+  </div>
+
+  <!-- Step 1: Table QR Ordering -->
+  <section class="flow-card">
+    <div class="step-badge-ribbon">
+      <span class="step-pill">Stage 1: At The Table</span>
+      <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--primary);">Guest Experience</span>
+    </div>
+    <h3 class="step-title">1. Guest Scans Table Standee & Orders Without App Download</h3>
+    <p class="step-desc">
+      When customers sit at Table 04, they scan the acrylic table QR code using their iPhone or Android camera. The menu opens immediately in their default browser with high-resolution dish photos, modifiers, and spice preferences.
+    </p>
+
+    <div class="phone-mockup-container">
+      <!-- Phone Mockup -->
+      <div class="phone-frame">
+        <div class="phone-notch"></div>
+        <div style="font-size: 11px; font-weight: 700; color: #FFFFFF; margin-bottom: 6px; display: flex; justify-content: space-between;">
+          <span>Table 04 • Cafe Rizz</span>
+          <span style="color: var(--primary);">#AT-0041</span>
+        </div>
+        <div class="phone-card">
+          <div style="font-size: 11.5px; font-weight: 700; color: #FFFFFF;">Truffle Fettuccine</div>
+          <div style="font-size: 9.5px; color: var(--text-muted);">Extra Parmesan, Spicy Base</div>
+          <div style="font-size: 11px; color: var(--primary); margin-top: 4px; font-weight: 700;">₹380 × 2 = ₹760</div>
+        </div>
+        <div class="phone-card">
+          <div style="font-size: 11.5px; font-weight: 700; color: #FFFFFF;">Smoked Chicken Wings</div>
+          <div style="font-size: 9.5px; color: var(--text-muted);">Honey Mustard Dip</div>
+          <div style="font-size: 11px; color: var(--primary); margin-top: 4px; font-weight: 700;">₹420 × 1 = ₹420</div>
+        </div>
+        <div class="phone-btn">Send Order to Kitchen (₹1,180)</div>
+      </div>
+
+      <!-- Detail Points -->
+      <div>
+        <ul class="feature-points">
+          <li><strong>Zero Customer Resistance:</strong> Guests do not download any app or enter their phone number to see the menu.</li>
+          <li><strong>Live Cooking Countdown:</strong> As soon as the kitchen accepts the ticket, the guest's phone shows a real-time countdown timer.</li>
+          <li><strong>Multi-Round Ordering:</strong> If guests order a second round of drinks 40 minutes later, it joins the same active table session automatically.</li>
+          <li><strong>Direct UPI QR Checkout:</strong> At the end of dining, guests can pay directly to your restaurant's bank account with 0% commission.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Step 2: Kitchen Display System (KDS) -->
+  <section class="flow-card">
+    <div class="step-badge-ribbon">
+      <span class="step-pill" style="background: var(--warning);">Stage 2: In The Kitchen</span>
+      <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--warning);">Chef Terminal</span>
+    </div>
+    <h3 class="step-title">2. Kitchen Display System (KDS) Receives Digital KOT</h3>
+    <p class="step-desc">
+      Incoming orders flash onto the kitchen touchscreen in under 200ms. Tickets are color-coded by urgency to keep kitchen expeditors completely organized during high-volume rushes.
+    </p>
+
+    <!-- Mockup of KDS -->
+    <div class="mockup-window" style="margin-bottom: 16px;">
+      <div class="mockup-topbar">
+        <div class="mockup-dot dot-red"></div>
+        <div class="mockup-dot dot-yellow"></div>
+        <div class="mockup-dot dot-green"></div>
+        <span class="mockup-topbar-title">Kitchen Display System (KDS) — Pass Screen</span>
+      </div>
+      <div class="mockup-body">
+        <div class="kds-grid">
+          <!-- Card 1 (Fresh) -->
+          <div class="kds-card">
+            <div class="kds-card-head kds-green">
+              <span>Table 04 (#AT-0041)</span>
+              <span>01:14</span>
+            </div>
+            <div class="kds-card-body">
+              <div class="kds-item"><span>2× Truffle Fettuccine</span></div>
+              <div class="kds-note">★ Extra Parmesan, Spicy Base</div>
+              <div class="kds-item"><span>1× Smoked Wings</span></div>
+              <div class="kds-btn">Start Cooking</div>
+            </div>
+          </div>
+
+          <!-- Card 2 (In-Prep) -->
+          <div class="kds-card">
+            <div class="kds-card-head kds-yellow">
+              <span>Table 01 (#AT-0039)</span>
+              <span>06:45</span>
+            </div>
+            <div class="kds-card-body">
+              <div class="kds-item"><span>1× Lamb Chops (Med-Rare)</span></div>
+              <div class="kds-item"><span>2× Garlic Herb Fries</span></div>
+              <div class="kds-btn" style="background: rgba(16, 185, 129, 0.2); color: var(--primary); border-color: var(--primary);">Mark Ready for Pickup</div>
+            </div>
+          </div>
+
+          <!-- Card 3 (Urgent) -->
+          <div class="kds-card">
+            <div class="kds-card-head kds-red">
+              <span>Table 02 (#AT-0038)</span>
+              <span>12:20</span>
+            </div>
+            <div class="kds-card-body">
+              <div class="kds-item"><span>1× Mushroom Risotto</span></div>
+              <div class="kds-item"><span>2× Yuzu Soda</span></div>
+              <div class="kds-btn" style="background: rgba(239, 68, 68, 0.2); color: var(--danger); border-color: var(--danger);">Bump Ticket</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ul class="feature-points">
+      <li><strong>Paperless & Grease-Free:</strong> No dropped tickets, ink fading, or noisy paper jams.</li>
+      <li><strong>Modifier Highlighting:</strong> Allergies and special requests are highlighted in bold amber warnings so chefs never miss a detail.</li>
+      <li><strong>Course Progression:</strong> Expeditors can pace courses (Appetizers &rarr; Main Course &rarr; Desserts) with a single tap.</li>
+    </ul>
+  </section>
+
+  <div class="page-break"></div>
+
+  <!-- Step 3: Waiter Handheld Assistance -->
+  <section class="flow-card">
+    <div class="step-badge-ribbon">
+      <span class="step-pill" style="background: var(--info); color: #FFFFFF;">Stage 3: On The Floor</span>
+      <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--info);">Waiter Terminal</span>
+    </div>
+    <h3 class="step-title">3. Floor Staff Manage Tables on Their Own Smartphones</h3>
+    <p class="step-desc">
+      Waiters carry standard Android or iOS phones. When the kitchen marks food as "Ready", the waiter's terminal receives an instant chime. Waitstaff can also punch in verbal orders, modify seats, or request voids.
+    </p>
+
+    <div class="mockup-window" style="margin-bottom: 16px;">
+      <div class="mockup-topbar">
+        <div class="mockup-dot dot-red"></div>
+        <div class="mockup-dot dot-yellow"></div>
+        <div class="mockup-dot dot-green"></div>
+        <span class="mockup-topbar-title">Floor View — Table State Grid</span>
+      </div>
+      <div class="mockup-body">
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
+          <div style="background: #121820; border: 1px solid var(--border); border-radius: 8px; padding: 10px; text-align: center;">
+            <div style="font-size: 12px; font-weight: 700; color: #FFFFFF;">Table 01</div>
+            <div style="font-size: 10px; color: var(--primary); font-family: 'JetBrains Mono', monospace; margin: 4px 0;">COOKING (04:18)</div>
+            <div style="font-size: 11px; color: var(--text-muted);">₹1,480 • 4 Guests</div>
+          </div>
+          <div style="background: #121820; border: 1px solid var(--primary); border-radius: 8px; padding: 10px; text-align: center; box-shadow: 0 0 10px rgba(16,185,129,0.2);">
+            <div style="font-size: 12px; font-weight: 700; color: #FFFFFF;">Table 02</div>
+            <div style="font-size: 10px; color: var(--primary-light); font-family: 'JetBrains Mono', monospace; margin: 4px 0;">READY TO SERVE 🔔</div>
+            <div style="font-size: 11px; color: var(--text-muted);">₹860 • 2 Guests</div>
+          </div>
+          <div style="background: #121820; border: 1px solid var(--border); border-radius: 8px; padding: 10px; text-align: center; opacity: 0.6;">
+            <div style="font-size: 12px; font-weight: 700; color: #FFFFFF;">Table 03</div>
+            <div style="font-size: 10px; color: var(--text-subtle); font-family: 'JetBrains Mono', monospace; margin: 4px 0;">AVAILABLE</div>
+            <div style="font-size: 11px; color: var(--text-muted);">Ready for seating</div>
+          </div>
+          <div style="background: #121820; border: 1px solid var(--border); border-radius: 8px; padding: 10px; text-align: center;">
+            <div style="font-size: 12px; font-weight: 700; color: #FFFFFF;">Table 04</div>
+            <div style="font-size: 10px; color: var(--warning); font-family: 'JetBrains Mono', monospace; margin: 4px 0;">ORDERED (00:45)</div>
+            <div style="font-size: 11px; color: var(--text-muted);">₹2,150 • 4 Guests</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Step 4: Cashier POS & Thermal Receipt -->
+  <section class="flow-card">
+    <div class="step-badge-ribbon">
+      <span class="step-pill">Stage 4: At The Cashier Counter</span>
+      <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--primary);">Settlement & Audit</span>
+    </div>
+    <h3 class="step-title">4. Instant 80mm GST Thermal Receipt & Anti-Theft Security</h3>
+    <p class="step-desc">
+      When guests settle their bill, the cashier screen handles cash, card, UPI QR, and split bills. Receipts print directly from the browser without third-party drivers.
+    </p>
+
+    <div class="cashier-receipt-container">
+      <div>
+        <ul class="feature-points">
+          <li><strong>Anti-Theft Manager Queue:</strong> Waiters cannot cancel dishes on their own. All item cancellations, bill voids, and discounts require an explanatory reason and 1-click manager approval.</li>
+          <li><strong>Recipe-Level Inventory Deduction:</strong> Ingredients are deducted automatically from stock in real-time as dishes are cooked.</li>
+          <li><strong>Multi-Branch Cloud Dashboard:</strong> Real-time consolidated sales, gross margins, and tax breakdowns update live on the owner's dashboard.</li>
+        </ul>
+      </div>
+
+      <!-- Thermal Receipt Sample -->
+      <div class="receipt-paper">
+        <div class="title">KAFEI BISTRO</div>
+        <div class="center">Sundarban, WB • GSTIN: 19AAECK1234A1Z5</div>
+        <div class="receipt-divider"></div>
+        <div class="receipt-row"><span>Date: 09/09/2026</span><span>Table: 04</span></div>
+        <div class="receipt-row"><span>Token: #AT-0041</span><span>Server: Rahul</span></div>
+        <div class="receipt-divider"></div>
+        <div class="receipt-row"><span>2× Truffle Fettuccine</span><span>760.00</span></div>
+        <div class="receipt-row"><span>1× Smoked Chicken Wings</span><span>420.00</span></div>
+        <div class="receipt-divider"></div>
+        <div class="receipt-row"><span>Subtotal</span><span>1,180.00</span></div>
+        <div class="receipt-row"><span>CGST (2.5%)</span><span>29.50</span></div>
+        <div class="receipt-row"><span>SGST (2.5%)</span><span>29.50</span></div>
+        <div class="receipt-divider"></div>
+        <div class="receipt-row receipt-total"><span>TOTAL DUE</span><span>₹1,239.00</span></div>
+        <div class="receipt-row" style="font-size: 9.5px; margin-top: 4px;"><span>PAID VIA UPI</span><span>SUCCESS</span></div>
+        <div class="receipt-divider"></div>
+        <div class="center">Thank you for dining with us!</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div><strong>Kafei Technologies</strong> • Modern Restaurant Billing Platform</div>
+    <div>Portal: <a href="https://kafei.in" style="color: var(--primary); text-decoration: none;">https://kafei.in</a> | Phone: +91 9903085026</div>
+  </footer>
+
+</div>
+
+</body>
+</html>
