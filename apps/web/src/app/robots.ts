@@ -9,6 +9,12 @@ export default function robots(): MetadataRoute.Robots {
 
   const publicAllowed = [
     '/',
+    '/restaurant-billing-software',
+    '/restaurant-pos-system',
+    '/qr-code-ordering-system',
+    '/kitchen-display-system',
+    '/free-restaurant-billing-software',
+    '/llms.txt',
     '/docs',
     '/contact',
     '/support',

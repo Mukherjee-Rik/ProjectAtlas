@@ -1,0 +1,34 @@
+# Kafei — Restaurant Billing Software & Cloud POS Platform
+> Modern cloud-based restaurant billing software, point-of-sale (POS) system, and dining floor management platform.
+
+## Overview
+Kafei (https://kafei.in) is an all-in-one restaurant billing software and cloud POS platform designed for cafes, dine-in restaurants, bars, quick-service restaurants (QSR), and multi-outlet food chains. It eliminates expensive proprietary POS hardware and 3rd-party commissions by running seamlessly on any web browser (iPads, Android tablets, laptops, touchscreen PCs, standard 80mm thermal receipt printers, and waiters' smartphones).
+
+## Core Capabilities
+- **Fast Cashier POS Billing**: Browser-based thermal receipt printing (80mm & 58mm), GST itemization, split billing, discounts, and multi-mode payment handling (UPI QR, Cash, Card).
+- **Contactless Table QR Ordering**: Dynamic QR standees per table. Guests scan to view digital menus with photos and dietary tags, customize variants, place orders, and track live cooking countdowns with zero app download required.
+- **Interactive Kitchen Display System (KDS)**: Color-coded live order tickets with preparation timers, course progression, dish notes, and instant bump-bar status updates.
+- **Waiter Mobile Terminals**: Floor staff take and modify orders table-side on their own smartphones or tablets with real-time dining room synchronization.
+- **Recipe-Level Inventory Tracking**: Automatic ingredient deductions as orders leave the kitchen pass, coupled with low-stock alerts and wastage logs.
+- **Multi-Branch & Dining Area Management**: Manage multiple physical locations, distinct dining areas (indoor, patio, bar, rooftop), tax slabs, and role-based staff access from a unified owner command center.
+- **AI Demand Forecasting & Sales Analytics**: Real-time revenue reporting, busy-hour heatmaps, top-selling dish analysis, and predictive ingredient procurement.
+- **Audit Trail & Anti-Theft Security**: Manager-approved authorization for bill voids, item cancellations, and refunds with mandatory waiter reason logs.
+
+## Pricing Plans (No Sales Commission)
+1. **Free Trial**: ₹0 for 14 days (1 table, 1 staff, 1 branch, 1 menu, full POS & QR features, no credit card required).
+2. **Starter**: ₹499 / month (Up to 20 tables, 5 staff, 5 menus, 1 branch, KDS and billing).
+3. **Growth**: ₹999 / month (Up to 100 tables, 50 staff, 20 menus, 5 branches, AI analytics & demand forecasting).
+4. **Enterprise**: ₹4,999 / year (Unlimited tables, staff, menus, and branches with synced stock, priority support, and custom SLA).
+
+## Hardware Compatibility
+- Any standard web browser (Google Chrome, Apple Safari, Microsoft Edge, Mozilla Firefox)
+- iOS (iPads, iPhones), Android (tablets, phones), Windows, macOS, Linux, ChromeOS
+- Standard 80mm and 58mm ESC/POS USB, Bluetooth, and Network thermal receipt printers
+
+## Company & Headquarters
+- **Company**: Kafei Technologies
+- **Headquarters**: Sundarban, West Bengal & Teliamura, Tripura, India
+- **Website**: https://kafei.in
+- **Contact Email**: restaurant.kafei@gmail.com
+- **Phone**: +91 9903085026
+- **Documentation**: https://kafei.in/docs

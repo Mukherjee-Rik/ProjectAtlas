@@ -11,6 +11,7 @@ import { AuthenticHeroTerminal } from '@/components/landing/AuthenticHeroTermina
 import { BentoModulesGrid } from '@/components/landing/BentoModulesGrid';
 import { ServiceFlow } from '@/components/landing/ServiceFlow';
 import { InteractiveTableStandee } from '@/components/landing/InteractiveTableStandee';
+import { PosComparisonTable } from '@/components/landing/PosComparisonTable';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 /* ---------------------------------------------------------------------------
@@ -445,6 +446,9 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ═══ Comparison Matrix ══════════════════════════════════════════ */}
+      <PosComparisonTable />
+
       {/* ═══ Pricing ═════════════════════════════════════════════════════ */}
       <section id="pricing" className="border-t border-border px-6 py-24 sm:py-32 lg:px-8">
         <div className="mx-auto max-w-6xl">
@@ -626,7 +630,7 @@ export default function Home() {
       <footer className="border-t border-border bg-background px-6 py-14 lg:px-8">
         <div className="mx-auto max-w-6xl">
           <div className="grid gap-10 md:grid-cols-12">
-            <div className="md:col-span-5">
+            <div className="md:col-span-4">
               <div className="flex items-center gap-2.5">
                 <Image
                   src="/logo.png"
@@ -640,15 +644,48 @@ export default function Home() {
                 </span>
               </div>
               <p className="mt-4 max-w-xs text-[13px] leading-relaxed text-muted-foreground">
-                Restaurant billing and floor software for dine-in operations. Built for rooms that fill up.
+                Modern restaurant billing software, point-of-sale (POS) systems, and floor operations for dine-in businesses.
               </p>
             </div>
 
             <div className="md:col-span-3">
               <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-subtle">
+                Solutions
+              </p>
+              <ul className="mt-4 space-y-2 text-[13px] text-muted-foreground">
+                <li>
+                  <Link href="/restaurant-billing-software" className="transition-colors hover:text-foreground">
+                    Billing Software
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/restaurant-pos-system" className="transition-colors hover:text-foreground">
+                    Cloud POS System
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/qr-code-ordering-system" className="transition-colors hover:text-foreground">
+                    Table QR Ordering
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/kitchen-display-system" className="transition-colors hover:text-foreground">
+                    Kitchen Display (KDS)
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/free-restaurant-billing-software" className="transition-colors hover:text-foreground text-primary font-medium">
+                    Free Trial POS
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            <div className="md:col-span-2">
+              <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-subtle">
                 Product
               </p>
-              <ul className="mt-4 space-y-2.5 text-[13px] text-muted-foreground">
+              <ul className="mt-4 space-y-2 text-[13px] text-muted-foreground">
                 <li>
                   <a href="#floor" className="transition-colors hover:text-foreground">
                     Floor view

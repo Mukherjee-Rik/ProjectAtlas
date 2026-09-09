@@ -5,6 +5,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useState,
   type ReactNode,
 } from 'react';
@@ -33,26 +34,34 @@ const BranchContext = createContext<BranchContextValue | undefined>(undefined);
 export function BranchProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const { currentRestaurant } = useRestaurant();
-  const [currentBranch, setCurrentBranchState] = useState<Branch | null>(null);
+  const isOwnerOrAdmin = user?.role === 'OWNER' || user?.role === 'PLATFORM_ADMIN';
+
+  // Seeded from storage on the first render, with both guards applied before
+  // the value is ever adopted: a branch from another restaurant is dropped,
+  // and non-owner staff keep only their assigned Main branch. Doing this in an
+  // effect meant every branch-scoped screen waited an extra commit — and the
+  // request that follows an extra round trip — for something already on disk.
+  const [currentBranch, setCurrentBranchState] = useState<Branch | null>(() => {
+    const stored = getCurrentBranch();
+    if (!stored) return null;
+    if (currentRestaurant && stored.restaurantId !== currentRestaurant.id) return null;
+    if (!isOwnerOrAdmin && stored.code?.toUpperCase() !== 'MAIN') return null;
+    return stored;
+  });
   const [branches, setBranches] = useState<Branch[]>([]);
   const [isLoadingBranches, setIsLoadingBranches] = useState(false);
 
-  const isOwnerOrAdmin = user?.role === 'OWNER' || user?.role === 'PLATFORM_ADMIN';
-
+  // First render is covered by the seed above; this catches a restaurant switch
+  // afterwards, so the previous restaurant's branch is not left selected while
+  // the new list loads. The staff-branch rule is not re-applied here —
+  // `reloadBranches` owns which branch a non-owner ends up on, and second-
+  // guessing its choice from this effect would clear the branch it just set.
   useEffect(() => {
-    const stored = getCurrentBranch();
-    if (stored) {
-      if (currentRestaurant && stored.restaurantId !== currentRestaurant.id) {
-        clearCurrentBranch();
-        setCurrentBranchState(null);
-      } else if (!isOwnerOrAdmin && stored.code?.toUpperCase() !== 'MAIN') {
-        clearCurrentBranch();
-        setCurrentBranchState(null);
-      } else {
-        setCurrentBranchState(stored);
-      }
-    }
-  }, [currentRestaurant?.id, isOwnerOrAdmin]);
+    if (!currentBranch || !currentRestaurant) return;
+    if (currentBranch.restaurantId === currentRestaurant.id) return;
+    clearCurrentBranch();
+    setCurrentBranchState(null);
+  }, [currentRestaurant?.id, currentBranch]);
 
   const clearBranch = useCallback(() => {
     setCurrentBranchState(null);
@@ -134,20 +143,30 @@ export function BranchProvider({ children }: { children: ReactNode }) {
   }, [currentRestaurant?.id, reloadBranches, clearBranch]);
 
 
+  // Memoised so a new object here does not re-render every branch consumer on
+  // an unrelated state change further up the provider stack.
+  const value = useMemo<BranchContextValue>(
+    () => ({
+      branches,
+      currentBranch,
+      currentBranchId: currentBranch?.id ?? null,
+      isLoadingBranches,
+      setCurrentBranch,
+      clearBranch,
+      reloadBranches,
+    }),
+    [
+      branches,
+      currentBranch,
+      isLoadingBranches,
+      setCurrentBranch,
+      clearBranch,
+      reloadBranches,
+    ],
+  );
+
   return (
-    <BranchContext.Provider
-      value={{
-        branches,
-        currentBranch,
-        currentBranchId: currentBranch?.id ?? null,
-        isLoadingBranches,
-        setCurrentBranch,
-        clearBranch,
-        reloadBranches,
-      }}
-    >
-      {children}
-    </BranchContext.Provider>
+    <BranchContext.Provider value={value}>{children}</BranchContext.Provider>
   );
 }
 

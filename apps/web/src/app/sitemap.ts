@@ -18,6 +18,36 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 1.0,
     },
     {
+      url: `${baseUrl}/restaurant-billing-software`,
+      lastModified: now,
+      changeFrequency: 'daily' as const,
+      priority: 0.98,
+    },
+    {
+      url: `${baseUrl}/restaurant-pos-system`,
+      lastModified: now,
+      changeFrequency: 'daily' as const,
+      priority: 0.95,
+    },
+    {
+      url: `${baseUrl}/qr-code-ordering-system`,
+      lastModified: now,
+      changeFrequency: 'daily' as const,
+      priority: 0.95,
+    },
+    {
+      url: `${baseUrl}/kitchen-display-system`,
+      lastModified: now,
+      changeFrequency: 'daily' as const,
+      priority: 0.92,
+    },
+    {
+      url: `${baseUrl}/free-restaurant-billing-software`,
+      lastModified: now,
+      changeFrequency: 'daily' as const,
+      priority: 0.95,
+    },
+    {
       url: `${baseUrl}/docs`,
       lastModified: now,
       changeFrequency: 'weekly' as const,
