@@ -17,6 +17,11 @@ const docsToGenerate = [
     title: 'Kafei Restaurant Billing System Commercial Client Brochure',
   },
   {
+    input: path.join(rootDir, 'docs', 'kafei-end-to-end-live-ui-guide.html'),
+    output: path.join(rootDir, 'docs', 'Kafei_End_To_End_Live_UI_Guide.pdf'),
+    title: 'Kafei End-to-End Live UI Visual Guide',
+  },
+  {
     input: path.join(rootDir, 'docs', 'atlas-end-to-end-architecture-and-flow.html'),
     output: path.join(rootDir, 'docs', 'Project_Atlas_End_To_End_System_Guide.pdf'),
     title: 'Technical & Architecture System Guide',
