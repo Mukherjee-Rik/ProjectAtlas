@@ -12,6 +12,11 @@ const browserPath = fs.existsSync(chromePath) ? chromePath : edgePath;
 
 const docsToGenerate = [
   {
+    input: path.join(rootDir, 'docs', 'kafei-product-brochure.html'),
+    output: path.join(rootDir, 'docs', 'Kafei_Restaurant_Billing_System_Brochure.pdf'),
+    title: 'Kafei Restaurant Billing System Commercial Client Brochure',
+  },
+  {
     input: path.join(rootDir, 'docs', 'atlas-end-to-end-architecture-and-flow.html'),
     output: path.join(rootDir, 'docs', 'Project_Atlas_End_To_End_System_Guide.pdf'),
     title: 'Technical & Architecture System Guide',

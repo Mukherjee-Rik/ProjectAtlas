@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Kafei — Restaurant Billing Software & Floor Operations Brochure</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+    :root {
+      --primary: #10B981;
+      --primary-dark: #059669;
+      --primary-light: #34D399;
+      --bg-dark: #090D11;
+      --bg-card: #121820;
+      --bg-card-alt: #18222D;
+      --border: #232E3C;
+      --border-light: #2D3A4B;
+      --text-main: #F1F5F9;
+      --text-muted: #94A3B8;
+      --text-subtle: #64748B;
+      --accent-gold: #F59E0B;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      line-height: 1.6;
+      font-size: 13.5px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page-container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px;
+    }
+
+    @media print {
+      body {
+        background-color: #090D11 !important;
+        color: #F1F5F9 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      .page-container {
+        padding: 20px;
+        max-width: 100%;
+      }
+      .page-break {
+        page-break-before: always;
+        break-before: page;
+      }
+    }
+
+    /* Header & Cover */
+    .brochure-header {
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 30px;
+      margin-bottom: 35px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-logo-badge {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 20px;
+      color: #042F1E;
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+    }
+
+    .brand-text h1 {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: #FFFFFF;
+      line-height: 1.1;
+    }
+
+    .brand-text p {
+      font-size: 12px;
+      color: var(--primary-light);
+      font-family: 'JetBrains Mono', monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    .header-contact {
+      text-align: right;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .header-contact a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    /* Hero Section */
+    .hero-banner {
+      background: linear-gradient(180deg, var(--bg-card) 0%, rgba(18, 24, 32, 0.6) 100%);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 35px 30px;
+      margin-bottom: 35px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-banner::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -10%;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--primary);
+      font-family: 'JetBrains Mono', monospace;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    .hero-banner h2 {
+      font-size: 28px;
+      font-weight: 800;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+      color: #FFFFFF;
+    }
+
+    .hero-banner p {
+      font-size: 14px;
+      color: var(--text-muted);
+      max-width: 720px;
+      line-height: 1.65;
+    }
+
+    /* Stats Ribbon */
+    .stats-ribbon {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 35px;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .stat-card .val {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--primary);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .stat-card .lbl {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Section Headings */
+    .section-title {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #FFFFFF;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+
+    /* 4-Screen Architecture */
+    .screens-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-bottom: 35px;
+    }
+
+    .screen-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px;
+      transition: all 0.2s;
+    }
+
+    .screen-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .screen-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--primary);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      text-transform: uppercase;
+    }
+
+    .screen-icon {
+      font-size: 22px;
+    }
+
+    .screen-card h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #FFFFFF;
+      margin-bottom: 8px;
+    }
+
+    .screen-card p {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      line-height: 1.55;
+      margin-bottom: 12px;
+    }
+
+    .screen-features {
+      list-style: none;
+      border-top: 1px solid var(--border);
+      padding-top: 12px;
+    }
+
+    .screen-features li {
+      font-size: 11.5px;
+      color: var(--text-main);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .screen-features li::before {
+      content: '✓';
+      color: var(--primary);
+      font-weight: bold;
+    }
+
+    /* Service Flow (Horizontal Steps) */
+    .workflow-container {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px;
+      margin-bottom: 35px;
+    }
+
+    .workflow-steps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      position: relative;
+    }
+
+    .step-item {
+      background: var(--bg-card-alt);
+      border: 1px solid var(--border-light);
+      border-radius: 10px;
+      padding: 16px;
+      position: relative;
+    }
+
+    .step-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--primary);
+      background: rgba(16, 185, 129, 0.1);
+      padding: 2px 6px;
+      border-radius: 4px;
+      display: inline-block;
+      margin-bottom: 8px;
+    }
+
+    .step-item h4 {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #FFFFFF;
+      margin-bottom: 6px;
+    }
+
+    .step-item p {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    /* Comparison Table */
+    .table-container {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 35px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 12.5px;
+    }
+
+    th {
+      background: var(--bg-card-alt);
+      color: #FFFFFF;
+      font-weight: 600;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th.highlight {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--primary);
+      border-left: 1px solid rgba(16, 185, 129, 0.3);
+      border-right: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    td {
+      padding: 11px 16px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-muted);
+    }
+
+    td.feature-name {
+      color: var(--text-main);
+      font-weight: 500;
+    }
+
+    td.highlight {
+      background: rgba(16, 185, 129, 0.05);
+      color: var(--primary-light);
+      font-weight: 600;
+      border-left: 1px solid rgba(16, 185, 129, 0.2);
+      border-right: 1px solid rgba(16, 185, 129, 0.2);
+      text-align: center;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Pricing Plans Grid */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 35px;
+    }
+
+    .pricing-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px;
+      position: relative;
+    }
+
+    .pricing-card.featured {
+      border-color: var(--primary);
+      background: linear-gradient(180deg, rgba(16, 185, 129, 0.08) 0%, var(--bg-card) 100%);
+    }
+
+    .featured-tag {
+      position: absolute;
+      top: -10px;
+      right: 18px;
+      background: var(--primary);
+      color: #042F1E;
+      font-weight: 700;
+      font-size: 9.5px;
+      font-family: 'JetBrains Mono', monospace;
+      padding: 2px 8px;
+      border-radius: 10px;
+      text-transform: uppercase;
+    }
+
+    .pricing-card h4 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #FFFFFF;
+      margin-bottom: 4px;
+    }
+
+    .pricing-card .price {
+      font-size: 26px;
+      font-weight: 800;
+      color: #FFFFFF;
+      font-family: 'JetBrains Mono', monospace;
+      margin: 12px 0 4px 0;
+    }
+
+    .pricing-card .period {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+    }
+
+    .pricing-card .plan-desc {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 12px;
+    }
+
+    .pricing-features {
+      list-style: none;
+    }
+
+    .pricing-features li {
+      font-size: 11px;
+      color: var(--text-main);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .pricing-features li::before {
+      content: '•';
+      color: var(--primary);
+      font-weight: bold;
+    }
+
+    /* FAQ Section */
+    .faq-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-bottom: 35px;
+    }
+
+    .faq-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+    }
+
+    .faq-item h4 {
+      font-size: 13px;
+      font-weight: 600;
+      color: #FFFFFF;
+      margin-bottom: 6px;
+    }
+
+    .faq-item p {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* Footer & Call to Action */
+    .brochure-footer {
+      border-top: 2px solid var(--border);
+      padding-top: 25px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11.5px;
+      color: var(--text-muted);
+    }
+
+    .cta-box {
+      background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-card-alt) 100%);
+      border: 1px solid var(--primary);
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin-bottom: 25px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .cta-text h3 {
+      font-size: 17px;
+      font-weight: 700;
+      color: #FFFFFF;
+      margin-bottom: 4px;
+    }
+
+    .cta-text p {
+      font-size: 12.5px;
+      color: var(--text-muted);
+    }
+
+    .cta-button {
+      background: var(--primary);
+      color: #042F1E;
+      font-weight: 700;
+      font-size: 13px;
+      padding: 10px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+
+<div class="page-container">
+
+  <!-- Header -->
+  <header class="brochure-header">
+    <div class="brand-group">
+      <div class="brand-logo-badge">K</div>
+      <div class="brand-text">
+        <h1>Kafei 2.0</h1>
+        <p>Restaurant Billing & Floor Operations</p>
+      </div>
+    </div>
+    <div class="header-contact">
+      <div>Official Portal: <a href="https://kafei.in">https://kafei.in</a></div>
+      <div>Direct Sales: <strong>+91 9903085026</strong></div>
+      <div>Support: <strong>restaurant.kafei@gmail.com</strong></div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero-banner">
+    <div class="eyebrow">⚡ Next-Generation Restaurant Platform</div>
+    <h2>Nothing Gets Lost Between the Table, Kitchen & Cashier.</h2>
+    <p>
+      Kafei is the modern, cloud-native restaurant billing software and floor operations platform designed for dine-in cafes, busy restaurants, bars, and multi-outlet chains. It eliminates expensive proprietary hardware, 3rd-party commissions, and lost kitchen tickets by unifying your entire service onto one lightning-fast system.
+    </p>
+  </section>
+
+  <!-- Stats Ribbon -->
+  <div class="stats-ribbon">
+    <div class="stat-card">
+      <div class="val">4</div>
+      <div class="lbl">Screens, 1 Live Order</div>
+    </div>
+    <div class="stat-card">
+      <div class="val">0%</div>
+      <div class="lbl">Commission on Sales</div>
+    </div>
+    <div class="stat-card">
+      <div class="val">80mm</div>
+      <div class="lbl">Standard Thermal Receipts</div>
+    </div>
+    <div class="stat-card">
+      <div class="val">14 Days</div>
+      <div class="lbl">Free Full Access Trial</div>
+    </div>
+  </div>
+
+  <!-- The 4-Screen Unified Architecture -->
+  <section>
+    <h2 class="section-title">🖥️ The 4-Screen Unified Floor Architecture</h2>
+    <p class="section-desc">Every participant in your dining room sees exactly what they need in real time.</p>
+
+    <div class="screens-grid">
+      <!-- Screen 1 -->
+      <div class="screen-card">
+        <div class="screen-card-header">
+          <span class="screen-badge">1. At the Table</span>
+          <span class="screen-icon">📱</span>
+        </div>
+        <h3>Contactless Table QR Ordering</h3>
+        <p>Guests point their phone camera at the print-ready table standee. The digital menu opens immediately in their browser with high-res photos and customizable variants.</p>
+        <ul class="screen-features">
+          <li>0 apps for customers to download</li>
+          <li>Live kitchen cooking countdown timer</li>
+          <li>Direct UPI QR payment with 0% commission</li>
+          <li>Multiple order rounds join the same table bill</li>
+        </ul>
+      </div>
+
+      <!-- Screen 2 -->
+      <div class="screen-card">
+        <div class="screen-card-header">
+          <span class="screen-badge">2. In the Kitchen</span>
+          <span class="screen-icon">🍳</span>
+        </div>
+        <h3>Interactive Kitchen Display (KDS)</h3>
+        <p>Chefs and kitchen expeditors view incoming tickets color-coded by urgency. Paperless, grease-free, and organized by prep station.</p>
+        <ul class="screen-features">
+          <li>Cooking countdown timers per dish</li>
+          <li>Bold allergen and special cooking notes</li>
+          <li>1-tap bump bar to notify floor staff</li>
+          <li>Course pacing (Starters &rarr; Mains &rarr; Desserts)</li>
+        </ul>
+      </div>
+
+      <!-- Screen 3 -->
+      <div class="screen-card">
+        <div class="screen-card-header">
+          <span class="screen-badge">3. On the Floor</span>
+          <span class="screen-icon">🤵</span>
+        </div>
+        <h3>Waiter Handheld Terminal</h3>
+        <p>Floor staff take orders at the table, punch in custom requests, and check live table status from their own existing Android or iOS smartphones.</p>
+        <ul class="screen-features">
+          <li>Instant table status sync across rooms</li>
+          <li>Add items or modify active table sessions</li>
+          <li>No expensive proprietary handhelds to lease</li>
+          <li>Table handover and section management</li>
+        </ul>
+      </div>
+
+      <!-- Screen 4 -->
+      <div class="screen-card">
+        <div class="screen-card-header">
+          <span class="screen-badge">4. At the Counter</span>
+          <span class="screen-icon">🧾</span>
+        </div>
+        <h3>Cashier POS & Manager Command</h3>
+        <p>The central point-of-sale terminal for split bills, cash/card/UPI settlements, anti-theft void approvals, recipe inventory, and 80mm thermal receipt printing.</p>
+        <ul class="screen-features">
+          <li>Fast 80mm & 58mm browser thermal printing</li>
+          <li>Itemized GST tax breakouts & compliance</li>
+          <li>Anti-theft manager approval for voids & refunds</li>
+          <li>Recipe-level automatic inventory deduction</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Page Break for Print Cleanliness -->
+  <div class="page-break"></div>
+
+  <!-- How It Works (Step-by-Step) -->
+  <section>
+    <h2 class="section-title">🔄 How Kafei Works During a Live Dinner Service</h2>
+    <p class="section-desc">From the moment a guest sits down until the bill is settled, the workflow is automated.</p>
+
+    <div class="workflow-container">
+      <div class="workflow-steps">
+        <div class="step-item">
+          <span class="step-num">STEP 01</span>
+          <h4>Scan & Browse</h4>
+          <p>Guest scans the table QR. The visual menu loads instantly with dietary tags and dish photos.</p>
+        </div>
+        <div class="step-item">
+          <span class="step-num">STEP 02</span>
+          <h4>Instant KOT Route</h4>
+          <p>Order fires directly to the Kitchen KDS. Chef taps "Start Cooking" and the guest sees a live timer.</p>
+        </div>
+        <div class="step-item">
+          <span class="step-num">STEP 03</span>
+          <h4>Plated & Served</h4>
+          <p>Chef bumps the order to "Ready". Waiter terminal alerts floor staff to serve hot dishes.</p>
+        </div>
+        <div class="step-item">
+          <span class="step-num">STEP 04</span>
+          <h4>Settle & Clear</h4>
+          <p>Guest pays via UPI QR or counter. Cashier prints 80mm GST receipt; table resets instantly.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Comparison Matrix -->
+  <section>
+    <h2 class="section-title">📊 Why Kafei Outperforms Legacy POS Systems</h2>
+    <p class="section-desc">See how modern cloud architecture saves money and eliminates operational bottlenecks.</p>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 38%;">Feature / Capability</th>
+            <th class="highlight" style="width: 32%;">Kafei 2.0 (Cloud Platform)</th>
+            <th style="width: 30%;">Legacy POS (Petpooja / Posist)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="feature-name">Hardware Requirements</td>
+            <td class="highlight">Zero (Any phone, tablet, laptop)</td>
+            <td>Expensive proprietary terminals</td>
+          </tr>
+          <tr>
+            <td class="feature-name">Sales Commission</td>
+            <td class="highlight">0% Flat (No cuts on orders)</td>
+            <td>Hidden transaction % & setup fees</td>
+          </tr>
+          <tr>
+            <td class="feature-name">Table QR Dine-in Ordering</td>
+            <td class="highlight">Included (Zero app download)</td>
+            <td>Add-on charge or missing</td>
+          </tr>
+          <tr>
+            <td class="feature-name">Kitchen Display System (KDS)</td>
+            <td class="highlight">Included & Color-Coded</td>
+            <td>Costly extra screen license</td>
+          </tr>
+          <tr>
+            <td class="feature-name">Thermal Receipt Printing</td>
+            <td class="highlight">80mm & 58mm direct from browser</td>
+            <td>Requires local desktop drivers</td>
+          </tr>
+          <tr>
+            <td class="feature-name">Anti-Theft Void Approvals</td>
+            <td class="highlight">Mandatory Reason + Manager Queue</td>
+            <td>Loose password overrides</td>
+          </tr>
+          <tr>
+            <td class="feature-name">Recipe Inventory Depletion</td>
+            <td class="highlight">Live deduction as dishes leave pass</td>
+            <td>End-of-day manual tally</td>
+          </tr>
+          <tr>
+            <td class="feature-name">Setup Time</td>
+            <td class="highlight">5 Minutes (Instant online)</td>
+            <td>2–5 days of technician setup</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Transparent Pricing -->
+  <section>
+    <h2 class="section-title">💰 Simple, Transparent Pricing</h2>
+    <p class="section-desc">Flat monthly fees. Zero commission on your food sales. Pick the plan for your room.</p>
+
+    <div class="pricing-grid">
+      <!-- Starter -->
+      <div class="pricing-card">
+        <h4>Starter</h4>
+        <div class="price">₹499</div>
+        <div class="period">per month</div>
+        <div class="plan-desc">For small cafes, food trucks, and single-room bistros.</div>
+        <ul class="pricing-features">
+          <li>Up to 20 tables</li>
+          <li>Up to 5 staff members</li>
+          <li>5 menus, 1 branch</li>
+          <li>QR ordering & cashier billing</li>
+          <li>80mm thermal receipt printing</li>
+        </ul>
+      </div>
+
+      <!-- Growth -->
+      <div class="pricing-card featured">
+        <div class="featured-tag">MOST POPULAR</div>
+        <h4>Growth</h4>
+        <div class="price">₹999</div>
+        <div class="period">per month</div>
+        <div class="plan-desc">For busy dining rooms and expanding restaurants.</div>
+        <ul class="pricing-features">
+          <li>Up to 100 tables</li>
+          <li>Up to 50 staff members</li>
+          <li>20 menus, 5 branches</li>
+          <li>Kitchen Display System (KDS)</li>
+          <li>AI demand forecasting & reports</li>
+          <li>Recipe-level inventory tracking</li>
+        </ul>
+      </div>
+
+      <!-- Enterprise -->
+      <div class="pricing-card">
+        <h4>Enterprise</h4>
+        <div class="price">₹4,999</div>
+        <div class="period">per year</div>
+        <div class="plan-desc">For multi-branch restaurant chains & franchises.</div>
+        <ul class="pricing-features">
+          <li>Unlimited tables & staff</li>
+          <li>Unlimited branches & menus</li>
+          <li>Cross-branch inventory sync</li>
+          <li>Dedicated account manager</li>
+          <li>Custom SLA & priority support</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Box -->
+  <div class="cta-box">
+    <div class="cta-text">
+      <h3>Ready to Transform Your Restaurant Floor?</h3>
+      <p>Start your 14-day full access free trial today. No credit card required. Setup takes 5 minutes.</p>
+    </div>
+    <a href="https://kafei.in/signup" class="cta-button">Start Free for 14 Days &rarr;</a>
+  </div>
+
+  <!-- Frequently Asked Questions -->
+  <section>
+    <h2 class="section-title">❓ Frequently Asked Questions</h2>
+    <p class="section-desc">Everything you need to know about setting up Kafei.</p>
+
+    <div class="faq-grid">
+      <div class="faq-item">
+        <h4>Do I need to buy expensive POS computers?</h4>
+        <p>No! Kafei runs on any device with a browser: iPads, Android tablets, laptops, counter PCs, and staff smartphones. You save ₹50,000+ in upfront hardware costs.</p>
+      </div>
+      <div class="faq-item">
+        <h4>Can I print 80mm GST thermal receipts?</h4>
+        <p>Yes. Kafei generates standard 80mm and 58mm thermal receipts with full itemized GST breakdown, restaurant branding, and table tokens directly to any USB/Bluetooth/LAN printer.</p>
+      </div>
+      <div class="faq-item">
+        <h4>How does the UPI QR payment work?</h4>
+        <p>Upload your UPI QR in Settings. When customers view the bill on their phone, your QR is displayed with the exact total for 0% commission direct bank settlement.</p>
+      </div>
+      <div class="faq-item">
+        <h4>Can I manage multiple dining areas or branches?</h4>
+        <p>Yes. You can manage indoor, patio, bar, and rooftop areas, as well as multiple restaurant outlets under a single unified owner login.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="brochure-footer">
+    <div>
+      <strong>Kafei Technologies</strong> • Sundarban, West Bengal & Teliamura, Tripura, India
+    </div>
+    <div>
+      Website: <a href="https://kafei.in" style="color: var(--primary); text-decoration: none;">https://kafei.in</a> | Phone: +91 9903085026
+    </div>
+  </footer>
+
+</div>
+
+</body>
+</html>
