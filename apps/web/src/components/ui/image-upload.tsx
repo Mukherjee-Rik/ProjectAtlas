@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useRef, useState } from 'react';
-import { Upload, X, Image as ImageIcon, Link as LinkIcon, Check } from 'lucide-react';
+import React, { useId, useRef, useState } from 'react';
+import { AlertCircle, Check, Link as LinkIcon, Upload, X } from 'lucide-react';
 
 interface ImageUploadProps {
   label?: string;
@@ -21,6 +21,7 @@ export function ImageUpload({
   accept = 'image/png, image/jpeg, image/webp, image/svg+xml',
 }: ImageUploadProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const inputId = useId();
   const [isDragging, setIsDragging] = useState(false);
   const [isUrlMode, setIsUrlMode] = useState(false);
   const [urlInput, setUrlInput] = useState(value);
@@ -89,7 +90,10 @@ export function ImageUpload({
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+        <label
+          htmlFor={inputId}
+          className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+        >
           {label}
         </label>
 
@@ -114,6 +118,7 @@ export function ImageUpload({
         <div className="space-y-2">
           <div className="flex gap-2">
             <input
+              id={inputId}
               type="url"
               value={urlInput}
               onChange={(e) => setUrlInput(e.target.value)}
@@ -136,8 +141,8 @@ export function ImageUpload({
         <div>
           {value ? (
             /* Uploaded Image Preview Box */
-            <div className="relative rounded-2xl border border-primary/40 bg-secondary p-4 flex items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
+            <div className="relative flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-primary/40 bg-secondary p-4">
+              <div className="flex min-w-0 items-center gap-3">
                 <div className="h-16 w-16 rounded-xl bg-foreground p-1 flex items-center justify-center overflow-hidden border border-border shrink-0 shadow-md">
                   <img
                     src={value}
@@ -147,16 +152,19 @@ export function ImageUpload({
                 </div>
 
                 <div className="space-y-0.5 min-w-0">
-                  <p className="text-xs font-bold text-foreground flex items-center gap-1.5">
-                    <span className="text-primary">✓</span> Custom QR Uploaded
+                  <p className="flex items-center gap-1.5 text-xs font-bold text-foreground">
+                    <Check className="h-3.5 w-3.5 shrink-0 text-primary" aria-hidden="true" />
+                    Custom QR Uploaded
                   </p>
                   <p className="text-[11px] text-muted-foreground">
-                    Image ready & active for customer table payments
+                    Image ready &amp; active for customer table payments
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
+              {/* On a phone the buttons take their own row: the coarse-pointer
+                  minimum makes them wide enough to crush the label otherwise. */}
+              <div className="flex w-full items-center justify-end gap-2 sm:w-auto">
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
@@ -175,45 +183,55 @@ export function ImageUpload({
               </div>
             </div>
           ) : (
-            /* Drag & Drop Upload Zone */
-            <div
+            /* Drag & Drop Upload Zone. A real button, because the file input
+               it opens is visually hidden — as a div this was unreachable by
+               keyboard, so there was no way to upload at all. */
+            <button
+              type="button"
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
               className={[
-                'cursor-pointer rounded-2xl border-2 border-dashed p-6 text-center transition-all duration-200 flex flex-col items-center justify-center space-y-2',
+                'flex w-full flex-col items-center justify-center space-y-2 rounded-2xl border-2 border-dashed p-6 text-center transition-colors',
                 isDragging
-                  ? 'border-primary bg-primary/10 scale-[1.01]'
+                  ? 'border-primary bg-primary/10'
                   : 'border-border bg-background/60 hover:border-primary/60 hover:bg-secondary/40',
               ].join(' ')}
             >
-              <div className="rounded-full bg-secondary p-3 text-primary border border-border shadow-inner">
-                <Upload className="h-5 w-5" />
-              </div>
+              <span className="rounded-full border border-border bg-secondary p-3 text-primary">
+                <Upload className="h-5 w-5" aria-hidden="true" />
+              </span>
 
-              <div className="space-y-1">
-                <p className="text-xs font-bold text-foreground">
-                  Click to upload or drag & drop QR Code photo
-                </p>
-                <p className="text-[11px] text-muted-foreground">{helperText}</p>
-              </div>
-            </div>
+              <span className="block space-y-1">
+                <span className="block text-xs font-bold text-foreground">
+                  Click to upload or drag &amp; drop QR Code photo
+                </span>
+                <span className="block text-[11px] text-muted-foreground">{helperText}</span>
+              </span>
+            </button>
           )}
 
+          {/* sr-only rather than hidden: a hidden input is out of the tab
+              order, which also detached it from the label above. */}
           <input
             ref={fileInputRef}
+            id={inputId}
             type="file"
             accept={accept}
             onChange={handleFileChange}
-            className="hidden"
+            className="sr-only"
           />
         </div>
       )}
 
       {error && (
-        <p className="text-xs font-semibold text-atlas-error animate-fadeIn">
-          ⚠️ {error}
+        <p
+          role="alert"
+          className="flex items-start gap-1.5 text-xs font-semibold text-atlas-error"
+        >
+          <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+          <span>{error}</span>
         </p>
       )}
     </div>

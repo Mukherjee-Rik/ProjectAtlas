@@ -226,14 +226,19 @@ body {
    Touch targets
    Pointer-coarse devices get a minimum hit area so controls sized for a mouse
    remain usable on phones and tablets.
+
+   `.allow-small-target` opts a control out. It matters most for a checkbox or
+   radio: min-height alone stretches the box vertically into a sliver, so a
+   square control whose 44px target is carried by its wrapping row needs the
+   escape hatch rather than the minimum.
 --------------------------------------------------------------------------- */
 @media (pointer: coarse) {
   button:not(.allow-small-target),
   [role='button']:not(.allow-small-target),
   a[role='button'],
   select,
-  input[type='checkbox'],
-  input[type='radio'] {
+  input[type='checkbox']:not(.allow-small-target),
+  input[type='radio']:not(.allow-small-target) {
     min-height: 44px;
   }
 
@@ -670,12 +675,16 @@ select:disabled,
   backdrop-filter: blur(10px) saturate(160%);
 }
 
-/* Mobile high-efficiency glass: disable heavy mask composites and use native blur */
+/* Mobile high-efficiency glass: disable heavy mask composites and use native
+   blur. The tint goes near-opaque here because the sheen and rim layers below
+   are switched off — without them a 0.55-0.65 pane is just a washed-out
+   rectangle with page content crawling under it. --lg-tint is the triple form
+   of this colour; --card is a hex and cannot go inside rgb(). */
 @media (max-width: 768px), (pointer: coarse) {
   .liquid-glass {
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
-    background-color: rgb(var(--card) / 0.88);
+    background-color: rgb(var(--lg-tint) / 0.88);
     transition: none;
   }
   .liquid-glass::before,

@@ -34,9 +34,9 @@ const STATUSES: { label: string; value: 'ALL' | OrderStatus }[] = [
 const STATUS_TONE: Record<OrderStatus, BadgeTone> = {
   PENDING: 'warning',
   CONFIRMED: 'info',
-  PREPARING: 'purple',
+  PREPARING: 'info',
   READY: 'success',
-  SERVED: 'mint',
+  SERVED: 'accent',
   COMPLETED: 'neutral',
   CANCELLED: 'error',
 };

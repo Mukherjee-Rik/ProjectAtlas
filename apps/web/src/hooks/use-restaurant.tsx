@@ -5,6 +5,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useState,
   type ReactNode,
 } from 'react';
@@ -14,6 +15,7 @@ import {
   setCurrentRestaurant as saveCurrentRestaurant,
   clearCurrentRestaurant,
 } from '@/lib/restaurant-storage';
+import { getCurrentTenantId } from '@/lib/tenant-storage';
 import { useTenant } from './use-tenant';
 import { apiClient } from '@/services/api-client';
 
@@ -33,21 +35,30 @@ const RestaurantContext = createContext<RestaurantContextValue | undefined>(
 
 export function RestaurantProvider({ children }: { children: ReactNode }) {
   const { currentTenant } = useTenant();
-  const [currentRestaurant, setCurrentRestaurantState] = useState<Restaurant | null>(null);
+
+  // Seeded from storage rather than in an effect, so a returning user's
+  // restaurant-scoped requests — branches, the subscription check, the page's
+  // own queries — all fire on the first render instead of waiting a commit for
+  // this to arrive. The tenant guard is applied here too: a stored restaurant
+  // belonging to another tenant is never adopted, even for one render.
+  const [currentRestaurant, setCurrentRestaurantState] = useState<Restaurant | null>(() => {
+    const stored = getCurrentRestaurant();
+    if (!stored) return null;
+    const tenantId = getCurrentTenantId();
+    return tenantId && stored.tenantId !== tenantId ? null : stored;
+  });
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [isLoadingRestaurants, setIsLoadingRestaurants] = useState(false);
 
+  // The seed above covers first render, so this only has to catch a tenant
+  // switch afterwards: holding on to the previous tenant's restaurant would
+  // leave it selected in the UI while the new tenant's list loads.
   useEffect(() => {
-    const stored = getCurrentRestaurant();
-    if (stored) {
-      if (currentTenant && stored.tenantId !== currentTenant.id) {
-        clearCurrentRestaurant();
-        setCurrentRestaurantState(null);
-      } else {
-        setCurrentRestaurantState(stored);
-      }
-    }
-  }, [currentTenant?.id]);
+    if (!currentTenant || !currentRestaurant) return;
+    if (currentRestaurant.tenantId === currentTenant.id) return;
+    clearCurrentRestaurant();
+    setCurrentRestaurantState(null);
+  }, [currentTenant?.id, currentRestaurant]);
 
   const clearRestaurant = useCallback(() => {
     setCurrentRestaurantState(null);
@@ -115,18 +126,31 @@ export function RestaurantProvider({ children }: { children: ReactNode }) {
     }
   }, [currentTenant?.id, reloadRestaurants, clearRestaurant]);
 
+  // Memoised because this provider wraps the whole app: without it every
+  // consumer, and every effect keyed on the context value, re-runs on any
+  // unrelated state change in a parent.
+  const value = useMemo<RestaurantContextValue>(
+    () => ({
+      restaurants,
+      currentRestaurant,
+      currentRestaurantId: currentRestaurant?.id ?? null,
+      isLoadingRestaurants,
+      setCurrentRestaurant,
+      clearRestaurant,
+      reloadRestaurants,
+    }),
+    [
+      restaurants,
+      currentRestaurant,
+      isLoadingRestaurants,
+      setCurrentRestaurant,
+      clearRestaurant,
+      reloadRestaurants,
+    ],
+  );
+
   return (
-    <RestaurantContext.Provider
-      value={{
-        restaurants,
-        currentRestaurant,
-        currentRestaurantId: currentRestaurant?.id ?? null,
-        isLoadingRestaurants,
-        setCurrentRestaurant,
-        clearRestaurant,
-        reloadRestaurants,
-      }}
-    >
+    <RestaurantContext.Provider value={value}>
       {children}
     </RestaurantContext.Provider>
   );

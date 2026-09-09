@@ -4,6 +4,7 @@ import React, {
   createContext,
   useCallback,
   useContext,
+  useMemo,
   useSyncExternalStore,
 } from 'react';
 
@@ -193,12 +194,15 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     [resolved, commit]
   );
 
+  // This provider wraps the entire tree, so the value has to be stable or
+  // every consumer re-renders whenever anything above it does.
+  const value = useMemo<ThemeContextValue>(
+    () => ({ preference, resolved, toggle, setPreference: commit }),
+    [preference, resolved, toggle, commit],
+  );
+
   return (
-    <ThemeContext.Provider
-      value={{ preference, resolved, toggle, setPreference: commit }}
-    >
-      {children}
-    </ThemeContext.Provider>
+    <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
   );
 }
 

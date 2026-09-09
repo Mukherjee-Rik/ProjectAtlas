@@ -7,7 +7,6 @@ import { BranchProvider } from "@/hooks/use-branch";
 import { QueryProvider } from "@/lib/query-client";
 import { ToastProvider } from "@/components/ui/toast";
 import { ThemeProvider, themeInitScript } from "@/hooks/use-theme";
-import { LiquidGlassDefs } from "@/components/ui/liquid-glass-defs";
 import { CookieConsentBanner } from "@/components/legal/CookieConsentBanner";
 import { JsonLd } from "@/components/seo/JsonLd";
 import "./globals.css";
@@ -145,9 +144,6 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
       <body className="min-h-full flex flex-col bg-background text-foreground font-sans selection:bg-primary selection:text-background">
-        {/* Filter library for .liquid-glass. Must exist in the document for
-            `backdrop-filter: url(#atlas-lens)` to resolve. */}
-        <LiquidGlassDefs />
         <ThemeProvider>
           <QueryProvider>
             <ToastProvider>

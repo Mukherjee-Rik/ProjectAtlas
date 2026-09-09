@@ -2,8 +2,10 @@
 
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
+  useMemo,
   useState,
   type ReactNode,
 } from 'react';
@@ -92,18 +94,21 @@ export function AuthProvider({
     };
   }, []);
 
-  function loginUser(token: string, authenticatedUser: AuthUser) {
-    clearCurrentTenant();
-    clearCurrentRestaurant();
-    clearCurrentBranch();
-    setAccessToken(token);
-    setStoredUser(authenticatedUser);
+  const loginUser = useCallback(
+    (token: string, authenticatedUser: AuthUser) => {
+      clearCurrentTenant();
+      clearCurrentRestaurant();
+      clearCurrentBranch();
+      setAccessToken(token);
+      setStoredUser(authenticatedUser);
 
-    setAccessTokenState(token);
-    setUser(authenticatedUser);
-  }
+      setAccessTokenState(token);
+      setUser(authenticatedUser);
+    },
+    [],
+  );
 
-  async function logout() {
+  const logout = useCallback(async () => {
     try {
       await apiClient.post('/auth/logout');
     } catch (err) {
@@ -115,22 +120,24 @@ export function AuthProvider({
     clearCurrentBranch();
     setAccessTokenState(null);
     setUser(null);
-  }
+  }, []);
 
-  return (
-    <AuthContext.Provider
-      value={{
-        user,
-        accessToken,
-        isAuthenticated: !!accessToken,
-        isLoading,
-        loginUser,
-        logout,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
+  // This is the outermost of the four providers, so an unmemoised value here
+  // re-rendered every screen in the app — and re-ran every effect keyed on
+  // `useAuth()` — on any state change anywhere above it.
+  const value = useMemo<AuthContextValue>(
+    () => ({
+      user,
+      accessToken,
+      isAuthenticated: !!accessToken,
+      isLoading,
+      loginUser,
+      logout,
+    }),
+    [user, accessToken, isLoading, loginUser, logout],
   );
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {
