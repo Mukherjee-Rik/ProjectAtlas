@@ -197,13 +197,13 @@ export default function ContactUsPage() {
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary border border-primary/20">
                     <Mail className="h-5 w-5" />
                   </div>
-                  <div className="space-y-1">
+                  <div className="min-w-0 space-y-1">
                     <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                       Email Inquiries & Desk
                     </p>
                     <a
                       href="mailto:restaurant.kafei@gmail.com"
-                      className="text-sm font-bold text-primary underline underline-offset-4 hover:text-primary-hover"
+                      className="text-sm font-bold text-primary underline underline-offset-4 break-all hover:text-primary-hover"
                     >
                       restaurant.kafei@gmail.com
                     </a>

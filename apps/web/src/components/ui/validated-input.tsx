@@ -66,7 +66,7 @@ export const ValidatedInput = React.forwardRef<HTMLInputElement, ValidatedInputP
                     ? 'text-atlas-error'
                     : currentLength === maxLength
                     ? 'text-atlas-warning'
-                    : 'text-muted-foreground/70'
+                    : 'text-subtle'
                 }`}
               >
                 {currentLength}/{maxLength}
@@ -85,7 +85,7 @@ export const ValidatedInput = React.forwardRef<HTMLInputElement, ValidatedInputP
             required={required}
             aria-invalid={Boolean(error)}
             aria-describedby={error ? errorId : helperText ? helperId : undefined}
-            className={`w-full rounded-lg border bg-secondary px-3.5 py-2 text-sm text-foreground placeholder-muted-foreground/50 transition-colors outline-none ${
+            className={`w-full rounded-lg border bg-secondary px-3.5 py-2 text-sm text-foreground placeholder:text-subtle transition-colors outline-none ${
               error
                 ? 'border-atlas-error focus:border-atlas-error focus:ring-1 focus:ring-atlas-error'
                 : 'border-border focus:border-primary focus:ring-1 focus:ring-primary'
@@ -97,13 +97,13 @@ export const ValidatedInput = React.forwardRef<HTMLInputElement, ValidatedInputP
         {error ? (
           <p
             id={errorId}
-            className="flex items-center gap-1.5 text-xs text-atlas-error animate-in fade-in slide-in-from-top-1 duration-150"
+            className="flex items-center gap-1.5 text-xs text-atlas-error"
           >
             <AlertCircle className="w-3.5 h-3.5 shrink-0" />
             <span>{error}</span>
           </p>
         ) : helperText ? (
-          <p id={helperId} className="text-xs text-muted-foreground/70">
+          <p id={helperId} className="text-xs text-subtle">
             {helperText}
           </p>
         ) : null}
@@ -145,6 +145,7 @@ export const ValidatedTextarea = React.forwardRef<HTMLTextAreaElement, Validated
     const generatedId = useId();
     const inputId = customId || generatedId;
     const errorId = `${inputId}-error`;
+    const helperId = `${inputId}-helper`;
 
     const currentLength = typeof value === 'string' ? value.length : 0;
     const shouldShowCount = showCount !== false && maxLength != null && maxLength > 0;
@@ -166,7 +167,7 @@ export const ValidatedTextarea = React.forwardRef<HTMLTextAreaElement, Validated
                     ? 'text-atlas-error'
                     : currentLength === maxLength
                     ? 'text-atlas-warning'
-                    : 'text-muted-foreground/70'
+                    : 'text-subtle'
                 }`}
               >
                 {currentLength}/{maxLength}
@@ -182,7 +183,8 @@ export const ValidatedTextarea = React.forwardRef<HTMLTextAreaElement, Validated
           maxLength={maxLength}
           required={required}
           aria-invalid={Boolean(error)}
-          className={`w-full rounded-lg border bg-secondary px-3.5 py-2 text-sm text-foreground placeholder-muted-foreground/50 transition-colors outline-none resize-y min-h-[80px] ${
+          aria-describedby={error ? errorId : helperText ? helperId : undefined}
+          className={`w-full rounded-lg border bg-secondary px-3.5 py-2 text-sm text-foreground placeholder:text-subtle transition-colors outline-none resize-y min-h-[80px] ${
             error
               ? 'border-atlas-error focus:border-atlas-error focus:ring-1 focus:ring-atlas-error'
               : 'border-border focus:border-primary focus:ring-1 focus:ring-primary'
@@ -193,13 +195,15 @@ export const ValidatedTextarea = React.forwardRef<HTMLTextAreaElement, Validated
         {error ? (
           <p
             id={errorId}
-            className="flex items-center gap-1.5 text-xs text-atlas-error animate-in fade-in slide-in-from-top-1 duration-150"
+            className="flex items-center gap-1.5 text-xs text-atlas-error"
           >
             <AlertCircle className="w-3.5 h-3.5 shrink-0" />
             <span>{error}</span>
           </p>
         ) : helperText ? (
-          <p className="text-xs text-muted-foreground/70">{helperText}</p>
+          <p id={helperId} className="text-xs text-subtle">
+            {helperText}
+          </p>
         ) : null}
       </div>
     );
@@ -237,6 +241,7 @@ export const ValidatedSelect = React.forwardRef<HTMLSelectElement, ValidatedSele
     const generatedId = useId();
     const inputId = customId || generatedId;
     const errorId = `${inputId}-error`;
+    const helperId = `${inputId}-helper`;
 
     return (
       <div className={`space-y-1.5 ${containerClassName}`}>
@@ -254,6 +259,7 @@ export const ValidatedSelect = React.forwardRef<HTMLSelectElement, ValidatedSele
           id={inputId}
           required={required}
           aria-invalid={Boolean(error)}
+          aria-describedby={error ? errorId : helperText ? helperId : undefined}
           className={`w-full rounded-lg border bg-secondary px-3.5 py-2 text-sm text-foreground transition-colors outline-none ${
             error
               ? 'border-atlas-error focus:border-atlas-error focus:ring-1 focus:ring-atlas-error'
@@ -267,13 +273,15 @@ export const ValidatedSelect = React.forwardRef<HTMLSelectElement, ValidatedSele
         {error ? (
           <p
             id={errorId}
-            className="flex items-center gap-1.5 text-xs text-atlas-error animate-in fade-in slide-in-from-top-1 duration-150"
+            className="flex items-center gap-1.5 text-xs text-atlas-error"
           >
             <AlertCircle className="w-3.5 h-3.5 shrink-0" />
             <span>{error}</span>
           </p>
         ) : helperText ? (
-          <p className="text-xs text-muted-foreground/70">{helperText}</p>
+          <p id={helperId} className="text-xs text-subtle">
+            {helperText}
+          </p>
         ) : null}
       </div>
     );

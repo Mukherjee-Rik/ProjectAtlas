@@ -105,8 +105,16 @@ export function Pagination({
         )}
       </div>
 
-      {/* Pagination Controls */}
-      <div className="flex items-center gap-1">
+      {/*
+        Pagination Controls
+
+        On a phone this row is Prev, a page counter and Next, and nothing else.
+        The coarse-pointer rule in globals.css gives every button a 44px
+        minimum, so the full set — First, Prev, seven numbers, Next, Last —
+        is over 500px of un-shrinkable content and used to push every
+        paginated screen into sideways scroll.
+      */}
+      <div className="flex flex-wrap items-center justify-center gap-1">
         {/* First Page button */}
         {!compact && totalPages > 5 && (
           <button
@@ -114,7 +122,7 @@ export function Pagination({
             onClick={() => onPageChange(1)}
             disabled={currentPage === 1}
             aria-label="First page"
-            className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-secondary text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
+            className="hidden h-8 w-8 items-center justify-center rounded-lg border border-border bg-secondary text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground disabled:opacity-30 disabled:pointer-events-none cursor-pointer sm:flex"
           >
             <ChevronsLeft className="h-3.5 w-3.5" />
           </button>
@@ -129,11 +137,20 @@ export function Pagination({
           className="flex h-8 items-center justify-center gap-1 rounded-lg border border-border bg-secondary px-2.5 text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
         >
           <ChevronLeft className="h-3.5 w-3.5" />
-          <span className="hidden xs:inline text-xs font-semibold">Prev</span>
+          <span className="hidden sm:inline text-xs font-semibold">Prev</span>
         </button>
 
+        {/* Phone stand-in for the numbered buttons. The range text above
+            already announces the position, so this is visual only. */}
+        <span
+          aria-hidden="true"
+          className="px-2 text-xs font-semibold text-foreground sm:hidden"
+        >
+          {currentPage} / {totalPages}
+        </span>
+
         {/* Numbered Page Buttons */}
-        <div className="flex items-center gap-1 mx-0.5">
+        <div className="mx-0.5 hidden items-center gap-1 sm:flex">
           {pageNumbers.map((page, idx) => {
             if (page === '...') {
               return (
@@ -153,9 +170,9 @@ export function Pagination({
                 type="button"
                 onClick={() => onPageChange(page)}
                 aria-current={isActive ? 'page' : undefined}
-                className={`flex h-8 min-w-[32px] px-2 items-center justify-center rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                className={`flex h-8 min-w-[32px] px-2 items-center justify-center rounded-lg text-xs font-bold transition-colors cursor-pointer ${
                   isActive
-                    ? 'bg-primary text-background shadow-xs font-black scale-105'
+                    ? 'bg-primary text-background'
                     : 'border border-border bg-secondary text-muted-foreground hover:border-primary/50 hover:text-foreground'
                 }`}
               >
@@ -173,7 +190,7 @@ export function Pagination({
           aria-label="Next page"
           className="flex h-8 items-center justify-center gap-1 rounded-lg border border-border bg-secondary px-2.5 text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
         >
-          <span className="hidden xs:inline text-xs font-semibold">Next</span>
+          <span className="hidden sm:inline text-xs font-semibold">Next</span>
           <ChevronRight className="h-3.5 w-3.5" />
         </button>
 
@@ -184,7 +201,7 @@ export function Pagination({
             onClick={() => onPageChange(totalPages)}
             disabled={currentPage === totalPages}
             aria-label="Last page"
-            className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-secondary text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
+            className="hidden h-8 w-8 items-center justify-center rounded-lg border border-border bg-secondary text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground disabled:opacity-30 disabled:pointer-events-none cursor-pointer sm:flex"
           >
             <ChevronsRight className="h-3.5 w-3.5" />
           </button>

@@ -5,6 +5,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useState,
   type ReactNode,
 } from 'react';
@@ -33,17 +34,16 @@ const TenantContext = createContext<TenantContextValue | undefined>(undefined);
 
 export function TenantProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
-  const [currentTenant, setCurrentTenantState] = useState<Tenant | null>(null);
+  // Read straight out of storage rather than in an effect after first paint.
+  // Everything downstream — the restaurant list, the branch list, the
+  // subscription check — is gated on a tenant being known, so setting it a
+  // commit later turned the whole boot into a chain of one request per round
+  // trip. Seeded here, those calls all leave in the same tick.
+  const [currentTenant, setCurrentTenantState] = useState<Tenant | null>(() =>
+    getCurrentTenant(),
+  );
   const [memberships, setMemberships] = useState<TenantMembership[]>([]);
   const [isLoadingMemberships, setIsLoadingMemberships] = useState(false);
-
-  // Initialize from localStorage
-  useEffect(() => {
-    const stored = getCurrentTenant();
-    if (stored) {
-      setCurrentTenantState(stored);
-    }
-  }, []);
 
   const clearTenant = useCallback(() => {
     setCurrentTenantState(null);
@@ -127,20 +127,31 @@ export function TenantProvider({ children }: { children: ReactNode }) {
     });
   }, [clearTenant]);
 
+  // Memoised because this provider sits above the whole app: a fresh object
+  // here re-renders every consumer, and every effect keyed on the context
+  // value, on any unrelated state change.
+  const value = useMemo<TenantContextValue>(
+    () => ({
+      currentTenant,
+      currentTenantId: currentTenant?.id ?? null,
+      memberships,
+      isLoadingMemberships,
+      setCurrentTenant,
+      clearTenant,
+      reloadMemberships,
+    }),
+    [
+      currentTenant,
+      memberships,
+      isLoadingMemberships,
+      setCurrentTenant,
+      clearTenant,
+      reloadMemberships,
+    ],
+  );
+
   return (
-    <TenantContext.Provider
-      value={{
-        currentTenant,
-        currentTenantId: currentTenant?.id ?? null,
-        memberships,
-        isLoadingMemberships,
-        setCurrentTenant,
-        clearTenant,
-        reloadMemberships,
-      }}
-    >
-      {children}
-    </TenantContext.Provider>
+    <TenantContext.Provider value={value}>{children}</TenantContext.Provider>
   );
 }
 

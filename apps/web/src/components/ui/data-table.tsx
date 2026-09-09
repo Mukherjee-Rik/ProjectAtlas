@@ -102,17 +102,23 @@ export function DataTable<T>({
   const mobileColumns = columns.filter((c) => !c.hideOnMobile);
   const primaryColumn = columns.find((c) => c.primary);
 
+  // Both layouts stay mounted, so `renderExpanded` — arbitrary caller work —
+  // was being run three times per row. Run it once and share the result.
+  const renderedRows = visibleRows.map((row) => ({
+    row,
+    key: rowKey(row),
+    expanded: renderExpanded?.(row),
+  }));
+
   return (
     <div className="space-y-4">
       {/* ---------------- Mobile / small tablet: card list ---------------- */}
       <ul className="flex flex-col gap-3 md:hidden">
-        {visibleRows.map((row) => {
-          const expanded = renderExpanded?.(row);
-
+        {renderedRows.map(({ row, key, expanded }) => {
           return (
             <li
-              key={rowKey(row)}
-              className="rounded-xl border border-border bg-card shadow-lg"
+              key={key}
+              className="rounded-xl border border-border bg-card shadow-sm"
             >
               <div
                 // Deliberately not role="button": these cards contain their
@@ -133,7 +139,7 @@ export function DataTable<T>({
                           e.stopPropagation();
                           onRowClick(row);
                         }}
-                        aria-expanded={Boolean(renderExpanded?.(row))}
+                        aria-expanded={Boolean(expanded)}
                         className="shrink-0 rounded-lg border border-border px-2 py-1 text-xs text-muted-foreground transition-colors hover:border-primary hover:text-primary"
                       >
                         Details
@@ -195,11 +201,9 @@ export function DataTable<T>({
           </thead>
 
           <tbody className="divide-y divide-border">
-            {visibleRows.map((row) => {
-              const expanded = renderExpanded?.(row);
-
+            {renderedRows.map(({ row, key, expanded }) => {
               return (
-                <Fragment key={rowKey(row)}>
+                <Fragment key={key}>
                   <tr
                     // Pointer affordance only — the row contains its own
                     // buttons, so it must not itself be a focusable control.

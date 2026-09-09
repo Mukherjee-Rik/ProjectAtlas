@@ -165,7 +165,7 @@ export default function ForgotPasswordPage() {
     'w-full rounded-xl border bg-input/70 px-4 py-2.5 text-[15px] text-foreground placeholder:text-subtle outline-none transition-[color,background-color,border-color,box-shadow] focus:bg-input focus:ring-2 border-border focus:border-primary focus:ring-primary/30';
 
   return (
-    <main className="min-h-screen bg-background text-foreground flex flex-col justify-center items-center px-4 py-12">
+    <main className="relative min-h-screen min-h-[100dvh] overflow-hidden bg-background text-foreground flex flex-col justify-center items-center px-4 py-12">
       {/* Background glow */}
       <div
         aria-hidden="true"

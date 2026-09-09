@@ -31,33 +31,34 @@ interface ToastContextValue {
 
 const ToastContext = createContext<ToastContextValue | undefined>(undefined);
 
+/**
+ * The variant is carried by the icon and by a coloured left edge. It used to
+ * also set a background tint on the same element as `bg-card`, where only one
+ * of the two could win depending on stylesheet order.
+ */
 const VARIANT_STYLES: Record<
   ToastVariant,
-  { icon: typeof Info; border: string; text: string; bg: string }
+  { icon: typeof Info; border: string; text: string }
 > = {
   success: {
     icon: CheckCircle2,
-    border: 'border-atlas-success/40',
+    border: 'border-l-atlas-success',
     text: 'text-atlas-success',
-    bg: 'bg-atlas-success/10',
   },
   error: {
     icon: XCircle,
-    border: 'border-atlas-error/40',
+    border: 'border-l-atlas-error',
     text: 'text-atlas-error',
-    bg: 'bg-atlas-error/10',
   },
   warning: {
     icon: AlertTriangle,
-    border: 'border-atlas-warning/40',
+    border: 'border-l-atlas-warning',
     text: 'text-atlas-warning',
-    bg: 'bg-atlas-warning/10',
   },
   info: {
     icon: Info,
-    border: 'border-atlas-info/40',
+    border: 'border-l-atlas-info',
     text: 'text-atlas-info',
-    bg: 'bg-atlas-info/10',
   },
 };
 
@@ -96,7 +97,9 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       <div
         aria-live="polite"
         aria-atomic="false"
-        className="pointer-events-none fixed inset-x-0 bottom-0 z-[100] flex flex-col items-center gap-2 p-4 sm:inset-x-auto sm:right-0 sm:top-0 sm:bottom-auto sm:items-end"
+        // The bottom pad clears the iOS home indicator, where a dismiss
+        // button otherwise lands in the system gesture strip.
+        className="pointer-events-none fixed inset-x-0 bottom-0 z-[100] flex flex-col items-center gap-2 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:inset-x-auto sm:right-0 sm:top-0 sm:bottom-auto sm:items-end sm:pb-4"
       >
         {toasts.map((t) => (
           <ToastItem key={t.id} toast={t} onDismiss={dismiss} />
@@ -124,7 +127,7 @@ function ToastItem({
   return (
     <div
       role={toast.variant === 'error' ? 'alert' : 'status'}
-      className={`pointer-events-auto flex w-full max-w-sm items-start gap-3 rounded-xl border ${styles.border} ${styles.bg} bg-card p-3.5 backdrop-blur-md`}
+      className={`pointer-events-auto flex w-full max-w-sm items-start gap-3 rounded-xl border border-l-4 border-border bg-card p-3.5 shadow-lg ${styles.border}`}
     >
       <Icon className={`mt-0.5 h-5 w-5 shrink-0 ${styles.text}`} aria-hidden="true" />
       <p className="flex-1 text-sm text-foreground">{toast.message}</p>
