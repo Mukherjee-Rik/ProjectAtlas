@@ -12,6 +12,11 @@ const browserPath = fs.existsSync(chromePath) ? chromePath : edgePath;
 
 const docsToGenerate = [
   {
+    input: path.join(rootDir, 'docs', 'sweta-restaurant-complete-master-manual.html'),
+    output: path.join(rootDir, 'docs', 'Kafei_Master_Operations_Manual_Sweta_Restaurant.pdf'),
+    title: 'Kafei 2.0 Master Operations Manual — Sweta Restaurant Edition (30+ Pages)',
+  },
+  {
     input: path.join(rootDir, 'docs', 'kafei-product-brochure.html'),
     output: path.join(rootDir, 'docs', 'Kafei_Restaurant_Billing_System_Brochure.pdf'),
     title: 'Kafei Restaurant Billing System Commercial Client Brochure',

@@ -2,19 +2,22 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import {
   ShieldAlert,
   Trash2,
   ExternalLink,
-  Mail,
   CheckCircle2,
-  Clock,
   Lock,
   ArrowRight,
-  Sparkles,
 } from 'lucide-react';
-import { ThemeToggle } from '@/components/ui/theme-toggle';
+import { PublicFooter, PublicHeader } from '@/components/legal/LegalPageShell';
+import { LEGAL_ENTITY } from '@/lib/legal-docs-data';
+
+const USER_TYPES = [
+  { id: 'diner', label: 'Restaurant Guest / Diner' },
+  { id: 'staff', label: 'Staff / Waiter / Chef' },
+  { id: 'owner', label: 'Restaurant Owner / Admin' },
+];
 
 export default function DataDeletionPage() {
   const [name, setName] = useState('');
@@ -24,54 +27,75 @@ export default function DataDeletionPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [ticketId, setTicketId] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // A statutory erasure request is the one form on the site that must not
+  // pretend: the confirmation and its reference only appear once the request
+  // has actually been accepted, and a failure sends the visitor to the DPO
+  // mailbox rather than leaving them holding an invented ticket number.
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
-    // Simulate instantaneous receipt & ticket dispatch
-    setTimeout(() => {
-      const randomTicket = `DEL-${Math.floor(100000 + Math.random() * 900000)}`;
-      setTicketId(randomTicket);
+    setError(null);
+
+    const payload = {
+      name,
+      email,
+      phone: '',
+      restaurantName: '',
+      inquiryType: 'DATA_DELETION',
+      subject: `Data deletion request (${
+        USER_TYPES.find((t) => t.id === userType)?.label ?? userType
+      })`,
+      message: details || 'No additional details supplied.',
+    };
+
+    try {
+      let res = await fetch('/api/proxy/support/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        res = await fetch('/api/v1/support/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+      }
+
+      const data = await res.json().catch(() => ({}));
+
+      if (res.ok && data?.referenceCode) {
+        setTicketId(data.referenceCode);
+        setSubmitted(true);
+      } else if (res.ok) {
+        setTicketId('');
+        setSubmitted(true);
+      } else {
+        setError(
+          `We could not lodge your request automatically. Email ${LEGAL_ENTITY.privacyEmail} with the same details and our Data Protection Officer will process it.`,
+        );
+      }
+    } catch {
+      setError(
+        `We could not reach our servers. Email ${LEGAL_ENTITY.privacyEmail} with the same details and our Data Protection Officer will process it.`,
+      );
+    } finally {
       setSubmitting(false);
-      setSubmitted(true);
-    }, 600);
+    }
   };
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col justify-between">
-      {/* ── Top Navigation Bar ────────────────────────────────────────── */}
-      <header className="border-b border-border/80 bg-background/80 backdrop-blur-md sticky top-0 z-40">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
-          <Link href="/" className="flex items-center gap-2.5">
-            <Image
-              src="/logo.png"
-              alt="Kafei"
-              width={32}
-              height={32}
-              className="h-8 w-auto rounded-md object-contain"
-            />
-            <span className="font-display text-lg font-bold tracking-tight text-foreground">
-              Kafei
-            </span>
-          </Link>
-
-          <div className="flex items-center gap-3">
-            <Link
-              href="/privacy"
-              className="text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors hidden sm:inline-block"
-            >
-              Privacy Policy
-            </Link>
-            <Link
-              href="/legal"
-              className="text-xs font-semibold text-primary hover:underline"
-            >
-              Legal Hub →
-            </Link>
-            <ThemeToggle />
-          </div>
-        </div>
-      </header>
+      <PublicHeader
+        label="Data deletion"
+        links={[
+          { href: '/privacy', label: 'Privacy Policy' },
+          { href: '/legal', label: 'Legal Hub' },
+        ]}
+      />
 
       {/* ── Main Content Area ────────────────────────────────────────── */}
       <main className="mx-auto max-w-4xl px-6 py-12 flex-1 space-y-12">
@@ -94,7 +118,7 @@ export default function DataDeletionPage() {
           {/* Option 1: Google OAuth Permissions Revocation */}
           <div className="rounded-2xl border border-border bg-card p-6 space-y-4 shadow-sm flex flex-col justify-between">
             <div className="space-y-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/10 text-blue-500 border border-blue-500/20">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-secondary">
                 <svg className="h-5 w-5" viewBox="0 0 24 24">
                   <path
                     fill="#4285F4"
@@ -177,12 +201,18 @@ export default function DataDeletionPage() {
                 <h3 className="text-base font-bold text-foreground">
                   Data Erasure Request Submitted
                 </h3>
-                <p className="text-xs text-muted-foreground">
-                  Your reference ticket is <strong className="text-primary font-mono">{ticketId}</strong>.
-                </p>
+                {ticketId && (
+                  <p className="text-xs text-muted-foreground">
+                    Your reference ticket is{' '}
+                    <strong className="text-primary font-mono break-all">{ticketId}</strong>.
+                  </p>
+                )}
               </div>
               <p className="text-xs text-muted-foreground max-w-md mx-auto leading-relaxed">
-                A confirmation has been logged for <strong className="text-foreground">{email}</strong>. Our security team will purge all matching identifiers and send a formal Certificate of Destruction within 30 days as required by law.
+                A confirmation has been logged for{' '}
+                <strong className="text-foreground break-all">{email}</strong>. Our security team
+                will purge all matching identifiers and send a formal Certificate of Destruction
+                within 30 days as required by law.
               </p>
               <button
                 type="button"
@@ -194,6 +224,21 @@ export default function DataDeletionPage() {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
+              {error && (
+                <div
+                  role="alert"
+                  className="rounded-xl border border-atlas-error/40 bg-atlas-error/10 p-3 text-xs leading-relaxed text-foreground"
+                >
+                  {error}{' '}
+                  <a
+                    href={`mailto:${LEGAL_ENTITY.privacyEmail}?subject=${encodeURIComponent('Data deletion request')}`}
+                    className="font-semibold text-primary underline underline-offset-2 break-all"
+                  >
+                    Email the DPO
+                  </a>
+                </div>
+              )}
+
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-1.5">
                   <label htmlFor="req-name" className="text-xs font-semibold text-foreground">
@@ -230,17 +275,16 @@ export default function DataDeletionPage() {
                 <label className="text-xs font-semibold text-foreground">
                   Your Relationship with Kafei
                 </label>
-                <div className="grid grid-cols-3 gap-2.5">
-                  {[
-                    { id: 'diner', label: 'Restaurant Guest / Diner' },
-                    { id: 'staff', label: 'Staff / Waiter / Chef' },
-                    { id: 'owner', label: 'Restaurant Owner / Admin' },
-                  ].map((opt) => (
+                {/* Three labels this long cannot share a 320px row; below sm the
+                    picker reads as a list instead of three ragged columns. */}
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-3 sm:gap-2.5">
+                  {USER_TYPES.map((opt) => (
                     <button
                       key={opt.id}
                       type="button"
+                      aria-pressed={userType === opt.id}
                       onClick={() => setUserType(opt.id)}
-                      className={`rounded-xl border p-2.5 text-xs font-medium transition-all text-center cursor-pointer ${
+                      className={`min-h-11 rounded-xl border p-2.5 text-xs font-medium transition-all text-left cursor-pointer sm:text-center ${
                         userType === opt.id
                           ? 'border-primary bg-primary/10 text-primary font-bold'
                           : 'border-border bg-secondary/40 text-muted-foreground hover:bg-secondary'
@@ -269,7 +313,7 @@ export default function DataDeletionPage() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full flex items-center justify-center gap-2 rounded-xl bg-primary py-3 text-xs font-bold text-background shadow-md hover:bg-primary-hover active:scale-[0.99] transition-all disabled:opacity-50 cursor-pointer"
+                className="w-full flex items-center justify-center gap-2 rounded-xl bg-primary py-3 text-xs font-bold text-primary-foreground shadow-md hover:bg-primary-hover active:scale-[0.99] transition-all disabled:opacity-50 cursor-pointer"
               >
                 {submitting ? 'Submitting Erasure Ticket...' : 'Submit Permanent Data Deletion Request'}
               </button>
@@ -295,24 +339,18 @@ export default function DataDeletionPage() {
             </li>
           </ul>
 
-          <div className="pt-3 border-t border-border/60 flex flex-wrap items-center justify-between gap-3 text-[11px]">
-            <span>Direct DPO Contact: <strong className="text-foreground">restaurant.kafei@gmail.com</strong></span>
-            <span>Hotline: <strong className="text-foreground">+91 9903085026</strong></span>
-            <span>Entity: <strong className="text-foreground">Kafei</strong></span>
+          <div className="pt-3 border-t border-border/60 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 text-[11px]">
+            <span className="min-w-0">
+              Direct DPO Contact:{' '}
+              <strong className="text-foreground break-all">{LEGAL_ENTITY.privacyEmail}</strong>
+            </span>
+            <span>Hotline: <strong className="text-foreground">{LEGAL_ENTITY.phone}</strong></span>
+            <span>Entity: <strong className="text-foreground">{LEGAL_ENTITY.name}</strong></span>
           </div>
         </div>
       </main>
 
-      {/* ── Footer ─────────────────────────────────────────────────── */}
-      <footer className="border-t border-border bg-background px-6 py-8 text-center text-xs text-muted-foreground space-y-2">
-        <p>© {new Date().getFullYear()} Kafei. Kafei — All rights reserved (Copyright Claim from 03-09-2026).</p>
-        <div className="flex justify-center gap-4 text-xs">
-          <Link href="/privacy" className="hover:text-foreground">Privacy Policy</Link>
-          <Link href="/terms" className="hover:text-foreground">Terms of Service</Link>
-          <Link href="/cookies" className="hover:text-foreground">Cookie Policy</Link>
-          <Link href="/security" className="hover:text-foreground">Security</Link>
-        </div>
-      </footer>
+      <PublicFooter />
     </div>
   );
 }

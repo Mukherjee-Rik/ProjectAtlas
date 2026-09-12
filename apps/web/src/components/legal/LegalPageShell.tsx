@@ -22,9 +22,17 @@ export { LEGAL_DOCS, type LegalNavDoc };
  * Typography for the policy body. The pages are plain semantic HTML, so all
  * rhythm lives here — that way every document reads identically and a page
  * author never hand-rolls a className on a <ul> again.
+ *
+ * The reading measure is applied to the top-level text elements rather than to
+ * the container: a paragraph needs to stop at ~68 characters, but the tables,
+ * callout grids and controller rows a policy drops in between them are content
+ * that wants the whole card — clamping the container made the sub-processor
+ * table scroll sideways inside a 520px box on a 1920px display.
  */
 const PROSE = [
-  'max-w-[68ch] text-[13.5px] sm:text-sm leading-[1.75] text-muted-foreground',
+  'text-[13.5px] sm:text-sm leading-[1.75] text-muted-foreground',
+  '[&>p]:max-w-[68ch] [&>ul]:max-w-[68ch] [&>ol]:max-w-[68ch]',
+  '[&>h2]:max-w-[68ch] [&>h3]:max-w-[68ch] [&>blockquote]:max-w-[68ch]',
   '[&>*+*]:mt-4',
   '[&_h2]:mt-10 [&_h2]:mb-3 [&_h2]:text-[17px] [&_h2]:font-bold [&_h2]:tracking-tight [&_h2]:text-foreground',
   '[&_h2]:border-b [&_h2]:border-border [&_h2]:pb-2 [&_h2]:scroll-mt-24',
@@ -39,6 +47,86 @@ const PROSE = [
   '[&_blockquote]:border-l-2 [&_blockquote]:border-primary [&_blockquote]:bg-secondary/50',
   '[&_blockquote]:rounded-r-lg [&_blockquote]:px-4 [&_blockquote]:py-3 [&_blockquote]:text-foreground',
 ].join(' ');
+
+export interface PublicHeaderLink {
+  href: string;
+  label: string;
+  /** Marks the route the visitor is already on. */
+  current?: boolean;
+}
+
+/**
+ * The one header every public route wears.
+ *
+ * Each of the public pages used to hand-roll its own bar, which is how the site
+ * ended up with five different heights, paddings and logo sizes — and with rows
+ * that overflowed a 320px viewport, because `pointer: coarse` widens the theme
+ * toggle to 44px and nothing was allowed to shrink. Secondary links are gated at
+ * `sm` for that reason: below it, only the wordmark, one action and the toggle
+ * are guaranteed to fit.
+ */
+export function PublicHeader({
+  label,
+  links = [],
+  action,
+}: {
+  label?: string;
+  links?: PublicHeaderLink[];
+  /** Replaces the default "Sign in" pill, e.g. with a dashboard link. */
+  action?: React.ReactNode;
+}) {
+  return (
+    <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur-md print:hidden">
+      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
+        <Link href="/" className="flex min-w-0 items-center gap-2.5">
+          <Image
+            src="/logo.png"
+            alt=""
+            width={28}
+            height={28}
+            className="h-6 w-auto shrink-0 rounded-md object-contain"
+          />
+          <span className="shrink-0 font-display text-[15px] font-extrabold tracking-tight text-foreground">
+            Kafei
+          </span>
+          {label && (
+            <span className="hidden truncate text-[13px] text-muted-foreground sm:inline">
+              {label}
+            </span>
+          )}
+        </Link>
+
+        <nav className="flex shrink-0 items-center gap-1 text-[13px]">
+          {links.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              aria-current={link.current ? 'page' : undefined}
+              className={`hidden rounded-lg px-2.5 py-1.5 font-medium transition-colors sm:inline-block ${
+                link.current
+                  ? 'text-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              {link.label}
+            </Link>
+          ))}
+          {action ?? (
+            <Link
+              href="/login"
+              className="ml-1 rounded-lg border border-border bg-card px-3 py-1.5 font-semibold text-foreground transition-colors hover:border-primary/50"
+            >
+              Sign in
+            </Link>
+          )}
+          <span className="ml-1">
+            <ThemeToggle />
+          </span>
+        </nav>
+      </div>
+    </header>
+  );
+}
 
 interface LegalPageShellProps {
   title: string;
@@ -97,50 +185,13 @@ export function LegalPageShell({
 
   return (
     <div className="min-h-screen bg-background text-foreground antialiased selection:bg-primary/20 selection:text-primary">
-      {/* ── Header ────────────────────────────────────────────────────── */}
-      <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur-md print:hidden">
-        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-          <Link href="/" className="group flex items-center gap-2.5">
-            <Image
-              src="/logo.png"
-              alt=""
-              width={28}
-              height={28}
-              className="h-6 w-auto rounded-md object-contain"
-            />
-            <span className="font-display text-[15px] font-extrabold tracking-tight text-foreground">
-              Kafei
-            </span>
-            <span className="hidden text-[13px] text-muted-foreground sm:inline">
-              Legal
-            </span>
-          </Link>
-
-          <nav className="flex items-center gap-1 text-[13px]">
-            <Link
-              href="/legal"
-              className="rounded-lg px-2.5 py-1.5 font-medium text-muted-foreground transition-colors hover:text-foreground"
-            >
-              All policies
-            </Link>
-            <Link
-              href="/contact"
-              className="hidden rounded-lg px-2.5 py-1.5 font-medium text-muted-foreground transition-colors hover:text-foreground sm:inline-block"
-            >
-              Contact
-            </Link>
-            <Link
-              href="/login"
-              className="ml-1 rounded-lg border border-border bg-card px-3 py-1.5 font-semibold text-foreground transition-colors hover:border-primary/50"
-            >
-              Sign in
-            </Link>
-            <span className="ml-1">
-              <ThemeToggle />
-            </span>
-          </nav>
-        </div>
-      </header>
+      <PublicHeader
+        label="Legal"
+        links={[
+          { href: '/legal', label: 'All policies' },
+          { href: '/contact', label: 'Contact' },
+        ]}
+      />
 
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
         {/* ── Breadcrumb ──────────────────────────────────────────────── */}
@@ -290,7 +341,10 @@ export function LegalPageShell({
   );
 }
 
-/** Shared across every legal route so no policy page is a dead end. */
+/**
+ * Shared across every public route so no page is a dead end — /docs and
+ * /sitemap previously shipped no footer at all.
+ */
 export function LegalFooter() {
   const columns: Array<[string, LegalNavDoc[]]> = [
     ['Terms', LEGAL_DOCS.filter((d) => d.group === 'terms')],
@@ -367,7 +421,7 @@ export function LegalFooter() {
               <li>
                 <a
                   href={`mailto:${LEGAL_ENTITY.legalEmail}`}
-                  className="text-muted-foreground transition-colors hover:text-foreground"
+                  className="text-muted-foreground transition-colors break-all hover:text-foreground"
                 >
                   {LEGAL_ENTITY.legalEmail}
                 </a>
@@ -380,7 +434,7 @@ export function LegalFooter() {
           <span>
             © {new Date().getFullYear()} {LEGAL_ENTITY.name}. All rights reserved (Copyright Claim from 03-09-2026).
           </span>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
             <Link href="/data-deletion" className="hover:text-foreground transition-colors">Data Deletion</Link>
             <Link href="/" className="transition-colors hover:text-foreground">
               ← Back to {LEGAL_ENTITY.domain}
@@ -391,3 +445,9 @@ export function LegalFooter() {
     </footer>
   );
 }
+
+/**
+ * Alias so a non-legal public page (docs, support, sitemap) can adopt the same
+ * footer without the import reading as if the page were a policy document.
+ */
+export const PublicFooter = LegalFooter;

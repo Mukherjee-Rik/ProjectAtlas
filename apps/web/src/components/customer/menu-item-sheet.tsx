@@ -1,19 +1,14 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { Check, Minus, Plus, X } from 'lucide-react';
 import type { PublicCustomerMenuItemDetail } from '@/types/menu';
 import { getPublicCustomerMenuItem } from '@/services/public-tables.service';
 import { useCart } from '@/hooks/use-cart';
 import { formatCurrency } from '@/lib/currency';
+import { DietaryMark } from '@/components/customer/dietary-mark';
 
 const MAX_QUANTITY = 99;
-
-const DIETARY_COLOR: Record<string, string> = {
-  VEG: '#22C55E',
-  VEGAN: '#22C55E',
-  EGG: '#EAB308',
-  NON_VEG: '#EF4444',
-};
 
 export function MenuItemSheet({
   token,
@@ -27,6 +22,15 @@ export function MenuItemSheet({
   onAdded: () => void;
 }) {
   const { addItem, error, clearError } = useCart();
+
+  const titleId = useId();
+  const panelRef = useRef<HTMLDivElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
+  // Read through a ref so the modal effect below can run once on open. Bound
+  // directly it would re-run on every cart tap — the menu re-renders then, and
+  // a fresh `onClose` closure would yank focus back to the close button.
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
 
   const [detail, setDetail] = useState<PublicCustomerMenuItemDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -62,6 +66,48 @@ export function MenuItemSheet({
       cancelled = true;
     };
   }, [token, itemId, clearError]);
+
+  // The sheet is a modal, so it behaves like one: Escape closes it, the menu
+  // behind it stops scrolling, Tab stays inside, and focus starts on the close
+  // button rather than wherever the diner happened to be on the page.
+  useEffect(() => {
+    closeRef.current?.focus();
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onCloseRef.current();
+        return;
+      }
+
+      if (e.key !== 'Tab') return;
+
+      const focusable = panelRef.current?.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+      );
+      if (!focusable || focusable.length === 0) return;
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const active = document.activeElement;
+
+      if (e.shiftKey && (active === first || !panelRef.current?.contains(active))) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && (active === last || !panelRef.current?.contains(active))) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    document.addEventListener('keydown', onKeyDown);
+
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, []);
 
   const item = detail?.item;
   const variantIds = useMemo(() => Object.values(variantByGroup), [variantByGroup]);
@@ -133,11 +179,24 @@ export function MenuItemSheet({
   }, [item, quantity, variantIds, addonIds, unitPreview, addItem, onAdded]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 backdrop-blur-sm">
-      <div className="max-h-[88vh] w-full max-w-sm overflow-y-auto rounded-t-2xl border border-border bg-card text-foreground">
-        <div className="sticky top-0 flex items-start justify-between gap-3 border-b border-border bg-card p-4">
-          <div className="space-y-1">
-            <h2 className="text-base font-bold leading-tight">
+    <div
+      onClick={onClose}
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 backdrop-blur-sm sm:items-center sm:p-4"
+    >
+      {/* dvh, not vh: on iOS Safari `vh` is the URL-bar-hidden height, so with
+          the bar showing the sheet grew taller than the space it was given and
+          clipped its own Add to Cart button. */}
+      <div
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        onClick={(e) => e.stopPropagation()}
+        className="max-h-[88dvh] w-full max-w-sm overflow-y-auto rounded-t-2xl border border-border bg-card text-foreground sm:max-h-[80dvh] sm:rounded-2xl"
+      >
+        <div className="sticky top-0 z-10 flex items-start justify-between gap-3 border-b border-border bg-card p-4">
+          <div className="min-w-0 space-y-1">
+            <h2 id={titleId} className="text-base font-bold leading-tight break-words">
               {item?.name ?? (loadError ? 'Unavailable' : 'Loading…')}
             </h2>
             {item?.category?.name && (
@@ -147,16 +206,17 @@ export function MenuItemSheet({
             )}
           </div>
           <button
+            ref={closeRef}
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="rounded-lg border border-border px-2 py-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
+            className="flex shrink-0 items-center justify-center rounded-lg border border-border p-2 text-muted-foreground transition-colors hover:text-foreground"
           >
-            ✕
+            <X className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
           </button>
         </div>
 
-        <div className="space-y-5 p-4">
+        <div className="space-y-5 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
           {isLoading && (
             <div className="space-y-3 animate-pulse">
               <div className="h-3 w-2/3 rounded bg-secondary" />
@@ -178,10 +238,7 @@ export function MenuItemSheet({
                   <p className="text-xs leading-relaxed text-muted-foreground">{item.description}</p>
                 )}
                 <div className="flex items-center gap-2">
-                  <span
-                    className="h-2.5 w-2.5 rounded-full"
-                    style={{ backgroundColor: DIETARY_COLOR[item.dietaryType] ?? '#A1A1AA' }}
-                  />
+                  <DietaryMark type={item.dietaryType} />
                   <span className="text-sm font-bold text-primary">
                     {formatCurrency(item.price)}
                   </span>
@@ -220,8 +277,10 @@ export function MenuItemSheet({
                               : 'border-border bg-secondary text-foreground hover:border-primary/40'
                           }`}
                         >
-                          <span className="font-semibold">{variant.name}</span>
-                          <span>{variant.price > 0 ? `+ ${formatCurrency(variant.price)}` : '—'}</span>
+                          <span className="min-w-0 font-semibold break-words">{variant.name}</span>
+                          <span className="shrink-0">
+                            {variant.price > 0 ? `+ ${formatCurrency(variant.price)}` : '—'}
+                          </span>
                         </button>
                       );
                     })}
@@ -262,11 +321,17 @@ export function MenuItemSheet({
                                 : 'border-border bg-secondary text-foreground hover:border-primary/40'
                             } ${disabled ? 'cursor-not-allowed opacity-40' : ''}`}
                           >
-                            <span className="font-semibold">
-                              {selected ? '✓ ' : '+ '}
-                              {addon.name}
+                            <span className="flex min-w-0 items-center gap-1.5 font-semibold">
+                              {selected ? (
+                                <Check className="h-3.5 w-3.5 shrink-0" strokeWidth={2.5} aria-hidden="true" />
+                              ) : (
+                                <Plus className="h-3.5 w-3.5 shrink-0" strokeWidth={2.5} aria-hidden="true" />
+                              )}
+                              <span className="break-words">{addon.name}</span>
                             </span>
-                            <span>{addon.price > 0 ? `+ ${formatCurrency(addon.price)}` : '—'}</span>
+                            <span className="shrink-0">
+                              {addon.price > 0 ? `+ ${formatCurrency(addon.price)}` : '—'}
+                            </span>
                           </button>
                         );
                       })}
@@ -285,9 +350,9 @@ export function MenuItemSheet({
                     aria-label="Decrease quantity"
                     disabled={quantity <= 1}
                     onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                    className="h-8 w-8 rounded-lg border border-border text-sm font-bold text-foreground transition-colors hover:border-primary/40 disabled:opacity-30"
+                    className="flex h-8 w-8 items-center justify-center rounded-lg border border-border text-foreground transition-colors hover:border-primary/40 disabled:opacity-30"
                   >
-                    −
+                    <Minus className="h-4 w-4" strokeWidth={2.5} aria-hidden="true" />
                   </button>
                   <span className="w-6 text-center text-sm font-bold">{quantity}</span>
                   <button
@@ -295,9 +360,9 @@ export function MenuItemSheet({
                     aria-label="Increase quantity"
                     disabled={quantity >= MAX_QUANTITY}
                     onClick={() => setQuantity((q) => Math.min(MAX_QUANTITY, q + 1))}
-                    className="h-8 w-8 rounded-lg border border-border text-sm font-bold text-foreground transition-colors hover:border-primary/40 disabled:opacity-30"
+                    className="flex h-8 w-8 items-center justify-center rounded-lg border border-border text-foreground transition-colors hover:border-primary/40 disabled:opacity-30"
                   >
-                    +
+                    <Plus className="h-4 w-4" strokeWidth={2.5} aria-hidden="true" />
                   </button>
                 </div>
               </div>

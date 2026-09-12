@@ -1,130 +1,115 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import type { ReactNode } from 'react';
+import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 
-import { getUserById, deleteUser } from '@/services/users.service';
-import type { User } from '@/types/user';
+import { useUser, useDeleteUser } from '@/hooks/use-users';
 import { useAuth } from '@/hooks/use-auth';
 
-import { PageError } from '@/components/ui/page-error';
-import { PageLoading } from '@/components/ui/page-loading';
+import { Button } from '@/components/ui/button';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
+import { PageLoading } from '@/components/ui/page-loading';
+import { ErrorPanel, PageHeader } from '@/components/ui/primitives';
+import { useToast } from '@/components/ui/toast';
 import { UserRoleBadge } from '@/components/users/user-role-badge';
 import { UserStatusBadge } from '@/components/users/user-status-badge';
+
+/**
+ * A label over its value. `min-w-0` is the load-bearing part: grid and flex
+ * items default to `min-width: auto`, so a cell holding an unbreakable email
+ * refuses to shrink below that address and pushes the whole document into
+ * horizontal scroll on a phone.
+ */
+function DetailField({
+  label,
+  children,
+  breakAll = false,
+}: {
+  label: string;
+  children: ReactNode;
+  breakAll?: boolean;
+}) {
+  return (
+    <div className="min-w-0">
+      <p className="text-xs uppercase tracking-wider text-muted-foreground">{label}</p>
+      <div
+        className={`mt-1 text-base font-medium text-foreground ${breakAll ? 'break-all' : 'break-words'}`}
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
 
 export default function UserDetailsPage() {
   const params = useParams();
   const router = useRouter();
+  const toast = useToast();
   const { user: currentUser } = useAuth();
 
   const id = params.id as string;
 
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data: user, isPending, isError, error, refetch } = useUser(id);
+  const deleteUser = useDeleteUser();
+
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [error, setError] = useState('');
 
   const isCurrentUser = currentUser?.id === user?.id;
 
-  useEffect(() => {
-    async function loadUser() {
-      try {
-        const response = await getUserById(id);
-
-        setUser(response.data);
-      } catch (err) {
-        console.error(err);
-
-        setError('Unable to load user.');
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    void loadUser();
-  }, [id]);
-
-  function openDeleteDialog() {
-    setShowDeleteDialog(true);
-  }
-
   function closeDeleteDialog() {
-    if (!isDeleting) {
+    if (!deleteUser.isPending) {
       setShowDeleteDialog(false);
     }
   }
 
-  async function handleDelete() {
-    setIsDeleting(true);
-
-    try {
-      await deleteUser(id);
-
-      router.push('/users');
-    } catch (err) {
-      console.error(err);
-
-      setError('Unable to delete user.');
-    } finally {
-      setIsDeleting(false);
-      setShowDeleteDialog(false);
-    }
+  function handleDelete() {
+    deleteUser.mutate(id, {
+      onSuccess: () => {
+        toast.success('Team member removed.');
+        router.push('/users');
+      },
+      onError: (err: unknown) => {
+        setShowDeleteDialog(false);
+        toast.error(err instanceof Error ? err.message : 'Unable to delete user.');
+      },
+    });
   }
 
-  if (isLoading) {
+  if (isPending) {
     return <PageLoading />;
   }
 
-  if (error || !user) {
+  if (isError || !user) {
     return (
-      <PageError
-        message={error || 'User not found.'}
+      <ErrorPanel
+        message={error instanceof Error ? error.message : 'User not found.'}
+        onRetry={() => void refetch()}
       />
     );
   }
 
   return (
-    <div className="mx-auto max-w-3xl space-y-8">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="font-display text-3xl font-semibold tracking-[-0.02em] text-foreground">
-            {user.name}
-          </h1>
-
-          <p className="mt-2 text-sm text-muted-foreground">
-            User details
-          </p>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-3">
-          <button
-            type="button"
-            onClick={() => router.push(`/users/${user.id}/edit`)}
-            className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-background transition-all hover:bg-primary-hover active:scale-[0.99]"
-          >
-            Edit
-          </button>
-
-          <button
-            type="button"
-            onClick={openDeleteDialog}
-            disabled={isDeleting || isCurrentUser}
-            className="rounded-lg border border-atlas-error/40 bg-atlas-error/10 px-4 py-2 text-sm font-medium text-atlas-error transition-all hover:bg-atlas-error/20 disabled:opacity-40"
-          >
-            Delete
-          </button>
-
-          <button
-            type="button"
-            onClick={() => router.push('/users')}
-            className="rounded-lg border border-border bg-secondary px-4 py-2 text-sm font-medium text-foreground transition-colors hover:border-primary"
-          >
-            Back
-          </button>
-        </div>
-      </div>
+    <div className="mx-auto max-w-3xl space-y-6 sm:space-y-8">
+      <PageHeader
+        title={user.name}
+        description="User details"
+        actions={
+          <>
+            <Button variant="primary" onClick={() => router.push(`/users/${user.id}/edit`)}>
+              Edit
+            </Button>
+            <Button
+              variant="danger"
+              disabled={deleteUser.isPending || isCurrentUser}
+              onClick={() => setShowDeleteDialog(true)}
+            >
+              Delete
+            </Button>
+            <Button onClick={() => router.push('/users')}>Back</Button>
+          </>
+        }
+      />
 
       {isCurrentUser && (
         <div className="rounded-lg border border-atlas-warning/30 bg-atlas-warning/10 p-3 text-xs text-atlas-warning">
@@ -133,66 +118,28 @@ export default function UserDetailsPage() {
       )}
 
       <div className="rounded-2xl border border-border bg-card">
-        <div className="grid gap-6 p-8 md:grid-cols-2">
-          <div>
-            <p className="text-xs uppercase tracking-wider text-muted-foreground">
-              Name
-            </p>
+        <div className="grid gap-5 p-5 sm:gap-6 sm:p-6 md:grid-cols-2 lg:p-8">
+          <DetailField label="Name">{user.name}</DetailField>
 
-            <p className="mt-1 text-base font-medium text-foreground">
-              {user.name}
-            </p>
-          </div>
+          <DetailField label="Email" breakAll>
+            {user.email}
+          </DetailField>
 
-          <div>
-            <p className="text-xs uppercase tracking-wider text-muted-foreground">
-              Email
-            </p>
+          <DetailField label="Phone" breakAll>
+            {user.phone ?? '—'}
+          </DetailField>
 
-            <p className="mt-1 text-base font-medium text-foreground">
-              {user.email}
-            </p>
-          </div>
+          <DetailField label="Role">
+            <UserRoleBadge role={user.role} />
+          </DetailField>
 
-          <div>
-            <p className="text-xs uppercase tracking-wider text-muted-foreground">
-              Phone
-            </p>
+          <DetailField label="Status">
+            <UserStatusBadge status={user.status} />
+          </DetailField>
 
-            <p className="mt-1 text-base font-medium text-foreground">
-              {user.phone ?? '—'}
-            </p>
-          </div>
-
-          <div>
-            <p className="text-xs uppercase tracking-wider text-muted-foreground">
-              Role
-            </p>
-
-            <div className="mt-1">
-              <UserRoleBadge role={user.role} />
-            </div>
-          </div>
-
-          <div>
-            <p className="text-xs uppercase tracking-wider text-muted-foreground">
-              Status
-            </p>
-
-            <div className="mt-1">
-              <UserStatusBadge status={user.status} />
-            </div>
-          </div>
-
-          <div>
-            <p className="text-xs uppercase tracking-wider text-muted-foreground">
-              Created
-            </p>
-
-            <p className="mt-1 text-base font-medium text-foreground">
-              {new Date(user.createdAt).toLocaleDateString()}
-            </p>
-          </div>
+          <DetailField label="Created">
+            {new Date(user.createdAt).toLocaleDateString()}
+          </DetailField>
         </div>
       </div>
 
@@ -202,7 +149,7 @@ export default function UserDetailsPage() {
         description={`Are you sure you want to delete ${user.name}? This action cannot be undone.`}
         confirmText="Delete user"
         cancelText="Cancel"
-        isLoading={isDeleting}
+        isLoading={deleteUser.isPending}
         onConfirm={handleDelete}
         onCancel={closeDeleteDialog}
       />

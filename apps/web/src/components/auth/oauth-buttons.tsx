@@ -1,13 +1,13 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useId, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { oauthLogin } from '@/services/auth.service';
 import { useAuth } from '@/hooks/use-auth';
 import { clearCurrentTenant, setCurrentTenant } from '@/lib/tenant-storage';
 import { clearCurrentRestaurant, setCurrentRestaurant } from '@/lib/restaurant-storage';
 import { clearCurrentBranch, setCurrentBranch } from '@/lib/branch-storage';
-import { X, Sparkles, Key, CheckCircle } from 'lucide-react';
+import { X, Sparkles, Key, CheckCircle, Minus, Plus } from 'lucide-react';
 
 interface OAuthButtonsProps {
   onLoading?: (isLoading: boolean) => void;
@@ -39,6 +39,11 @@ export function OAuthButtons({ onLoading, onError }: OAuthButtonsProps) {
   const [devName, setDevName] = useState('');
   const [devProvider, setDevProvider] = useState<'google' | 'github'>('google');
   const [showCredGuide, setShowCredGuide] = useState(false);
+
+  const baseId = useId();
+  const modalTitleId = `${baseId}-title`;
+  const credGuideId = `${baseId}-cred-guide`;
+  const modalRef = useRef<HTMLDivElement>(null);
 
   const googleClientId =
     process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ||
@@ -191,6 +196,50 @@ export function OAuthButtons({ onLoading, onError }: OAuthButtonsProps) {
     }
   }, [isRealGoogleConfigured, googleClientId]);
 
+  // The sheet is an overlay over the sign-in form, so it has to behave like
+  // one: Escape closes it, the page behind stops scrolling, focus starts
+  // inside it and Tab cannot walk out into the form underneath.
+  useEffect(() => {
+    if (!showDevModal) return;
+
+    modalRef.current?.focus();
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setShowDevModal(false);
+        return;
+      }
+
+      if (e.key !== 'Tab') return;
+
+      const focusable = modalRef.current?.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), [href], input:not([disabled]), select, textarea, [tabindex]:not([tabindex="-1"])',
+      );
+      if (!focusable || focusable.length === 0) return;
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const active = document.activeElement;
+
+      if (e.shiftKey && (active === first || !modalRef.current?.contains(active))) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && (active === last || !modalRef.current?.contains(active))) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    document.addEventListener('keydown', onKeyDown);
+
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [showDevModal]);
+
   const ensureGoogleScriptLoaded = (): Promise<any> => {
     return new Promise((resolve) => {
       if (typeof window === 'undefined') return resolve(null);
@@ -296,25 +345,25 @@ export function OAuthButtons({ onLoading, onError }: OAuthButtonsProps) {
 
   return (
     <div className="space-y-3">
-      <div className="relative my-4">
-        <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t border-border" />
-        </div>
-        <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-card px-2 text-muted-foreground font-mono text-[11px]">
-            Or continue with
-          </span>
-        </div>
+      {/* Real segments rather than an opaque swatch punched over a full-width
+          rule: this component also sits on the login page's translucent glass
+          card, where a `bg-card` label reads as a solid floating rectangle. */}
+      <div className="my-4 flex items-center gap-3">
+        <span className="h-px flex-1 bg-border" aria-hidden="true" />
+        <span className="font-mono text-[11px] uppercase text-muted-foreground">
+          Or continue with
+        </span>
+        <span className="h-px flex-1 bg-border" aria-hidden="true" />
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {/* Google OAuth Button */}
         <button
           type="button"
           aria-label="Continue with Google"
           disabled={!!activeProvider}
           onClick={handleGoogleClick}
-          className="flex h-11 items-center justify-center gap-2.5 rounded-xl border border-border bg-secondary/70 px-4 text-xs font-bold text-foreground transition-all hover:border-primary/40 hover:bg-secondary active:scale-[0.98] disabled:opacity-50 cursor-pointer shadow-sm"
+          className="flex h-11 min-w-0 items-center justify-center gap-2.5 rounded-xl border border-border bg-secondary/70 px-4 text-xs font-bold text-foreground transition-all hover:border-primary/40 hover:bg-secondary active:scale-[0.98] disabled:opacity-50 cursor-pointer shadow-sm"
         >
           <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24">
             <path
@@ -334,7 +383,7 @@ export function OAuthButtons({ onLoading, onError }: OAuthButtonsProps) {
               d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
             />
           </svg>
-          <span>{activeProvider === 'google' ? 'Connecting…' : 'Google'}</span>
+          <span className="truncate">{activeProvider === 'google' ? 'Connecting…' : 'Google'}</span>
         </button>
 
         {/* GitHub OAuth Button */}
@@ -343,26 +392,40 @@ export function OAuthButtons({ onLoading, onError }: OAuthButtonsProps) {
           aria-label="Continue with GitHub"
           disabled={!!activeProvider}
           onClick={handleGitHubClick}
-          className="flex h-11 items-center justify-center gap-2.5 rounded-xl border border-border bg-secondary/70 px-4 text-xs font-bold text-foreground transition-all hover:border-primary/40 hover:bg-secondary active:scale-[0.98] disabled:opacity-50 cursor-pointer shadow-sm"
+          className="flex h-11 min-w-0 items-center justify-center gap-2.5 rounded-xl border border-border bg-secondary/70 px-4 text-xs font-bold text-foreground transition-all hover:border-primary/40 hover:bg-secondary active:scale-[0.98] disabled:opacity-50 cursor-pointer shadow-sm"
         >
           <svg className="h-4 w-4 fill-current text-foreground shrink-0" viewBox="0 0 24 24">
             <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
           </svg>
-          <span>{activeProvider === 'github' ? 'Connecting…' : 'GitHub'}</span>
+          <span className="truncate">{activeProvider === 'github' ? 'Connecting…' : 'GitHub'}</span>
         </button>
       </div>
 
       {/* Dev Mode Sign-In Modal */}
       {showDevModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-          <div className="relative w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in-95 duration-150">
-            <div className="flex items-start justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
+        <div
+          onClick={() => setShowDevModal(false)}
+          className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-background/80 p-4 backdrop-blur-sm sm:items-center"
+        >
+          {/* The sheet is taller than a landscape phone, and the overlay is
+              fixed, so the document behind it cannot be scrolled to reach the
+              submit button — the panel has to carry its own scroll. */}
+          <div
+            ref={modalRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={modalTitleId}
+            tabIndex={-1}
+            onClick={(e) => e.stopPropagation()}
+            className="relative my-auto max-h-[calc(100dvh-2rem)] w-full max-w-md overflow-y-auto overscroll-contain rounded-2xl border border-border bg-card p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in-95 duration-150"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex min-w-0 items-center gap-2.5">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
                   <Sparkles className="h-5 w-5" />
                 </div>
-                <div>
-                  <h3 className="text-base font-bold text-foreground">
+                <div className="min-w-0">
+                  <h3 id={modalTitleId} className="text-base font-bold text-foreground">
                     {devProvider === 'google' ? 'Google Sign-In' : 'GitHub Sign-In'}
                   </h3>
                   <p className="text-xs text-muted-foreground">
@@ -374,8 +437,9 @@ export function OAuthButtons({ onLoading, onError }: OAuthButtonsProps) {
               </div>
               <button
                 type="button"
+                aria-label="Close"
                 onClick={() => setShowDevModal(false)}
-                className="rounded-lg p-1.5 text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors cursor-pointer"
+                className="shrink-0 rounded-lg p-1.5 text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors cursor-pointer"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -386,38 +450,38 @@ export function OAuthButtons({ onLoading, onError }: OAuthButtonsProps) {
               <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
                 Instant Sign-In Presets
               </p>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                 <button
                   type="button"
                   onClick={() => handlePresetSelect('restaurant.kafei@gmail.com', 'Restaurant Owner')}
-                  className="flex flex-col items-start rounded-xl border border-border/80 bg-secondary/50 p-2.5 text-left text-xs hover:border-primary hover:bg-secondary transition-all cursor-pointer"
+                  className="flex min-w-0 flex-col items-start rounded-xl border border-border/80 bg-secondary/50 p-2.5 text-left text-xs hover:border-primary hover:bg-secondary transition-all cursor-pointer"
                 >
                   <span className="font-semibold text-foreground">Restaurant Owner</span>
-                  <span className="text-[10px] text-muted-foreground">restaurant.kafei@gmail.com</span>
+                  <span className="w-full truncate text-[11px] text-muted-foreground">restaurant.kafei@gmail.com</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => handlePresetSelect('admin@kafei.internal', 'Platform Admin')}
-                  className="flex flex-col items-start rounded-xl border border-border/80 bg-secondary/50 p-2.5 text-left text-xs hover:border-primary hover:bg-secondary transition-all cursor-pointer"
+                  className="flex min-w-0 flex-col items-start rounded-xl border border-border/80 bg-secondary/50 p-2.5 text-left text-xs hover:border-primary hover:bg-secondary transition-all cursor-pointer"
                 >
                   <span className="font-semibold text-foreground">Platform Admin</span>
-                  <span className="text-[10px] text-muted-foreground">admin@kafei.internal</span>
+                  <span className="w-full truncate text-[11px] text-muted-foreground">admin@kafei.internal</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => handlePresetSelect('waiter@kafei.internal', 'Waiter Staff')}
-                  className="flex flex-col items-start rounded-xl border border-border/80 bg-secondary/50 p-2.5 text-left text-xs hover:border-primary hover:bg-secondary transition-all cursor-pointer"
+                  className="flex min-w-0 flex-col items-start rounded-xl border border-border/80 bg-secondary/50 p-2.5 text-left text-xs hover:border-primary hover:bg-secondary transition-all cursor-pointer"
                 >
                   <span className="font-semibold text-foreground">Waitstaff</span>
-                  <span className="text-[10px] text-muted-foreground">waiter@kafei.internal</span>
+                  <span className="w-full truncate text-[11px] text-muted-foreground">waiter@kafei.internal</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => handlePresetSelect('chef@kafei.internal', 'Head Chef')}
-                  className="flex flex-col items-start rounded-xl border border-border/80 bg-secondary/50 p-2.5 text-left text-xs hover:border-primary hover:bg-secondary transition-all cursor-pointer"
+                  className="flex min-w-0 flex-col items-start rounded-xl border border-border/80 bg-secondary/50 p-2.5 text-left text-xs hover:border-primary hover:bg-secondary transition-all cursor-pointer"
                 >
                   <span className="font-semibold text-foreground">Kitchen / Chef</span>
-                  <span className="text-[10px] text-muted-foreground">chef@kafei.internal</span>
+                  <span className="w-full truncate text-[11px] text-muted-foreground">chef@kafei.internal</span>
                 </button>
               </div>
             </div>
@@ -447,10 +511,10 @@ export function OAuthButtons({ onLoading, onError }: OAuthButtonsProps) {
 
               <button
                 type="submit"
-                className="w-full flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-xs font-bold text-primary-foreground shadow-md hover:bg-primary/90 active:scale-[0.98] transition-all cursor-pointer"
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-xs font-bold text-primary-foreground shadow-md hover:bg-primary-hover active:scale-[0.98] transition-all cursor-pointer"
               >
-                <CheckCircle className="h-4 w-4" />
-                <span>Continue with {devEmail ? devEmail : 'Selected Email'}</span>
+                <CheckCircle className="h-4 w-4 shrink-0" />
+                <span className="truncate">Continue with {devEmail ? devEmail : 'Selected Email'}</span>
               </button>
             </form>
 
@@ -459,17 +523,23 @@ export function OAuthButtons({ onLoading, onError }: OAuthButtonsProps) {
               <button
                 type="button"
                 onClick={() => setShowCredGuide((p) => !p)}
-                className="flex w-full items-center justify-between text-left text-[11px] font-semibold text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                aria-expanded={showCredGuide}
+                aria-controls={credGuideId}
+                className="flex w-full items-center justify-between gap-3 text-left text-[11px] font-semibold text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
               >
-                <span className="flex items-center gap-1.5">
-                  <Key className="h-3.5 w-3.5 text-primary" />
+                <span className="flex min-w-0 items-center gap-1.5">
+                  <Key className="h-3.5 w-3.5 shrink-0 text-primary" />
                   How to setup real Google OAuth credentials
                 </span>
-                <span>{showCredGuide ? '−' : '+'}</span>
+                {showCredGuide ? (
+                  <Minus className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                ) : (
+                  <Plus className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                )}
               </button>
 
               {showCredGuide && (
-                <div className="mt-2.5 rounded-xl border border-border/80 bg-secondary/30 p-3 text-[11px] text-muted-foreground space-y-2 leading-relaxed font-mono">
+                <div id={credGuideId} className="mt-2.5 rounded-xl border border-border/80 bg-secondary/30 p-3 text-[11px] text-muted-foreground space-y-2 leading-relaxed font-mono">
                   <p className="font-sans text-xs text-foreground font-semibold">Setup Steps:</p>
                   <ol className="list-decimal list-inside space-y-1 font-sans">
                     <li>Open <strong>Google Cloud Console</strong> &gt; <em>APIs &amp; Services</em> &gt; <em>Credentials</em>.</li>

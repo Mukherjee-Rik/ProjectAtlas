@@ -14,6 +14,9 @@ import {
   Smartphone,
   QrCode,
   Zap,
+  Coffee,
+  Clock,
+  type LucideIcon,
 } from 'lucide-react';
 
 interface DishItem {
@@ -24,7 +27,7 @@ interface DishItem {
   badge?: string;
   description: string;
   prepTime: string;
-  icon: string;
+  icon: LucideIcon;
 }
 
 const SAMPLE_DISHES: DishItem[] = [
@@ -36,7 +39,7 @@ const SAMPLE_DISHES: DishItem[] = [
     badge: "Chef's Special",
     description: 'Arborio rice, porcini glaze & parmesan crisp',
     prepTime: '12m',
-    icon: '🥘',
+    icon: Utensils,
   },
   {
     id: 'd2',
@@ -46,7 +49,7 @@ const SAMPLE_DISHES: DishItem[] = [
     badge: 'Popular',
     description: 'Double espresso, salted caramel, oat milk',
     prepTime: '4m',
-    icon: '☕',
+    icon: Coffee,
   },
 ];
 
@@ -75,6 +78,21 @@ export function InteractiveTableStandee({ className = '' }: { className?: string
     }
   }, []);
 
+  /**
+   * Every timeout the demo schedules, so a reset — or unmounting the hero —
+   * cannot leave a callback in flight that empties the tray under the guest's
+   * hands three seconds later.
+   */
+  const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const clearTimers = () => {
+    timers.current.forEach(clearTimeout);
+    timers.current = [];
+  };
+  const schedule = (fn: () => void, ms: number) => {
+    timers.current.push(setTimeout(fn, ms));
+  };
+  React.useEffect(() => clearTimers, []);
+
   // Mouse physics for 3D tilt (only on desktop hover devices)
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -82,12 +100,31 @@ export function InteractiveTableStandee({ className = '' }: { className?: string
   const springConfig = { damping: 25, stiffness: 200 };
   const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [8, -8]), springConfig);
   const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-10, 10]), springConfig);
-  const glareX = useSpring(useTransform(mouseX, [-0.5, 0.5], [10, 90]), springConfig);
-  const glareY = useSpring(useTransform(mouseY, [-0.5, 0.5], [10, 90]), springConfig);
+
+  /**
+   * The card's box, measured once per hover rather than once per mousemove.
+   * A pointer handler that calls getBoundingClientRect forces a synchronous
+   * layout on every event; anything that can move the card instead nulls the
+   * cache so the next move re-measures a single time.
+   */
+  const rectRef = useRef<DOMRect | null>(null);
+
+  React.useEffect(() => {
+    const invalidate = () => {
+      rectRef.current = null;
+    };
+    window.addEventListener('resize', invalidate, { passive: true });
+    window.addEventListener('scroll', invalidate, { passive: true });
+    return () => {
+      window.removeEventListener('resize', invalidate);
+      window.removeEventListener('scroll', invalidate);
+    };
+  }, []);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!isDesktopHover || !containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
+    const rect = rectRef.current ?? containerRef.current.getBoundingClientRect();
+    rectRef.current = rect;
     const x = (e.clientX - rect.left) / rect.width - 0.5;
     const y = (e.clientY - rect.top) / rect.height - 0.5;
     mouseX.set(x);
@@ -95,16 +132,19 @@ export function InteractiveTableStandee({ className = '' }: { className?: string
   };
 
   const handleMouseLeave = () => {
+    rectRef.current = null;
     if (!isDesktopHover) return;
     mouseX.set(0);
     mouseY.set(0);
   };
 
   const resetDemo = () => {
+    clearTimers();
     setCartCount(0);
     setCartTotal(0);
     setOrderSent(false);
     setIsDispatching(false);
+    setAddedItemKey(null);
     setActiveMobileTab('standee');
   };
 
@@ -112,21 +152,22 @@ export function InteractiveTableStandee({ className = '' }: { className?: string
     setCartCount((prev) => prev + 1);
     setCartTotal((prev) => prev + dish.price);
     setAddedItemKey(dish.id);
-    setTimeout(() => {
-      setAddedItemKey(null);
-    }, 700);
+    schedule(() => setAddedItemKey(null), 700);
   };
 
   const sendOrderToKitchen = () => {
     if (cartCount === 0 || isDispatching) return;
     setIsDispatching(true);
-    setTimeout(() => {
+    schedule(() => {
       setIsDispatching(false);
       setOrderSent(true);
       setLastTicketNumber((prev) => prev + 1);
-      setTimeout(() => {
+      // The banner and the tray clear together; leaving the banner up next to
+      // an empty tray reads as a bug in a demo people are meant to trust.
+      schedule(() => {
         setCartCount(0);
         setCartTotal(0);
+        setOrderSent(false);
       }, 3500);
     }, 600);
   };
@@ -139,9 +180,6 @@ export function InteractiveTableStandee({ className = '' }: { className?: string
       className={`relative w-full max-w-full select-none ${className}`}
       style={isDesktopHover ? { perspective: 1200 } : undefined}
     >
-      {/* Ambient glowing backdrop glow */}
-      <div className="pointer-events-none absolute -inset-2 sm:-inset-4 rounded-3xl bg-gradient-to-tr from-emerald-500/10 via-primary/10 to-amber-500/10 blur-xl opacity-80" />
-
       {/* Main Container Box (Flat hardware-accelerated on mobile, 3D tilted on desktop) */}
       <motion.div
         style={
@@ -155,25 +193,12 @@ export function InteractiveTableStandee({ className = '' }: { className?: string
         }
         className="relative w-full overflow-hidden rounded-2xl sm:rounded-3xl border border-border/80 bg-card sm:bg-card/90 sm:backdrop-blur-xl p-4 sm:p-5 shadow-xl sm:shadow-2xl"
       >
-        {/* Dynamic Glare Shimmer (Desktop Only) */}
-        {isDesktopHover && (
-          <motion.div
-            className="pointer-events-none absolute inset-0 rounded-2xl sm:rounded-3xl opacity-15"
-            style={{
-              background: `radial-gradient(circle at ${glareX}% ${glareY}%, rgba(255,255,255,0.4) 0%, transparent 65%)`,
-            }}
-          />
-        )}
-
         {/* ═══ Top Control Bar ═══ */}
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/60 pb-3 sm:pb-3.5">
           {/* Status Indicator */}
           <div className="flex items-center gap-2">
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-            </span>
-            <span className="font-mono text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-emerald-500">
+            <span className="h-2 w-2 shrink-0 rounded-full bg-primary" />
+            <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-primary">
               Live Table Standee
             </span>
           </div>
@@ -185,7 +210,8 @@ export function InteractiveTableStandee({ className = '' }: { className?: string
                 key={t.id}
                 type="button"
                 onClick={() => setSelectedTable(t)}
-                className={`rounded-md px-2 py-0.5 font-mono text-[10px] font-semibold transition-all ${
+                aria-pressed={selectedTable.id === t.id}
+                className={`allow-small-target rounded-md px-2 py-1 font-mono text-[11px] font-semibold transition-colors ${
                   selectedTable.id === t.id
                     ? 'bg-primary text-primary-foreground shadow-sm'
                     : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
@@ -197,10 +223,11 @@ export function InteractiveTableStandee({ className = '' }: { className?: string
             <button
               type="button"
               onClick={resetDemo}
-              title="Reset Live Demo"
-              className="ml-1 rounded-md p-1 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+              title="Reset live demo"
+              aria-label="Reset live demo"
+              className="allow-small-target ml-1 rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
             >
-              <RotateCcw className="h-3 w-3" />
+              <RotateCcw className="h-3.5 w-3.5" />
             </button>
           </div>
         </div>
@@ -210,28 +237,30 @@ export function InteractiveTableStandee({ className = '' }: { className?: string
           <button
             type="button"
             onClick={() => setActiveMobileTab('standee')}
-            className={`flex-1 rounded-md py-1 text-center transition-all flex items-center justify-center gap-1.5 ${
+            aria-pressed={activeMobileTab === 'standee'}
+            className={`flex-1 min-w-0 rounded-md py-1 text-center transition-colors flex items-center justify-center gap-1.5 ${
               activeMobileTab === 'standee'
                 ? 'bg-background text-foreground shadow-sm font-bold'
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
-            <QrCode className="h-3.5 w-3.5 text-emerald-500" />
-            <span>Table Standee</span>
+            <QrCode className="h-3.5 w-3.5 shrink-0 text-primary" />
+            <span className="truncate">Table Standee</span>
           </button>
           <button
             type="button"
             onClick={() => setActiveMobileTab('menu')}
-            className={`flex-1 rounded-md py-1 text-center transition-all flex items-center justify-center gap-1.5 ${
+            aria-pressed={activeMobileTab === 'menu'}
+            className={`flex-1 min-w-0 rounded-md py-1 text-center transition-colors flex items-center justify-center gap-1.5 ${
               activeMobileTab === 'menu'
                 ? 'bg-background text-foreground shadow-sm font-bold'
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
-            <Smartphone className="h-3.5 w-3.5 text-primary" />
-            <span>Guest Menu</span>
+            <Smartphone className="h-3.5 w-3.5 shrink-0 text-primary" />
+            <span className="truncate">Guest Menu</span>
             {cartCount > 0 && (
-              <span className="flex h-4 w-4 items-center justify-center rounded-full bg-emerald-500 text-[9px] font-black text-white">
+              <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
                 {cartCount}
               </span>
             )}
@@ -240,60 +269,54 @@ export function InteractiveTableStandee({ className = '' }: { className?: string
 
         {/* ═══ Main Stage: Standee + Live Menu ═══ */}
         <div className="mt-4 flex flex-col sm:flex-row items-stretch gap-4 sm:gap-5 min-w-0">
-          
+
           {/* ================= LEFT: 3D Acrylic & Wood Table Standee ================= */}
           <div
-            className={`flex-col items-center justify-center sm:w-[185px] md:w-[195px] lg:w-[205px] shrink-0 ${
+            className={`flex-col items-center justify-center sm:w-[170px] lg:w-[180px] xl:w-[205px] shrink-0 ${
               activeMobileTab === 'standee' ? 'flex' : 'hidden sm:flex'
             }`}
           >
-            {/* Acrylic Glass Plaque */}
-            <div
-              className="relative w-full max-w-[210px] rounded-2xl border border-white/25 bg-gradient-to-b from-white/20 via-white/10 to-white/15 p-3.5 shadow-xl sm:backdrop-blur-md dark:border-white/15 dark:from-white/10 dark:via-white/5 dark:to-white/10"
-              style={{
-                boxShadow:
-                  '0 15px 35px -10px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.4)',
-              }}
-            >
-              {/* Brass Screw Caps */}
-              <div className="absolute left-2 top-2 h-2 w-2 rounded-full bg-gradient-to-tr from-amber-600 via-amber-300 to-amber-100 shadow-sm" />
-              <div className="absolute right-2 top-2 h-2 w-2 rounded-full bg-gradient-to-tr from-amber-600 via-amber-300 to-amber-100 shadow-sm" />
-
+            {/* Acrylic Glass Plaque. The white overlays are the material — a
+                sheet of acrylic over the page — not a colour of their own. */}
+            <div className="relative w-full max-w-[210px] rounded-2xl border border-white/25 bg-gradient-to-b from-white/20 to-white/10 p-3.5 shadow-xl dark:border-white/15 dark:from-white/10 dark:to-white/5">
               {/* Standee Header */}
               <div className="pt-0.5 pb-2 text-center">
-                <div className="inline-flex items-center gap-1 rounded-full bg-black/10 dark:bg-white/10 px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wider text-foreground">
-                  <span>☕</span>
+                <div className="inline-flex items-center gap-1 rounded-full bg-foreground/10 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-foreground">
+                  <Coffee className="h-2.5 w-2.5" />
                   <span>Kafei Café</span>
                 </div>
                 <h4 className="mt-1 font-display text-base font-black tracking-tight text-foreground">
                   {selectedTable.name}
                 </h4>
-                <p className="font-mono text-[9px] text-muted-foreground">{selectedTable.area}</p>
+                <p className="font-mono text-[11px] text-muted-foreground">{selectedTable.area}</p>
               </div>
 
               {/* QR Code Container with Animated Laser Scanner */}
               <div className="relative mx-auto flex h-28 w-28 sm:h-32 sm:w-32 items-center justify-center rounded-xl bg-white p-2.5 shadow-inner">
-                {/* Crisp SVG QR Code */}
+                {/* Crisp SVG QR code. A QR is monochrome by specification, so the
+                    matrix stays black on white; only the brand emblem and the
+                    finder cores carry the accent. */}
                 <svg
                   viewBox="0 0 100 100"
                   className="h-full w-full select-none"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
                 >
                   {/* Outer corner finder 1 */}
                   <rect x="2" y="2" width="28" height="28" rx="4" fill="#09090b" />
                   <rect x="6" y="6" width="20" height="20" rx="2" fill="#ffffff" />
-                  <rect x="10" y="10" width="12" height="12" rx="1.5" fill="#10b981" />
+                  <rect x="10" y="10" width="12" height="12" rx="1.5" className="fill-primary" />
 
                   {/* Outer corner finder 2 */}
                   <rect x="70" y="2" width="28" height="28" rx="4" fill="#09090b" />
                   <rect x="74" y="6" width="20" height="20" rx="2" fill="#ffffff" />
-                  <rect x="78" y="10" width="12" height="12" rx="1.5" fill="#10b981" />
+                  <rect x="78" y="10" width="12" height="12" rx="1.5" className="fill-primary" />
 
                   {/* Outer corner finder 3 */}
                   <rect x="2" y="70" width="28" height="28" rx="4" fill="#09090b" />
                   <rect x="6" y="74" width="20" height="20" rx="2" fill="#ffffff" />
-                  <rect x="10" y="78" width="12" height="12" rx="1.5" fill="#10b981" />
+                  <rect x="10" y="78" width="12" height="12" rx="1.5" className="fill-primary" />
 
                   {/* QR Matrix Elements */}
                   <rect x="36" y="6" width="6" height="6" rx="1" fill="#09090b" />
@@ -324,7 +347,7 @@ export function InteractiveTableStandee({ className = '' }: { className?: string
 
                   {/* Center Coffee Emblem */}
                   <circle cx="50" cy="50" r="14" fill="#ffffff" />
-                  <circle cx="50" cy="50" r="11" fill="#10b981" />
+                  <circle cx="50" cy="50" r="11" className="fill-primary" />
                   <path d="M46 54C46 54 45 47 50 47C55 47 54 54 54 54H46Z" fill="#ffffff" />
                   <path
                     d="M54 49C55.5 49 56.5 50 56.5 51.5C56.5 53 55.5 54 54 54"
@@ -334,55 +357,46 @@ export function InteractiveTableStandee({ className = '' }: { className?: string
                   />
                 </svg>
 
-                {/* Animated Laser Scanning Beam */}
+                {/* Scanning beam. `whileInView` so the loop stops once the hero
+                    has scrolled away instead of running for the whole session. */}
                 <motion.div
-                  animate={{
-                    y: ['-42px', '42px', '-42px'],
-                  }}
+                  whileInView={{ y: ['-42px', '42px', '-42px'] }}
+                  viewport={{ once: false }}
                   transition={{
                     duration: 2.2,
                     repeat: Infinity,
                     ease: 'easeInOut',
                   }}
-                  className="pointer-events-none absolute inset-x-2 h-0.5 bg-gradient-to-r from-transparent via-emerald-400 to-transparent shadow-[0_0_10px_#10b981]"
+                  className="pointer-events-none absolute inset-x-2 h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent"
                 />
 
                 {/* Camera Reticle Brackets */}
-                <div className="pointer-events-none absolute inset-1.5 flex items-center justify-center rounded-lg border border-emerald-500/30">
-                  <div className="absolute -top-0.5 -left-0.5 h-2.5 w-2.5 border-t-2 border-l-2 border-emerald-500" />
-                  <div className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 border-t-2 border-r-2 border-emerald-500" />
-                  <div className="absolute -bottom-0.5 -left-0.5 h-2.5 w-2.5 border-b-2 border-l-2 border-emerald-500" />
-                  <div className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 border-b-2 border-r-2 border-emerald-500" />
+                <div className="pointer-events-none absolute inset-1.5 flex items-center justify-center rounded-lg border border-primary/30">
+                  <div className="absolute -top-0.5 -left-0.5 h-2.5 w-2.5 border-t-2 border-l-2 border-primary" />
+                  <div className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 border-t-2 border-r-2 border-primary" />
+                  <div className="absolute -bottom-0.5 -left-0.5 h-2.5 w-2.5 border-b-2 border-l-2 border-primary" />
+                  <div className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 border-b-2 border-r-2 border-primary" />
                 </div>
               </div>
 
               {/* NFC Chip Indicator */}
               <div className="mt-2.5 text-center">
-                <div className="inline-flex items-center gap-1 text-[9px] font-semibold text-foreground/90">
-                  <Wifi className="h-2.5 w-2.5 rotate-90 text-emerald-500" />
+                <div className="inline-flex items-center gap-1 text-[11px] font-semibold text-foreground/90">
+                  <Wifi className="h-2.5 w-2.5 shrink-0 rotate-90 text-primary" />
                   <span>NFC Tap or Camera Scan</span>
                 </div>
-                <p className="mt-0.5 text-[8px] text-muted-foreground">No app download needed</p>
+                <p className="mt-0.5 text-[11px] text-muted-foreground">No app download needed</p>
               </div>
             </div>
 
-            {/* Teak Wood Base */}
-            <div
-              className="relative -mt-1.5 flex h-4 w-44 sm:w-48 items-center justify-center rounded-md border-t border-[#a16b3b]/60 bg-gradient-to-r from-[#5c3a21] via-[#85532b] to-[#5c3a21] shadow-xl"
-              style={{
-                boxShadow: '0 8px 20px -4px rgba(0,0,0,0.4)',
-              }}
-            >
-              <span className="font-mono text-[7px] font-black uppercase tracking-[0.2em] text-[#f2d49c] opacity-90">
-                Kafei • Smart Table
-              </span>
-            </div>
+            {/* Standee base */}
+            <div className="relative -mt-1.5 h-4 w-full max-w-[210px] rounded-md border-t border-border bg-secondary shadow-md" />
 
             {/* Mobile Helper: Tap to open menu */}
             <button
               type="button"
               onClick={() => setActiveMobileTab('menu')}
-              className="mt-3 sm:hidden inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-3 py-1 text-xs font-bold text-emerald-400"
+              className="mt-3 sm:hidden inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-bold text-primary"
             >
               <span>Open Menu Demo</span>
               <ArrowRight className="h-3 w-3" />
@@ -398,7 +412,7 @@ export function InteractiveTableStandee({ className = '' }: { className?: string
             {/* Header / Speed Badge */}
             <div className="flex items-center justify-between gap-2">
               <div className="min-w-0">
-                <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-500">
+                <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary">
                   <Sparkles className="h-3 w-3 shrink-0" />
                   <span className="truncate">Instant Guest Ordering</span>
                 </span>
@@ -406,8 +420,9 @@ export function InteractiveTableStandee({ className = '' }: { className?: string
                   Scan & Order Experience
                 </h4>
               </div>
-              <span className="shrink-0 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[9px] font-bold text-emerald-500">
-                ⚡ 0.4s to KDS
+              <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-primary/20 bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary">
+                <Zap className="h-2.5 w-2.5" />
+                0.4s to KDS
               </span>
             </div>
 
@@ -415,18 +430,19 @@ export function InteractiveTableStandee({ className = '' }: { className?: string
             <div className="space-y-2.5 min-w-0">
               {SAMPLE_DISHES.map((dish) => {
                 const isJustAdded = addedItemKey === dish.id;
+                const DishIcon = dish.icon;
 
                 return (
                   <motion.div
                     key={dish.id}
                     whileHover={{ scale: 1.01 }}
                     transition={{ type: 'spring', stiffness: 350, damping: 25 }}
-                    className="group relative flex items-center justify-between gap-2.5 rounded-xl border border-border/70 bg-secondary/50 p-2.5 transition-all hover:border-emerald-500/40 hover:bg-secondary/80 min-w-0"
+                    className="group relative flex items-center justify-between gap-2.5 rounded-xl border border-border/70 bg-secondary/50 p-2.5 transition-colors hover:border-primary/40 hover:bg-secondary/80 min-w-0"
                   >
                     {/* Left Dish Details */}
                     <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-border/50 bg-background text-lg shadow-sm">
-                        {dish.icon}
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-border/50 bg-background shadow-sm">
+                        <DishIcon className="h-4 w-4 text-muted-foreground" />
                       </span>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-1.5 flex-wrap">
@@ -434,18 +450,21 @@ export function InteractiveTableStandee({ className = '' }: { className?: string
                             {dish.name}
                           </h5>
                           {dish.badge && (
-                            <span className="shrink-0 rounded bg-emerald-500/10 px-1 py-0.2 text-[8px] font-bold text-emerald-500">
+                            <span className="shrink-0 rounded bg-primary/10 px-1 py-0.5 text-[10px] font-bold text-primary">
                               {dish.badge}
                             </span>
                           )}
                         </div>
-                        <p className="mt-0.5 text-[10px] text-muted-foreground truncate">
+                        <p className="mt-0.5 text-[11px] text-muted-foreground truncate">
                           {dish.description}
                         </p>
-                        <div className="mt-0.5 flex items-center gap-2 font-mono text-[9px] text-muted-foreground">
-                          <span className="font-bold text-foreground text-[10px]">₹{dish.price}</span>
-                          <span>•</span>
-                          <span>⏳ {dish.prepTime}</span>
+                        <div className="mt-1 flex items-center gap-2 font-mono text-[10px] text-muted-foreground">
+                          <span className="font-bold text-foreground text-[11px]">₹{dish.price}</span>
+                          <span aria-hidden>•</span>
+                          <span className="inline-flex items-center gap-1">
+                            <Clock className="h-2.5 w-2.5 shrink-0" />
+                            {dish.prepTime}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -455,10 +474,11 @@ export function InteractiveTableStandee({ className = '' }: { className?: string
                       type="button"
                       whileTap={{ scale: 0.92 }}
                       onClick={() => addItemToCart(dish)}
-                      className={`shrink-0 rounded-lg px-2.5 py-1.5 text-[11px] font-bold transition-all flex items-center gap-1 shadow-sm ${
+                      aria-label={`Add ${dish.name} to the tray`}
+                      className={`shrink-0 rounded-lg px-2.5 py-1.5 text-[11px] font-bold transition-colors flex items-center gap-1 shadow-sm ${
                         isJustAdded
-                          ? 'bg-emerald-500 text-white'
-                          : 'bg-emerald-600 hover:bg-emerald-500 text-white active:bg-emerald-700'
+                          ? 'bg-primary/80 text-primary-foreground'
+                          : 'bg-primary text-primary-foreground hover:bg-primary-hover'
                       }`}
                     >
                       {isJustAdded ? (
@@ -469,7 +489,7 @@ export function InteractiveTableStandee({ className = '' }: { className?: string
                       ) : (
                         <>
                           <span>Add</span>
-                          <span className="text-xs leading-none">+</span>
+                          <span className="text-xs leading-none" aria-hidden>+</span>
                         </>
                       )}
                     </motion.button>
@@ -481,13 +501,13 @@ export function InteractiveTableStandee({ className = '' }: { className?: string
             {/* Tray Summary & Send to Kitchen Button */}
             <div className="rounded-xl border border-border/70 bg-background/80 p-2.5 shadow-sm flex items-center justify-between gap-2 min-w-0">
               <div className="flex items-center gap-2 min-w-0">
-                <div className="relative flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-500">
+                <div className="relative flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
                   <ShoppingBag className="h-3.5 w-3.5" />
                   {cartCount > 0 && (
                     <motion.span
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      className="absolute -top-1 -right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-emerald-500 text-[8px] font-black text-white"
+                      className="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground"
                     >
                       {cartCount}
                     </motion.span>
@@ -499,8 +519,8 @@ export function InteractiveTableStandee({ className = '' }: { className?: string
                       ? 'Tray is empty'
                       : `${cartCount} dish${cartCount > 1 ? 'es' : ''} on ${selectedTable.id}`}
                   </div>
-                  <div className="text-[9px] font-mono text-muted-foreground truncate">
-                    {cartCount === 0 ? 'Click "Add +" above' : `Total: ₹${cartTotal}`}
+                  <div className="text-[11px] font-mono text-muted-foreground truncate">
+                    {cartCount === 0 ? 'Add a dish to start' : `Total: ₹${cartTotal}`}
                   </div>
                 </div>
               </div>
@@ -510,14 +530,14 @@ export function InteractiveTableStandee({ className = '' }: { className?: string
                 whileTap={{ scale: 0.95 }}
                 disabled={cartCount === 0 || isDispatching}
                 onClick={sendOrderToKitchen}
-                className={`shrink-0 rounded-lg px-3 py-1.5 text-[11px] font-bold transition-all flex items-center gap-1.5 ${
+                className={`shrink-0 rounded-lg px-3 py-1.5 text-[11px] font-bold transition-colors flex items-center gap-1.5 ${
                   cartCount > 0
-                    ? 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm'
-                    : 'bg-secondary text-muted-foreground opacity-40 cursor-not-allowed'
+                    ? 'bg-primary text-primary-foreground hover:bg-primary-hover shadow-sm'
+                    : 'bg-secondary text-muted-foreground opacity-50 cursor-not-allowed'
                 }`}
               >
-                <span>{isDispatching ? 'Dispatching...' : 'Send to Kitchen'}</span>
-                <ArrowRight className="h-3 w-3" />
+                <span>{isDispatching ? 'Dispatching…' : 'Send to Kitchen'}</span>
+                <ArrowRight className="h-3 w-3 shrink-0" />
               </motion.button>
             </div>
 
@@ -525,21 +545,23 @@ export function InteractiveTableStandee({ className = '' }: { className?: string
             <AnimatePresence>
               {orderSent && (
                 <motion.div
-                  initial={{ opacity: 0, y: 8, scale: 0.96 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -6, scale: 0.96 }}
-                  className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-2.5 text-xs text-emerald-400 flex items-center justify-between gap-2 shadow-md"
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
+                  role="status"
+                  className="rounded-xl border border-primary/30 bg-primary/10 p-2.5 flex items-center justify-between gap-2 shadow-sm"
                 >
                   <div className="flex items-center gap-2 min-w-0">
-                    <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white font-black text-[9px]">
-                      ✓
+                    <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                      <Check className="h-2.5 w-2.5" />
                     </span>
-                    <span className="font-semibold text-foreground text-[10.5px] truncate">
-                      Sent to KDS Ticket #{lastTicketNumber} on {selectedTable.name}!
+                    <span className="font-semibold text-foreground text-[11px] truncate">
+                      Sent to KDS Ticket #{lastTicketNumber} on {selectedTable.name}
                     </span>
                   </div>
-                  <span className="font-mono text-[9px] text-emerald-500 font-bold shrink-0">
-                    KDS Alert 🔔
+                  <span className="inline-flex shrink-0 items-center gap-1 font-mono text-[11px] font-bold text-primary">
+                    <Bell className="h-2.5 w-2.5" />
+                    KDS Alert
                   </span>
                 </motion.div>
               )}
@@ -548,12 +570,18 @@ export function InteractiveTableStandee({ className = '' }: { className?: string
         </div>
 
         {/* ═══ Bottom Footer Hint ═══ */}
-        <div className="mt-3.5 flex items-center justify-between border-t border-border/50 pt-2.5 text-[10px] text-muted-foreground">
-          <span className="flex items-center gap-1.5 truncate">
-            <span className="inline-block h-1.5 w-1.5 rounded-full bg-primary shrink-0" />
-            <span className="truncate">Interactive 3D Demo • Tilt with mouse or add dishes</span>
+        <div className="mt-3.5 flex items-center justify-between gap-3 border-t border-border/50 pt-2.5 text-[11px] text-muted-foreground">
+          {/* The hint has to match the device it is read on: tilt is gated on a
+              fine pointer, so a phone is never told to use a mouse. */}
+          <span className="flex min-w-0 items-center gap-1.5">
+            <span className="inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+            <span className="truncate">
+              {isDesktopHover
+                ? 'Live demo — tilt the card or add dishes'
+                : 'Live demo — add dishes to build an order'}
+            </span>
           </span>
-          <span className="font-mono text-[9px] shrink-0 text-muted-foreground/80 hidden sm:inline">
+          <span className="font-mono text-[11px] shrink-0 text-subtle hidden sm:inline">
             Zero Hardware Leases
           </span>
         </div>

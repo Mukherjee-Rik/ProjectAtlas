@@ -10,6 +10,7 @@ import type {
   UserRole,
   UserStatus,
 } from '@/types/user';
+import { Button } from '@/components/ui/button';
 import { ValidatedInput, ValidatedSelect } from '@/components/ui/validated-input';
 import { validateText, validateEmail, validatePhone, validatePassword } from '@/lib/validation';
 
@@ -238,27 +239,30 @@ export function UserForm({
         </ValidatedSelect>
       )}
 
-      <div className="flex justify-end gap-3 pt-4">
-        <button
+      {/*
+        Stacked and full-width on a phone — side by side the two labels need
+        more room than a 320px card interior has, and wrap to uneven heights.
+        Reversed so the primary action sits on top, within thumb reach.
+      */}
+      <div className="flex flex-col-reverse gap-3 border-t border-border pt-4 sm:flex-row sm:justify-end">
+        <Button
           type="button"
           onClick={onCancel}
           disabled={isSubmitting}
-          className="rounded-lg border border-border bg-secondary px-4 py-2 text-sm font-medium text-foreground transition-colors hover:border-primary"
+          className="w-full sm:w-auto"
         >
           Cancel
-        </button>
+        </Button>
 
-        <button
+        <Button
           type="submit"
-          disabled={isSubmitting}
-          className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-background transition-all hover:bg-primary-hover active:scale-[0.99] disabled:opacity-50 font-bold"
+          variant="primary"
+          isLoading={isSubmitting}
+          loadingText="Saving…"
+          className="w-full sm:w-auto"
         >
-          {isSubmitting
-            ? 'Saving...'
-            : isEdit
-              ? 'Save changes'
-              : 'Add Staff Member'}
-        </button>
+          {isEdit ? 'Save changes' : 'Add Staff Member'}
+        </Button>
       </div>
     </form>
   );

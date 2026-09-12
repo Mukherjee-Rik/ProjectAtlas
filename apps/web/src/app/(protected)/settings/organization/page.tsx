@@ -2,21 +2,18 @@
 
 import { useAuth } from '@/hooks/use-auth';
 import { useTenant } from '@/hooks/use-tenant';
+import { PageHeader } from '@/components/ui/primitives';
 
 export default function OrganizationSettingsPage() {
   const { user } = useAuth();
   const { currentTenant } = useTenant();
 
   return (
-    <div className="space-y-8 max-w-4xl">
-      <div>
-        <h1 className="font-display text-3xl font-semibold tracking-[-0.02em] text-foreground">
-          Organization
-        </h1>
-        <p className="mt-2 text-muted-foreground">
-          View your current restaurant group organization and membership.
-        </p>
-      </div>
+    <div className="space-y-8">
+      <PageHeader
+        title="Organization"
+        description="View your current restaurant group organization and membership."
+      />
 
       <div className="overflow-hidden rounded-xl border border-border bg-card">
         <div className="border-b border-border p-6 bg-secondary/40">
@@ -43,7 +40,7 @@ export default function OrganizationSettingsPage() {
               <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                 Tenant Slug
               </p>
-              <p className="mt-1.5 text-sm font-mono text-primary">
+              <p className="mt-1.5 break-all font-mono text-sm text-primary">
                 {currentTenant?.slug ?? 'mukherjee-restaurants'}
               </p>
             </div>

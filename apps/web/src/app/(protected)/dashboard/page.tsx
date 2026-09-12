@@ -1,23 +1,44 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
+import {
+  Armchair,
+  CalendarRange,
+  MapPin,
+  RefreshCw,
+  ShoppingCart,
+  UtensilsCrossed,
+} from 'lucide-react';
 
 import { useAuth } from '@/hooks/use-auth';
 import { useTenant } from '@/hooks/use-tenant';
 import { useRestaurant } from '@/hooks/use-restaurant';
 import { useBranch } from '@/hooks/use-branch';
-import { getDashboardOverview, getDashboardAnalytics } from '@/services/dashboard.service';
-import type { DashboardOverview, DashboardAnalytics } from '@/types/dashboard';
+import { useDashboardAnalytics, useDashboardOverview } from '@/hooks/use-dashboard';
 
 import { StatCard } from '@/components/dashboard/stat-card';
 import { DashboardSkeleton } from '@/components/dashboard/dashboard-skeleton';
-import { PlatformAdminDashboard } from '@/components/dashboard/platform-admin-dashboard';
-import { AnalyticsDetailModal, AnalyticsModalMode } from '@/components/dashboard/revenue-detail-modal';
-import { DashboardLineGraph } from '@/components/dashboard/dashboard-line-graph';
+import type { AnalyticsModalMode } from '@/components/dashboard/revenue-detail-modal';
 import { Pagination } from '@/components/ui/pagination';
 import { formatCurrency } from '@/lib/currency';
+
+/**
+ * The chart and the breakdown modal are Analytics-tab-only and together are the
+ * heaviest client chunks on this route, so the Overview tab — which is what
+ * almost every visit lands on — no longer downloads them.
+ */
+const DashboardLineGraph = dynamic(
+  () => import('@/components/dashboard/dashboard-line-graph').then((m) => m.DashboardLineGraph),
+  { ssr: false },
+);
+
+const AnalyticsDetailModal = dynamic(
+  () => import('@/components/dashboard/revenue-detail-modal').then((m) => m.AnalyticsDetailModal),
+  { ssr: false },
+);
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -50,63 +71,38 @@ export default function DashboardPage() {
   const [startDate, setStartDate] = useState(getPastDateStr(30));
   const [endDate, setEndDate] = useState(getTodayDateStr());
 
-  // Overview state
-  const [dashboard, setDashboard] = useState<DashboardOverview | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [error, setError] = useState('');
-
-  // Analytics state
-  const [analytics, setAnalytics] = useState<DashboardAnalytics | null>(null);
-  const [isLoadingAnalytics, setIsLoadingAnalytics] = useState(false);
-  const [analyticsError, setAnalyticsError] = useState('');
   const [modalMode, setModalMode] = useState<AnalyticsModalMode | null>(null);
   const [recentOrdersPage, setRecentOrdersPage] = useState(1);
   const [recentOrdersPageSize, setRecentOrdersPageSize] = useState(5);
 
-  const loadDashboard = useCallback(async (showRefreshing = false, start?: string, end?: string) => {
-    if (user?.role === 'PLATFORM_ADMIN') {
-      setIsLoading(false);
-      return;
-    }
+  const isPlatformAdmin = user?.role === 'PLATFORM_ADMIN';
 
-    if (showRefreshing) {
-      setIsRefreshing(true);
-    } else {
-      setIsLoading(true);
-    }
-    setError('');
+  // Both queries are keyed on restaurant + branch + the date window, so the
+  // cache survives a tab toggle: leaving Analytics and coming back repaints
+  // from cache instead of starting from an empty panel again.
+  const {
+    data: dashboard,
+    isPending: isLoading,
+    isFetching: isRefreshing,
+    isError,
+    refetch: refetchDashboard,
+  } = useDashboardOverview({ startDate, endDate, enabled: !isPlatformAdmin });
 
-    try {
-      const actualStart = start !== undefined ? start : startDate;
-      const actualEnd = end !== undefined ? end : endDate;
-      const response = await getDashboardOverview(actualStart, actualEnd);
-      setDashboard(response.data);
-    } catch (err) {
-      console.error(err);
-      setError('Unable to load restaurant dashboard overview');
-    } finally {
-      setIsLoading(false);
-      setIsRefreshing(false);
-    }
-  }, [user?.role, startDate, endDate, currentRestaurant?.id, currentBranch?.id]);
+  const {
+    data: analytics,
+    isPending: isPendingAnalytics,
+    isFetching: isFetchingAnalytics,
+    isError: isAnalyticsError,
+    refetch: refetchAnalytics,
+  } = useDashboardAnalytics({
+    startDate,
+    endDate,
+    enabled: !isPlatformAdmin && activeTab === 'analytics',
+  });
 
-  const loadAnalytics = useCallback(async (showLoading = true, start?: string, end?: string) => {
-    if (showLoading) setIsLoadingAnalytics(true);
-    setAnalyticsError('');
-
-    try {
-      const actualStart = start !== undefined ? start : startDate;
-      const actualEnd = end !== undefined ? end : endDate;
-      const response = await getDashboardAnalytics(actualStart, actualEnd);
-      setAnalytics(response.data);
-    } catch (err) {
-      console.error(err);
-      setAnalyticsError('Unable to load restaurant advanced analytics');
-    } finally {
-      setIsLoadingAnalytics(false);
-    }
-  }, [startDate, endDate, currentRestaurant?.id, currentBranch?.id]);
+  // `isPending` stays true forever on a disabled query, so the Analytics panel
+  // asks about the fetch that is actually running.
+  const isLoadingAnalytics = isPendingAnalytics && isFetchingAnalytics;
 
   // Redirect dedicated role users to their respective portals
   useEffect(() => {
@@ -120,17 +116,6 @@ export default function DashboardPage() {
       router.replace('/kitchen');
     }
   }, [user?.role, router]);
-
-  // Load dashboard and analytics when dates, active tab, restaurant, or branch change
-  useEffect(() => {
-    if (user?.role === 'PLATFORM_ADMIN') return;
-    void loadDashboard(false, startDate, endDate);
-    if (activeTab === 'analytics') {
-      void loadAnalytics(false, startDate, endDate);
-    } else {
-      setAnalytics(null);
-    }
-  }, [startDate, endDate, activeTab, currentRestaurant?.id, currentBranch?.id, user?.role, loadDashboard, loadAnalytics]);
 
   if (user?.role === 'PLATFORM_ADMIN') {
     return (
@@ -147,7 +132,7 @@ export default function DashboardPage() {
     return <DashboardSkeleton />;
   }
 
-  if (error || !dashboard) {
+  if (isError || !dashboard) {
     return (
       <div className="flex flex-col items-center justify-center rounded-xl border border-border bg-card p-12 text-center">
         <h2 className="text-xl font-bold text-foreground">
@@ -158,7 +143,7 @@ export default function DashboardPage() {
         </p>
         <button
           type="button"
-          onClick={() => void loadDashboard()}
+          onClick={() => void refetchDashboard()}
           className="mt-6 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-background transition-all hover:bg-primary-hover active:scale-[0.99]"
         >
           Try Again
@@ -228,7 +213,7 @@ export default function DashboardPage() {
             <button
               type="button"
               disabled={isRefreshing}
-              onClick={() => void loadDashboard(true)}
+              onClick={() => void refetchDashboard()}
               className="flex items-center gap-2 rounded-xl border border-border bg-secondary px-3.5 py-2 text-xs font-medium text-foreground transition-colors hover:border-primary disabled:opacity-50"
             >
               <span className={isRefreshing ? 'animate-spin' : ''}>⟳</span>
@@ -238,7 +223,7 @@ export default function DashboardPage() {
             <button
               type="button"
               disabled={isLoadingAnalytics}
-              onClick={() => void loadAnalytics(true)}
+              onClick={() => void refetchAnalytics()}
               className="flex items-center gap-2 rounded-xl border border-border bg-secondary px-3.5 py-2 text-xs font-medium text-foreground transition-colors hover:border-primary disabled:opacity-50"
             >
               <span className={isLoadingAnalytics ? 'animate-spin' : ''}>⟳</span>
@@ -528,9 +513,9 @@ export default function DashboardPage() {
             <div className="rounded-xl border border-border bg-card p-12 text-center text-sm text-muted-foreground animate-pulse">
               Generating restaurant performance analysis...
             </div>
-          ) : analyticsError || !analytics ? (
+          ) : isAnalyticsError || !analytics ? (
             <div className="rounded-xl border border-atlas-error/40 bg-atlas-error/10 p-6 text-center text-xs text-atlas-error">
-              {analyticsError || 'Failed to load analytics details.'}
+              Failed to load analytics details.
             </div>
           ) : (
             <div className="space-y-6">

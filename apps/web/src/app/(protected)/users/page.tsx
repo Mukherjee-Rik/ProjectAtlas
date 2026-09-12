@@ -1,74 +1,65 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { Users } from 'lucide-react';
 
-import { getUsers } from '@/services/users.service';
 import { useRestaurant } from '@/hooks/use-restaurant';
+import { useUsers } from '@/hooks/use-users';
 import type { User, UserRole, UserStatus } from '@/types/user';
 
-import { PageError } from '@/components/ui/page-error';
+import { Button } from '@/components/ui/button';
+import { DataTable, type Column } from '@/components/ui/data-table';
 import { Pagination } from '@/components/ui/pagination';
-import { UsersTableSkeleton } from '@/components/users/users-table-skeleton';
+import {
+  EmptyState,
+  ErrorPanel,
+  PageHeader,
+  SkeletonTable,
+} from '@/components/ui/primitives';
 import { UserRoleBadge } from '@/components/users/user-role-badge';
 import { UserStatusBadge } from '@/components/users/user-status-badge';
+
+const PAGE_SIZE_OPTIONS = [10, 25, 50];
 
 export default function UsersPage() {
   const router = useRouter();
   const { currentRestaurant } = useRestaurant();
 
-  const [users, setUsers] = useState<User[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
-
-  // Filtering & Search state
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState<'ALL' | UserRole>('ALL');
   const [statusFilter, setStatusFilter] = useState<'ALL' | UserStatus>('ALL');
 
-  // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 10;
+  const [pageSize, setPageSize] = useState(10);
 
-  const [totalUsers, setTotalUsers] = useState(0);
-  const [totalPages, setTotalPages] = useState(1);
-
-  const loadUsers = useCallback(async () => {
-    setIsLoading(true);
-    setError('');
-
-    try {
-      const response = await getUsers({
-        search: search.trim() || undefined,
-        role: roleFilter === 'ALL' ? undefined : roleFilter,
-        status: statusFilter === 'ALL' ? undefined : statusFilter,
-        page: currentPage,
-        limit: pageSize,
-      });
-
-      const usersList = Array.isArray(response?.data)
-        ? response.data
-        : (response?.data as any)?.data ?? [];
-
-      const meta = response?.meta ?? (response?.data as any)?.meta ?? {
-        total: usersList.length,
-        totalPages: 1,
-      };
-
-      setUsers(usersList);
-      setTotalUsers(meta.total ?? usersList.length);
-      setTotalPages(meta.totalPages ?? 1);
-    } catch (err) {
-      console.error(err);
-      setError('Unable to load restaurant staff.');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [search, roleFilter, statusFilter, currentPage]);
-
+  // Only the settled value reaches the query key. Sending every keystroke cost
+  // a round trip per character and, with the old blocking spinner, threw the
+  // search field away mid-word.
   useEffect(() => {
-    void loadUsers();
-  }, [loadUsers]);
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search.trim());
+      setCurrentPage(1);
+    }, 250);
+
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  const { data, isPending, isError, error, refetch } = useUsers({
+    search: debouncedSearch || undefined,
+    role: roleFilter === 'ALL' ? undefined : roleFilter,
+    status: statusFilter === 'ALL' ? undefined : statusFilter,
+    page: currentPage,
+    limit: pageSize,
+  });
+
+  const users = data?.users ?? [];
+  const totalUsers = data?.meta.total ?? users.length;
+  const totalPages = data?.meta.totalPages ?? 1;
+
+  const hasFilters = Boolean(search) || roleFilter !== 'ALL' || statusFilter !== 'ALL';
 
   function handleClearFilters() {
     setSearch('');
@@ -77,77 +68,98 @@ export default function UsersPage() {
     setCurrentPage(1);
   }
 
-  if (isLoading) {
-    return (
-      <div className="space-y-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="font-display text-3xl font-semibold tracking-[-0.02em] text-foreground">Restaurant Team</h1>
-            <p className="mt-2 text-sm text-muted-foreground">Manage employees and staff members.</p>
-          </div>
-        </div>
-        <UsersTableSkeleton />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <PageError
-        message={error}
-        onRetry={loadUsers}
-      />
-    );
-  }
+  const columns: Column<User>[] = useMemo(
+    () => [
+      {
+        key: 'name',
+        header: 'Staff Name',
+        primary: true,
+        render: (user) => (
+          // The link, not the row, is what carries navigation: a bare `<tr
+          // onClick>` is unreachable by keyboard and silent to screen readers.
+          <Link
+            href={`/users/${user.id}`}
+            onClick={(e) => e.stopPropagation()}
+            className="font-semibold text-foreground transition-colors hover:text-primary"
+          >
+            {user.name}
+          </Link>
+        ),
+      },
+      {
+        key: 'email',
+        header: 'Email',
+        cellClassName: 'text-muted-foreground',
+        // An address has no break opportunity, so without this the cell sets
+        // the column's min-content width and the table stops shrinking.
+        render: (user) => <span className="break-all">{user.email}</span>,
+      },
+      {
+        key: 'phone',
+        header: 'Phone',
+        hideOnMobile: true,
+        cellClassName: 'text-muted-foreground',
+        render: (user) => user.phone ?? '—',
+      },
+      {
+        key: 'role',
+        header: 'Role',
+        render: (user) => <UserRoleBadge role={user.role} />,
+      },
+      {
+        key: 'status',
+        header: 'Status',
+        render: (user) => <UserStatusBadge status={user.status} />,
+      },
+    ],
+    [],
+  );
 
   return (
-    <div className="space-y-8">
-      {/* Header & Add Employee Button */}
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="font-display text-3xl font-semibold tracking-[-0.02em] text-foreground">
-            Restaurant Team & Staff
-          </h1>
+    <div className="space-y-6 sm:space-y-8">
+      <PageHeader
+        title="Restaurant Team"
+        description={
+          <>
+            Managers, waiters, kitchen staff and cashiers working at{' '}
+            <span className="font-semibold text-foreground">
+              {currentRestaurant?.name ?? 'your restaurant'}
+            </span>
+            .
+          </>
+        }
+        actions={
+          <Button variant="primary" onClick={() => router.push('/users/create')}>
+            Add Staff Member
+          </Button>
+        }
+      />
 
-          <p className="mt-2 text-sm text-muted-foreground">
-            Manage employees working at <span className="font-semibold text-primary">{currentRestaurant?.name ?? 'your restaurant'}</span> (Managers, Waiters, Kitchen Staff, Cashiers).
-          </p>
-
-          <p className="mt-1 text-xs font-medium text-muted-foreground">
-            Showing {users.length} of {totalUsers} team members
-          </p>
-        </div>
-
-        <button
-          type="button"
-          onClick={() => router.push('/users/create')}
-          className="rounded-xl bg-primary px-4 py-2.5 text-sm font-bold text-background transition-all hover:bg-primary-hover active:scale-[0.99]"
-        >
-          + Add Staff Member
-        </button>
-      </div>
-
-      {/* Toolbar / Filters */}
-      <div className="flex flex-col gap-4 rounded-xl border border-border bg-card p-4 shadow-md md:flex-row md:items-center md:justify-between">
-        <div className="flex flex-1 flex-col gap-3 sm:flex-row sm:items-center">
+      <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4 md:flex-row md:items-center md:justify-between">
+        <div className="flex min-w-0 flex-1 flex-col gap-3 sm:flex-row sm:items-center">
+          <label className="sr-only" htmlFor="staff-search">
+            Search staff
+          </label>
           <input
+            id="staff-search"
             type="search"
             placeholder="Search by name, email, phone..."
             value={search}
-            onChange={(event) => {
-              setSearch(event.target.value);
-              setCurrentPage(1);
-            }}
-            className="w-full rounded-lg border border-border bg-secondary px-3.5 py-2 text-sm text-foreground placeholder-muted-foreground transition-colors outline-none focus:border-primary focus:ring-1 focus:ring-primary sm:max-w-xs"
+            onChange={(event) => setSearch(event.target.value)}
+            className="w-full min-w-0 rounded-lg border border-border bg-secondary px-3.5 py-2 text-sm text-foreground placeholder-muted-foreground outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary sm:max-w-xs"
           />
 
+          <label className="sr-only" htmlFor="staff-role-filter">
+            Filter by role
+          </label>
           <select
+            id="staff-role-filter"
             value={roleFilter}
             onChange={(event) => {
               setRoleFilter(event.target.value as 'ALL' | UserRole);
               setCurrentPage(1);
             }}
-            className="rounded-lg border border-border bg-secondary px-3 py-2 text-sm text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+            className="min-w-0 rounded-lg border border-border bg-secondary px-3 py-2 text-sm text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary"
           >
             <option value="ALL">All Roles</option>
             <option value="OWNER">Owner</option>
@@ -158,13 +170,17 @@ export default function UsersPage() {
             <option value="STAFF">General Staff</option>
           </select>
 
+          <label className="sr-only" htmlFor="staff-status-filter">
+            Filter by status
+          </label>
           <select
+            id="staff-status-filter"
             value={statusFilter}
             onChange={(event) => {
               setStatusFilter(event.target.value as 'ALL' | UserStatus);
               setCurrentPage(1);
             }}
-            className="rounded-lg border border-border bg-secondary px-3 py-2 text-sm text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+            className="min-w-0 rounded-lg border border-border bg-secondary px-3 py-2 text-sm text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary"
           >
             <option value="ALL">All statuses</option>
             <option value="ACTIVE">Active</option>
@@ -173,107 +189,69 @@ export default function UsersPage() {
           </select>
         </div>
 
-        {(search || roleFilter !== 'ALL' || statusFilter !== 'ALL') && (
-          <button
-            type="button"
-            onClick={handleClearFilters}
-            className="rounded-lg border border-border bg-secondary px-3 py-2 text-xs font-medium text-foreground transition-colors hover:border-primary hover:text-primary"
-          >
+        {hasFilters && (
+          <Button className="shrink-0" onClick={handleClearFilters}>
             Clear filters
-          </button>
+          </Button>
         )}
       </div>
 
-      {/* Table Container */}
-      <div className="table-responsive rounded-xl border border-border bg-card">
-        <table className="w-full min-w-[700px] text-left">
-          <thead className="border-b border-border bg-secondary">
-            <tr>
-              <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Staff Name
-              </th>
+      {isPending ? (
+        <SkeletonTable rows={10} columns={5} />
+      ) : isError ? (
+        <ErrorPanel
+          message={error instanceof Error ? error.message : 'Unable to load restaurant staff.'}
+          onRetry={() => void refetch()}
+        />
+      ) : (
+        <>
+          <DataTable
+            caption="Restaurant staff"
+            columns={columns}
+            rows={users}
+            rowKey={(user) => user.id}
+            onRowClick={(user) => router.push(`/users/${user.id}`)}
+            // The list is paginated server-side, so DataTable must not slice
+            // the page it was handed — and the page-size control has to write
+            // back into the request, which only this component can do.
+            enablePagination={false}
+            emptyState={
+              <EmptyState
+                icon={<Users className="h-6 w-6" aria-hidden="true" />}
+                title="No staff members found"
+                description={
+                  hasFilters
+                    ? 'No team member matches the current filters.'
+                    : 'Add your first team member to start assigning shifts and roles.'
+                }
+                action={
+                  hasFilters ? (
+                    <Button onClick={handleClearFilters}>Clear filters</Button>
+                  ) : (
+                    <Button variant="primary" onClick={() => router.push('/users/create')}>
+                      Add Staff Member
+                    </Button>
+                  )
+                }
+              />
+            }
+          />
 
-              <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Email
-              </th>
-
-              <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Phone
-              </th>
-
-              <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Role
-              </th>
-
-              <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Status
-              </th>
-            </tr>
-          </thead>
-
-          <tbody className="divide-y divide-border">
-            {users.map((user) => (
-              <tr
-                key={user.id}
-                onClick={() => router.push(`/users/${user.id}`)}
-                className="cursor-pointer transition-colors hover:bg-secondary"
-              >
-                <td className="px-4 py-4 text-sm font-medium text-foreground">
-                  {user.name}
-                </td>
-
-                <td className="px-4 py-4 text-sm text-muted-foreground">
-                  {user.email}
-                </td>
-
-                <td className="px-4 py-4 text-sm text-muted-foreground">
-                  {user.phone ?? '—'}
-                </td>
-
-                <td className="px-4 py-4 text-sm">
-                  <UserRoleBadge role={user.role} />
-                </td>
-
-                <td className="px-4 py-4 text-sm">
-                  <UserStatusBadge status={user.status} />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        {/* Empty State */}
-        {users.length === 0 && (
-          <div className="p-10 text-center">
-            <p className="text-foreground font-medium">
-              No staff members found for this restaurant.
-            </p>
-
-            {(search || roleFilter !== 'ALL' || statusFilter !== 'ALL') && (
-              <button
-                type="button"
-                onClick={handleClearFilters}
-                className="mt-4 rounded-lg border border-border bg-secondary px-4 py-2 text-sm text-foreground transition-colors hover:border-primary"
-              >
-                Clear filters
-              </button>
-            )}
-          </div>
-        )}
-
-        {/* Pagination Footer */}
-        {totalPages > 1 && (
-          <div className="border-t border-border p-4 bg-secondary/20">
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setCurrentPage}
-              totalItems={totalUsers}
-              pageSize={pageSize}
-            />
-          </div>
-        )}
-      </div>
+          <Pagination
+            className="rounded-xl border border-border"
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+            totalItems={totalUsers}
+            pageSize={pageSize}
+            pageSizeOptions={PAGE_SIZE_OPTIONS}
+            onPageSizeChange={(size) => {
+              setPageSize(size);
+              setCurrentPage(1);
+            }}
+          />
+        </>
+      )}
     </div>
   );
 }

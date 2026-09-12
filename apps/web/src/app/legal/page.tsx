@@ -1,9 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { ArrowRight, ExternalLink, ShieldCheck } from 'lucide-react';
-import { ThemeToggle } from '@/components/ui/theme-toggle';
-import { LegalFooter } from '@/components/legal/LegalPageShell';
+import { LegalFooter, PublicHeader } from '@/components/legal/LegalPageShell';
 import { LEGAL_DOCS, LEGAL_ENTITY } from '@/lib/legal-docs-data';
 import type { Metadata } from 'next';
 
@@ -35,47 +33,13 @@ const GROUPS: Array<{ key: 'terms' | 'privacy' | 'trust'; label: string; blurb: 
 export default function LegalHubPage() {
   return (
     <div className="min-h-screen bg-background text-foreground antialiased selection:bg-primary/20 selection:text-primary">
-      <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur-md">
-        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-          <Link href="/" className="flex items-center gap-2.5">
-            <Image
-              src="/logo.png"
-              alt=""
-              width={28}
-              height={28}
-              className="h-6 w-auto rounded-md object-contain"
-            />
-            <span className="font-display text-[15px] font-extrabold tracking-tight text-foreground">
-              Kafei
-            </span>
-            <span className="hidden text-[13px] text-muted-foreground sm:inline">Legal</span>
-          </Link>
-
-          <nav className="flex items-center gap-1 text-[13px]">
-            <Link
-              href="/"
-              className="rounded-lg px-2.5 py-1.5 font-medium text-muted-foreground transition-colors hover:text-foreground"
-            >
-              Home
-            </Link>
-            <Link
-              href="/contact"
-              className="hidden rounded-lg px-2.5 py-1.5 font-medium text-muted-foreground transition-colors hover:text-foreground sm:inline-block"
-            >
-              Contact
-            </Link>
-            <Link
-              href="/login"
-              className="ml-1 rounded-lg border border-border bg-card px-3 py-1.5 font-semibold text-foreground transition-colors hover:border-primary/50"
-            >
-              Sign in
-            </Link>
-            <span className="ml-1">
-              <ThemeToggle />
-            </span>
-          </nav>
-        </div>
-      </header>
+      <PublicHeader
+        label="Legal"
+        links={[
+          { href: '/', label: 'Home' },
+          { href: '/contact', label: 'Contact' },
+        ]}
+      />
 
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         {/* ── Intro ─────────────────────────────────────────────────────── */}
