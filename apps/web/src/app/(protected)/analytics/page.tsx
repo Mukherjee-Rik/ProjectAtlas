@@ -1,16 +1,8 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import {
-  analyticsService,
-  type KpiResponse,
-  type TimeSeriesResponse,
-  type RevenueAnalyticsResponse,
-  type MenuAnalyticsResponse,
-  type CustomerCohortResponse,
-  type BranchAnalyticsResponse,
-  type DemandMatrixResponse,
-} from '@/services/analytics.service';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { analyticsService } from '@/services/analytics.service';
 import { KpiSummaryGrid } from '@/components/analytics/kpi-summary-grid';
 import { ComparisonTrendChart } from '@/components/analytics/comparison-trend-chart';
 import { RevenueAnalyticsView } from '@/components/analytics/revenue-analytics-view';
@@ -19,93 +11,140 @@ import { CustomerCohortTable } from '@/components/analytics/customer-cohort-tabl
 import { BranchBenchmarkingView } from '@/components/analytics/branch-benchmarking-view';
 import { OperationalHeatmap } from '@/components/analytics/operational-heatmap';
 import { DrillDownModal } from '@/components/analytics/drill-down-modal';
+import { ErrorPanel, PageHeader } from '@/components/ui/primitives';
+import { useToast } from '@/components/ui/toast';
 import { useRestaurant } from '@/hooks/use-restaurant';
 import { useBranch } from '@/hooks/use-branch';
 import {
   TrendingUp,
   Download,
-  Calendar,
   Layers,
   UtensilsCrossed,
   Users,
   Building2,
   Clock,
-  RotateCcw,
 } from 'lucide-react';
+
+type AnalyticsTab = 'overview' | 'revenue' | 'menu' | 'customers' | 'branches' | 'operations';
+
+const TABS: Array<{ id: AnalyticsTab; label: string; icon: typeof Layers }> = [
+  { id: 'overview', label: 'Overview & Trends', icon: Layers },
+  { id: 'revenue', label: 'Revenue & Financials', icon: TrendingUp },
+  { id: 'menu', label: 'Menu & Products', icon: UtensilsCrossed },
+  { id: 'customers', label: 'Customers & Cohorts', icon: Users },
+  { id: 'branches', label: 'Branch Benchmarks', icon: Building2 },
+  { id: 'operations', label: '7×24 Demand Matrix', icon: Clock },
+];
+
+const PERIOD_PRESETS: Array<{ id: '7D' | '30D' | '90D' | '1Y'; label: string }> = [
+  { id: '7D', label: '7 Days' },
+  { id: '30D', label: '30 Days' },
+  { id: '90D', label: 'Quarter' },
+  { id: '1Y', label: 'Year' },
+];
+
+const DAYS_IN_PRESET = { '7D': 7, '30D': 30, '90D': 90, '1Y': 365 } as const;
+
+function getDateRange(preset: keyof typeof DAYS_IN_PRESET) {
+  const end = new Date();
+  const start = new Date(end.getTime() - DAYS_IN_PRESET[preset] * 86400000);
+  return {
+    dateFrom: start.toISOString().slice(0, 10),
+    dateTo: end.toISOString().slice(0, 10),
+  };
+}
 
 export default function AnalyticsPage() {
   const { currentRestaurant } = useRestaurant();
   const { currentBranch } = useBranch();
+  const toast = useToast();
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'revenue' | 'menu' | 'customers' | 'branches' | 'operations'>(
-    'overview',
-  );
+  const [activeTab, setActiveTab] = useState<AnalyticsTab>('overview');
   const [periodPreset, setPeriodPreset] = useState<'7D' | '30D' | '90D' | '1Y'>('30D');
   const [selectedBranchId, setSelectedBranchId] = useState<string>('');
-
-  const [loading, setLoading] = useState(true);
-  const [kpiData, setKpiData] = useState<KpiResponse['data'] | null>(null);
-  const [timeSeriesData, setTimeSeriesData] = useState<TimeSeriesResponse['data']>([]);
-  const [revenueData, setRevenueData] = useState<RevenueAnalyticsResponse['data'] | null>(null);
-  const [menuData, setMenuData] = useState<MenuAnalyticsResponse['data'] | null>(null);
-  const [customerData, setCustomerData] = useState<CustomerCohortResponse['data'] | null>(null);
-  const [branchData, setBranchData] = useState<BranchAnalyticsResponse['data'] | null>(null);
-  const [demandData, setDemandData] = useState<DemandMatrixResponse['data'] | null>(null);
 
   // Drill Down State
   const [drillDownOpen, setDrillDownOpen] = useState(false);
   const [drillDownTitle, setDrillDownTitle] = useState('');
-  const [drillDownDimension, setDrillDownDimension] = useState<'BRANCH' | 'CATEGORY' | 'MENU_ITEM' | 'ORDER'>('ORDER');
+  const [drillDownDimension, setDrillDownDimension] =
+    useState<'BRANCH' | 'CATEGORY' | 'MENU_ITEM' | 'ORDER'>('ORDER');
   const [drillDownTargetId, setDrillDownTargetId] = useState<string | undefined>();
 
-  const getDateRange = (preset: '7D' | '30D' | '90D' | '1Y') => {
-    const end = new Date();
-    const daysMap = { '7D': 7, '30D': 30, '90D': 90, '1Y': 365 };
-    const start = new Date(end.getTime() - daysMap[preset] * 86400000);
-    return {
-      dateFrom: start.toISOString().slice(0, 10),
-      dateTo: end.toISOString().slice(0, 10),
-    };
-  };
+  // Recomputed only when the preset changes, so the value stays stable across
+  // renders and does not churn the query keys it feeds.
+  const { dateFrom, dateTo } = useMemo(() => getDateRange(periodPreset), [periodPreset]);
 
-  const loadData = async () => {
-    setLoading(true);
-    const { dateFrom, dateTo } = getDateRange(periodPreset);
-    const effectiveBranch = selectedBranchId || currentBranch?.id || undefined;
-    const filter = {
-      dateFrom,
-      dateTo,
-      branchId: effectiveBranch,
-    };
+  const restaurantId = currentRestaurant?.id;
+  const effectiveBranch = selectedBranchId || currentBranch?.id || undefined;
+  const filter = { dateFrom, dateTo, branchId: effectiveBranch };
 
-    try {
-      const [kpisRes, tsRes, revRes, menuRes, custRes, branchRes, demandRes] = await Promise.all([
-        analyticsService.getKpis(filter),
-        analyticsService.getTimeSeries(filter),
-        analyticsService.getRevenue(filter),
-        analyticsService.getMenuPerformance(filter),
-        analyticsService.getCustomers(),
-        analyticsService.getBranches(filter),
-        analyticsService.getDemandMatrix(filter),
-      ]);
+  /**
+   * Every aggregate is keyed by restaurant, branch and window and guarded on
+   * the restaurant id, so nothing leaves the browser until the active tenant
+   * is known and a branch switch can never serve the previous branch's
+   * numbers from cache. The seven endpoints are seven queries rather than one
+   * `Promise.all`: each card paints as its own data lands, one failure does
+   * not blank the other six, and react-query cancels the in-flight request
+   * when the preset changes instead of letting a stale response win the race.
+   */
+  const scope = [restaurantId ?? null, effectiveBranch ?? null, dateFrom, dateTo] as const;
+  const enabled = Boolean(restaurantId);
 
-      setKpiData(kpisRes?.data ?? null);
-      setTimeSeriesData(tsRes?.data ?? []);
-      setRevenueData(revRes?.data ?? null);
-      setMenuData(menuRes?.data ?? null);
-      setCustomerData(custRes?.data ?? null);
-      setBranchData(branchRes?.data ?? null);
-      setDemandData(demandRes?.data ?? null);
-    } catch (err) {
-      console.error('Failed to load analytics engine data:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const kpisQuery = useQuery({
+    queryKey: ['analytics', 'kpis', ...scope],
+    queryFn: async () => (await analyticsService.getKpis(filter))?.data ?? null,
+    enabled,
+  });
 
-  useEffect(() => {
-    loadData();
-  }, [periodPreset, selectedBranchId, currentRestaurant?.id, currentBranch?.id]);
+  const timeSeriesQuery = useQuery({
+    queryKey: ['analytics', 'time-series', ...scope],
+    queryFn: async () => (await analyticsService.getTimeSeries(filter))?.data ?? [],
+    enabled,
+  });
+
+  const revenueQuery = useQuery({
+    queryKey: ['analytics', 'revenue', ...scope],
+    queryFn: async () => (await analyticsService.getRevenue(filter))?.data ?? null,
+    enabled,
+  });
+
+  // Eager despite being a tab dataset: the branch filter in the header reads
+  // its list.
+  const branchesQuery = useQuery({
+    queryKey: ['analytics', 'branches', ...scope],
+    queryFn: async () => (await analyticsService.getBranches(filter))?.data ?? null,
+    enabled,
+  });
+
+  // The remaining three are the heaviest aggregations and belong to a single
+  // tab each, so they stay unrequested until that tab is opened.
+  const menuQuery = useQuery({
+    queryKey: ['analytics', 'menu', ...scope],
+    queryFn: async () => (await analyticsService.getMenuPerformance(filter))?.data ?? null,
+    enabled: enabled && activeTab === 'menu',
+  });
+
+  const customersQuery = useQuery({
+    queryKey: ['analytics', 'customers', restaurantId ?? null],
+    queryFn: async () => (await analyticsService.getCustomers())?.data ?? null,
+    enabled: enabled && activeTab === 'customers',
+  });
+
+  const demandQuery = useQuery({
+    queryKey: ['analytics', 'demand-matrix', ...scope],
+    queryFn: async () => (await analyticsService.getDemandMatrix(filter))?.data ?? null,
+    enabled: enabled && activeTab === 'operations',
+  });
+
+  const branchData = branchesQuery.data;
+
+  const loadError = kpisQuery.isError
+    ? kpisQuery.error
+    : timeSeriesQuery.isError
+      ? timeSeriesQuery.error
+      : revenueQuery.isError
+        ? revenueQuery.error
+        : null;
 
   const handleKpiClick = (kpiKey: string) => {
     setDrillDownTitle(`Underlying Orders (${kpiKey.replace(/_/g, ' ').toUpperCase()})`);
@@ -115,12 +154,33 @@ export default function AnalyticsPage() {
   };
 
   const [isExporting, setIsExporting] = useState(false);
+  const [exportOpen, setExportOpen] = useState(false);
+  const exportRef = useRef<HTMLDivElement>(null);
+
+  // The menu used to appear on :hover only, which left it unreachable by
+  // touch and by keyboard while its two buttons stayed tabbable at opacity 0.
+  useEffect(() => {
+    if (!exportOpen) return;
+
+    const onPointerDown = (e: PointerEvent) => {
+      if (!exportRef.current?.contains(e.target as Node)) setExportOpen(false);
+    };
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setExportOpen(false);
+    };
+
+    document.addEventListener('pointerdown', onPointerDown);
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('pointerdown', onPointerDown);
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, [exportOpen]);
 
   const handleExport = async (type: 'ORDERS' | 'MENU') => {
     try {
+      setExportOpen(false);
       setIsExporting(true);
-      const { dateFrom, dateTo } = getDateRange(periodPreset);
-      const effectiveBranch = selectedBranchId || currentBranch?.id || undefined;
       const csvData = await analyticsService.exportCsv(type, {
         dateFrom,
         dateTo,
@@ -128,7 +188,7 @@ export default function AnalyticsPage() {
       });
 
       if (!csvData) {
-        alert('No data available to export for the selected period.');
+        toast.warning('No data available to export for the selected period.');
         return;
       }
 
@@ -147,7 +207,7 @@ export default function AnalyticsPage() {
       URL.revokeObjectURL(url);
     } catch (err: any) {
       console.error('Export failed:', err);
-      alert('Failed to export CSV: ' + (err.message || 'Unknown error'));
+      toast.error('Failed to export CSV: ' + (err?.message || 'Unknown error'));
     } finally {
       setIsExporting(false);
     }
@@ -155,211 +215,178 @@ export default function AnalyticsPage() {
 
   return (
     <div className="space-y-8 pb-12">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary border border-primary/20">
-              <TrendingUp className="w-5 h-5" />
-            </div>
-            <div>
-              <h1 className="font-display text-3xl font-semibold tracking-[-0.02em] text-foreground">Advanced Analytics Engine</h1>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Single-source-of-truth data intelligence, multi-period comparisons, and drill-down metrics.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Global Filter Bar */}
-        <div className="flex flex-wrap items-center gap-2.5">
-          {/* Branch Select */}
-          {branchData && branchData.branches.length > 1 && (
-            <select
-              value={selectedBranchId}
-              onChange={(e) => setSelectedBranchId(e.target.value)}
-              className="px-3 py-2 rounded-xl border border-border bg-card text-xs font-medium text-foreground focus:border-primary focus:outline-none"
-            >
-              <option value="">All Branches ({branchData.branches.length})</option>
-              {branchData.branches.map((b) => (
-                <option key={b.branchId} value={b.branchId}>
-                  {b.name}
-                </option>
-              ))}
-            </select>
-          )}
-
-          {/* Period Presets */}
-          <div className="flex items-center p-1 bg-card rounded-xl text-xs font-medium border border-border">
-            <button
-              onClick={() => setPeriodPreset('7D')}
-              className={`px-3 py-1.5 rounded-lg transition-all ${
-                periodPreset === '7D' ? 'bg-primary font-bold text-background shadow-sm' : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              7 Days
-            </button>
-            <button
-              onClick={() => setPeriodPreset('30D')}
-              className={`px-3 py-1.5 rounded-lg transition-all ${
-                periodPreset === '30D' ? 'bg-primary font-bold text-background shadow-sm' : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              30 Days
-            </button>
-            <button
-              onClick={() => setPeriodPreset('90D')}
-              className={`px-3 py-1.5 rounded-lg transition-all ${
-                periodPreset === '90D' ? 'bg-primary font-bold text-background shadow-sm' : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              Quarter
-            </button>
-            <button
-              onClick={() => setPeriodPreset('1Y')}
-              className={`px-3 py-1.5 rounded-lg transition-all ${
-                periodPreset === '1Y' ? 'bg-primary font-bold text-background shadow-sm' : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              Year
-            </button>
-          </div>
-
-          {/* Export Dropdown */}
-          <div className="relative group">
-            <button
-              disabled={isExporting}
-              className={`flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary text-background text-xs font-bold shadow-md hover:bg-primary-hover transition-all ${
-                isExporting ? 'opacity-70 cursor-not-allowed' : ''
-              }`}
-            >
-              <Download className={`w-3.5 h-3.5 ${isExporting ? 'animate-bounce' : ''}`} />
-              {isExporting ? 'Exporting...' : 'Export'}
-            </button>
-            {!isExporting && (
-              <div className="absolute right-0 top-full mt-1.5 w-48 bg-card border border-border rounded-xl p-1.5 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-all z-30">
-                <button
-                  onClick={() => handleExport('ORDERS')}
-                  className="w-full text-left px-3 py-2 text-xs rounded-lg hover:bg-secondary font-medium text-foreground transition-colors"
-                >
-                  Export Orders CSV
-                </button>
-                <button
-                  onClick={() => handleExport('MENU')}
-                  className="w-full text-left px-3 py-2 text-xs rounded-lg hover:bg-secondary font-medium text-foreground transition-colors"
-                >
-                  Export Menu Analytics CSV
-                </button>
-              </div>
+      <PageHeader
+        title="Advanced Analytics Engine"
+        description="Single-source-of-truth data intelligence, multi-period comparisons, and drill-down metrics."
+        actions={
+          <>
+            {/* Branch Select */}
+            {branchData && branchData.branches.length > 1 && (
+              <select
+                value={selectedBranchId}
+                onChange={(e) => setSelectedBranchId(e.target.value)}
+                aria-label="Filter analytics by branch"
+                className="max-w-full rounded-xl border border-border bg-card px-3 py-2 text-xs font-medium text-foreground focus:border-primary focus:outline-none"
+              >
+                <option value="">All Branches ({branchData.branches.length})</option>
+                {branchData.branches.map((b) => (
+                  <option key={b.branchId} value={b.branchId}>
+                    {b.name}
+                  </option>
+                ))}
+              </select>
             )}
-          </div>
-        </div>
-      </div>
+
+            {/* Period Presets — scrolls rather than forcing the row wider than
+                the viewport on a 320px phone. */}
+            <div className="no-scrollbar flex max-w-full items-center overflow-x-auto rounded-xl border border-border bg-card p-1 text-xs font-medium">
+              {PERIOD_PRESETS.map((preset) => (
+                <button
+                  key={preset.id}
+                  type="button"
+                  onClick={() => setPeriodPreset(preset.id)}
+                  aria-pressed={periodPreset === preset.id}
+                  className={`shrink-0 rounded-lg px-3 py-1.5 transition-all ${
+                    periodPreset === preset.id
+                      ? 'bg-primary font-bold text-primary-foreground shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  {preset.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Export Menu */}
+            <div ref={exportRef} className="relative">
+              <button
+                type="button"
+                disabled={isExporting}
+                onClick={() => setExportOpen((open) => !open)}
+                aria-haspopup="menu"
+                aria-expanded={exportOpen}
+                className={`flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-xs font-bold text-primary-foreground shadow-md transition-all hover:bg-primary-hover ${
+                  isExporting ? 'cursor-not-allowed opacity-70' : ''
+                }`}
+              >
+                <Download className={`h-3.5 w-3.5 ${isExporting ? 'animate-spin' : ''}`} />
+                {isExporting ? 'Exporting...' : 'Export'}
+              </button>
+
+              {exportOpen && !isExporting && (
+                <div
+                  role="menu"
+                  aria-label="Export analytics"
+                  className="absolute right-0 top-full z-30 mt-1.5 w-56 max-w-[calc(100vw-2rem)] rounded-xl border border-border bg-card p-1.5 shadow-lg"
+                >
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={() => handleExport('ORDERS')}
+                    className="w-full rounded-lg px-3 py-2 text-left text-xs font-medium text-foreground transition-colors hover:bg-secondary"
+                  >
+                    Export Orders CSV
+                  </button>
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={() => handleExport('MENU')}
+                    className="w-full rounded-lg px-3 py-2 text-left text-xs font-medium text-foreground transition-colors hover:bg-secondary"
+                  >
+                    Export Menu Analytics CSV
+                  </button>
+                </div>
+              )}
+            </div>
+          </>
+        }
+      />
+
+      {/* A failed aggregation used to fall through to "No KPI metrics
+          available", which tells an operator there were no sales when in fact
+          the request never completed. */}
+      {loadError && (
+        <ErrorPanel
+          message={(loadError as Error)?.message || 'Failed to load analytics for this period.'}
+          onRetry={() => {
+            kpisQuery.refetch();
+            timeSeriesQuery.refetch();
+            revenueQuery.refetch();
+          }}
+        />
+      )}
 
       {/* KPI Cards Grid */}
       <KpiSummaryGrid
-        kpis={kpiData?.kpis ?? []}
-        isLoading={loading}
+        kpis={kpisQuery.data?.kpis ?? []}
+        isLoading={kpisQuery.isPending}
         onKpiClick={handleKpiClick}
       />
 
       {/* Main Tabs Navigation */}
-      <div className="flex items-center gap-2 border-b border-border pb-px overflow-x-auto">
-        <button
-          onClick={() => setActiveTab('overview')}
-          className={`flex items-center gap-2 px-4 py-3 text-xs font-semibold border-b-2 transition-all whitespace-nowrap ${
-            activeTab === 'overview'
-              ? 'border-primary text-primary font-bold'
-              : 'border-transparent text-muted-foreground hover:text-foreground'
-          }`}
-        >
-          <Layers className="w-4 h-4" />
-          Overview & Trends
-        </button>
-        <button
-          onClick={() => setActiveTab('revenue')}
-          className={`flex items-center gap-2 px-4 py-3 text-xs font-semibold border-b-2 transition-all whitespace-nowrap ${
-            activeTab === 'revenue'
-              ? 'border-primary text-primary font-bold'
-              : 'border-transparent text-muted-foreground hover:text-foreground'
-          }`}
-        >
-          <TrendingUp className="w-4 h-4" />
-          Revenue & Financials
-        </button>
-        <button
-          onClick={() => setActiveTab('menu')}
-          className={`flex items-center gap-2 px-4 py-3 text-xs font-semibold border-b-2 transition-all whitespace-nowrap ${
-            activeTab === 'menu'
-              ? 'border-primary text-primary font-bold'
-              : 'border-transparent text-muted-foreground hover:text-foreground'
-          }`}
-        >
-          <UtensilsCrossed className="w-4 h-4" />
-          Menu & Products
-        </button>
-        <button
-          onClick={() => setActiveTab('customers')}
-          className={`flex items-center gap-2 px-4 py-3 text-xs font-semibold border-b-2 transition-all whitespace-nowrap ${
-            activeTab === 'customers'
-              ? 'border-primary text-primary font-bold'
-              : 'border-transparent text-muted-foreground hover:text-foreground'
-          }`}
-        >
-          <Users className="w-4 h-4" />
-          Customers & Cohorts
-        </button>
-        <button
-          onClick={() => setActiveTab('branches')}
-          className={`flex items-center gap-2 px-4 py-3 text-xs font-semibold border-b-2 transition-all whitespace-nowrap ${
-            activeTab === 'branches'
-              ? 'border-primary text-primary font-bold'
-              : 'border-transparent text-muted-foreground hover:text-foreground'
-          }`}
-        >
-          <Building2 className="w-4 h-4" />
-          Branch Benchmarks
-        </button>
-        <button
-          onClick={() => setActiveTab('operations')}
-          className={`flex items-center gap-2 px-4 py-3 text-xs font-semibold border-b-2 transition-all whitespace-nowrap ${
-            activeTab === 'operations'
-              ? 'border-primary text-primary font-bold'
-              : 'border-transparent text-muted-foreground hover:text-foreground'
-          }`}
-        >
-          <Clock className="w-4 h-4" />
-          7×24 Demand Matrix
-        </button>
+      <div className="no-scrollbar flex items-center gap-2 overflow-x-auto border-b border-border pb-px">
+        {TABS.map((tab) => {
+          const Icon = tab.icon;
+          return (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex shrink-0 items-center gap-2 whitespace-nowrap border-b-2 px-4 py-3 text-xs font-semibold transition-all ${
+                activeTab === tab.id
+                  ? 'border-primary font-bold text-primary'
+                  : 'border-transparent text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <Icon className="h-4 w-4" />
+              {tab.label}
+            </button>
+          );
+        })}
       </div>
 
       {/* Tab View Render */}
       <div className="space-y-6">
         {activeTab === 'overview' && (
           <div className="space-y-6">
-            <ComparisonTrendChart data={timeSeriesData} isLoading={loading} />
-            <RevenueAnalyticsView data={revenueData ?? undefined} isLoading={loading} />
+            <ComparisonTrendChart
+              data={timeSeriesQuery.data ?? []}
+              isLoading={timeSeriesQuery.isPending}
+            />
+            <RevenueAnalyticsView
+              data={revenueQuery.data ?? undefined}
+              isLoading={revenueQuery.isPending}
+            />
           </div>
         )}
 
         {activeTab === 'revenue' && (
-          <RevenueAnalyticsView data={revenueData ?? undefined} isLoading={loading} />
+          <RevenueAnalyticsView
+            data={revenueQuery.data ?? undefined}
+            isLoading={revenueQuery.isPending}
+          />
         )}
 
         {activeTab === 'menu' && (
-          <MenuPerformanceMatrix data={menuData ?? undefined} isLoading={loading} />
+          <MenuPerformanceMatrix data={menuQuery.data ?? undefined} isLoading={menuQuery.isPending} />
         )}
 
         {activeTab === 'customers' && (
-          <CustomerCohortTable data={customerData ?? undefined} isLoading={loading} />
+          <CustomerCohortTable
+            data={customersQuery.data ?? undefined}
+            isLoading={customersQuery.isPending}
+          />
         )}
 
         {activeTab === 'branches' && (
-          <BranchBenchmarkingView data={branchData ?? undefined} isLoading={loading} />
+          <BranchBenchmarkingView
+            data={branchData ?? undefined}
+            isLoading={branchesQuery.isPending}
+          />
         )}
 
         {activeTab === 'operations' && (
-          <OperationalHeatmap data={demandData ?? undefined} isLoading={loading} />
+          <OperationalHeatmap data={demandQuery.data ?? undefined} isLoading={demandQuery.isPending} />
         )}
       </div>
 
@@ -370,8 +397,8 @@ export default function AnalyticsPage() {
         title={drillDownTitle}
         dimension={drillDownDimension}
         targetId={drillDownTargetId}
-        dateFrom={getDateRange(periodPreset).dateFrom}
-        dateTo={getDateRange(periodPreset).dateTo}
+        dateFrom={dateFrom}
+        dateTo={dateTo}
         branchId={selectedBranchId || undefined}
       />
     </div>

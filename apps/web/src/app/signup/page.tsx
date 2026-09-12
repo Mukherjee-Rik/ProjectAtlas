@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useId, useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/use-auth';
 import {
   registerRestaurant,
@@ -13,10 +14,25 @@ import { clearAuthStorage } from '@/lib/auth-storage';
 import { setCurrentTenant } from '@/lib/tenant-storage';
 import { setCurrentRestaurant } from '@/lib/restaurant-storage';
 import { setCurrentBranch } from '@/lib/branch-storage';
-import { ShieldCheck, Mail, ArrowLeft, RefreshCw, KeyRound, CheckCircle2 } from 'lucide-react';
+import { ShieldCheck, Mail, ArrowLeft, RefreshCw, CheckCircle2 } from 'lucide-react';
 import { ValidatedInput } from '@/components/ui/validated-input';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { validateText, validateEmail, validatePhone, validatePassword } from '@/lib/validation';
 import { OAuthButtons } from '@/components/auth/oauth-buttons';
+
+/**
+ * Submission-time validation focuses the first field it rejected. On a phone
+ * the banner sits above the fold of a long form, so without this the user
+ * taps Continue at the bottom and nothing visibly happens.
+ */
+const FIELD_ORDER = [
+  'restaurantName',
+  'ownerName',
+  'email',
+  'phone',
+  'password',
+  'confirmPassword',
+] as const;
 
 export default function SignupPage() {
   const router = useRouter();
@@ -55,6 +71,10 @@ export default function SignupPage() {
   const [resendMessage, setResendMessage] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
   const [otpStep, setOtpStep] = useState(false);
+
+  const baseId = useId();
+  const robotErrId = `${baseId}-robot-error`;
+  const fieldId = (name: string) => `${baseId}-${name}`;
 
   // Countdown timer for OTP resend
   useEffect(() => {
@@ -153,6 +173,13 @@ export default function SignupPage() {
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       setError('Please resolve the highlighted errors before submitting.');
+
+      const firstInvalid = FIELD_ORDER.find((name) => validationErrors[name]);
+      const target = firstInvalid
+        ? document.getElementById(fieldId(firstInvalid))
+        : document.getElementById(validationErrors.terms ? 'terms' : 'not-a-robot');
+      target?.focus();
+      target?.scrollIntoView({ block: 'center', behavior: 'smooth' });
       return;
     }
 
@@ -274,21 +301,34 @@ export default function SignupPage() {
   };
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-background p-4 text-foreground">
-      <div className="w-full max-w-md space-y-6">
-        {/* Brand Logo & Header */}
-        <div className="text-center space-y-3">
-          <div className="flex justify-center">
-            <img
-              src="/logo.png"
-              alt="Kafei Logo"
-              className="h-20 w-auto object-contain drop-shadow-[0_0_12px_rgba(42,254,183,0.2)] rounded-lg"
-            />
-          </div>
-          <h1 className="text-xl font-bold text-foreground pt-1">
-            {otpStep ? 'Verify Your Email' : 'Start Your Free Trial'}
+    <main className="flex min-h-screen min-h-[100dvh] flex-col bg-background text-foreground">
+      {/* The same lockup + theme control the sign-in page carries, so the two
+          halves of one flow do not feel like two products. */}
+      <div className="flex items-center justify-between px-4 py-5 sm:px-6">
+        <Link href="/" className="flex items-center gap-2.5">
+          <Image
+            src="/logo.png"
+            alt="Kafei"
+            width={30}
+            height={30}
+            priority
+            className="h-7 w-auto rounded object-contain"
+          />
+          <span className="font-display text-[15px] font-bold tracking-[-0.02em] text-foreground">
+            Kafei
+          </span>
+        </Link>
+        <ThemeToggle />
+      </div>
+
+      <div className="flex flex-1 items-center justify-center px-4 pb-12">
+        <div className="w-full max-w-md space-y-6">
+        {/* Header */}
+        <div className="space-y-2">
+          <h1 className="font-display text-[1.75rem] font-bold leading-tight tracking-[-0.03em] text-foreground sm:text-[2rem]">
+            {otpStep ? 'Verify your email' : 'Start a free trial'}
           </h1>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             {otpStep
               ? 'Enter the 6-digit verification code sent to your email to activate your account.'
               : 'Create your restaurant account and manage menus, orders, and branches.'}
@@ -321,7 +361,7 @@ export default function SignupPage() {
             )}
 
             {error && (
-              <div className="rounded-xl border border-atlas-error/30 bg-atlas-error/10 p-3 text-xs text-atlas-error animate-in fade-in">
+              <div role="alert" className="rounded-xl border border-atlas-error/30 bg-atlas-error/10 p-3 text-xs text-atlas-error animate-in fade-in">
                 {error}
               </div>
             )}
@@ -392,14 +432,15 @@ export default function SignupPage() {
           </form>
         ) : (
           /* ── STEP 1: Signup Details Card ── */
-          <form onSubmit={handleInitiateSignup} className="space-y-4 rounded-2xl border border-border bg-card p-6" noValidate>
+          <form onSubmit={handleInitiateSignup} className="space-y-4 rounded-2xl border border-border bg-card p-4 sm:p-6" noValidate>
             {error && (
-              <div className="rounded-xl border border-atlas-error/30 bg-atlas-error/10 p-3 text-xs text-atlas-error animate-in fade-in">
+              <div role="alert" className="rounded-xl border border-atlas-error/30 bg-atlas-error/10 p-3 text-xs text-atlas-error animate-in fade-in">
                 {error}
               </div>
             )}
 
             <ValidatedInput
+              id={fieldId('restaurantName')}
               label="Restaurant Name"
               required
               maxLength={100}
@@ -415,6 +456,7 @@ export default function SignupPage() {
             />
 
             <ValidatedInput
+              id={fieldId('ownerName')}
               label="Owner Full Name"
               required
               maxLength={100}
@@ -431,6 +473,7 @@ export default function SignupPage() {
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <ValidatedInput
+                id={fieldId('email')}
                 label="Email Address"
                 required
                 type="email"
@@ -446,6 +489,7 @@ export default function SignupPage() {
               />
 
               <ValidatedInput
+                id={fieldId('phone')}
                 label="Phone (Optional)"
                 type="tel"
                 maxLength={15}
@@ -462,6 +506,7 @@ export default function SignupPage() {
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <ValidatedInput
+                id={fieldId('password')}
                 label="Password"
                 required
                 type="password"
@@ -479,6 +524,7 @@ export default function SignupPage() {
               />
 
               <ValidatedInput
+                id={fieldId('confirmPassword')}
                 label="Confirm Password"
                 required
                 type="password"
@@ -495,7 +541,10 @@ export default function SignupPage() {
             </div>
 
             <div className="space-y-1 pt-1">
-              <div className="flex items-start gap-2">
+              {/* The 44px coarse-pointer target lives on the row, not on the
+                  box: min-height beats height, so an unsized checkbox renders
+                  as a 13px-wide, 44px-tall sliver on every phone. */}
+              <div className="flex min-h-[44px] items-start gap-2 py-1.5">
                 <input
                   type="checkbox"
                   id="terms"
@@ -508,7 +557,7 @@ export default function SignupPage() {
                       setErrors(next);
                     }
                   }}
-                  className="mt-0.5 rounded border-border bg-secondary text-primary focus:ring-primary"
+                  className="allow-small-target mt-0.5 h-4 w-4 shrink-0 rounded border-border bg-secondary text-primary focus:ring-primary"
                 />
                 <label htmlFor="terms" className="text-xs text-muted-foreground leading-relaxed cursor-pointer">
                   I agree to Kafei&apos;s{' '}
@@ -541,7 +590,7 @@ export default function SignupPage() {
                       setErrors(next);
                     }
                   }}
-                  className="h-4 w-4 shrink-0 rounded border-border bg-secondary text-primary focus:ring-primary"
+                  className="allow-small-target h-4 w-4 shrink-0 rounded border-border bg-secondary text-primary focus:ring-primary"
                 />
                 <label
                   htmlFor="not-a-robot"
@@ -554,13 +603,22 @@ export default function SignupPage() {
                   aria-hidden="true"
                 />
               </div>
-              {errors.robot && <p className="text-xs text-atlas-error">{errors.robot}</p>}
+              {errors.robot && (
+                <p id={robotErrId} className="text-xs text-atlas-error">
+                  {errors.robot}
+                </p>
+              )}
             </div>
 
+            {/* Only the in-flight request disables this. Gating it on the
+                human check instead left a new customer's first impression as a
+                dead button, and made the `robot` validation branch below
+                unreachable. */}
             <button
               type="submit"
-              disabled={isLoading || !notARobot}
-              className="w-full rounded-xl bg-primary py-3.5 text-sm font-bold text-background shadow-lg transition-all hover:bg-primary-hover active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
+              disabled={isLoading}
+              aria-describedby={errors.robot ? robotErrId : undefined}
+              className="w-full rounded-xl bg-primary py-3.5 text-sm font-bold text-primary-foreground shadow-lg transition-all hover:bg-primary-hover active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isLoading ? 'Sending Verification Code...' : 'Continue to Verification'}
             </button>
@@ -578,6 +636,7 @@ export default function SignupPage() {
             </p>
           </form>
         )}
+        </div>
       </div>
     </main>
   );

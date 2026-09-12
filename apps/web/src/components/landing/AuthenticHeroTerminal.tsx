@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   UtensilsCrossed,
   ChefHat,
   Receipt,
   QrCode,
+  Check,
   CheckCircle2,
   Volume2,
   Printer,
@@ -88,12 +89,22 @@ export function AuthenticHeroTerminal() {
 
   const selectedTable = tables.find((t) => t.id === selectedTableId) || tables[0];
 
+  // The simulation timeout has to be cancellable: without this it keeps
+  // firing after the visitor has scrolled past and unmounted the section.
+  const simulateTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(
+    () => () => {
+      if (simulateTimer.current) clearTimeout(simulateTimer.current);
+    },
+    []
+  );
+
   const handleSimulateOrder = () => {
     if (isSimulating) return;
     setIsSimulating(true);
 
     // Update Table 3 from Available to Ordered
-    setTimeout(() => {
+    simulateTimer.current = setTimeout(() => {
       setTables((prev) =>
         prev.map((t) =>
           t.id === 't3'
@@ -126,21 +137,21 @@ export function AuthenticHeroTerminal() {
         };
       case 'ordered':
         return {
-          bg: 'bg-sky-500/10 text-sky-400 border-sky-500/20',
+          bg: 'bg-atlas-info/10 text-atlas-info border-atlas-info/20',
           label: 'New Order',
-          dot: 'bg-sky-400 animate-pulse',
+          dot: 'bg-atlas-info',
         };
       case 'cooking':
         return {
           bg: 'bg-atlas-warning/10 text-atlas-warning border-atlas-warning/20',
           label: 'In Kitchen',
-          dot: 'bg-atlas-warning animate-ping',
+          dot: 'bg-atlas-warning animate-pulse',
         };
       case 'ready':
         return {
           bg: 'bg-primary/15 text-primary border-primary/30',
           label: 'Ready to Serve',
-          dot: 'bg-primary animate-pulse',
+          dot: 'bg-primary',
         };
       default:
         return {

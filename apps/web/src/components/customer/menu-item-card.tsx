@@ -1,15 +1,10 @@
 'use client';
 
 import { memo } from 'react';
+import { Minus, Plus } from 'lucide-react';
 import { formatCurrency } from '@/lib/currency';
+import { DietaryMark } from '@/components/customer/dietary-mark';
 import type { DietaryType } from '@/types/menu';
-
-const DIETARY_COLOR: Record<DietaryType, string> = {
-  VEG: '#22C55E',
-  VEGAN: '#22C55E',
-  EGG: '#EAB308',
-  NON_VEG: '#EF4444',
-};
 
 export interface MenuCardItem {
   id: string;
@@ -54,16 +49,22 @@ function MenuItemCardComponent({
     (item.addonGroups && item.addonGroups.length > 0);
 
   return (
-    <article className="space-y-3 rounded-2xl border border-border bg-card p-4 transition-all hover:border-primary/30 shadow-md">
-      <div onClick={() => onOpen(item.id)} className="cursor-pointer space-y-1.5">
+    <article className="space-y-3 rounded-2xl border border-border bg-card p-4 shadow-sm transition-colors hover:border-primary/30">
+      {/* A real button, not a div: opening an item is the main action on this
+          screen, so it has to be reachable by keyboard and switch control. */}
+      <button
+        type="button"
+        onClick={() => onOpen(item.id)}
+        aria-label={`View ${item.name}`}
+        className="w-full space-y-1.5 text-left"
+      >
         <div className="flex items-start justify-between gap-3">
-          <div className="space-y-1 flex-1">
+          <div className="min-w-0 flex-1 space-y-1">
             <div className="flex items-center gap-2">
-              <span
-                className="h-2.5 w-2.5 shrink-0 rounded-full"
-                style={{ backgroundColor: DIETARY_COLOR[item.dietaryType] ?? '#A1A1AA' }}
-              />
-              <h3 className="text-sm font-bold leading-tight text-foreground">{item.name}</h3>
+              <DietaryMark type={item.dietaryType} />
+              <h3 className="text-sm font-bold leading-tight text-foreground break-words">
+                {item.name}
+              </h3>
             </div>
             {item.description && (
               <p className="line-clamp-2 text-[11px] leading-relaxed text-muted-foreground">
@@ -75,27 +76,24 @@ function MenuItemCardComponent({
           {item.imageUrl && (
             <img
               src={item.imageUrl}
-              alt={item.name}
+              alt=""
               loading="lazy"
               decoding="async"
-              className="h-16 w-16 shrink-0 rounded-xl object-cover border border-border"
+              className="h-16 w-16 shrink-0 rounded-xl border border-border object-cover"
             />
           )}
         </div>
-      </div>
+      </button>
 
       {/* Bottom Row: Price + Direct Inline Quantity Controls */}
-      <div className="flex items-center justify-between pt-2 border-t border-border/40">
-        <div className="flex flex-col">
+      <div className="flex items-center justify-between gap-3 border-t border-border/40 pt-2">
+        <div className="flex min-w-0 flex-col">
           <span className="text-base font-black text-primary">{formatCurrency(item.price)}</span>
           {hasCustomizations && (
-            <button
-              type="button"
-              onClick={() => onOpen(item.id)}
-              className="text-[10px] text-muted-foreground hover:text-primary text-left underline"
-            >
-              Customisable options
-            </button>
+            // Information, not a second control: the card itself already opens
+            // the sheet, and as a button the coarse-pointer 44px minimum made
+            // customisable cards visibly taller than plain ones.
+            <span className="text-[11px] text-muted-foreground">Customisable</span>
           )}
         </div>
 
@@ -103,32 +101,32 @@ function MenuItemCardComponent({
           <button
             type="button"
             onClick={() => onQuickAdd(item)}
-            className="flex items-center gap-1.5 rounded-xl border border-primary bg-primary/10 px-5 py-2 text-xs font-bold text-primary transition-all hover:bg-primary hover:text-background active:scale-90 shadow-sm cursor-pointer"
+            className="flex shrink-0 items-center gap-1.5 rounded-xl border border-primary bg-primary/10 px-5 py-2 text-xs font-bold text-primary shadow-sm transition-colors hover:bg-primary hover:text-background"
           >
-            <span>+</span> ADD
+            <Plus className="h-3.5 w-3.5" strokeWidth={2.5} aria-hidden="true" /> ADD
           </button>
         ) : (
-          <div className="flex items-center rounded-xl border border-primary bg-secondary p-0.5 shadow-sm">
+          <div className="flex shrink-0 items-center rounded-xl border border-primary bg-secondary p-0.5 shadow-sm">
             <button
               type="button"
               onClick={() => onDecrement(item, quantity)}
-              className="flex h-7 w-8 items-center justify-center rounded-lg text-base font-bold text-primary transition-all hover:bg-primary/20 active:scale-75 cursor-pointer"
-              aria-label="Decrease quantity"
+              className="flex h-7 w-8 items-center justify-center rounded-lg text-primary transition-colors hover:bg-primary/20"
+              aria-label={`Decrease ${item.name} quantity`}
             >
-              −
+              <Minus className="h-4 w-4" strokeWidth={2.5} aria-hidden="true" />
             </button>
 
-            <span className="min-w-7 text-center text-xs font-bold font-mono text-foreground">
+            <span className="min-w-7 text-center font-mono text-xs font-bold text-foreground">
               {quantity}
             </span>
 
             <button
               type="button"
               onClick={() => onIncrement(item, quantity)}
-              className="flex h-7 w-8 items-center justify-center rounded-lg text-base font-bold text-primary transition-all hover:bg-primary/20 active:scale-75 cursor-pointer"
-              aria-label="Increase quantity"
+              className="flex h-7 w-8 items-center justify-center rounded-lg text-primary transition-colors hover:bg-primary/20"
+              aria-label={`Increase ${item.name} quantity`}
             >
-              +
+              <Plus className="h-4 w-4" strokeWidth={2.5} aria-hidden="true" />
             </button>
           </div>
         )}

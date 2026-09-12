@@ -1,0 +1,1733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Kafei 2.0 — Complete Master Operations Manual (Sweta's Restaurant Edition)</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap');
+
+    :root {
+      --primary: #10B981;
+      --primary-dark: #059669;
+      --primary-light: #34D399;
+      --bg-dark: #090D11;
+      --bg-card: #121820;
+      --bg-card-alt: #18222D;
+      --border: #232E3C;
+      --border-light: #2D3A4B;
+      --text-main: #F1F5F9;
+      --text-muted: #94A3B8;
+      --text-subtle: #64748B;
+      --gold: #F59E0B;
+      --danger: #EF4444;
+      --info: #3B82F6;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      line-height: 1.6;
+      font-size: 13px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .manual-container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 40px 30px;
+    }
+
+    @page {
+      size: A4;
+      margin: 1.5cm 1.2cm;
+      @bottom-right {
+        content: "Page " counter(page);
+        font-size: 8pt;
+        color: #64748B;
+        font-family: 'JetBrains Mono', monospace;
+      }
+      @bottom-left {
+        content: "Kafei 2.0 — Sweta's Restaurant Master Manual";
+        font-size: 8pt;
+        font-weight: 600;
+        color: #10B981;
+      }
+    }
+
+    @media print {
+      body {
+        background-color: #090D11 !important;
+        color: #F1F5F9 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      .manual-container {
+        padding: 0;
+        max-width: 100%;
+      }
+      .page-break {
+        page-break-before: always !important;
+        break-before: page !important;
+      }
+      .avoid-break {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+      }
+    }
+
+    .page-break {
+      page-break-before: always;
+      margin-top: 35px;
+      padding-top: 20px;
+      border-top: 1px dashed var(--border);
+    }
+
+    /* Cover Page */
+    .cover-page {
+      min-height: 920px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 60px 45px;
+      background: radial-gradient(circle at 90% 10%, rgba(16, 185, 129, 0.15) 0%, transparent 60%),
+                  linear-gradient(180deg, #121820 0%, #090D11 100%);
+      margin-bottom: 50px;
+    }
+
+    .cover-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .cover-logo-badge {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: #042F1E;
+      font-weight: 800;
+      font-size: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+    }
+
+    .cover-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--primary);
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 6px 14px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .cover-middle h1 {
+      font-size: 40px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      color: #FFFFFF;
+      margin-bottom: 14px;
+    }
+
+    .cover-middle h2 {
+      font-size: 21px;
+      font-weight: 600;
+      color: var(--primary-light);
+      margin-bottom: 24px;
+    }
+
+    .cover-middle p {
+      font-size: 14px;
+      color: var(--text-muted);
+      max-width: 720px;
+      line-height: 1.7;
+    }
+
+    .cover-featured-box {
+      background: rgba(24, 34, 45, 0.7);
+      border: 1px solid var(--border-light);
+      border-left: 4px solid var(--primary);
+      border-radius: 10px;
+      padding: 18px 22px;
+      margin-top: 32px;
+    }
+
+    .cover-featured-box .label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      text-transform: uppercase;
+      color: var(--primary);
+      font-weight: 700;
+      letter-spacing: 0.1em;
+    }
+
+    .cover-featured-box .name {
+      font-size: 17px;
+      font-weight: 700;
+      color: #FFFFFF;
+      margin-top: 2px;
+    }
+
+    .cover-featured-box .details {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      line-height: 1.5;
+    }
+
+    .cover-bottom {
+      border-top: 1px solid var(--border);
+      padding-top: 24px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* Table of Contents */
+    .toc-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 30px;
+      margin-bottom: 40px;
+    }
+
+    .toc-card h2 {
+      font-size: 22px;
+      font-weight: 800;
+      color: #FFFFFF;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .toc-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px 20px;
+    }
+
+    .toc-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      background: var(--bg-card-alt);
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+    }
+
+    .toc-item span:first-child {
+      font-weight: 600;
+      color: var(--text-main);
+      font-size: 12px;
+    }
+
+    .toc-item span:last-child {
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 11px;
+    }
+
+    /* Chapter Header */
+    .chapter-header {
+      background: linear-gradient(90deg, rgba(16, 185, 129, 0.15) 0%, transparent 100%);
+      border-left: 4px solid var(--primary);
+      padding: 14px 20px;
+      border-radius: 0 10px 10px 0;
+      margin-bottom: 24px;
+    }
+
+    .chapter-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--primary);
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+    }
+
+    .chapter-title {
+      font-size: 21px;
+      font-weight: 800;
+      color: #FFFFFF;
+      margin-top: 2px;
+    }
+
+    .chapter-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Content Cards & Mockups */
+    .content-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px;
+      margin-bottom: 26px;
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #FFFFFF;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-text {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      line-height: 1.6;
+    }
+
+    /* Terminal & UI Window Mockups */
+    .ui-window {
+      background: #0B0F14;
+      border: 1px solid var(--border-light);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.6);
+      margin: 16px 0;
+    }
+
+    .ui-topbar {
+      background: #141B24;
+      padding: 10px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .ui-dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .ui-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+    }
+    .dot-r { background: #EF4444; }
+    .dot-y { background: #F59E0B; }
+    .dot-g { background: #10B981; }
+
+    .ui-url {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--text-subtle);
+      background: #090D11;
+      padding: 2px 12px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+    }
+
+    .ui-body {
+      padding: 20px;
+    }
+
+    /* Grids */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    /* Tables */
+    .table-box {
+      background: var(--bg-card-alt);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      text-align: center;
+    }
+
+    .table-box.active {
+      border-color: var(--primary);
+      box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
+    }
+
+    .table-box.urgent {
+      border-color: var(--danger);
+      box-shadow: 0 0 15px rgba(239, 68, 68, 0.2);
+    }
+
+    /* KDS Ticket */
+    .ticket {
+      background: var(--bg-card-alt);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .ticket-head {
+      padding: 8px 12px;
+      display: flex;
+      justify-content: space-between;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .head-green { background: rgba(16, 185, 129, 0.2); color: var(--primary); }
+    .head-yellow { background: rgba(245, 158, 11, 0.2); color: var(--gold); }
+    .head-red { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+
+    .ticket-body {
+      padding: 12px;
+      font-size: 12px;
+    }
+
+    .ticket-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    .ticket-warn {
+      font-size: 10.5px;
+      color: var(--gold);
+      font-style: italic;
+      margin-bottom: 6px;
+    }
+
+    /* Receipt Paper */
+    .receipt-sample {
+      background: #F8FAFC;
+      color: #0F172A;
+      font-family: 'JetBrains Mono', monospace;
+      padding: 20px;
+      border-radius: 4px;
+      font-size: 11px;
+      line-height: 1.45;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+      max-width: 320px;
+      margin: 0 auto;
+    }
+
+    .receipt-header {
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .receipt-header h3 {
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .receipt-line {
+      border-top: 1px dashed #94A3B8;
+      margin: 8px 0;
+    }
+
+    .receipt-row {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .receipt-total {
+      font-size: 13px;
+      font-weight: 800;
+      margin-top: 6px;
+    }
+
+    /* Specs List */
+    .spec-list {
+      list-style: none;
+    }
+
+    .spec-list li {
+      font-size: 12.5px;
+      color: var(--text-main);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .spec-list li strong {
+      color: #FFFFFF;
+    }
+
+    .spec-list li::before {
+      content: '✓';
+      color: var(--primary);
+      font-weight: bold;
+    }
+
+    .page-footer {
+      border-top: 1px solid var(--border);
+      padding-top: 14px;
+      margin-top: 30px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-subtle);
+    }
+  </style>
+</head>
+<body>
+
+<div class="manual-container">
+
+  <!-- ====================================================================
+       PAGE 1: COVER
+       ==================================================================== -->
+  <div class="cover-page">
+    <div class="cover-top">
+      <div class="cover-logo-badge">K</div>
+      <div class="cover-tag">Master Operations Manual</div>
+    </div>
+
+    <div class="cover-middle">
+      <h1>Kafei 2.0 Enterprise Billing & Floor Operating System</h1>
+      <h2>Complete End-to-End System Manual & Visual Workflows</h2>
+      <p>
+        The comprehensive operational manual detailing every single screen, role, and workflow in the Kafei platform. Designed for restaurant owners, general managers, head chefs, and cashier operators to run zero-chaos dining operations.
+      </p>
+
+      <div class="cover-featured-box">
+        <div class="label">Featured Pilot Establishment</div>
+        <div class="name">Sweta's Restaurant & Rooftop Lounge</div>
+        <div class="details">
+          Primary Branch: Sundarban, West Bengal • Outlet #2: Teliamura, Tripura, India<br>
+          GSTIN: 19AAECK1234A1Z5 • Total Seating Capacity: 120 Covers across 4 Dining Zones
+        </div>
+      </div>
+    </div>
+
+    <div class="cover-bottom">
+      <div>Platform Portal: <strong>https://kafei.in</strong></div>
+      <div>Direct Sales & Technical Onboarding: <strong>+91 9903085026</strong></div>
+      <div>Support: <strong>restaurant.kafei@gmail.com</strong></div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ====================================================================
+       PAGE 2: TABLE OF CONTENTS
+       ==================================================================== -->
+  <div class="toc-card avoid-break">
+    <h2>📋 Master Table of Contents</h2>
+    <div class="toc-grid">
+      <div class="toc-item"><span>1. System Architecture & 4-Screen Sync</span><span>Section 01</span></div>
+      <div class="toc-item"><span>2. Authentication & Secure Onboarding</span><span>Section 02</span></div>
+      <div class="toc-item"><span>3. Multi-Branch & Floor Layouts</span><span>Section 03</span></div>
+      <div class="toc-item"><span>4. Table Grid & Standee QR Generation</span><span>Section 04</span></div>
+      <div class="toc-item"><span>5. Menu Engineering & Item Modifiers</span><span>Section 05</span></div>
+      <div class="toc-item"><span>6. Guest Table QR Journey (Sweta's)</span><span>Section 06</span></div>
+      <div class="toc-item"><span>7. Waiter Mobile Terminal Operations</span><span>Section 07</span></div>
+      <div class="toc-item"><span>8. Kitchen Display System (KDS) Screen</span><span>Section 08</span></div>
+      <div class="toc-item"><span>9. Cashier POS & 80mm GST Thermal Bills</span><span>Section 09</span></div>
+      <div class="toc-item"><span>10. Anti-Theft Void & Refund Approvals</span><span>Section 10</span></div>
+      <div class="toc-item"><span>11. Recipe Inventory & Stock Depletion</span><span>Section 11</span></div>
+      <div class="toc-item"><span>12. Executive Analytics & AI Forecasting</span><span>Section 12</span></div>
+      <div class="toc-item"><span>13. Staff RBAC & User Administration</span><span>Section 13</span></div>
+      <div class="toc-item"><span>14. Organization Settings & UPI QR Settle</span><span>Section 14</span></div>
+      <div class="toc-item"><span>15. Hardware, Printer & Network Setup</span><span>Section 15</span></div>
+      <div class="toc-item"><span>16. Client Onboarding Checklist & SOP</span><span>Section 16</span></div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ====================================================================
+       PAGE 3: SECTION 1 - 4-SCREEN ARCHITECTURE
+       ==================================================================== -->
+  <div class="chapter-header avoid-break">
+    <div class="chapter-tag">Section 01</div>
+    <div class="chapter-title">System Architecture & The 4-Screen Real-Time Floor</div>
+    <div class="chapter-desc">How real-time WebSockets connect every terminal in under 200 milliseconds.</div>
+  </div>
+
+  <div class="content-card avoid-break">
+    <div class="card-title">⚡ The 4 Synchronized Screens of Sweta's Restaurant</div>
+    <p class="card-text">
+      During peak dinner rush at Sweta's Restaurant, orders move effortlessly through four synchronized terminals. When a guest orders a woodfired pizza on their phone at Table 04, the ticket appears simultaneously on the Kitchen display screen, the waiter's phone chimes, and the table turns green on the cashier counter.
+    </p>
+
+    <div class="grid-4">
+      <div class="table-box active">
+        <div style="font-size: 20px;">📱</div>
+        <div style="font-weight: 700; color: #FFFFFF; margin: 4px 0;">1. Table QR</div>
+        <div style="font-size: 11px; color: var(--text-muted);">Guest scans acrylic standee, browses photos & orders.</div>
+      </div>
+      <div class="table-box active">
+        <div style="font-size: 20px;">🍳</div>
+        <div style="font-weight: 700; color: #FFFFFF; margin: 4px 0;">2. Kitchen KDS</div>
+        <div style="font-size: 11px; color: var(--text-muted);">Color-coded tickets with live cooking countdowns.</div>
+      </div>
+      <div class="table-box active">
+        <div style="font-size: 20px;">🤵</div>
+        <div style="font-weight: 700; color: #FFFFFF; margin: 4px 0;">3. Waiter Phone</div>
+        <div style="font-size: 11px; color: var(--text-muted);">Table-side punches, custom mods & ready chimes.</div>
+      </div>
+      <div class="table-box active">
+        <div style="font-size: 20px;">🧾</div>
+        <div style="font-weight: 700; color: #FFFFFF; margin: 4px 0;">4. Cashier POS</div>
+        <div style="font-size: 11px; color: var(--text-muted);">80mm thermal bills, UPI QR pay & anti-theft queue.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ====================================================================
+       PAGE 4: SECTION 2 - AUTHENTICATION & LOGIN
+       ==================================================================== -->
+  <div class="chapter-header avoid-break">
+    <div class="chapter-tag">Section 02</div>
+    <div class="chapter-title">Authentication, Secure Onboarding & Session Control</div>
+    <div class="chapter-desc">Enterprise-grade multi-tenant security with JWT token cookies and password recovery.</div>
+  </div>
+
+  <div class="content-card avoid-break">
+    <div class="card-title">🔐 Live Login & Multi-Tenant Onboarding Screens</div>
+    <p class="card-text">
+      Sweta's Restaurant administrators access their private tenant environment securely via email/phone OTP and encrypted JWT sessions.
+    </p>
+
+    <div class="ui-window">
+      <div class="ui-topbar">
+        <div class="ui-dots"><div class="ui-dot dot-r"></div><div class="ui-dot dot-y"></div><div class="ui-dot dot-g"></div></div>
+        <div class="ui-url">https://kafei.in/login</div>
+      </div>
+      <div class="ui-body">
+        <div style="max-width: 360px; margin: 0 auto; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 20px;">
+          <div style="font-size: 16px; font-weight: 800; color: #FFFFFF; text-align: center; margin-bottom: 4px;">Sign in to Kafei</div>
+          <div style="font-size: 11.5px; color: var(--text-muted); text-align: center; margin-bottom: 16px;">Sweta's Restaurant Command Center</div>
+          
+          <div style="margin-bottom: 12px;">
+            <label style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 4px;">Email or Registered Phone</label>
+            <div style="background: #090D11; border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; color: #FFFFFF; font-size: 12px;">sweta.owner@swetarestaurant.in</div>
+          </div>
+          <div style="margin-bottom: 16px;">
+            <label style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 4px;">Password</label>
+            <div style="background: #090D11; border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; color: #FFFFFF; font-size: 12px;">••••••••••••</div>
+          </div>
+          <div style="background: var(--primary); color: #042F1E; font-weight: 700; text-align: center; padding: 9px; border-radius: 6px; font-size: 12.5px;">Sign In to Dashboard</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ====================================================================
+       PAGE 5: SECTION 3 - MULTI-BRANCH OUTLETS
+       ==================================================================== -->
+  <div class="chapter-header avoid-break">
+    <div class="chapter-tag">Section 03</div>
+    <div class="chapter-title">Multi-Branch Outlets & Dining Area Setup</div>
+    <div class="chapter-desc">Managing the Sundarban Flagship and Teliamura branch from a single login.</div>
+  </div>
+
+  <div class="content-card avoid-break">
+    <div class="card-title">🏢 Sweta's Restaurant Multi-Outlet Structure</div>
+    <p class="card-text">
+      Sweta manages two physical locations. Revenue, inventory, and staff are partitioned cleanly per branch while rolling up into one centralized owner overview.
+    </p>
+
+    <div class="grid-2">
+      <div style="background: var(--bg-card-alt); border: 1px solid var(--border); border-radius: 10px; padding: 16px;">
+        <div style="font-size: 14px; font-weight: 800; color: #FFFFFF;">Branch 1: Sundarban Flagship</div>
+        <div style="font-size: 11px; color: var(--primary); font-family: 'JetBrains Mono'; margin: 4px 0;">Sundarban, West Bengal, India</div>
+        <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 6px;">
+          • 18 Tables (AC Hall + Rooftop Lounge)<br>
+          • 12 Kitchen Staff & Waiters<br>
+          • Average Daily Revenue: ₹85,000
+        </div>
+      </div>
+
+      <div style="background: var(--bg-card-alt); border: 1px solid var(--border); border-radius: 10px; padding: 16px;">
+        <div style="font-size: 14px; font-weight: 800; color: #FFFFFF;">Branch 2: Teliamura Express</div>
+        <div style="font-size: 11px; color: var(--primary); font-family: 'JetBrains Mono'; margin: 4px 0;">Teliamura, Tripura, India</div>
+        <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 6px;">
+          • 10 Tables (Diner + Garden Patio)<br>
+          • 6 Kitchen Staff & Cashiers<br>
+          • Average Daily Revenue: ₹42,000
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ====================================================================
+       PAGE 6: SECTION 4 - DINING AREAS ARCHITECTURE
+       ==================================================================== -->
+  <div class="chapter-header avoid-break">
+    <div class="chapter-tag">Section 04</div>
+    <div class="chapter-title">Dining Areas Architecture & Floor Sections</div>
+    <div class="chapter-desc">Configuring AC Main Hall, Garden Patio, Rooftop Lounge, and VIP Suites.</div>
+  </div>
+
+  <div class="content-card avoid-break">
+    <div class="card-title">🪑 4 Specialized Dining Zones at Sweta's Restaurant</div>
+    <div class="grid-4">
+      <div class="table-box">
+        <div style="font-size: 14px; font-weight: 800; color: #FFFFFF;">Main AC Hall</div>
+        <div style="font-size: 11px; color: var(--primary); margin: 4px 0;">Tables 01 – 10</div>
+        <div style="font-size: 10.5px; color: var(--text-muted);">Family fine dining</div>
+      </div>
+      <div class="table-box">
+        <div style="font-size: 14px; font-weight: 800; color: #FFFFFF;">Rooftop Lounge</div>
+        <div style="font-size: 11px; color: var(--primary); margin: 4px 0;">Tables 11 – 18</div>
+        <div style="font-size: 10.5px; color: var(--text-muted);">Cocktails & grills</div>
+      </div>
+      <div class="table-box">
+        <div style="font-size: 14px; font-weight: 800; color: #FFFFFF;">Garden Patio</div>
+        <div style="font-size: 11px; color: var(--primary); margin: 4px 0;">Tables 19 – 24</div>
+        <div style="font-size: 10.5px; color: var(--text-muted);">Open-air seating</div>
+      </div>
+      <div class="table-box">
+        <div style="font-size: 14px; font-weight: 800; color: #FFFFFF;">Private VIP Suite</div>
+        <div style="font-size: 11px; color: var(--primary); margin: 4px 0;">Tables 25 – 26</div>
+        <div style="font-size: 10.5px; color: var(--text-muted);">Executive banquet</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ====================================================================
+       PAGE 7: SECTION 5 - TABLE QR CODE STANDEES
+       ==================================================================== -->
+  <div class="chapter-header avoid-break">
+    <div class="chapter-tag">Section 05</div>
+    <div class="chapter-title">Dynamic Acrylic Standee QR Codes</div>
+    <div class="chapter-desc">Generating encrypted, print-ready vector QR codes per table.</div>
+  </div>
+
+  <div class="content-card avoid-break">
+    <div class="card-title">🖨️ Sweta's Restaurant Table 04 Standee Specification</div>
+    <div class="grid-2">
+      <div style="background: #000000; border: 2px solid var(--primary); border-radius: 14px; padding: 24px; text-align: center;">
+        <div style="width: 140px; height: 140px; background: #FFFFFF; margin: 0 auto 12px auto; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-family: 'JetBrains Mono'; font-weight: 800; color: #000; font-size: 18px;">
+          [ QR CODE ]
+        </div>
+        <div style="font-size: 16px; font-weight: 800; color: #FFFFFF;">SWETA'S RESTAURANT</div>
+        <div style="font-size: 11px; color: var(--primary); font-family: 'JetBrains Mono'; margin-top: 2px;">Table 04 • Rooftop Lounge</div>
+        <div style="font-size: 10px; color: var(--text-muted); margin-top: 8px;">Point Camera to Browse Menu & Order</div>
+      </div>
+
+      <div>
+        <ul class="spec-list">
+          <li><strong>0 Guest App Friction:</strong> Opens in mobile Safari or Google Chrome without asking for customer logins.</li>
+          <li><strong>Encrypted Tokens:</strong> Prevents fake orders placed from outside the restaurant premises.</li>
+          <li><strong>One-Click PDF Vector Export:</strong> Formatted for standard 4×6 inch acrylic table standees.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ====================================================================
+       PAGE 8: SECTION 6 - MENU ENGINEERING & CATALOG
+       ==================================================================== -->
+  <div class="chapter-header avoid-break">
+    <div class="chapter-tag">Section 06</div>
+    <div class="chapter-title">Menu Engineering & Digital Catalog Management</div>
+    <div class="chapter-desc">Managing dishes, high-resolution food photography, and dietary tags.</div>
+  </div>
+
+  <div class="content-card avoid-break">
+    <div class="card-title">📖 Sweta's Signature Dishes & Price Slabs</div>
+    <div class="grid-3">
+      <div style="background: var(--bg-card-alt); border: 1px solid var(--border); border-radius: 8px; padding: 12px;">
+        <div style="display: flex; justify-content: space-between; font-weight: 700; color: #FFFFFF;">
+          <span>Truffle Fettuccine</span>
+          <span style="color: var(--primary);">₹380</span>
+        </div>
+        <div style="font-size: 10px; color: var(--text-muted); margin: 4px 0;">Handmade egg pasta, black truffle butter</div>
+        <div style="font-size: 9.5px; color: var(--primary-light); font-family: 'JetBrains Mono';">Category: Pastas & Mains</div>
+      </div>
+
+      <div style="background: var(--bg-card-alt); border: 1px solid var(--border); border-radius: 8px; padding: 12px;">
+        <div style="display: flex; justify-content: space-between; font-weight: 700; color: #FFFFFF;">
+          <span>Smoked Chicken Wings</span>
+          <span style="color: var(--primary);">₹420</span>
+        </div>
+        <div style="font-size: 10px; color: var(--text-muted); margin: 4px 0;">Hickory smoked with honey glaze</div>
+        <div style="font-size: 9.5px; color: var(--primary-light); font-family: 'JetBrains Mono';">Category: Appetizers</div>
+      </div>
+
+      <div style="background: var(--bg-card-alt); border: 1px solid var(--border); border-radius: 8px; padding: 12px;">
+        <div style="display: flex; justify-content: space-between; font-weight: 700; color: #FFFFFF;">
+          <span>Cold Brew Negroni</span>
+          <span style="color: var(--primary);">₹450</span>
+        </div>
+        <div style="font-size: 10px; color: var(--text-muted); margin: 4px 0;">Artisanal gin, campari, cold brew</div>
+        <div style="font-size: 9.5px; color: var(--gold); font-family: 'JetBrains Mono';">Category: Signature Bar</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ====================================================================
+       PAGE 9: SECTION 7 - DISH MODIFIERS & CUSTOMIZERS
+       ==================================================================== -->
+  <div class="chapter-header avoid-break">
+    <div class="chapter-tag">Section 07</div>
+    <div class="chapter-title">Dish Modifiers, Variants & Allergen Options</div>
+    <div class="chapter-desc">Configuring portion sizes, spice levels, add-ons, and chef cooking notes.</div>
+  </div>
+
+  <div class="content-card avoid-break">
+    <div class="card-title">⚙️ Interactive Modifier Matrix for Sweta's Kitchen</div>
+    <div class="grid-2">
+      <div style="background: var(--bg-card-alt); border: 1px solid var(--border); border-radius: 10px; padding: 16px;">
+        <div style="font-weight: 700; color: #FFFFFF; font-size: 13px;">Truffle Fettuccine Modifiers:</div>
+        <ul style="list-style: none; margin-top: 8px; font-size: 11.5px; color: var(--text-muted);">
+          <li>• <strong>Cheese Options:</strong> Normal Parmigiano (Free) | Extra Aged Truffle Cheese (+₹40)</li>
+          <li>• <strong>Spice Preference:</strong> Mild | Medium | Extra Spicy (Red Pepper)</li>
+          <li>• <strong>Preparation:</strong> Regular Butter | Low Fat Olive Oil</li>
+        </ul>
+      </div>
+
+      <div style="background: var(--bg-card-alt); border: 1px solid var(--border); border-radius: 10px; padding: 16px;">
+        <div style="font-weight: 700; color: #FFFFFF; font-size: 13px;">Smoked Wings Modifiers:</div>
+        <ul style="list-style: none; margin-top: 8px; font-size: 11.5px; color: var(--text-muted);">
+          <li>• <strong>Portion Size:</strong> Half Rack (6 pcs — ₹420) | Full Rack (12 pcs — ₹780)</li>
+          <li>• <strong>Sauce Selection:</strong> Honey Mustard | Fiery Peri-Peri | Smokey BBQ</li>
+          <li>• <strong>Extra Dips:</strong> Blue Cheese Dip (+₹50) | Garlic Aioli (+₹40)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ====================================================================
+       PAGE 10: SECTION 8 - REAL-TIME 86'D STOCK TOGGLES
+       ==================================================================== -->
+  <div class="chapter-header avoid-break">
+    <div class="chapter-tag">Section 08</div>
+    <div class="chapter-title">Real-Time Out-of-Stock (86'd) Inventory Toggles</div>
+    <div class="chapter-desc">Instantly disabling sold-out items across all QR menus and waiter handhelds.</div>
+  </div>
+
+  <div class="content-card avoid-break">
+    <div class="card-title">🚫 Zero Waiter Confusion When Items Sell Out</div>
+    <p class="card-text">
+      When Sweta's kitchen runs out of fresh lamb chops on a Friday night, the chef flips a single switch. The dish disappears from all table QR menus immediately, preventing disappointed guests.
+    </p>
+
+    <div class="ui-window">
+      <div class="ui-topbar">
+        <div class="ui-dots"><div class="ui-dot dot-r"></div><div class="ui-dot dot-y"></div><div class="ui-dot dot-g"></div></div>
+        <div class="ui-url">https://kafei.in/menus/live-availability</div>
+      </div>
+      <div class="ui-body">
+        <div class="grid-3">
+          <div class="table-box" style="border-color: var(--primary);">
+            <div style="font-size: 12px; font-weight: 700; color: #FFFFFF;">Truffle Fettuccine</div>
+            <div style="font-size: 11px; color: var(--primary); font-family: 'JetBrains Mono'; margin: 4px 0;">IN STOCK</div>
+            <div style="font-size: 10px; color: var(--text-muted);">28 Portions Available</div>
+          </div>
+          <div class="table-box" style="border-color: var(--gold);">
+            <div style="font-size: 12px; font-weight: 700; color: #FFFFFF;">Wild Mushroom Risotto</div>
+            <div style="font-size: 11px; color: var(--gold); font-family: 'JetBrains Mono'; margin: 4px 0;">LOW STOCK (4 Left)</div>
+            <div style="font-size: 10px; color: var(--text-muted);">Auto-86 at zero</div>
+          </div>
+          <div class="table-box" style="border-color: var(--danger);">
+            <div style="font-size: 12px; font-weight: 700; color: #FFFFFF;">Signature Lamb Chops</div>
+            <div style="font-size: 11px; color: var(--danger); font-family: 'JetBrains Mono'; margin: 4px 0;">SOLD OUT (86'd)</div>
+            <div style="font-size: 10px; color: var(--text-muted);">Hidden from QR Menu</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ====================================================================
+       PAGE 11: SECTION 9 - GUEST TABLE QR ORDERING (SWETA'S)
+       ==================================================================== -->
+  <div class="chapter-header avoid-break">
+    <div class="chapter-tag">Section 09</div>
+    <div class="chapter-title">Guest Dine-In QR Ordering Flow at Table 04</div>
+    <div class="chapter-desc">Full customer mobile interface, variant selection, and cart checkout.</div>
+  </div>
+
+  <div class="content-card avoid-break">
+    <div class="card-title">📱 Live Customer Mobile Cart & Order Dispatch</div>
+    <div class="grid-2">
+      <!-- Mobile View -->
+      <div style="background: #090D11; border: 3px solid #232E3C; border-radius: 24px; padding: 16px; max-width: 280px; margin: 0 auto;">
+        <div style="font-size: 11px; font-weight: 800; color: #FFFFFF; display: flex; justify-content: space-between;">
+          <span>Table 04 • Rooftop</span>
+          <span style="color: var(--primary);">#SW-1082</span>
+        </div>
+        <div style="background: #121820; border: 1px solid var(--border); border-radius: 8px; padding: 10px; margin: 10px 0;">
+          <div style="font-size: 11.5px; font-weight: 700; color: #FFFFFF;">2× Truffle Fettuccine</div>
+          <div style="font-size: 10px; color: var(--primary); font-family: 'JetBrains Mono';">₹760.00</div>
+          <div style="font-size: 9.5px; color: var(--text-muted);">Extra Cheese, Spicy</div>
+        </div>
+        <div style="background: #121820; border: 1px solid var(--border); border-radius: 8px; padding: 10px; margin: 10px 0;">
+          <div style="font-size: 11.5px; font-weight: 700; color: #FFFFFF;">1× Smoked Chicken Wings</div>
+          <div style="font-size: 10px; color: var(--primary); font-family: 'JetBrains Mono';">₹420.00</div>
+          <div style="font-size: 9.5px; color: var(--text-muted);">Honey Mustard Dip</div>
+        </div>
+        <div style="background: var(--primary); color: #042F1E; font-weight: 800; font-size: 11px; text-align: center; padding: 8px; border-radius: 6px;">
+          Send Order to Kitchen (₹1,180)
+        </div>
+      </div>
+
+      <!-- Feature Notes -->
+      <div>
+        <ul class="spec-list">
+          <li><strong>Automatic Token Creation:</strong> Ticket `#SW-1082` is created instantaneously and broadcast to the Kitchen KDS.</li>
+          <li><strong>No Customer Registration:</strong> Customers order without tedious OTP forms, maximizing table conversion.</li>
+          <li><strong>Shared Table Session:</strong> Companions at Table 04 can open the menu and add items to the same consolidated bill.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ====================================================================
+       PAGE 12: SECTION 10 - LIVE COOKING COUNTDOWN
+       ==================================================================== -->
+  <div class="chapter-header avoid-break">
+    <div class="chapter-tag">Section 10</div>
+    <div class="chapter-title">Live Kitchen Cooking Countdown & Status Tracking</div>
+    <div class="chapter-desc">Delighting guests with real-time cooking countdowns and course status.</div>
+  </div>
+
+  <div class="content-card avoid-break">
+    <div class="card-title">⏱️ Guest Mobile Countdown Screen</div>
+    <p class="card-text">
+      As soon as Chef Anirban accepts the ticket on the Kitchen display screen, the guest's mobile phone reflects a live countdown.
+    </p>
+
+    <div style="background: #0B0F14; border: 2px solid var(--primary); border-radius: 16px; padding: 30px; text-align: center; max-width: 460px; margin: 0 auto;">
+      <div style="font-size: 12px; font-family: 'JetBrains Mono'; color: var(--primary); font-weight: 700;">CHEF ANIRBAN IS COOKING YOUR ORDER</div>
+      <div style="font-size: 42px; font-weight: 800; color: #FFFFFF; font-family: 'JetBrains Mono'; margin: 12px 0;">07:35</div>
+      <div style="font-size: 12px; color: var(--text-muted);">Estimated arrival: 21:52 at Table 04 (Rooftop Lounge)</div>
+      <div style="margin-top: 16px; background: rgba(16, 185, 129, 0.15); border: 1px solid var(--primary); color: var(--primary-light); padding: 8px 12px; border-radius: 8px; font-size: 11px;">
+        🔔 Your waiter Amit will bring your dishes hot to the table!
+      </div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ====================================================================
+       PAGE 13: SECTION 11 - MULTI-ROUND DINING
+       ==================================================================== -->
+  <div class="chapter-header avoid-break">
+    <div class="chapter-tag">Section 11</div>
+    <div class="chapter-title">Multi-Round Dining & Session Consolidation</div>
+    <div class="chapter-desc">Adding drinks, appetizers, and second rounds seamlessly into one table check.</div>
+  </div>
+
+  <div class="content-card avoid-break">
+    <div class="card-title">🍹 Multiple Rounds Consolidated Automatically</div>
+    <p class="card-text">
+      Guests at Table 04 ordered appetizers at 21:30 and decided to add cocktails at 22:15. Both rounds link automatically under Token `#SW-1082`.
+    </p>
+
+    <div class="grid-2">
+      <div style="background: var(--bg-card-alt); border: 1px solid var(--border); border-radius: 10px; padding: 14px;">
+        <div style="font-weight: 700; color: #FFFFFF; font-size: 12.5px;">Round 1 (21:30) — Kitchen Pass</div>
+        <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 4px;">
+          • 2× Truffle Fettuccine (₹760)<br>
+          • 1× Smoked Chicken Wings (₹420)
+        </div>
+        <div style="font-size: 10.5px; color: var(--primary); font-family: 'JetBrains Mono'; margin-top: 6px;">Status: PLATED & SERVED</div>
+      </div>
+
+      <div style="background: var(--bg-card-alt); border: 1px solid var(--border); border-radius: 10px; padding: 14px;">
+        <div style="font-weight: 700; color: #FFFFFF; font-size: 12.5px;">Round 2 (22:15) — Bar Pass</div>
+        <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 4px;">
+          • 2× Cold Brew Negroni (₹900)<br>
+          • 1× Truffle Fries (₹220)
+        </div>
+        <div style="font-size: 10.5px; color: var(--gold); font-family: 'JetBrains Mono'; margin-top: 6px;">Status: IN PREPARATION</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ====================================================================
+       PAGE 14: SECTION 12 - 0% COMMISSION UPI QR SETTLE
+       ==================================================================== -->
+  <div class="chapter-header avoid-break">
+    <div class="chapter-tag">Section 12</div>
+    <div class="chapter-title">Direct UPI QR Payments with Zero Commission</div>
+    <div class="chapter-desc">Enabling guests to settle bills instantly from their phone with direct bank deposits.</div>
+  </div>
+
+  <div class="content-card avoid-break">
+    <div class="card-title">💳 Sweta's Direct UPI QR Settlement Screen</div>
+    <div class="grid-2">
+      <div style="background: #0B0F14; border: 2px solid var(--primary); border-radius: 16px; padding: 20px; text-align: center;">
+        <div style="font-size: 12px; font-weight: 800; color: #FFFFFF;">SWETA'S RESTAURANT BILL PAY</div>
+        <div style="font-size: 26px; font-weight: 800; color: var(--primary); font-family: 'JetBrains Mono'; margin: 8px 0;">₹2,478.00</div>
+        <div style="width: 120px; height: 120px; background: #FFFFFF; margin: 0 auto 10px auto; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #000; font-family: 'JetBrains Mono'; font-weight: 800; font-size: 12px;">
+          [ UPI QR ]
+        </div>
+        <div style="font-size: 10.5px; color: var(--text-muted);">UPI ID: sweta.restaurant@icici</div>
+        <div style="font-size: 10px; color: var(--primary-light); margin-top: 6px;">0% Aggregator Commission • Instant Settlement</div>
+      </div>
+
+      <div>
+        <ul class="spec-list">
+          <li><strong>Direct to Bank:</strong> Payments go directly into the owner's bank account with zero intermediate escrow holding.</li>
+          <li><strong>Auto-Verification:</strong> The cashier terminal reflects successful settlement automatically upon payment confirmation.</li>
+          <li><strong>Split Payment:</strong> Allows guests to pay their share via UPI and remaining in cash.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ====================================================================
+       PAGE 15: SECTION 13 - WAITER MOBILE DASHBOARD
+       ==================================================================== -->
+  <div class="chapter-header avoid-break">
+    <div class="chapter-tag">Section 13</div>
+    <div class="chapter-title">Waiter Mobile Terminal & Live Table Grid</div>
+    <div class="chapter-desc">Real-time floor occupancy, table status flags, and table-side order taking.</div>
+  </div>
+
+  <div class="content-card avoid-break">
+    <div class="card-title">🤵 Live Floor Table State Screen (Waiter View)</div>
+    <div class="ui-window">
+      <div class="ui-topbar">
+        <div class="ui-dots"><div class="ui-dot dot-r"></div><div class="ui-dot dot-y"></div><div class="ui-dot dot-g"></div></div>
+        <div class="ui-url">https://kafei.in/waiter (Server: Amit)</div>
+      </div>
+      <div class="ui-body">
+        <div class="grid-4">
+          <div class="table-box" style="border-color: var(--primary); background: rgba(16, 185, 129, 0.08);">
+            <div style="font-size: 13px; font-weight: 800; color: #FFFFFF;">Table 04</div>
+            <div style="font-size: 10px; color: var(--primary); font-family: 'JetBrains Mono'; font-weight: 700; margin: 2px 0;">COOKING (04:12)</div>
+            <div style="font-size: 11px; color: var(--text-muted);">4 Guests • ₹2,478</div>
+          </div>
+          <div class="table-box active">
+            <div style="font-size: 13px; font-weight: 800; color: #FFFFFF;">Table 02</div>
+            <div style="font-size: 10px; color: var(--primary-light); font-family: 'JetBrains Mono'; font-weight: 700; margin: 2px 0;">READY TO SERVE 🔔</div>
+            <div style="font-size: 11px; color: var(--text-muted);">2 Guests • ₹860</div>
+          </div>
+          <div class="table-box">
+            <div style="font-size: 13px; font-weight: 800; color: #FFFFFF;">Table 01</div>
+            <div style="font-size: 10px; color: var(--text-subtle); font-family: 'JetBrains Mono'; margin: 2px 0;">AVAILABLE</div>
+            <div style="font-size: 11px; color: var(--text-muted);">Clean & Set</div>
+          </div>
+          <div class="table-box" style="border-color: var(--gold);">
+            <div style="font-size: 13px; font-weight: 800; color: #FFFFFF;">Table 03</div>
+            <div style="font-size: 10px; color: var(--gold); font-family: 'JetBrains Mono'; font-weight: 700; margin: 2px 0;">BILL REQUESTED</div>
+            <div style="font-size: 11px; color: var(--text-muted);">6 Guests • ₹4,200</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ====================================================================
+       PAGE 16: SECTION 14 - WAITER TABLE-SIDE PUNCHING
+       ==================================================================== -->
+  <div class="chapter-header avoid-break">
+    <div class="chapter-tag">Section 14</div>
+    <div class="chapter-title">Waiter Table-Side Punching & Custom Orders</div>
+    <div class="chapter-desc">How floor staff assist elderly guests or guests requesting customized off-menu items.</div>
+  </div>
+
+  <div class="content-card avoid-break">
+    <div class="card-title">📝 Verbal Order Taking on Waiter's Phone</div>
+    <p class="card-text">
+      If walk-in guests at Table 01 prefer ordering verbally, the waiter opens `/waiter`, taps Table 01, and punches in items directly into the kitchen stream.
+    </p>
+
+    <div class="ui-window">
+      <div class="ui-topbar">
+        <div class="ui-dots"><div class="ui-dot dot-r"></div><div class="ui-dot dot-y"></div><div class="ui-dot dot-g"></div></div>
+        <div class="ui-url">https://kafei.in/waiter/table-01/order</div>
+      </div>
+      <div class="ui-body">
+        <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 14px;">
+          <div style="display: flex; justify-content: space-between; font-weight: 700; color: #FFFFFF; font-size: 13px;">
+            <span>Table 01 • Punch Order</span>
+            <span style="color: var(--primary);">Waiter: Amit</span>
+          </div>
+          <div style="margin: 12px 0; font-size: 12px; color: var(--text-muted);">
+            • 2× Wild Mushroom Risotto (₹960)<br>
+            • 2× Sparking Yuzu Soda (₹320)<br>
+            • <em>Chef Note: "No garlic in risotto for guest allergy"</em>
+          </div>
+          <div style="background: var(--primary); color: #042F1E; font-weight: 800; font-size: 11px; text-align: center; padding: 8px; border-radius: 6px;">
+            Dispatch KOT to Kitchen & Bar (₹1,280)
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ====================================================================
+       PAGE 17: SECTION 15 - READY-TO-SERVE CHIMES
+       ==================================================================== -->
+  <div class="chapter-header avoid-break">
+    <div class="chapter-tag">Section 15</div>
+    <div class="chapter-title">Instant Sound Chimes & Plated Notifications</div>
+    <div class="chapter-desc">Notifying floor runners the split second a dish is plated hot on the pass.</div>
+  </div>
+
+  <div class="content-card avoid-break">
+    <div class="card-title">🔔 Zero Cold Food Rejections with Audio/Visual Alerts</div>
+    <p class="card-text">
+      When Chef Anirban taps "Ready for Pickup", an audio chime triggers on the waiter tablet and Table 02 flashes bright green.
+    </p>
+
+    <div style="background: rgba(16, 185, 129, 0.1); border: 2px solid var(--primary); border-radius: 12px; padding: 20px; text-align: center;">
+      <div style="font-size: 24px;">🔔 🍽️</div>
+      <div style="font-size: 16px; font-weight: 800; color: #FFFFFF; margin-top: 4px;">ORDER READY FOR TABLE 02</div>
+      <div style="font-size: 12px; color: var(--primary-light); margin-top: 2px;">Pass: Main Kitchen • Dish: 1× Mushroom Risotto (Hot Plated)</div>
+      <div style="font-size: 11px; color: var(--text-muted); margin-top: 6px;">Waiter Amit acknowledged pickup at 21:50</div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ====================================================================
+       PAGE 18: SECTION 16 - KITCHEN DISPLAY SYSTEM (KDS)
+       ==================================================================== -->
+  <div class="chapter-header avoid-break">
+    <div class="chapter-tag">Section 16</div>
+    <div class="chapter-title">Kitchen Display System (KDS) Touchscreen Pass</div>
+    <div class="chapter-desc">Digital ticket queues color-coded by preparation urgency and station routing.</div>
+  </div>
+
+  <div class="content-card avoid-break">
+    <div class="card-title">🍳 Head Chef Kitchen Terminal at Sweta's Restaurant</div>
+    <div class="ui-window">
+      <div class="ui-topbar">
+        <div class="ui-dots"><div class="ui-dot dot-r"></div><div class="ui-dot dot-y"></div><div class="ui-dot dot-g"></div></div>
+        <div class="ui-url">https://kafei.in/kitchen (Main Pass Screen)</div>
+      </div>
+      <div class="ui-body">
+        <div class="grid-3">
+          <div class="ticket">
+            <div class="ticket-head head-green">
+              <span>Table 04 (#SW-1082)</span>
+              <span>01:14</span>
+            </div>
+            <div class="ticket-body">
+              <div class="ticket-item"><span>2× Truffle Fettuccine</span></div>
+              <div class="ticket-warn">★ Extra Parmesan, Spicy Base</div>
+              <div class="ticket-item"><span>1× Smoked Wings</span></div>
+              <div style="background: #18222D; color: #FFFFFF; font-size: 10.5px; font-weight: 700; padding: 6px; border-radius: 4px; text-align: center; margin-top: 8px;">Start Cooking</div>
+            </div>
+          </div>
+
+          <div class="ticket">
+            <div class="ticket-head head-yellow">
+              <span>Table 02 (#SW-1080)</span>
+              <span>06:45</span>
+            </div>
+            <div class="ticket-body">
+              <div class="ticket-item"><span>1× Wild Mushroom Risotto</span></div>
+              <div class="ticket-item"><span>2× Cold Brew Negroni</span></div>
+              <div style="background: rgba(16, 185, 129, 0.2); color: var(--primary); font-size: 10.5px; font-weight: 700; padding: 6px; border-radius: 4px; text-align: center; margin-top: 8px; border: 1px solid var(--primary);">Mark Ready</div>
+            </div>
+          </div>
+
+          <div class="ticket">
+            <div class="ticket-head head-red">
+              <span>Table 01 (#SW-1078)</span>
+              <span>13:10</span>
+            </div>
+            <div class="ticket-body">
+              <div class="ticket-item"><span>2× Lamb Chops (Med-Rare)</span></div>
+              <div class="ticket-item"><span>2× Garlic Herb Fries</span></div>
+              <div style="background: rgba(239, 68, 68, 0.2); color: var(--danger); font-size: 10.5px; font-weight: 700; padding: 6px; border-radius: 4px; text-align: center; margin-top: 8px; border: 1px solid var(--danger);">Bump Delayed</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ====================================================================
+       PAGE 19: SECTION 17 - STATION ROUTING & MULTI-KITCHEN
+       ==================================================================== -->
+  <div class="chapter-header avoid-break">
+    <div class="chapter-tag">Section 17</div>
+    <div class="chapter-title">Station Routing: Kitchen, Bar, Grill & Pastry Line</div>
+    <div class="chapter-desc">Splitting multi-item tickets automatically to their corresponding prep stations.</div>
+  </div>
+
+  <div class="content-card avoid-break">
+    <div class="card-title">📡 Intelligent Station Ticket Splitting</div>
+    <p class="card-text">
+      When Table 04 orders Truffle Fettuccine and Negroni cocktails, Kafei routes the pasta to the Hot Kitchen Screen and the cocktails to the Bar Screen automatically.
+    </p>
+
+    <div class="grid-2">
+      <div style="background: var(--bg-card-alt); border: 1px solid var(--border); border-radius: 10px; padding: 14px;">
+        <div style="font-weight: 700; color: #FFFFFF; font-size: 13px;">Hot Kitchen Screen (Table 04)</div>
+        <div style="font-size: 11px; color: var(--primary); font-family: 'JetBrains Mono'; margin-top: 2px;">• 2× Truffle Fettuccine (Spicy)</div>
+        <div style="font-size: 10px; color: var(--text-muted); margin-top: 6px;">Station: Pasta Station • Chef Anirban</div>
+      </div>
+
+      <div style="background: var(--bg-card-alt); border: 1px solid var(--border); border-radius: 10px; padding: 14px;">
+        <div style="font-weight: 700; color: #FFFFFF; font-size: 13px;">Bar Display Screen (Table 04)</div>
+        <div style="font-size: 11px; color: var(--gold); font-family: 'JetBrains Mono'; margin-top: 2px;">• 2× Cold Brew Negroni (Orange Peel)</div>
+        <div style="font-size: 10px; color: var(--text-muted); margin-top: 6px;">Station: Rooftop Bar • Bartender Rohan</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ====================================================================
+       PAGE 20: SECTION 18 - 1-TAP BUMP BAR MECHANICS
+       ==================================================================== -->
+  <div class="chapter-header avoid-break">
+    <div class="chapter-tag">Section 18</div>
+    <div class="chapter-title">1-Tap Bump Bar Mechanics & Order Recalls</div>
+    <div class="chapter-desc">Touchscreen bump bar controls and retrieving completed order tickets.</div>
+  </div>
+
+  <div class="content-card avoid-break">
+    <div class="card-title">👆 High-Speed Chef Workflow on Touchscreens</div>
+    <div class="grid-3">
+      <div class="table-box">
+        <div style="font-size: 13px; font-weight: 700; color: #FFFFFF;">1. Tap to Start</div>
+        <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Sets ticket to "In Prep" and starts the guest cooking timer.</div>
+      </div>
+      <div class="table-box">
+        <div style="font-size: 13px; font-weight: 700; color: #FFFFFF;">2. Tap to Complete</div>
+        <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Clears ticket from pass and alerts floor staff to serve.</div>
+      </div>
+      <div class="table-box">
+        <div style="font-size: 13px; font-weight: 700; color: #FFFFFF;">3. One-Click Recall</div>
+        <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Instantly restores bumped tickets if an extra plate is requested.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ====================================================================
+       PAGE 21: SECTION 19 - CASHIER POS & CHECKOUT
+       ==================================================================== -->
+  <div class="chapter-header avoid-break">
+    <div class="chapter-tag">Section 19</div>
+    <div class="chapter-title">Cashier POS Billing & Live Orders Queue</div>
+    <div class="chapter-desc">Settling tables, applying authorized discounts, and processing payments.</div>
+  </div>
+
+  <div class="content-card avoid-break">
+    <div class="card-title">🧾 Cashier POS Screen at Sweta's Restaurant</div>
+    <div class="ui-window">
+      <div class="ui-topbar">
+        <div class="ui-dots"><div class="ui-dot dot-r"></div><div class="ui-dot dot-y"></div><div class="ui-dot dot-g"></div></div>
+        <div class="ui-url">https://kafei.in/cashier (Terminal #01)</div>
+      </div>
+      <div class="ui-body">
+        <div style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 14px;">
+          <div>
+            <div style="font-size: 14px; font-weight: 800; color: #FFFFFF;">Table 04 — Rooftop Lounge</div>
+            <div style="font-size: 11px; color: var(--text-muted);">Token #SW-1082 • 4 Guests • Server: Rahul</div>
+          </div>
+          <div style="font-size: 18px; font-weight: 800; color: var(--primary); font-family: 'JetBrains Mono';">
+            ₹1,239.00 (Incl. GST)
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <div style="background: var(--bg-card-alt); border: 1px solid var(--border); color: #FFFFFF; font-size: 11px; font-weight: 700; padding: 6px 12px; border-radius: 6px;">Split Check</div>
+            <div style="background: var(--primary); color: #042F1E; font-size: 11px; font-weight: 800; padding: 6px 12px; border-radius: 6px;">Print & Settle</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ====================================================================
+       PAGE 22: SECTION 20 - 80MM GST THERMAL RECEIPT
+       ==================================================================== -->
+  <div class="chapter-header avoid-break">
+    <div class="chapter-tag">Section 20</div>
+    <div class="chapter-title">80mm & 58mm GST Thermal Receipt Printing</div>
+    <div class="chapter-desc">Browser-native printing to standard USB, Bluetooth, and LAN thermal receipt printers.</div>
+  </div>
+
+  <div class="content-card avoid-break">
+    <div class="card-title">📄 Official Tax Invoice Sample for Sweta's Restaurant</div>
+    <div class="receipt-sample">
+      <div class="receipt-header">
+        <h3>SWETA'S RESTAURANT</h3>
+        <div>Sundarban, West Bengal, India</div>
+        <div>GSTIN: 19AAECK1234A1Z5</div>
+        <div>Phone: +91 9903085026</div>
+      </div>
+      <div class="receipt-line"></div>
+      <div class="receipt-row"><span>Date: 09/09/2026</span><span>Time: 21:55</span></div>
+      <div class="receipt-row"><span>Table: 04 (Rooftop)</span><span>Token: #SW-1082</span></div>
+      <div class="receipt-row"><span>Server: Rahul</span><span>Guests: 4</span></div>
+      <div class="receipt-line"></div>
+      <div class="receipt-row"><span>2× Truffle Fettuccine</span><span>760.00</span></div>
+      <div class="receipt-row"><span>1× Smoked Chicken Wings</span><span>420.00</span></div>
+      <div class="receipt-line"></div>
+      <div class="receipt-row"><span>Subtotal:</span><span>1,180.00</span></div>
+      <div class="receipt-row"><span>CGST (2.5%):</span><span>29.50</span></div>
+      <div class="receipt-row"><span>SGST (2.5%):</span><span>29.50</span></div>
+      <div class="receipt-line"></div>
+      <div class="receipt-row receipt-total"><span>TOTAL DUE:</span><span>₹1,239.00</span></div>
+      <div class="receipt-row" style="margin-top: 4px; color: #15803D;"><span>PAID VIA UPI QR:</span><span>₹1,239.00</span></div>
+      <div class="receipt-line"></div>
+      <div style="text-align: center; font-size: 10px; color: #64748B;">Thank you for dining at Sweta's!</div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ====================================================================
+       PAGE 23: SECTION 21 - MULTI-TENDER & SPLIT BILLING
+       ==================================================================== -->
+  <div class="chapter-header avoid-break">
+    <div class="chapter-tag">Section 21</div>
+    <div class="chapter-title">Multi-Tender Payments & Split Billing</div>
+    <div class="chapter-desc">Splitting checks evenly or by individual items across multiple payment modes.</div>
+  </div>
+
+  <div class="content-card avoid-break">
+    <div class="card-title">🧮 Seamless Check Splitting for Large Parties</div>
+    <div class="grid-3">
+      <div class="table-box">
+        <div style="font-weight: 700; color: #FFFFFF; font-size: 12.5px;">Guest 1 (UPI QR)</div>
+        <div style="font-size: 16px; font-weight: 800; color: var(--primary); font-family: 'JetBrains Mono'; margin: 4px 0;">₹413.00</div>
+        <div style="font-size: 10.5px; color: var(--text-muted);">Paid via PhonePe</div>
+      </div>
+      <div class="table-box">
+        <div style="font-weight: 700; color: #FFFFFF; font-size: 12.5px;">Guest 2 (Credit Card)</div>
+        <div style="font-size: 16px; font-weight: 800; color: var(--primary); font-family: 'JetBrains Mono'; margin: 4px 0;">₹413.00</div>
+        <div style="font-size: 10.5px; color: var(--text-muted);">Paid via HDFC POS</div>
+      </div>
+      <div class="table-box">
+        <div style="font-weight: 700; color: #FFFFFF; font-size: 12.5px;">Guest 3 (Cash)</div>
+        <div style="font-size: 16px; font-weight: 800; color: var(--primary); font-family: 'JetBrains Mono'; margin: 4px 0;">₹413.00</div>
+        <div style="font-size: 10.5px; color: var(--text-muted);">Exact Cash Received</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ====================================================================
+       PAGE 24: SECTION 22 - ANTI-THEFT VOID SECURITY
+       ==================================================================== -->
+  <div class="chapter-header avoid-break">
+    <div class="chapter-tag">Section 22</div>
+    <div class="chapter-title">Anti-Theft Void & Refund Approval Workflow</div>
+    <div class="chapter-desc">Preventing staff cash skimming and unauthorized dish deletions.</div>
+  </div>
+
+  <div class="content-card avoid-break">
+    <div class="card-title">🛡️ Mandatory Reason & Manager Authorization Queue</div>
+    <div class="ui-window">
+      <div class="ui-topbar">
+        <div class="ui-dots"><div class="ui-dot dot-r"></div><div class="ui-dot dot-y"></div><div class="ui-dot dot-g"></div></div>
+        <div class="ui-url">https://kafei.in/orders/void-requests</div>
+      </div>
+      <div class="ui-body">
+        <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 14px;">
+          <div style="font-weight: 700; color: #FFFFFF; font-size: 13px;">Void Request: Table 04 (#SW-1082)</div>
+          <div style="font-size: 11.5px; color: var(--text-muted); margin: 6px 0;">
+            • Item: 1× Smoked Chicken Wings (₹420)<br>
+            • Reason: "Guest changed mind before cooking started"<br>
+            • Server: Rahul Das
+          </div>
+          <div style="display: flex; gap: 8px; justify-content: flex-end;">
+            <div style="background: rgba(239, 68, 68, 0.2); color: var(--danger); font-size: 11px; font-weight: 700; padding: 6px 12px; border-radius: 4px;">Reject</div>
+            <div style="background: var(--primary); color: #042F1E; font-size: 11px; font-weight: 800; padding: 6px 12px; border-radius: 4px;">Approve Void</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ====================================================================
+       PAGE 25: SECTION 23 - RECIPE INVENTORY & DEPLETION
+       ==================================================================== -->
+  <div class="chapter-header avoid-break">
+    <div class="chapter-tag">Section 23</div>
+    <div class="chapter-title">Recipe-Level Inventory & Automatic Stock Depletion</div>
+    <div class="chapter-desc">Real-time raw material deductions as orders leave the kitchen pass.</div>
+  </div>
+
+  <div class="content-card avoid-break">
+    <div class="card-title">📦 Real-Time Ingredient Depletion at Sweta's Restaurant</div>
+    <div class="grid-3">
+      <div class="table-box">
+        <div style="font-size: 12px; font-weight: 700; color: #FFFFFF;">Artisanal Fettuccine</div>
+        <div style="font-size: 18px; font-weight: 800; color: var(--primary); font-family: 'JetBrains Mono'; margin: 4px 0;">4.8 kg</div>
+        <div style="font-size: 10.5px; color: var(--text-muted);">-240g from Table 04</div>
+      </div>
+      <div class="table-box" style="border-color: var(--gold);">
+        <div style="font-size: 12px; font-weight: 700; color: #FFFFFF;">Truffle Butter</div>
+        <div style="font-size: 18px; font-weight: 800; color: var(--gold); font-family: 'JetBrains Mono'; margin: 4px 0;">380 g ⚠️</div>
+        <div style="font-size: 10.5px; color: var(--gold);">LOW STOCK ALERT</div>
+      </div>
+      <div class="table-box">
+        <div style="font-size: 12px; font-weight: 700; color: #FFFFFF;">Organic Wings</div>
+        <div style="font-size: 18px; font-weight: 800; color: var(--primary); font-family: 'JetBrains Mono'; margin: 4px 0;">18.5 kg</div>
+        <div style="font-size: 10.5px; color: var(--text-muted);">-500g from Table 04</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ====================================================================
+       PAGE 26: SECTION 24 - REORDER ALERTS & WASTAGE LOGS
+       ==================================================================== -->
+  <div class="chapter-header avoid-break">
+    <div class="chapter-tag">Section 24</div>
+    <div class="chapter-title">Automated Reorder Alerts & Wastage Tracking</div>
+    <div class="chapter-desc">Preventing stockouts and logging kitchen spoilage with variance tracking.</div>
+  </div>
+
+  <div class="content-card avoid-break">
+    <div class="card-title">⚠️ Automated Low-Stock Procurement Triggers</div>
+    <div class="grid-2">
+      <div style="background: var(--bg-card-alt); border: 1px solid var(--border); border-radius: 10px; padding: 14px;">
+        <div style="font-weight: 700; color: var(--gold); font-size: 13px;">Low Stock Alert: Truffle Butter</div>
+        <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 4px;">
+          • Current Level: 380 grams (Min: 500g)<br>
+          • Recommended Purchase: 2.0 kg from Gourmet Spices Ltd.<br>
+          • Automated WhatsApp notification sent to General Manager.
+        </div>
+      </div>
+
+      <div style="background: var(--bg-card-alt); border: 1px solid var(--border); border-radius: 10px; padding: 14px;">
+        <div style="font-weight: 700; color: #FFFFFF; font-size: 13px;">Kitchen Spoilage & Wastage Log</div>
+        <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 4px;">
+          • Logged by: Chef Anirban at 23:00<br>
+          • Discarded: 400g Fresh Cream (Expiry)<br>
+          • Loss Value: ₹180.00 logged into Daily P&L.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ====================================================================
+       PAGE 27: SECTION 25 - REVENUE ANALYTICS DASHBOARD
+       ==================================================================== -->
+  <div class="chapter-header avoid-break">
+    <div class="chapter-tag">Section 25</div>
+    <div class="chapter-title">Executive Revenue Analytics & Owner Command</div>
+    <div class="chapter-desc">Live sales metrics, gross margins, and daily P&L reporting.</div>
+  </div>
+
+  <div class="content-card avoid-break">
+    <div class="card-title">📈 Owner Command Dashboard (Sweta's Restaurant)</div>
+    <div class="ui-window">
+      <div class="ui-topbar">
+        <div class="ui-dots"><div class="ui-dot dot-r"></div><div class="ui-dot dot-y"></div><div class="ui-dot dot-g"></div></div>
+        <div class="ui-url">https://kafei.in/analytics</div>
+      </div>
+      <div class="ui-body">
+        <div class="grid-4">
+          <div class="table-box">
+            <div style="font-size: 11px; color: var(--text-muted);">Today's Sales</div>
+            <div style="font-size: 20px; font-weight: 800; color: var(--primary); font-family: 'JetBrains Mono'; margin: 4px 0;">₹84,250</div>
+            <div style="font-size: 10px; color: var(--primary-light);">+18.4% vs last week</div>
+          </div>
+          <div class="table-box">
+            <div style="font-size: 11px; color: var(--text-muted);">Orders Served</div>
+            <div style="font-size: 20px; font-weight: 800; color: #FFFFFF; font-family: 'JetBrains Mono'; margin: 4px 0;">148 Checks</div>
+            <div style="font-size: 10px; color: var(--text-muted);">Avg Check: ₹569</div>
+          </div>
+          <div class="table-box">
+            <div style="font-size: 11px; color: var(--text-muted);">Avg Table Turn</div>
+            <div style="font-size: 20px; font-weight: 800; color: #FFFFFF; font-family: 'JetBrains Mono'; margin: 4px 0;">38 mins</div>
+            <div style="font-size: 10px; color: var(--primary-light);">12m faster via QR</div>
+          </div>
+          <div class="table-box">
+            <div style="font-size: 11px; color: var(--text-muted);">Gross Margin</div>
+            <div style="font-size: 20px; font-weight: 800; color: var(--primary); font-family: 'JetBrains Mono'; margin: 4px 0;">68.5%</div>
+            <div style="font-size: 10px; color: var(--primary-light);">Food Cost: 31.5%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ====================================================================
+       PAGE 28: SECTION 26 - MENU PROFITABILITY MATRIX
+       ==================================================================== -->
+  <div class="chapter-header avoid-break">
+    <div class="chapter-tag">Section 26</div>
+    <div class="chapter-title">Menu Profitability & BCG Engineering Matrix</div>
+    <div class="chapter-desc">Identifying Stars, Plowhorses, Puzzles, and Dogs in your menu catalog.</div>
+  </div>
+
+  <div class="content-card avoid-break">
+    <div class="card-title">⭐ Sweta's Restaurant Menu Matrix Analysis</div>
+    <div class="grid-2">
+      <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid var(--primary); border-radius: 10px; padding: 14px;">
+        <div style="font-weight: 800; color: var(--primary); font-size: 13px;">🌟 STARS (High Profit & High Popularity)</div>
+        <div style="font-size: 11.5px; color: var(--text-main); margin-top: 4px;">
+          • Truffle Fettuccine (Margin: 74% • Sold: 142 checks/wk)<br>
+          • Cold Brew Negroni (Margin: 82% • Sold: 98 checks/wk)
+        </div>
+      </div>
+
+      <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid var(--gold); border-radius: 10px; padding: 14px;">
+        <div style="font-weight: 800; color: var(--gold); font-size: 13px;">🐴 PLOWHORSES (Low Profit & High Popularity)</div>
+        <div style="font-size: 11.5px; color: var(--text-main); margin-top: 4px;">
+          • Smoked Wings (Margin: 52% • Sold: 210 checks/wk)<br>
+          • Action: Increase price by ₹30 or bundle with dips.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ====================================================================
+       PAGE 29: SECTION 27 - AI DEMAND FORECASTING
+       ==================================================================== -->
+  <div class="chapter-header avoid-break">
+    <div class="chapter-tag">Section 27</div>
+    <div class="chapter-title">AI Demand Forecasting & Predictive Procurement</div>
+    <div class="chapter-desc">Predicting rush hours, staffing requirements, and ingredient procurement.</div>
+  </div>
+
+  <div class="content-card avoid-break">
+    <div class="card-title">🤖 Predictive Weekend Rush Modeling</div>
+    <div class="ui-window">
+      <div class="ui-topbar">
+        <div class="ui-dots"><div class="ui-dot dot-r"></div><div class="ui-dot dot-y"></div><div class="ui-dot dot-g"></div></div>
+        <div class="ui-url">https://kafei.in/forecasts</div>
+      </div>
+      <div class="ui-body">
+        <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 16px;">
+          <div style="font-weight: 800; color: #FFFFFF; font-size: 14px;">AI Weekend Rush Prediction (Saturday, 12 Sept 2026)</div>
+          <div style="font-size: 12px; color: var(--primary-light); margin: 6px 0;">Expected Revenue: ₹1,85,000 ± ₹8,000 (Peak Hours: 20:00 – 22:30)</div>
+          <div style="font-size: 11.5px; color: var(--text-muted); line-height: 1.5;">
+            • <strong>Prep Recommendations:</strong> Prep 25 kg chicken wings and 6 kg fresh pasta dough on Friday afternoon.<br>
+            • <strong>Staffing Advisory:</strong> Schedule 2 extra floor runners for Rooftop Lounge.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ====================================================================
+       PAGE 30: SECTION 28 - REPORT EXPORT & FINANCIAL AUDIT
+       ==================================================================== -->
+  <div class="chapter-header avoid-break">
+    <div class="chapter-tag">Section 28</div>
+    <div class="chapter-title">Financial Audit Reports & Tax Exports</div>
+    <div class="chapter-desc">Exporting GST breakdowns, server commission tallies, and monthly P&L summaries.</div>
+  </div>
+
+  <div class="content-card avoid-break">
+    <div class="card-title">📑 One-Click GST & Sales Export (Excel / CSV / PDF)</div>
+    <div class="grid-3">
+      <div class="table-box">
+        <div style="font-size: 13px; font-weight: 700; color: #FFFFFF;">GST GSTR-1 Report</div>
+        <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Itemized tax breakdown (CGST/SGST) ready for your CA.</div>
+      </div>
+      <div class="table-box">
+        <div style="font-size: 13px; font-weight: 700; color: #FFFFFF;">Server Tip & Sales Tally</div>
+        <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Performance breakdown per floor waiter and cashier.</div>
+      </div>
+      <div class="table-box">
+        <div style="font-size: 13px; font-weight: 700; color: #FFFFFF;">Daily Cash Reconciliation</div>
+        <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Opening cash, cash in drawer, UPI totals, card slips.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ====================================================================
+       PAGE 31: SECTION 29 - STAFF RBAC & ROLES
+       ==================================================================== -->
+  <div class="chapter-header avoid-break">
+    <div class="chapter-tag">Section 29</div>
+    <div class="chapter-title">Staff Administration & Role-Based Permissions</div>
+    <div class="chapter-desc">Granular security permissions for Owners, Managers, Cashiers, Waiters, and Chefs.</div>
+  </div>
+
+  <div class="content-card avoid-break">
+    <div class="card-title">👥 Sweta's Restaurant Team Hierarchy</div>
+    <div class="grid-2">
+      <div style="background: var(--bg-card-alt); border: 1px solid var(--border); border-radius: 8px; padding: 12px;">
+        <div style="font-weight: 700; color: #FFFFFF;">Sweta Mukherjee (Owner)</div>
+        <div style="font-size: 10.5px; color: var(--primary); font-family: 'JetBrains Mono';">Full Access • Both Branches</div>
+      </div>
+      <div style="background: var(--bg-card-alt); border: 1px solid var(--border); border-radius: 8px; padding: 12px;">
+        <div style="font-weight: 700; color: #FFFFFF;">Chef Anirban (Head Chef)</div>
+        <div style="font-size: 10.5px; color: var(--gold); font-family: 'JetBrains Mono';">Kitchen Display & Inventory Only</div>
+      </div>
+      <div style="background: var(--bg-card-alt); border: 1px solid var(--border); border-radius: 8px; padding: 12px;">
+        <div style="font-weight: 700; color: #FFFFFF;">Rahul Das (Floor Waiter)</div>
+        <div style="font-size: 10.5px; color: var(--info); font-family: 'JetBrains Mono';">Waiter Terminal Only</div>
+      </div>
+      <div style="background: var(--bg-card-alt); border: 1px solid var(--border); border-radius: 8px; padding: 12px;">
+        <div style="font-weight: 700; color: #FFFFFF;">Pooja Sen (Head Cashier)</div>
+        <div style="font-size: 10.5px; color: var(--primary-light); font-family: 'JetBrains Mono';">Cashier POS & Thermal Bills</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ====================================================================
+       PAGE 32: SECTION 30 - HARDWARE & THERMAL PRINTER SETUP
+       ==================================================================== -->
+  <div class="chapter-header avoid-break">
+    <div class="chapter-tag">Section 30</div>
+    <div class="chapter-title">Hardware, Printer & Local Network Configuration</div>
+    <div class="chapter-desc">Connecting USB, Bluetooth, and Wi-Fi thermal receipt printers in under 5 minutes.</div>
+  </div>
+
+  <div class="content-card avoid-break">
+    <div class="card-title">🔌 Plug-and-Play Hardware Architecture</div>
+    <div class="grid-3">
+      <div class="table-box">
+        <div style="font-size: 20px;">🖨️</div>
+        <div style="font-weight: 700; color: #FFFFFF; font-size: 13px; margin: 4px 0;">Thermal Printers</div>
+        <div style="font-size: 11px; color: var(--text-muted);">Epson, TVS, NGX, Everycom, Rongta (80mm & 58mm) over USB/Bluetooth/LAN.</div>
+      </div>
+      <div class="table-box">
+        <div style="font-size: 20px;">📱</div>
+        <div style="font-weight: 700; color: #FFFFFF; font-size: 13px; margin: 4px 0;">Tablets & Handhelds</div>
+        <div style="font-size: 11px; color: var(--text-muted);">Any iPad, Samsung Galaxy Tab, Lenovo tablet, or staff Android/iOS phone.</div>
+      </div>
+      <div class="table-box">
+        <div style="font-size: 20px;">💻</div>
+        <div style="font-weight: 700; color: #FFFFFF; font-size: 13px; margin: 4px 0;">Cashier Terminals</div>
+        <div style="font-size: 11px; color: var(--text-muted);">Any Windows PC, Mac, Chromebook, or All-in-One Touchscreen PC.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ====================================================================
+       PAGE 33: SECTION 31 - CLIENT ONBOARDING SOP & SUMMARY
+       ==================================================================== -->
+  <div class="chapter-header avoid-break">
+    <div class="chapter-tag">Section 31</div>
+    <div class="chapter-title">5-Minute Client Onboarding Standard Operating Procedure (SOP)</div>
+    <div class="chapter-desc">How new restaurant clients go live on Kafei in an afternoon.</div>
+  </div>
+
+  <div class="content-card avoid-break">
+    <div class="card-title">🚀 4 Steps to Go Live at Sweta's Restaurant</div>
+    <div class="grid-2">
+      <div style="background: var(--bg-card-alt); border: 1px solid var(--border); border-radius: 10px; padding: 16px;">
+        <div style="font-weight: 800; color: var(--primary); font-size: 13px;">Step 1: Sign Up & Create Outlet</div>
+        <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 4px;">
+          Go to `https://kafei.in/signup`, enter your restaurant name, operational currency (₹ INR), and branch address.
+        </div>
+      </div>
+
+      <div style="background: var(--bg-card-alt); border: 1px solid var(--border); border-radius: 10px; padding: 16px;">
+        <div style="font-weight: 800; color: var(--primary); font-size: 13px;">Step 2: Add Menu & Modifiers</div>
+        <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 4px;">
+          Upload dish photos, assign prices, configure GST slabs, and create variants (portion sizes, spice levels).
+        </div>
+      </div>
+
+      <div style="background: var(--bg-card-alt); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-top: 10px;">
+        <div style="font-weight: 800; color: var(--primary); font-size: 13px;">Step 3: Print Table Standees</div>
+        <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 4px;">
+          Download vector QR codes from `/table-qrs` and insert them into standard acrylic table stands.
+        </div>
+      </div>
+
+      <div style="background: var(--bg-card-alt); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-top: 10px;">
+        <div style="font-weight: 800; color: var(--primary); font-size: 13px;">Step 4: Launch Service!</div>
+        <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 4px;">
+          Open `/kitchen` on your kitchen screen, `/waiter` on staff phones, and `/cashier` on your billing counter.
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top: 24px; padding: 20px; background: rgba(16, 185, 129, 0.12); border: 1px solid var(--primary); border-radius: 12px; text-align: center;">
+      <div style="font-size: 17px; font-weight: 800; color: #FFFFFF;">Ready to Experience Kafei 2.0?</div>
+      <div style="font-size: 12.5px; color: var(--text-muted); margin: 6px 0 14px 0;">Start your 14-day free trial with zero credit card required and zero hardware lock-in.</div>
+      <div style="font-family: 'JetBrains Mono'; font-weight: 800; color: var(--primary); font-size: 14px;">Sign Up at: https://kafei.in/signup | Call: +91 9903085026</div>
+    </div>
+  </div>
+
+  <!-- Page Footer -->
+  <footer class="page-footer">
+    <div><strong>Kafei Technologies</strong> • Sundarban, West Bengal & Teliamura, Tripura, India</div>
+    <div>Portal: https://kafei.in • Support: restaurant.kafei@gmail.com • Direct Sales: +91 9903085026</div>
+  </footer>
+
+</div>
+
+</body>
+</html>

@@ -1,9 +1,13 @@
 'use client';
 
+import Link from 'next/link';
+import { ShieldCheck } from 'lucide-react';
+
 import { useAuth } from '@/hooks/use-auth';
 import { UserRoleBadge } from '@/components/users/user-role-badge';
 import { UserStatusBadge } from '@/components/users/user-status-badge';
 import { SessionsList } from '@/components/auth/sessions-list';
+import { PageHeader } from '@/components/ui/primitives';
 
 import type { UserRole, UserStatus } from '@/types/user';
 
@@ -11,15 +15,11 @@ export default function SecuritySettingsPage() {
   const { user } = useAuth();
 
   return (
-    <div className="space-y-8 max-w-4xl">
-      <div>
-        <h1 className="font-display text-3xl font-semibold tracking-[-0.02em] text-foreground">
-          Security
-        </h1>
-        <p className="mt-2 text-muted-foreground">
-          Manage your Kafei account security and session settings.
-        </p>
-      </div>
+    <div className="space-y-8">
+      <PageHeader
+        title="Security"
+        description="Manage your Kafei account security and session settings."
+      />
 
       {/* Account Security Information Card */}
       <div className="overflow-hidden rounded-xl border border-border bg-card">
@@ -77,8 +77,8 @@ export default function SecuritySettingsPage() {
             </div>
           </div>
 
-          <div className="pt-6 border-t border-border flex items-center justify-between">
-            <div>
+          <div className="flex flex-wrap items-center justify-between gap-4 border-t border-border pt-6">
+            <div className="min-w-0">
               <p className="text-sm font-medium text-foreground">
                 Password
               </p>
@@ -99,21 +99,25 @@ export default function SecuritySettingsPage() {
       </div>
 
       {/* Privacy, Google OAuth & Account Erasure Card */}
-      <div className="rounded-xl border border-border bg-card p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-base font-bold text-foreground">
-            🛡️ Privacy Rights & Data Portability
+      <div className="flex flex-col items-start justify-between gap-4 rounded-xl border border-border bg-card p-6 sm:flex-row sm:items-center">
+        <div className="min-w-0">
+          <h2 className="flex items-center gap-2 text-base font-bold text-foreground">
+            <ShieldCheck className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+            Privacy Rights & Data Portability
           </h2>
           <p className="mt-1 text-xs text-muted-foreground">
             Export personal data in JSON format, manage Google OAuth permissions, or permanently scrub your account.
           </p>
         </div>
-        <a
+        {/* next/link keeps this a client transition: a plain <a> re-bootstrapped
+            the whole app, including the layout-level entitlement request. */}
+        <Link
           href="/settings/privacy"
-          className="rounded-xl bg-primary px-4 py-2.5 text-xs font-bold text-background shadow transition-all hover:bg-primary-hover active:scale-[0.98] shrink-0"
+          role="button"
+          className="inline-flex shrink-0 items-center justify-center rounded-xl bg-primary px-4 py-2.5 text-xs font-bold text-background shadow transition-all hover:bg-primary-hover active:scale-[0.98]"
         >
-          Manage Data & Privacy →
-        </a>
+          Manage Data & Privacy
+        </Link>
       </div>
 
       {/* Active Device Sessions List */}
