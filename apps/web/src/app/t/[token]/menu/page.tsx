@@ -1,15 +1,15 @@
 'use client';
 
 import Link from 'next/link';
-import { use, useCallback, useEffect, useMemo, useState } from 'react';
-import type { PublicCustomerMenu } from '@/types/menu';
-import { getPublicCustomerMenu } from '@/services/public-tables.service';
-import { getPublicOrders } from '@/services/orders.service';
+import { use, useCallback, useMemo, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { Check, Coffee, TriangleAlert } from 'lucide-react';
 import type { Order } from '@/types/order';
 import { useCart } from '@/hooks/use-cart';
 import { CartBar } from '@/components/customer/cart-bar';
 import { MenuItemSheet } from '@/components/customer/menu-item-sheet';
 import { MenuItemCard, type MenuCardItem } from '@/components/customer/menu-item-card';
+import { publicMenuQuery, publicOrdersQuery } from '@/components/customer/public-queries';
 import { SmartPairingRecommendations } from '@/components/ai/smart-pairing-recommendations';
 
 export default function CustomerMenuPage({
@@ -19,52 +19,32 @@ export default function CustomerMenuPage({
 }) {
   const { token } = use(params);
 
-  const [menu, setMenu] = useState<PublicCustomerMenu | null>(null);
-  const [activeOrders, setActiveOrders] = useState<Order[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [loadError, setLoadError] = useState<string | null>(null);
   const [openItemId, setOpenItemId] = useState<string | null>(null);
-  const [isSessionSettled, setIsSessionSettled] = useState(false);
-  const [settledOrderId, setSettledOrderId] = useState<string | null>(null);
 
   const { cart, addItem, updateQuantity, removeItem } = useCart();
 
-  const loadMenu = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const [menuRes, ordersRes] = await Promise.allSettled([
-        getPublicCustomerMenu(token),
-        getPublicOrders(token),
-      ]);
+  // Both payloads are cached under token-scoped keys, so arriving here from the
+  // splash screen, the item sheet or the cart reads what is already in memory
+  // and revalidates behind the paint instead of showing the skeleton again.
+  const menuQuery = useQuery(publicMenuQuery(token));
+  const ordersQuery = useQuery(publicOrdersQuery(token));
 
-      if (menuRes.status === 'fulfilled') {
-        setMenu(menuRes.value.data);
-        setLoadError(null);
-      } else {
-        setLoadError('This menu is not available right now.');
-      }
+  const menu = menuQuery.data ?? null;
 
-      if (ordersRes.status === 'fulfilled') {
-        const rawOrders = ordersRes.value.data ?? [];
-        const nonCancelled = rawOrders.filter((o) => o.status !== 'CANCELLED');
-        const allCompleted =
-          nonCancelled.length > 0 && nonCancelled.every((o) => o.status === 'COMPLETED');
-        if (allCompleted) {
-          setIsSessionSettled(true);
-          setSettledOrderId(nonCancelled[0].id);
-        }
-        setActiveOrders(rawOrders.filter((o) => o.status !== 'CANCELLED' && o.status !== 'COMPLETED'));
-      }
-    } catch {
-      setLoadError('This menu is not available right now.');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [token]);
+  // The orders call is independent: a table whose order list fails to load can
+  // still be shown the menu, which is what the page did before.
+  const { activeOrders, isSessionSettled, settledOrderId } = useMemo(() => {
+    const rawOrders: Order[] = ordersQuery.data ?? [];
+    const nonCancelled = rawOrders.filter((o) => o.status !== 'CANCELLED');
+    const allCompleted =
+      nonCancelled.length > 0 && nonCancelled.every((o) => o.status === 'COMPLETED');
 
-  useEffect(() => {
-    void loadMenu();
-  }, [loadMenu]);
+    return {
+      activeOrders: nonCancelled.filter((o) => o.status !== 'COMPLETED'),
+      isSessionSettled: allCompleted,
+      settledOrderId: allCompleted ? nonCancelled[0].id : null,
+    };
+  }, [ordersQuery.data]);
 
   const handleAdded = useCallback(() => {
     setOpenItemId(null);
@@ -83,6 +63,10 @@ export default function CustomerMenuPage({
 
   const handleOpenItem = useCallback((itemId: string) => {
     setOpenItemId(itemId);
+  }, []);
+
+  const handleCloseItem = useCallback(() => {
+    setOpenItemId(null);
   }, []);
 
   // Referentially stable, so a re-render does not invalidate every memoised
@@ -129,10 +113,10 @@ export default function CustomerMenuPage({
     [removeItem, updateQuantity],
   );
 
-  if (isLoading) {
+  if (menuQuery.isPending) {
     return (
-      <main className="min-h-screen bg-background p-4 text-foreground">
-        <div className="mx-auto w-full max-w-sm space-y-4 animate-pulse">
+      <main className="min-h-dvh bg-background p-4 text-foreground">
+        <div className="mx-auto w-full max-w-sm animate-pulse space-y-4 sm:max-w-2xl">
           <div className="h-5 w-40 rounded bg-secondary" />
           <div className="h-3 w-56 rounded bg-secondary" />
           {[0, 1, 2].map((key) => (
@@ -145,51 +129,50 @@ export default function CustomerMenuPage({
 
   if (isSessionSettled) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-background p-4 text-foreground">
-        <div className="w-full max-w-sm space-y-5 rounded-3xl border-2 border-primary/40 bg-gradient-to-b from-card via-card to-background p-8 text-center shadow-2xl relative overflow-hidden">
-          <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-red-600 via-primary to-red-600" />
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/15 text-3xl shadow-lg border border-primary/30">
-            ☕
+      <main className="flex min-h-dvh items-center justify-center bg-background p-4 text-foreground">
+        <div className="relative w-full max-w-sm space-y-5 overflow-hidden rounded-2xl border border-primary/40 bg-card p-8 text-center shadow-lg">
+          <div className="absolute left-0 right-0 top-0 h-1 bg-primary" />
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-primary/30 bg-primary/15 text-primary">
+            <Coffee className="h-7 w-7" strokeWidth={1.8} aria-hidden="true" />
           </div>
           <div className="space-y-1.5">
-            <div className="inline-flex items-center gap-1.5 rounded-full bg-atlas-success/15 border border-atlas-success/30 px-3 py-1 text-xs font-bold text-atlas-success">
-              <span>✓</span> Dining Session Completed
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-atlas-success/30 bg-atlas-success/15 px-3 py-1 text-xs font-bold text-atlas-success">
+              <Check className="h-3 w-3" strokeWidth={3} aria-hidden="true" /> Dining Session
+              Completed
             </div>
-            <h2 className="text-lg font-black text-foreground pt-1">
+            <h2 className="pt-1 text-lg font-black text-foreground">
               Thank You for Visiting Kafei!
             </h2>
-            <p className="text-xs text-muted-foreground leading-relaxed">
+            <p className="text-xs leading-relaxed text-muted-foreground">
               Your dining bill for this table session has already been completed and settled. To start a new dining session, please scan the QR code at your table.
             </p>
           </div>
           {settledOrderId && (
             <Link
               href={`/t/${token}/orders/${settledOrderId}`}
-              className="inline-block w-full rounded-xl bg-primary px-4 py-3 text-xs font-bold text-background shadow-md transition-all hover:bg-primary-hover active:scale-95"
+              className="inline-block w-full rounded-xl bg-primary px-4 py-3 text-xs font-bold text-background shadow-md transition-colors hover:bg-primary-hover"
             >
               View Paid Bill Receipt
             </Link>
           )}
-          <p className="text-[11px] font-bold text-primary">
-            ✨ Please come back again soon! ✨
-          </p>
+          <p className="text-xs text-muted-foreground">Please come back again soon.</p>
         </div>
       </main>
     );
   }
 
-  if (loadError || !menu) {
+  if (menuQuery.isError || !menu) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-background p-4 text-foreground">
+      <main className="flex min-h-dvh items-center justify-center bg-background p-4 text-foreground">
         <div className="w-full max-w-sm space-y-4 rounded-2xl border border-atlas-error/30 bg-card p-8 text-center">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-atlas-error/10 text-2xl text-atlas-error">
-            ⚠️
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-atlas-error/10 text-atlas-error">
+            <TriangleAlert className="h-6 w-6" strokeWidth={1.8} aria-hidden="true" />
           </div>
           <p className="text-sm font-bold">Menu unavailable</p>
-          <p className="text-xs text-muted-foreground">{loadError}</p>
+          <p className="text-xs text-muted-foreground">This menu is not available right now.</p>
           <Link
             href={`/t/${token}`}
-            className="inline-block rounded-xl border border-border px-4 py-2 text-xs font-semibold text-muted-foreground"
+            className="inline-flex min-h-11 items-center rounded-xl border border-border px-4 text-xs font-semibold text-muted-foreground"
           >
             Back to table
           </Link>
@@ -199,58 +182,65 @@ export default function CustomerMenuPage({
   }
 
   return (
-    <main className="min-h-screen bg-background pb-28 text-foreground">
-      <header className="sticky top-0 z-30 border-b border-border bg-background/95 px-4 py-4 backdrop-blur">
-        <div className="mx-auto w-full max-w-sm space-y-1">
-          <div className="flex items-center gap-2">
-            <div className="h-2 w-2 rounded-full bg-primary shadow-[0_0_10px_#34D399]" />
-            <span className="text-[10px] font-bold uppercase tracking-widest text-primary">
-              {menu.menu.name}
-            </span>
+    <main className="min-h-dvh bg-background pb-[calc(8rem+env(safe-area-inset-bottom))] text-foreground">
+      {/* Header and category nav stick as one block. The nav used to carry a
+          hardcoded 81px offset that never matched the header's real height, so
+          the top of the chips sat behind it. */}
+      <div className="sticky top-0 z-30">
+        <header className="border-b border-border bg-background/95 px-4 py-4 backdrop-blur">
+          <div className="mx-auto w-full max-w-sm space-y-1 sm:max-w-2xl">
+            <div className="flex items-center gap-2">
+              <div className="h-2 w-2 rounded-full bg-primary" />
+              <span className="text-[10px] font-bold uppercase tracking-widest text-primary">
+                {menu.menu.name}
+              </span>
+            </div>
+            <h1 className="text-xl font-black break-words">{menu.restaurant.name}</h1>
+            <p className="text-[11px] text-muted-foreground">
+              {menu.branch.name} • {menu.diningArea.name} • {menu.table.name}
+            </p>
           </div>
-          <h1 className="text-xl font-black">{menu.restaurant.name}</h1>
-          <p className="text-[11px] text-muted-foreground">
-            {menu.branch.name} • {menu.diningArea.name} • {menu.table.name}
-          </p>
-        </div>
-      </header>
+        </header>
+
+        {menu.categories.length > 1 && (
+          <nav className="border-b border-border bg-card/60 px-4 py-2 backdrop-blur">
+            {/* The right-edge fade is the only cue that more categories exist:
+                the scrollbar is hidden and at 320px two chips fill the row. */}
+            <div className="mx-auto flex w-full max-w-sm gap-2 overflow-x-auto pr-6 no-scrollbar [mask-image:linear-gradient(to_right,black_calc(100%-24px),transparent)] sm:max-w-2xl">
+              {menu.categories.map((category) => (
+                <a
+                  key={category.id}
+                  href={`#category-${category.id}`}
+                  className="inline-flex min-h-11 shrink-0 items-center whitespace-nowrap rounded-full border border-border bg-secondary px-4 text-xs font-semibold text-muted-foreground transition-colors hover:border-primary/40 hover:text-primary"
+                >
+                  {category.name}
+                </a>
+              ))}
+            </div>
+          </nav>
+        )}
+      </div>
 
       {/* Active Orders Floating Pill / Banner */}
       {activeOrders.length > 0 && (
-        <div className="mx-auto w-full max-w-sm px-4 pt-3">
+        <div className="mx-auto w-full max-w-sm px-4 pt-3 sm:max-w-2xl">
           <Link
             href={`/t/${token}/orders`}
-            className="flex items-center justify-between rounded-xl border border-primary/40 bg-primary/10 p-2.5 text-xs font-bold text-primary transition-all hover:bg-primary/20 shadow-md animate-fadeIn"
+            className="flex items-center justify-between gap-3 rounded-xl border border-primary/40 bg-primary/10 p-3 text-xs font-bold text-primary transition-colors hover:bg-primary/20"
           >
-            <span className="flex items-center gap-2">
-              <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
-              <span>
+            <span className="flex min-w-0 items-center gap-2">
+              <span className="flex h-2 w-2 shrink-0 rounded-full bg-primary" />
+              <span className="break-words">
                 {activeOrders.length} Active {activeOrders.length === 1 ? 'Order' : 'Orders'} (Tokens:{' '}
                 {activeOrders.map((o) => `#${o.orderNumber}`).join(', ')})
               </span>
             </span>
-            <span className="text-[11px] underline shrink-0 font-extrabold">Track →</span>
+            <span className="shrink-0 text-[11px] font-extrabold underline">Track</span>
           </Link>
         </div>
       )}
 
-      {menu.categories.length > 1 && (
-        <nav className="border-b border-border bg-card/60 px-4 py-3 sticky top-[81px] z-20 backdrop-blur">
-          <div className="mx-auto flex w-full max-w-sm gap-2 overflow-x-auto no-scrollbar">
-            {menu.categories.map((category) => (
-              <a
-                key={category.id}
-                href={`#category-${category.id}`}
-                className="whitespace-nowrap rounded-full border border-border bg-secondary px-3.5 py-1.5 text-[11px] font-semibold text-muted-foreground transition-colors hover:border-primary/40 hover:text-primary active:scale-95"
-              >
-                {category.name}
-              </a>
-            ))}
-          </div>
-        </nav>
-      )}
-
-      <div className="mx-auto w-full max-w-sm space-y-6 p-4">
+      <div className="mx-auto w-full max-w-sm space-y-6 p-4 sm:max-w-2xl">
         {menu.categories.length === 0 && (
           <p className="rounded-xl border border-border bg-card p-4 text-center text-xs text-muted-foreground">
             Nothing on the menu yet. Please ask staff for assistance.
@@ -258,10 +248,16 @@ export default function CustomerMenuPage({
         )}
 
         {menu.categories.map((category) => (
-          <section key={category.id} id={`category-${category.id}`} className="space-y-3 pt-2">
-            <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+          // scroll-mt clears the sticky header + nav, so a category tap lands on
+          // the heading rather than under it.
+          <section
+            key={category.id}
+            id={`category-${category.id}`}
+            className="space-y-3 pt-2 scroll-mt-40"
+          >
+            <h2 className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-muted-foreground">
               <span>{category.name}</span>
-              <span className="h-[1px] flex-1 bg-border" />
+              <span className="h-px flex-1 bg-border" />
             </h2>
 
             {category.items.length === 0 ? (
@@ -269,17 +265,19 @@ export default function CustomerMenuPage({
                 No items available in this category.
               </p>
             ) : (
-              category.items.map((item) => (
-                <MenuItemCard
-                  key={item.id}
-                  item={item}
-                  quantity={quantityByMenuItemId.get(item.id) ?? 0}
-                  onOpen={handleOpenItem}
-                  onQuickAdd={handleQuickAdd}
-                  onIncrement={handleIncrement}
-                  onDecrement={handleDecrement}
-                />
-              ))
+              <div className="grid gap-3 sm:grid-cols-2">
+                {category.items.map((item) => (
+                  <MenuItemCard
+                    key={item.id}
+                    item={item}
+                    quantity={quantityByMenuItemId.get(item.id) ?? 0}
+                    onOpen={handleOpenItem}
+                    onQuickAdd={handleQuickAdd}
+                    onIncrement={handleIncrement}
+                    onDecrement={handleDecrement}
+                  />
+                ))}
+              </div>
             )}
           </section>
         ))}
@@ -309,7 +307,7 @@ export default function CustomerMenuPage({
         <MenuItemSheet
           token={token}
           itemId={openItemId}
-          onClose={() => setOpenItemId(null)}
+          onClose={handleCloseItem}
           onAdded={handleAdded}
         />
       )}

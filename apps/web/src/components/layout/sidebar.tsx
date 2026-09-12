@@ -91,16 +91,20 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
           key={item.href}
           href={item.href}
           title={item.label}
+          aria-current={isActive ? 'page' : undefined}
           className={[
-            'group relative flex h-10 w-10 mx-auto items-center justify-center rounded-xl transition-all duration-150',
+            // 44px, not 40: the coarse-pointer floor in globals.css only
+            // covers button/[role=button], and these are plain links — on a
+            // floor tablet they are the app's most-tapped targets.
+            'group relative flex h-11 w-11 mx-auto items-center justify-center rounded-xl transition-all duration-150',
             isActive
-              ? 'bg-primary/20 text-primary font-bold border border-primary/50 shadow-[0_0_12px_rgba(42,254,183,0.2)]'
+              ? 'bg-primary/20 text-primary font-bold border border-primary/50'
               : 'text-muted-foreground hover:bg-secondary hover:text-foreground hover:border border-border/60',
           ].join(' ')}
         >
           <Icon className="h-4 w-4 shrink-0 transition-transform group-hover:scale-110" />
           {isActive && (
-            <span className="absolute -left-1 top-1/2 -translate-y-1/2 h-4 w-1 rounded-r-full bg-primary shadow-[0_0_6px_#34D399]" />
+            <span className="absolute -left-1 top-1/2 -translate-y-1/2 h-4 w-1 rounded-r-full bg-primary" />
           )}
         </Link>
       );
@@ -110,10 +114,11 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
       <Link
         key={item.href}
         href={item.href}
+        aria-current={isActive ? 'page' : undefined}
         className={[
-          'group relative flex items-center justify-between rounded-xl px-3.5 py-2.5 text-[13px] font-medium transition-all duration-150',
+          'group relative flex min-h-[44px] items-center justify-between rounded-xl px-3.5 py-2.5 text-[13px] font-medium transition-all duration-150',
           isActive
-            ? 'bg-primary/15 text-primary font-bold border border-primary/40 shadow-[0_0_12px_rgba(42,254,183,0.15)]'
+            ? 'bg-primary/15 text-primary font-bold border border-primary/40'
             : 'text-muted-foreground hover:bg-secondary hover:text-foreground hover:border-l-2 hover:border-primary/40',
         ].join(' ')}
       >
@@ -122,7 +127,7 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
           <span className="truncate">{item.label}</span>
         </div>
         {isActive && (
-          <span className="h-1.5 w-1.5 rounded-full bg-primary shadow-[0_0_6px_#34D399]" />
+          <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
         )}
       </Link>
     );
@@ -165,12 +170,14 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
               isCollapsed ? 'justify-center p-2' : ''
             }`}
             title={isCollapsed ? 'Expand sidebar (Ctrl + B)' : 'Collapse sidebar (Ctrl + B)'}
+            // Collapsed, the label is the only accessible name this button has.
+            aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           >
             {isCollapsed ? (
-              <PanelLeftOpen className="h-4 w-4 text-primary" />
+              <PanelLeftOpen className="h-4 w-4 text-primary" aria-hidden="true" />
             ) : (
               <>
-                <PanelLeftClose className="h-4 w-4 text-primary" />
+                <PanelLeftClose className="h-4 w-4 text-primary" aria-hidden="true" />
                 <span>Collapse Sidebar</span>
                 <kbd className="ml-auto rounded bg-card border border-border px-1.5 py-0.5 text-[10px] font-mono">
                   Ctrl B

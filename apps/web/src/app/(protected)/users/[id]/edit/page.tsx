@@ -1,19 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 
-import {
-  getUserById,
-  updateUser,
-  type CreateUserPayload,
-  type UpdateUserPayload,
-} from '@/services/users.service';
+import type { CreateUserPayload, UpdateUserPayload } from '@/services/users.service';
+import { useUpdateUser, useUser } from '@/hooks/use-users';
 
-import type { User } from '@/types/user';
 import { UserForm } from '@/components/users/user-form';
-import { PageError } from '@/components/ui/page-error';
 import { PageLoading } from '@/components/ui/page-loading';
+import { Card, ErrorPanel, PageHeader } from '@/components/ui/primitives';
 
 export default function EditUserPage() {
   const params = useParams();
@@ -21,75 +16,47 @@ export default function EditUserPage() {
 
   const id = params.id as string;
 
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { data: user, isPending, isError, error: loadError, refetch } = useUser(id);
+  const updateUser = useUpdateUser();
+
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    async function loadUser() {
-      try {
-        const response = await getUserById(id);
-
-        setUser(response.data);
-      } catch (err) {
-        console.error(err);
-
-        setError('Unable to load user.');
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    void loadUser();
-  }, [id]);
-
-  async function handleSubmit(
-    data: CreateUserPayload | UpdateUserPayload,
-  ) {
-    setIsSubmitting(true);
+  async function handleSubmit(data: CreateUserPayload | UpdateUserPayload) {
     setError('');
 
     try {
-      await updateUser(id, data as UpdateUserPayload);
-
+      await updateUser.mutateAsync({ id, data: data as UpdateUserPayload });
       router.push(`/users/${id}`);
-    } catch (err: any) {
+    } catch (err) {
       console.error(err);
 
-      setError(err?.message || err?.error || 'Unable to update user.');
-    } finally {
-      setIsSubmitting(false);
+      setError(err instanceof Error ? err.message : 'Unable to update user.');
     }
   }
 
-  if (isLoading) {
+  if (isPending) {
     return <PageLoading />;
   }
 
-  if (!user) {
+  if (isError || !user) {
     return (
-      <PageError
-        message={error || 'User not found.'}
+      <ErrorPanel
+        message={loadError instanceof Error ? loadError.message : 'User not found.'}
+        onRetry={() => void refetch()}
       />
     );
   }
 
   return (
-    <div className="mx-auto max-w-2xl space-y-8">
-      <div>
-        <h1 className="font-display text-3xl font-semibold tracking-[-0.02em] text-foreground">
-          Edit User
-        </h1>
+    <div className="mx-auto max-w-2xl space-y-6 sm:space-y-8">
+      <PageHeader title="Edit User" description="Update user information." />
 
-        <p className="mt-2 text-sm text-muted-foreground">
-          Update user information.
-        </p>
-      </div>
-
-      <div className="rounded-2xl border border-border bg-card p-8">
+      <Card>
         {error && (
-          <div className="mb-5 rounded-lg border border-atlas-error/30 bg-atlas-error/10 p-3 text-sm font-medium text-atlas-error">
+          <div
+            role="alert"
+            className="mb-5 rounded-lg border border-atlas-error/30 bg-atlas-error/10 p-3 text-sm font-medium text-atlas-error"
+          >
             {error}
           </div>
         )}
@@ -98,9 +65,9 @@ export default function EditUserPage() {
           user={user}
           onSubmit={handleSubmit}
           onCancel={() => router.push(`/users/${id}`)}
-          isSubmitting={isSubmitting}
+          isSubmitting={updateUser.isPending}
         />
-      </div>
+      </Card>
     </div>
   );
 }

@@ -1,28 +1,85 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useId, useState } from 'react';
 import Link from 'next/link';
 import {
-  Sparkles,
   ShieldCheck,
   BrainCircuit,
   TrendingUp,
   UtensilsCrossed,
-  ArrowLeft,
+  ArrowRight,
   ExternalLink,
   CheckCircle2,
-  Lock,
+  type LucideIcon,
 } from 'lucide-react';
 
+import { PageHeader } from '@/components/ui/primitives';
+
+/**
+ * The switch is drawn by the track div; the real checkbox is `sr-only`, so the
+ * global :focus-visible outline lands on a clipped element and cannot be seen.
+ * The track has to carry the ring itself, and the input has to carry the name —
+ * the feature title lives outside the label.
+ */
+function GovernanceToggle({
+  icon: Icon,
+  title,
+  tag,
+  description,
+  checked,
+  onChange,
+}: {
+  icon: LucideIcon;
+  title: string;
+  tag: string;
+  description: string;
+  checked: boolean;
+  onChange: (next: boolean) => void;
+}) {
+  const titleId = useId();
+
+  return (
+    <div className="flex items-start justify-between gap-4 rounded-xl border border-border bg-secondary/40 p-4">
+      <div className="flex min-w-0 items-start gap-3">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+          <Icon className="h-5 w-5" aria-hidden="true" />
+        </div>
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <h3 id={titleId} className="text-sm font-bold text-foreground">
+              {title}
+            </h3>
+            <span className="rounded-full border border-primary/30 bg-primary/15 px-2 py-0.5 text-[9px] font-bold text-primary">
+              {tag}
+            </span>
+          </div>
+          <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{description}</p>
+        </div>
+      </div>
+
+      <label className="relative mt-1 inline-flex shrink-0 cursor-pointer items-center">
+        <input
+          type="checkbox"
+          checked={checked}
+          aria-labelledby={titleId}
+          onChange={(e) => onChange(e.target.checked)}
+          className="peer sr-only"
+        />
+        <div className="peer h-5 w-9 rounded-full bg-secondary after:absolute after:left-[2px] after:top-[2px] after:h-4 after:w-4 after:rounded-full after:border after:border-border after:bg-card after:transition-all after:content-[''] peer-checked:bg-primary peer-checked:after:translate-x-full peer-checked:after:border-transparent peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-primary" />
+      </label>
+    </div>
+  );
+}
+
 export default function AISettingsPage() {
-  const [mounted, setMounted] = useState(false);
   const [copilot, setCopilot] = useState(true);
   const [forecast, setForecast] = useState(true);
   const [upsell, setUpsell] = useState(true);
   const [savedMessage, setSavedMessage] = useState('');
 
+  // Reading localStorage on the first client tick reconciles the stored values
+  // onto the defaults already in state; the page itself never waits for it.
   useEffect(() => {
-    setMounted(true);
     try {
       const storedCopilot = localStorage.getItem('kafei_ai_copilot_enabled');
       const storedForecast = localStorage.getItem('kafei_ai_forecast_enabled');
@@ -60,50 +117,37 @@ export default function AISettingsPage() {
     handleSave(true, true, true);
   };
 
-  if (!mounted) return null;
-
   return (
-    <div className="space-y-8 max-w-4xl">
-      {/* ── Page Header ────────────────────────────────────────────── */}
-      <div className="flex items-center justify-between">
-        <div>
-          <div className="flex items-center gap-2">
-            <Link
-              href="/settings"
-              className="text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1 transition-colors"
-            >
-              <ArrowLeft className="h-3.5 w-3.5" /> Settings
-            </Link>
-          </div>
-          <h1 className="font-display text-3xl font-semibold tracking-[-0.02em] text-foreground mt-1">
-            AI & Automation Governance
-          </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Configure assistive AI models, opt-out of predictive analytics, and review data protections.
-          </p>
-        </div>
-
-        <Link
-          href="/ai-policy"
-          target="_blank"
-          className="text-xs font-semibold text-primary hover:underline hidden sm:inline-flex items-center gap-1"
-        >
-          <span>AI Policy</span>
-          <ExternalLink className="h-3 w-3" />
-        </Link>
-      </div>
+    <div className="space-y-8">
+      <PageHeader
+        title="AI & Automation Governance"
+        description="Configure assistive AI models, opt-out of predictive analytics, and review data protections."
+        actions={
+          <Link
+            href="/ai-policy"
+            target="_blank"
+            className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
+          >
+            <span>AI Policy</span>
+            <ExternalLink className="h-3 w-3" aria-hidden="true" />
+          </Link>
+        }
+      />
 
       {savedMessage && (
-        <div className="flex items-center gap-2 rounded-xl border border-atlas-success/30 bg-atlas-success/10 p-4 text-xs font-semibold text-atlas-success animate-in fade-in">
-          <CheckCircle2 className="h-4 w-4 shrink-0" />
+        <div
+          role="status"
+          className="flex items-center gap-2 rounded-xl border border-atlas-success/30 bg-atlas-success/10 p-4 text-xs font-semibold text-atlas-success"
+        >
+          <CheckCircle2 className="h-4 w-4 shrink-0" aria-hidden="true" />
           <span>{savedMessage}</span>
         </div>
       )}
 
       {/* ── Section 1: AI Features Toggle Controls ──────────────────── */}
-      <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm space-y-6 p-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/60 pb-5">
-          <div>
+      <div className="space-y-6 overflow-hidden rounded-2xl border border-border bg-card p-6">
+        <div className="flex flex-col justify-between gap-4 border-b border-border/60 pb-5 sm:flex-row sm:items-center">
+          <div className="min-w-0">
             <h2 className="text-base font-bold text-foreground">
               Feature-Level Opt-In / Opt-Out Controls
             </h2>
@@ -112,18 +156,18 @@ export default function AISettingsPage() {
             </p>
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex shrink-0 flex-wrap gap-2">
             <button
               type="button"
               onClick={handleDisableAll}
-              className="rounded-xl border border-border bg-secondary px-3.5 py-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+              className="cursor-pointer rounded-xl border border-border bg-secondary px-3.5 py-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground"
             >
               Disable All AI
             </button>
             <button
               type="button"
               onClick={handleEnableAll}
-              className="rounded-xl bg-primary px-3.5 py-1.5 text-xs font-bold text-background shadow transition-all hover:bg-primary-hover cursor-pointer"
+              className="cursor-pointer rounded-xl bg-primary px-3.5 py-1.5 text-xs font-bold text-background shadow transition-all hover:bg-primary-hover"
             >
               Enable All
             </button>
@@ -131,105 +175,42 @@ export default function AISettingsPage() {
         </div>
 
         <div className="space-y-4">
-          {/* Toggle 1: Copilot */}
-          <div className="flex items-start justify-between gap-4 rounded-xl border border-border bg-secondary/40 p-4">
-            <div className="flex items-start gap-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                <BrainCircuit className="h-5 w-5" />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="text-sm font-bold text-foreground">AI Natural Language Copilot</h3>
-                  <span className="rounded-full bg-primary/15 border border-primary/30 px-2 py-0.5 text-[9px] font-bold text-primary">
-                    Assistive
-                  </span>
-                </div>
-                <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
-                  Allows floor managers to ask conversational queries about sales margin, peak table occupancy, and shift metrics.
-                </p>
-              </div>
-            </div>
+          <GovernanceToggle
+            icon={BrainCircuit}
+            title="AI Natural Language Copilot"
+            tag="Assistive"
+            description="Allows floor managers to ask conversational queries about sales margin, peak table occupancy, and shift metrics."
+            checked={copilot}
+            onChange={(next) => handleSave(next, forecast, upsell)}
+          />
 
-            <label className="relative inline-flex items-center cursor-pointer shrink-0 mt-1">
-              <input
-                type="checkbox"
-                checked={copilot}
-                onChange={(e) => handleSave(e.target.checked, forecast, upsell)}
-                className="sr-only peer"
-              />
-              <div className="w-9 h-5 bg-secondary peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-border after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
-            </label>
-          </div>
+          <GovernanceToggle
+            icon={TrendingUp}
+            title="Predictive Demand & Prep Forecasting"
+            tag="Advisory"
+            description="Estimates ingredient batch sizes and kitchen preparation quantities based on historical dining room rush patterns."
+            checked={forecast}
+            onChange={(next) => handleSave(copilot, next, upsell)}
+          />
 
-          {/* Toggle 2: Demand Forecasting */}
-          <div className="flex items-start justify-between gap-4 rounded-xl border border-border bg-secondary/40 p-4">
-            <div className="flex items-start gap-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                <TrendingUp className="h-5 w-5" />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="text-sm font-bold text-foreground">Predictive Demand & Prep Forecasting</h3>
-                  <span className="rounded-full bg-primary/15 border border-primary/30 px-2 py-0.5 text-[9px] font-bold text-primary">
-                    Advisory
-                  </span>
-                </div>
-                <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
-                  Estimates ingredient batch sizes and kitchen preparation quantities based on historical dining room rush patterns.
-                </p>
-              </div>
-            </div>
-
-            <label className="relative inline-flex items-center cursor-pointer shrink-0 mt-1">
-              <input
-                type="checkbox"
-                checked={forecast}
-                onChange={(e) => handleSave(copilot, e.target.checked, upsell)}
-                className="sr-only peer"
-              />
-              <div className="w-9 h-5 bg-secondary peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-border after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
-            </label>
-          </div>
-
-          {/* Toggle 3: Smart Menu Recommendations */}
-          <div className="flex items-start justify-between gap-4 rounded-xl border border-border bg-secondary/40 p-4">
-            <div className="flex items-start gap-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                <UtensilsCrossed className="h-5 w-5" />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="text-sm font-bold text-foreground">Smart Menu Pairing & Combo Suggestions</h3>
-                  <span className="rounded-full bg-primary/15 border border-primary/30 px-2 py-0.5 text-[9px] font-bold text-primary">
-                    Recommendation
-                  </span>
-                </div>
-                <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
-                  Identifies item cross-order tendencies to suggest high-conversion combos during waiter table ordering.
-                </p>
-              </div>
-            </div>
-
-            <label className="relative inline-flex items-center cursor-pointer shrink-0 mt-1">
-              <input
-                type="checkbox"
-                checked={upsell}
-                onChange={(e) => handleSave(copilot, forecast, e.target.checked)}
-                className="sr-only peer"
-              />
-              <div className="w-9 h-5 bg-secondary peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-border after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
-            </label>
-          </div>
+          <GovernanceToggle
+            icon={UtensilsCrossed}
+            title="Smart Menu Pairing & Combo Suggestions"
+            tag="Recommendation"
+            description="Identifies item cross-order tendencies to suggest high-conversion combos during waiter table ordering."
+            checked={upsell}
+            onChange={(next) => handleSave(copilot, forecast, next)}
+          />
         </div>
       </div>
 
       {/* ── Section 2: Privacy Commitments Banner ───────────────────── */}
-      <div className="rounded-2xl border border-border/80 bg-secondary/30 p-6 space-y-4 text-xs text-muted-foreground leading-relaxed">
-        <div className="flex items-center gap-2 text-foreground font-bold text-sm">
-          <ShieldCheck className="h-5 w-5 text-primary" />
+      <div className="space-y-4 rounded-2xl border border-border/80 bg-secondary/30 p-6 text-xs leading-relaxed text-muted-foreground">
+        <div className="flex items-center gap-2 text-sm font-bold text-foreground">
+          <ShieldCheck className="h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
           <span>Responsible AI & Zero Model Training Guarantees</span>
         </div>
-        <ul className="list-disc list-inside space-y-1.5 pl-1">
+        <ul className="list-inside list-disc space-y-1.5 pl-1">
           <li>
             <strong>Zero Training on Private Records:</strong> Your sales revenues, customer order histories, and recipe databases are strictly excluded from AI model training datasets.
           </li>
@@ -240,9 +221,13 @@ export default function AISettingsPage() {
             <strong>Enterprise Commercial Terms:</strong> External inference queries use enterprise-tier APIs with zero data retention for generalized model training.
           </li>
         </ul>
-        <div className="pt-2 border-t border-border/60">
-          <Link href="/ai-policy" className="text-primary font-semibold hover:underline">
-            Read Full AI Usage & Responsible Use Policy →
+        <div className="border-t border-border/60 pt-2">
+          <Link
+            href="/ai-policy"
+            className="inline-flex items-center gap-1 font-semibold text-primary hover:underline"
+          >
+            Read Full AI Usage & Responsible Use Policy
+            <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
           </Link>
         </div>
       </div>

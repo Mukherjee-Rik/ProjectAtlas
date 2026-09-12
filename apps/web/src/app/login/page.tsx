@@ -1,7 +1,6 @@
 'use client';
 
 import { FormEvent, useState, useId, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { login, verifyOtp, resendOtp } from '@/services/auth.service';
@@ -13,14 +12,13 @@ import { validateEmail, validatePassword } from '@/lib/validation';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { LiquidGlass } from '@/components/ui/liquid-glass';
 import { OAuthButtons } from '@/components/auth/oauth-buttons';
-import { Mail, ArrowLeft, RefreshCw, KeyRound } from 'lucide-react';
+import { Mail, ArrowLeft, RefreshCw } from 'lucide-react';
 
 export default function LoginPage() {
   return <LoginForm />;
 }
 
 function LoginForm() {
-  const router = useRouter();
   const { loginUser } = useAuth();
 
   const [email, setEmail] = useState('');
@@ -45,6 +43,7 @@ function LoginForm() {
   const emailErrId = useId();
   const passErrId = useId();
   const formErrId = useId();
+  const otpHintId = useId();
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -246,7 +245,7 @@ function LoginForm() {
       const message =
         err?.error ??
         err?.message ??
-        'Incorrect or expired verification code. Please check your SMS or resend a code.';
+        'Incorrect or expired verification code. Check your email or request a new code.';
       setError(message);
     } finally {
       setLoading(false);
@@ -286,7 +285,7 @@ function LoginForm() {
   const fieldBad = 'border-destructive focus:border-destructive focus:ring-destructive/30';
 
   return (
-    <main className="grid min-h-screen lg:grid-cols-2">
+    <main className="grid min-h-screen min-h-[100dvh] lg:grid-cols-2">
       {/* ── Brand panel ─────────────────────────────────────────────────── */}
       <aside className="dark relative hidden flex-col justify-between overflow-hidden bg-gradient-to-br from-secondary via-secondary to-background p-12 text-foreground lg:flex">
         <div
@@ -364,10 +363,10 @@ function LoginForm() {
                   <h1 className="font-display text-2xl font-bold tracking-tight text-foreground">
                     Enter Verification Code
                   </h1>
-                  <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
+                  <p id={otpHintId} className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
                     We emailed a 6-digit code to{' '}
-                    <strong className="text-foreground font-mono">{emailMasked}</strong>. It
-                    expires in 5 minutes.
+                    <strong className="font-mono text-foreground break-all">{emailMasked}</strong>.
+                    It expires in 5 minutes.
                   </p>
                 </div>
 
@@ -390,9 +389,9 @@ function LoginForm() {
                   <div>
                     <label
                       htmlFor="otp"
-                      className="mb-2 block text-xs font-bold uppercase tracking-wider text-muted-foreground"
+                      className="mb-2 block text-[14px] font-medium text-foreground"
                     >
-                      6-Digit SMS Code
+                      6-digit email code
                     </label>
                     <input
                       id="otp"
@@ -402,6 +401,8 @@ function LoginForm() {
                       maxLength={6}
                       autoFocus
                       required
+                      autoComplete="one-time-code"
+                      aria-describedby={otpHintId}
                       value={otpCode}
                       onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
                       placeholder="••••••"
@@ -412,7 +413,7 @@ function LoginForm() {
                   <button
                     type="submit"
                     disabled={loading || otpCode.length !== 6}
-                    className="w-full rounded-xl bg-primary py-3.5 text-sm font-bold text-background shadow-lg transition-all hover:bg-primary-hover active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
+                    className="w-full rounded-xl bg-primary py-3.5 text-sm font-bold text-primary-foreground shadow-lg transition-all hover:bg-primary-hover active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {loading ? 'Verifying Code…' : 'Verify & Complete Sign In'}
                   </button>
@@ -498,9 +499,13 @@ function LoginForm() {
                       <label htmlFor="password" className="text-[14px] font-medium text-foreground">
                         Password
                       </label>
+                      {/* A bare <a> is outside the coarse-pointer 44px rule in
+                          globals.css, so the hit area is built here. The
+                          negative margin keeps the label on the Password
+                          baseline. */}
                       <Link
                         href="/forgot-password"
-                        className="-my-1 py-1 text-[13px] font-semibold text-primary underline-offset-4 hover:underline"
+                        className="-my-2 inline-flex min-h-[44px] items-center px-1 text-[13px] font-semibold text-primary underline-offset-4 hover:underline"
                       >
                         Forgot password?
                       </Link>
@@ -605,7 +610,7 @@ function LoginForm() {
                   New restaurant?{' '}
                   <Link
                     href="/signup"
-                    className="inline-block py-1 font-semibold text-primary underline-offset-4 hover:underline"
+                    className="-my-2 inline-flex min-h-[44px] items-center px-1 font-semibold text-primary underline-offset-4 hover:underline"
                   >
                     Start a free trial
                   </Link>
